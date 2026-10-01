@@ -128,7 +128,10 @@ class TestWhen:
 
     def test_empty_results_for_unknown_query(self, brain):
         from graph_engine.brain_engine import BrainEngine
-        engine = BrainEngine(brain)
+        from graph_engine.embedder import HashEmbedder
+        # Guarantee zero lexical/dense overlap; semantic models can assign
+        # positive similarity to words that do not share any tokens.
+        engine = BrainEngine(brain, embedder=HashEmbedder())
         engine.ingest("Something")
         results = engine.when("nonexistent", "2099-01-01T00:00:00Z")
         assert results == []

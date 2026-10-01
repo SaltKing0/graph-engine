@@ -71,7 +71,10 @@ class TestBuildContext:
     def test_respects_budget(self, engine):
         from graph_engine.context import build_context
         for i in range(20):
-            engine.ingest(f"Fact number {i} about memory systems and AI agents")
+            # Keep the budget fixture large even when a semantic embedder
+            # considers these near-identical notes duplicates.
+            engine.ingest(f"Fact number {i} about memory systems and AI agents",
+                          allow_duplicates=True)
         result = build_context(engine, "memory", budget=100)
         assert result["tokens"] <= 100
         assert result["truncated"] is True
