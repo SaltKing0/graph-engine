@@ -11,6 +11,7 @@ Examples:
   python -m graph_engine recall [--top 10] [--aggregate] [--dry-run] [--json]
   python -m graph_engine link <node_a> <node_b> [--kind same_as]
   python -m graph_engine search "attention" [--json]
+  python -m graph_engine explain <node_id> --query "attention" [--json]
   python -m graph_engine gaps [--taxonomy tax.json] [--min 10] [--json]
   python -m graph_engine merge <survivor_id> <deletee_id>   # consolidate a near-dup
   python -m graph_engine near-dup [--lo 0.78] [--hi 0.92]   # report near-duplicate pairs
@@ -692,6 +693,46 @@ def cmd_search(engine: BrainEngine, args: list[str]) -> None:
     print(f"\n{len(hits)} hits (hybrid dense+BM25)")
 
 
+def cmd_explain(engine: BrainEngine, args: list[str]) -> None:
+    """Explain a node's ranking for an explicit query (read-only)."""
+    import argparse
+    import json
+    from .retrieval import explain
+
+    parser = argparse.ArgumentParser(prog="ig explain", description=cmd_explain.__doc__)
+    parser.add_argument("node_id")
+    parser.add_argument("--query", required=True)
+    parser.add_argument("--top", type=int, default=5)
+    parser.add_argument("--rerank-k", type=int, default=30)
+    parser.add_argument("--json", action="store_true")
+    options = parser.parse_args(args)
+    try:
+        result = explain(engine, options.node_id, options.query,
+                         k=options.top, rerank_k=options.rerank_k)
+    except ValueError as exc:
+        print(f"Error: {exc}")
+        sys.exit(1)
+    if options.json:
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return
+    print(f"Node {result['node_id']} for query {result['query']!r}")
+    print(f"Result: {result['reason']} (rank: {result['rank']})")
+    for name in ("bm25", "dense"):
+        score = result[name]["score"]
+        display = "unavailable" if score is None else f"{score:.6f}"
+        print(f"  {name}: score={display}, rank={result[name]['rank']}, "
+              f"RRF contribution={result[name]['rrf_contribution']:.6f}")
+    print(f"  RRF: score={result['rrf']['score']:.6f}, rank={result['rrf']['rank']}")
+    print(f"  Final score ({result['final_score_kind']}): {result['final_score']}")
+    print(f"  Matched terms: {', '.join(result['matched_terms']) or '(none)'}")
+    print("Graph connections to other results (context only; not used for ranking):")
+    for edge in result["graph_context"]:
+        print(f"  {edge['source']} --{edge['kind']}--> {edge['target']} "
+              f"(origin={edge.get('origin')}, confidence={edge['confidence']})")
+    if not result["graph_context"]:
+        print("  (none)")
+
+
 def cmd_mcp(engine: BrainEngine, args: list[str]) -> None:
     """MCP server over stdio. Read-only by default; `--write` adds the agent
     memory tools (remember / recall / forget) — an opt-in, because a
@@ -982,6 +1023,7 @@ COMMANDS = {
     "reject": lambda e, a: _resolve_cmd(e, _first_or_usage(a, "reject"), False),
     "link": cmd_link,
     "search": cmd_search,
+    "explain": cmd_explain,
     "gaps": cmd_gaps,
     "merge": cmd_merge,
     "near-dup": cmd_near_dup,

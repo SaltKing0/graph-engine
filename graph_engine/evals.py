@@ -26,7 +26,7 @@ from .brain import Brain, Node
 from .brain_engine import BrainEngine
 from .intent import INTENT_KINDS
 from .recall import aggregate as aggregate_recalls
-from .retrieval import retrieve
+from .retrieval import explain, retrieve
 from .reranker import ReverseReranker
 
 
@@ -61,6 +61,15 @@ class RetrievalExpectation:
     top: int = 5
     includes: list[str] = field(default_factory=list)   # node texts that must appear in the top-`top`
     excludes: list[str] = field(default_factory=list)   # node texts that must NOT appear
+
+
+@dataclass
+class ExplanationExpectation:
+    """Explain a result with reconstructible scores and contextual edges."""
+    query: str
+    node_text: str
+    retrieved: bool = True
+    related_texts: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -105,6 +114,7 @@ class EvalOracle:
     edges: list[EdgeExpectation] = field(default_factory=list)
     no_edge: list[EdgeExpectation] = field(default_factory=list)
     retrieval: list[RetrievalExpectation] = field(default_factory=list)
+    explanations: list[ExplanationExpectation] = field(default_factory=list)
     # text -> expected node status (V2#2 memory hygiene)
     node_status: dict[str, str] = field(default_factory=dict)
     # topology expectations (report #3): partition-level assertions
@@ -343,6 +353,33 @@ def verify_retrieval(engine: BrainEngine, expectations: list[RetrievalExpectatio
     return failures
 
 
+def verify_explanations(engine: BrainEngine,
+                        expectations: list[ExplanationExpectation]) -> list[str]:
+    """Require score fidelity and expected graph context in the final brain."""
+    import math
+
+    failures: list[str] = []
+    for exp in expectations:
+        node = find_node_by_text(engine.brain, exp.node_text)
+        if node is None:
+            failures.append(f"explanation node missing: {exp.node_text!r}")
+            continue
+        result = explain(engine, node.id, exp.query)
+        hits = dict(retrieve(engine, exp.query, persist=False))
+        if result["retrieved"] != exp.retrieved or result["final_score"] != hits.get(node.id):
+            failures.append(f"explanation disagrees with retrieval: {exp.node_text!r}")
+        contributions = sum(result[channel]["rrf_contribution"] for channel in ("bm25", "dense"))
+        if not math.isclose(result["rrf"]["score"], contributions):
+            failures.append(f"explanation RRF contributions do not sum: {exp.node_text!r}")
+        connected = {edge[side] for edge in result["graph_context"]
+                     for side in ("source", "target")} - {node.id}
+        for text in exp.related_texts:
+            related = find_node_by_text(engine.brain, text)
+            if related is None or related.id not in connected:
+                failures.append(f"explanation missing connection: {text!r}")
+    return failures
+
+
 def verify_neighborhood(brain: Brain, expectations: list) -> list[str]:
     """Check neighborhood reachability against NeighborhoodExpectation entries.
 
@@ -458,6 +495,7 @@ def run_eval(task: EvalTask, engine_factory: EngineFactory, k: int = 1) -> EvalR
             action(engine)
         failures = verify_end_state(engine.brain, task.oracle)
         failures += verify_retrieval(engine, task.oracle.retrieval)
+        failures += verify_explanations(engine, task.oracle.explanations)
         failures += verify_communities(engine.brain, task.oracle.communities)
         failures += verify_neighborhood(engine.brain, task.oracle.neighborhoods)
         if failures:
@@ -577,6 +615,17 @@ GOLDEN_SET: list[EvalTask] = [
             ("  katzen JAGEN maeuse   NACHTS ", {"source": "b"}),
         ],
         oracle=EvalOracle(node_count=1, duplicate_merged=[("katzen jagen maeuse nachts", ["a", "b"])]),
+    ),
+    EvalTask(
+        id="retrieval-explain",
+        name="Retrieval explanations reconstruct scores and show accepted graph context",
+        ingests=[("alpha beta", {}), ("alpha gamma", {}), ("omega psi", {})],
+        actions=[_link_same_as("alpha beta", "alpha gamma")],
+        oracle=EvalOracle(explanations=[
+            ExplanationExpectation(query="alpha", node_text="alpha beta",
+                                   related_texts=["alpha gamma"]),
+            ExplanationExpectation(query="alpha", node_text="omega psi", retrieved=False),
+        ]),
     ),
     EvalTask(
         id="dup-disabled",
@@ -1114,4 +1163,3 @@ ROADMAP_CASES: list[EvalTask] = [
     # Cross-encoder reranking (V2#1) is implemented → GOLDEN_SET
     # (`retrieval-rerank-honored`).
 ]
-
