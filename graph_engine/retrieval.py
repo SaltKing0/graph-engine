@@ -9,11 +9,11 @@ cross-encoder reranking of the top-K is added later.
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass, field
 
 import numpy as np
 
 from .brain_engine import BrainEngine
-from .similarity import cosine
 
 
 def tokenize(text: str) -> list[str]:
@@ -78,15 +78,29 @@ def rrf_fuse(ranked_lists: list[list[tuple[str, float]]], k: int = 60) -> list[t
     return sorted(fused.items(), key=lambda x: x[1], reverse=True)
 
 
-def retrieve_candidates(engine: BrainEngine, query: str, rerank_k: int = 30,
-                        persist: bool = True) -> tuple[list[str], dict[str, str], list[tuple[str, float]]]:
-    """Shared candidate retrieval for the retrieve()/rerank path."""
+@dataclass
+class _RetrievalTrace:
+    node_ids: list[str]
+    text_by_id: dict[str, str]
+    candidates: list[tuple[str, float]] = field(default_factory=list)
+    dense_scores: dict[str, float] = field(default_factory=dict)
+    bm25_scores: dict[str, float] = field(default_factory=dict)
+    dense_ranks: dict[str, int] = field(default_factory=dict)
+    bm25_ranks: dict[str, int] = field(default_factory=dict)
+    fused: list[tuple[str, float]] = field(default_factory=list)
+    reranker_scores: dict[str, float] = field(default_factory=dict)
+
+
+def _retrieve_trace(engine: BrainEngine, query: str, rerank_k: int,
+                    persist: bool) -> _RetrievalTrace:
+    """One scoring path for normal retrieval and its explanation."""
     nodes = engine.brain.read_nodes()
     # Audit #7: tombstones are "forgotten" — they must not come back as
     # search answers (consolidate/_find_duplicate already exclude them).
     nodes = [n for n in nodes if n.status != "tombstone"]
+    trace = _RetrievalTrace([n.id for n in nodes], {n.id: n.text for n in nodes})
     if not nodes:
-        return [], {}, []
+        return trace
     node_ids = [n.id for n in nodes]
     qvec = engine.embedder.embed(query)
 
@@ -115,6 +129,8 @@ def retrieve_candidates(engine: BrainEngine, query: str, rerank_k: int = 30,
     bm = BM25([n.text for n in nodes])
     bm_scores = bm.scores(tokenize(query))
     bm_rank = [(nid, s) for nid, s in zip(node_ids, bm_scores) if s > 0.0]
+    trace.dense_scores = dict(dense)
+    trace.bm25_scores = dict(zip(node_ids, bm_scores))
 
     # Audit #37: a nonsense query otherwise returned 5 "results" with
     # RRF scores ≈ 0.033 — both ranks meaningless, but presented as a
@@ -126,10 +142,85 @@ def retrieve_candidates(engine: BrainEngine, query: str, rerank_k: int = 30,
     dense = [(nid, s) for nid, s in dense if nid in overlap]
     bm_rank = [(nid, s) for nid, s in bm_rank if nid in overlap]
     if not dense and not bm_rank:
-        return node_ids, {n.id: n.text for n in nodes}, []
+        return trace
 
-    candidates = rrf_fuse([dense, bm_rank], k=60)[:rerank_k]
-    return node_ids, {n.id: n.text for n in nodes}, candidates
+    trace.dense_ranks = {nid: rank for rank, (nid, _) in enumerate(
+        sorted(dense, key=lambda hit: hit[1], reverse=True), start=1)}
+    trace.bm25_ranks = {nid: rank for rank, (nid, _) in enumerate(
+        sorted(bm_rank, key=lambda hit: hit[1], reverse=True), start=1)}
+    trace.fused = rrf_fuse([dense, bm_rank], k=60)
+    trace.candidates = trace.fused[:rerank_k]
+    return trace
+
+
+def retrieve_candidates(engine: BrainEngine, query: str, rerank_k: int = 30,
+                        persist: bool = True) -> tuple[list[str], dict[str, str], list[tuple[str, float]]]:
+    """Shared candidate retrieval for the retrieve()/rerank path."""
+    trace = _retrieve_trace(engine, query, rerank_k, persist)
+    return trace.node_ids, trace.text_by_id, trace.candidates
+
+
+def explain(engine: BrainEngine, node_id: str, query: str, *, k: int = 5,
+            rerank_k: int = 30) -> dict:
+    """Explain a fresh query against the current brain, without writing anything.
+
+    Graph edges are contextual evidence only: hybrid retrieval does not use
+    graph traversal. This is a recomputation, not a historical search log.
+    """
+    if not query.strip():
+        raise ValueError("query must be non-empty")
+    if k < 1 or rerank_k < 1:
+        raise ValueError("k and rerank_k must be positive")
+    node = engine.brain.read_node(node_id)
+    if node is None:
+        raise ValueError(f"No node with id {node_id!r}.")
+    if node.status == "tombstone":
+        raise ValueError(f"Node {node_id!r} is tombstoned and excluded from retrieval.")
+
+    trace = _retrieve_trace(engine, query, rerank_k, persist=False)
+    reranked = getattr(engine, "reranker", None) is not None
+    hits = (_rerank(engine, query, k, trace.text_by_id, trace.candidates,
+                    reranker_scores=trace.reranker_scores)
+            if reranked and trace.candidates else trace.candidates[:k])
+    final_ranks = {nid: rank for rank, (nid, _) in enumerate(hits, start=1)}
+    fused_ranks = {nid: rank for rank, (nid, _) in enumerate(trace.fused, start=1)}
+
+    def channel(scores: dict[str, float], ranks: dict[str, int]) -> dict:
+        rank = ranks.get(node_id)
+        return {"score": scores.get(node_id), "rank": rank,
+                "rrf_contribution": 1.0 / (60 + rank) if rank is not None else 0.0}
+
+    dense = channel(trace.dense_scores, trace.dense_ranks)
+    bm25 = channel(trace.bm25_scores, trace.bm25_ranks)
+    candidate = any(nid == node_id for nid, _ in trace.candidates)
+    retrieved = node_id in final_ranks
+    retrieval_score = dict(hits).get(node_id)
+    has_model_scores = bool(trace.reranker_scores)
+    reranker_score = trace.reranker_scores.get(node_id)
+    reason = ("returned" if retrieved else "outside_top_k" if candidate else
+              "outside_candidate_limit" if node_id in fused_ranks else "no_overlap")
+    # Only accepted, live connections to other returned hits are evidence.
+    hit_ids = set(final_ranks) - {node_id}
+    edges = [edge for edge in engine.brain.read_edges()
+             if not edge.pending and not edge.rejected and edge.valid_to is None
+             and ((edge.source == node_id and edge.target in hit_ids)
+                  or (edge.target == node_id and edge.source in hit_ids))]
+    return {
+        "query": query, "node_id": node_id, "retrieved": retrieved,
+        "reason": reason, "rank": final_ranks.get(node_id),
+        "k": k, "rerank_k": rerank_k, "candidate": candidate,
+        "dense": dense, "bm25": bm25,
+        "rrf": {"k": 60, "rank": fused_ranks.get(node_id),
+                "score": dict(trace.fused).get(node_id, 0.0)},
+        "retrieval_score": retrieval_score,
+        "reranker_score": reranker_score,
+        "final_score": (reranker_score if has_model_scores else retrieval_score)
+                       if retrieved else None,
+        "final_score_kind": "reranker" if has_model_scores else "rrf",
+        "matched_terms": sorted(set(tokenize(query)) & set(tokenize(node.text))),
+        "graph_used_for_ranking": False,
+        "graph_context": [edge.to_dict() for edge in sorted(edges, key=lambda e: e.id)],
+    }
 
 
 def retrieve(engine: BrainEngine, query: str, k: int = 5, rerank_k: int = 30,
@@ -163,7 +254,14 @@ def retrieve(engine: BrainEngine, query: str, k: int = 5, rerank_k: int = 30,
 
 
 def _rerank(engine: BrainEngine, query: str, k: int, text_by_id: dict[str, str],
-            candidates: list[tuple[str, float]]) -> list[tuple[str, float]]:
+            candidates: list[tuple[str, float]], *,
+            reranker_scores: dict[str, float] | None = None) -> list[tuple[str, float]]:
     with_text = [(nid, text_by_id[nid], score) for nid, score in candidates]
-    reranked = engine.reranker.rerank(query, with_text, k)
+    with_scores = getattr(engine.reranker, "rerank_with_scores", None)
+    if with_scores is None:
+        reranked = engine.reranker.rerank(query, with_text, k)
+    else:
+        reranked, scores = with_scores(query, with_text, k)
+        if reranker_scores is not None:
+            reranker_scores.update(scores)
     return [(nid, score) for nid, _, score in reranked]

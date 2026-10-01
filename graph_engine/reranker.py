@@ -16,14 +16,24 @@ from __future__ import annotations
 
 import os
 
+Candidate = tuple[str, str, float]
+
 
 class Reranker:
     """Protocol: re-sorts (query, candidates) down to the top-k."""
 
-    def rerank(self, query: str, candidates, k: int):
+    def rerank(self, query: str, candidates: list[Candidate], k: int) -> list[Candidate]:
         # candidates: list[(node_id, text, rrf_score)]
         # returns:    list[(node_id, text, rrf_score)] — top-k in rerank order
         raise NotImplementedError
+
+    def rerank_with_scores(self, query: str, candidates: list[Candidate],
+                           k: int) -> tuple[list[Candidate], dict[str, float]]:
+        """Return ordered hits and any model predictions, separately from RRF.
+
+        Ordering-only rerankers have no model scores to expose.
+        """
+        return self.rerank(query, candidates, k), {}
 
 
 class ReverseReranker(Reranker):
@@ -33,7 +43,7 @@ class ReverseReranker(Reranker):
     (pipeline integration) — not that the model is qualitatively better.
     """
 
-    def rerank(self, query: str, candidates, k: int):
+    def rerank(self, query: str, candidates: list[Candidate], k: int) -> list[Candidate]:
         return list(reversed(candidates))[:k]
 
 
@@ -50,11 +60,20 @@ class CrossEncoderReranker(Reranker):
             ) from exc
         self.model = CrossEncoder(model_name)
 
-    def rerank(self, query: str, candidates, k: int):
+    def rerank(self, query: str, candidates: list[Candidate], k: int) -> list[Candidate]:
+        # Preserve the public search contract: scores in hits remain RRF.
+        return self.rerank_with_scores(query, candidates, k)[0]
+
+    def rerank_with_scores(self, query: str, candidates: list[Candidate],
+                           k: int) -> tuple[list[Candidate], dict[str, float]]:
+        if not candidates:
+            return [], {}
         pairs = [(query, text) for _, text, _ in candidates]
         scores = self.model.predict(pairs, show_progress_bar=False)
         scored = sorted(zip(candidates, scores), key=lambda x: x[1], reverse=True)
-        return [cand for cand, _ in scored][:k]
+        # Include predictions for candidates excluded by the final top-k too.
+        return ([cand for cand, _ in scored][:k],
+                {cand[0]: float(score) for cand, score in scored})
 
 
 def get_reranker():

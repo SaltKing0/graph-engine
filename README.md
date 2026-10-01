@@ -125,6 +125,9 @@ ig history <node_id>               # how a node's edges evolved over time
 ig when <ISO-8601> <query>         # retrieval restricted to what was known then
 ig context <query> [--budget N]     # build a context window for a prompt
 ig search "attention"              # hybrid search (dense + BM25 via RRF)
+ig explain <node_id> --query "attention" [--json]
+                                   # explain scores/ranks for a fresh query;
+                                   # read-only, including graph context
 ig pending / accept / reject       # review edge suggestions
 ig accept-pending [--max-intent-per-source 2] [--dry-run]
                                    # accept pending suggestions in ONE commit,
@@ -156,6 +159,38 @@ ig merge <survivor> <deletee>      # consolidate a near-duplicate pair
 ig mcp                             # read-only MCP server over stdio (AI assistants)
 ig mcp --write                     # + remember/recall/forget (agent memory, opt-in)
 ```
+
+## Explain a search result
+
+`ig explain <node_id> --query "your search"` recomputes the search against the
+current brain and embedder. The query is required: a node ID alone cannot
+explain a query-dependent ranking. Use `--json` for structured output,
+`--top N` for the result count (default 5), and `--rerank-k N` for the candidate
+limit (default 30), matching the search defaults.
+
+The explanation shows raw BM25 and dense cosine scores, each channel's
+one-based rank and RRF contribution (`1 / (60 + rank)`), the fused score/rank,
+matched lexical terms, and the final score. With the cross-encoder enabled,
+the final score is its model prediction, labelled `reranker`, and is distinct
+from the RRF score. `retrieval_score` retains the score returned by search;
+`reranker_score` exposes the model prediction even for a scored candidate
+outside the final top-k. Ordering-only or legacy rerankers without separate
+predictions retain the `rrf` label and have a null `reranker_score`. Dense scores
+are `null` when the cached vector is incompatible with the query dimension.
+A node outside the results is explained too: `no_overlap`,
+`outside_candidate_limit`, or `outside_top_k`.
+
+Accepted, live edges connecting the node to other returned results appear as
+`graph_context`, with their direction, type, confidence and provenance.
+Hybrid search currently uses text and vectors; these connections are context
+and do not contribute to the ranking. Pending, rejected, invalidated edges and
+connections to tombstoned nodes are excluded. Unknown or tombstoned target
+nodes produce a clear error.
+
+Explain does not record a recall, persist vectors, or modify the brain. It
+explains a fresh search, rather than reconstructing a past result after the
+corpus, embedder or reranker has changed. RRF scores are rank-fusion scores,
+not confidence values or similarities.
 
 ## MCP server (AI assistants)
 

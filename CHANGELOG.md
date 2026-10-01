@@ -7,6 +7,11 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- `ig explain <node_id> --query "..." [--json]` explains a fresh search with
+  BM25/dense scores and ranks, per-channel RRF contributions, candidate/final
+  ranks, reranker scores and accepted live connections to other results.
+  Graph connections are labelled as context, since hybrid retrieval does not
+  use them for ranking. Explain never writes vectors or recall records.
 - **The status lifecycle (`ig dream --lifecycle`)** — the dual buffer finally has
   a driver, and its gates are derived from the live distribution instead of
   copied from another system. Measured before choosing them: 5 nodes with
@@ -127,6 +132,9 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
   past damage.
 
 ### Fixed
+- Explain reports actual cross-encoder predictions separately from the RRF
+  scores returned by search, including predictions for candidates outside
+  the final top-k. Ordering-only rerankers retain the RRF score label.
 - **Unreviewed intent-edge stream.** Intent edges carry `confidence=None`, so
   the 0.95 auto-accept band could never judge them, while the marker heuristic
   auto-accepted every edge it produced. Measured on the live brain before the

@@ -157,6 +157,45 @@ def test_search_without_args_is_usage(tmp_path):
     assert "Usage: ig search <term>" in r.stdout
 
 
+def test_explain_roundtrip_and_no_file_changes(tmp_path):
+    import json
+    from graph_engine.brain import Brain, Edge, Node
+
+    brain = Brain(tmp_path / "brain", mode="local")
+    brain.ensure_ready()
+    brain.write_node(Node(id="a", text="alpha beta"))
+    brain.write_node(Node(id="b", text="alpha gamma"))
+    # Legacy edge without origin exercises the text formatter too.
+    brain.write_edges([Edge(source="a", target="b", kind="extends", pending=False)])
+    before = {p: p.read_bytes() for p in brain.path.rglob("*") if p.is_file()}
+    r = run_cli(["explain", "a", "--query", "alpha", "--json"], tmp_path)
+    assert r.returncode == 0, r.stderr
+    data = json.loads(r.stdout)
+    assert data["retrieved"] and data["matched_terms"] == ["alpha"]
+    assert len(data["graph_context"]) == 1
+    r = run_cli(["explain", "a", "--query", "alpha"], tmp_path)
+    assert r.returncode == 0, r.stderr
+    assert "RRF contribution=" in r.stdout
+    assert "context only; not used for ranking" in r.stdout
+    assert {p: p.read_bytes() for p in brain.path.rglob("*") if p.is_file()} == before
+
+
+@pytest.mark.parametrize("args", [[], ["a"], ["a", "--query", "alpha", "--top", "bad"],
+                                 ["a", "--query", "alpha", "--unknown"]])
+def test_explain_usage_errors(tmp_path, args):
+    r = run_cli(["explain", *args], tmp_path)
+    assert r.returncode != 0
+    assert "usage: ig explain" in r.stderr
+    assert "Traceback" not in r.stderr
+
+
+def test_explain_unknown_node_clean_error(tmp_path):
+    r = run_cli(["explain", "missing", "--query", "alpha"], tmp_path)
+    assert r.returncode == 1
+    assert "No node" in r.stdout
+    assert "Traceback" not in r.stderr
+
+
 def test_search_json_emits_machine_readable_shape(tmp_path):
     """`ig search --json` is the machine-readable mode the MCP handoff asked for:
     stdout carries ONLY the JSON payload (the ST-fallback notice must stay on
