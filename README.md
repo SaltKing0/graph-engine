@@ -60,7 +60,9 @@ graph grows as visible history.
 ```
 
 - **Nodes** — one Markdown file per idea (`nodes/<id>.md`, YAML frontmatter:
-  `type: semantic|episodic|procedural`, `status: probation|active|tombstone`)
+  `type: semantic|episodic|procedural`, `status: probation|active|tombstone`).
+  Episodic nodes carry `observed_at` (when the event happened) and `context`
+  (where/how it was observed) — they are raw observations, not deduplicated.
 - **Edges** — `edges.jsonl`, typed (`similar`, `extends`,
   `contradicts`, `supersedes`, `continues`, `same_as`),
   bi-temporal (`valid_from`/`valid_to`) with confidence + provenance
@@ -115,6 +117,9 @@ The engine doesn't just store knowledge — it improves itself, in three tiers:
 ```bash
 ig init [--remote <url>] [--demo]  # create a brain (empty / connected / demo)
 ig ingest "New idea ..."           # ingest (duplicates are merged)
+ig observe "Event ..."              # store raw episodic event (no dedupe)
+ig extract <episodic_id> ["text"]   # extract semantic fact from episodic node
+ig timeline [--since X] [--until Y] # query episodic nodes by time range
 ig search "attention"              # hybrid search (dense + BM25 via RRF)
 ig pending / accept / reject       # review edge suggestions
 ig accept-pending [--max-intent-per-source 2] [--dry-run]

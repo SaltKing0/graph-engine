@@ -318,6 +318,91 @@ class BrainEngine:
                 raise
             return node, new_edges, False
 
+    def observe(self, text: str, source: str = "human", tags: list[str] | None = None,
+                observed_at: str | None = None, context: str | None = None,
+                allow_duplicates: bool = False) -> tuple[Node, bool]:
+        """Store a raw episodic event (Phase 1: episodic layer).
+
+        Episodic nodes are NOT deduplicated — every observation is a distinct
+        event, even if it describes the same fact. They carry `observed_at`
+        (when the event happened) and `context` (where/how it was observed).
+        Returns (node, is_duplicate) — is_duplicate is always False unless
+        allow_duplicates=False and an identical text already exists.
+        """
+        with BRAIN_LOCK:
+            self.brain.ensure_ready()
+            self.brain.pull()
+            text = text.strip()
+            if not text:
+                raise ValueError("Empty text cannot be observed.")
+            if not allow_duplicates:
+                # Exact-text dedupe for episodic (not cosine — events are unique)
+                existing = next(
+                    (n for n in self.brain.read_nodes()
+                     if n.ntype == "episodic" and n.text.strip() == text),
+                    None)
+                if existing is not None:
+                    return existing, True
+            node = Node(text=text, source=source, tags=tags, ntype="episodic",
+                        status="active", observed_at=observed_at, context=context)
+            self.brain.write_node(node)
+            self.brain.rebuild_index()
+            self.brain.commit_and_push(
+                f"observe: {text[:50]}{'…' if len(text) > 50 else ''}")
+            return node, False
+
+    def extract(self, node_id: str, text: str | None = None,
+                source: str = "human", tags: list[str] | None = None) -> Node:
+        """Extract a semantic fact from an episodic node (Phase 1).
+
+        Creates a new semantic node linked to the episodic source via an
+        `extends` edge. The original episodic node is NOT modified — the
+        extraction is a new, derived memory. If `text` is None, the episodic
+        node's text is used as the basis (the caller is expected to have
+        already refined it, e.g. via an LLM).
+        """
+        with BRAIN_LOCK:
+            self.brain.ensure_ready()
+            self.brain.pull()
+            episodic = self.brain.read_node(node_id)
+            if episodic is None:
+                raise ValueError(f"No node with id {node_id!r}.")
+            if episodic.ntype != "episodic":
+                raise ValueError(
+                    f"Node {node_id!r} is not episodic (type={episodic.ntype!r}).")
+            semantic_text = (text or episodic.text).strip()
+            if not semantic_text:
+                raise ValueError("Empty text cannot be extracted.")
+            node = Node(text=semantic_text, source=source, tags=tags,
+                        ntype="semantic", status="probation")
+            self.brain.write_node(node)
+            edge = Edge(source=node.id, target=episodic.id, kind="extends",
+                        pending=False, origin="consolidator")
+            self.brain.add_edge(edge)
+            self.brain.rebuild_index()
+            self.brain.commit_and_push(
+                f"extract: {node.id[:8]} from episodic {episodic.id[:8]}")
+            return node
+
+    def timeline(self, *, since: str | None = None, until: str | None = None,
+                 limit: int = 50) -> list[Node]:
+        """Query episodic nodes by time range (Phase 1: temporal reasoning).
+
+        Returns episodic nodes sorted by `observed_at` (newest first).
+        `since`/`until` are ISO-8601 date strings. Without arguments,
+        returns the most recent `limit` episodic nodes.
+        """
+        nodes = [n for n in self.brain.read_nodes()
+                 if n.ntype == "episodic" and n.status != "tombstone"]
+        if since:
+            nodes = [n for n in nodes
+                     if (n.observed_at or n.created) >= since]
+        if until:
+            nodes = [n for n in nodes
+                     if (n.observed_at or n.created) <= until]
+        nodes.sort(key=lambda n: n.observed_at or n.created, reverse=True)
+        return nodes[:limit]
+
     def _heal_after_failed_commit(self) -> None:
         """Audit #31: after a failed commit, restore the derived state to a
         consistent, rebuildable condition and tell the operator what happened."""

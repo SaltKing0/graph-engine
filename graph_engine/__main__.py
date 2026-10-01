@@ -41,6 +41,115 @@ def _short(text: str, n: int = 70) -> str:
     return text[: n - 1] + "…" if len(text) > n else text
 
 
+def cmd_observe(engine: BrainEngine, args: list[str]) -> None:
+    """Store a raw episodic event (Phase 1: episodic layer)."""
+    source = "human"
+    observed_at = None
+    context = None
+    allow_dup = False
+    rest: list[str] = []
+    i = 0
+    while i < len(args):
+        if args[i] == "--source":
+            if i + 1 >= len(args):
+                print("Usage: ig observe \"text\" --source <source>")
+                sys.exit(1)
+            source = args[i + 1]
+            i += 2
+        elif args[i] == "--at":
+            if i + 1 >= len(args):
+                print("Usage: ig observe \"text\" --at <ISO-8601>")
+                sys.exit(1)
+            observed_at = args[i + 1]
+            i += 2
+        elif args[i] == "--context":
+            if i + 1 >= len(args):
+                print("Usage: ig observe \"text\" --context <context>")
+                sys.exit(1)
+            context = args[i + 1]
+            i += 2
+        elif args[i] == "--allow-dup":
+            allow_dup = True
+            i += 1
+        else:
+            rest.append(args[i])
+            i += 1
+    if "-" in rest:
+        if len(rest) > 1:
+            print("Usage: '-' (stdin) cannot be combined with text arguments.")
+            sys.exit(1)
+        text = sys.stdin.read()
+    else:
+        text = " ".join(rest)
+    if not text.strip():
+        print("Nothing to observe. Usage: ig observe \"text\" | ig observe - < file")
+        sys.exit(1)
+    node, dup = engine.observe(text, source=source, observed_at=observed_at,
+                               context=context, allow_duplicates=allow_dup)
+    if dup:
+        print(f"Duplicate → merged into {node.id}: {_short(node.text)}")
+    else:
+        print(f"Episodic {node.id}: {_short(node.text)}")
+        if observed_at:
+            print(f"  observed_at: {observed_at}")
+        if context:
+            print(f"  context: {context}")
+
+
+def cmd_extract(engine: BrainEngine, args: list[str]) -> None:
+    """Extract a semantic fact from an episodic node (Phase 1)."""
+    if not args:
+        print("Usage: ig extract <episodic_node_id> [\"semantic text\"]")
+        sys.exit(1)
+    node_id = args[0]
+    text = " ".join(args[1:]) if len(args) > 1 else None
+    try:
+        node = engine.extract(node_id, text=text)
+    except ValueError as e:
+        print(f"Error: {e}")
+        sys.exit(1)
+    print(f"Semantic {node.id}: {_short(node.text)}")
+    print(f"  extracted from episodic {node_id}")
+
+
+def cmd_timeline(engine: BrainEngine, args: list[str]) -> None:
+    """Query episodic nodes by time range (Phase 1: temporal reasoning)."""
+    since = None
+    until = None
+    limit = 50
+    i = 0
+    while i < len(args):
+        if args[i] == "--since":
+            if i + 1 >= len(args):
+                print("Usage: ig timeline --since <ISO-8601>")
+                sys.exit(1)
+            since = args[i + 1]
+            i += 2
+        elif args[i] == "--until":
+            if i + 1 >= len(args):
+                print("Usage: ig timeline --until <ISO-8601>")
+                sys.exit(1)
+            until = args[i + 1]
+            i += 2
+        elif args[i] == "--limit":
+            if i + 1 >= len(args):
+                print("Usage: ig timeline --limit <n>")
+                sys.exit(1)
+            limit = int(args[i + 1])
+            i += 2
+        else:
+            i += 1
+    nodes = engine.timeline(since=since, until=until, limit=limit)
+    if not nodes:
+        print("No episodic nodes found.")
+        return
+    print(f"Timeline ({len(nodes)} episodic nodes):")
+    for n in nodes:
+        ts = n.observed_at or n.created
+        ctx = f" [{n.context}]" if n.context else ""
+        print(f"  {ts}  {n.id[:8]}  {_short(n.text, 60)}{ctx}")
+
+
 def cmd_ingest(engine: BrainEngine, args: list[str]) -> None:
     source = "human"
     allow_dup = False
@@ -771,6 +880,9 @@ def _dream_summarizer():
 COMMANDS = {
     "init": cmd_init,
     "ingest": cmd_ingest,
+    "observe": cmd_observe,
+    "extract": cmd_extract,
+    "timeline": cmd_timeline,
     "pending": lambda e, a: cmd_pending(e, a),
     "accept": lambda e, a: _resolve_cmd(e, _first_or_usage(a, "accept"), True),
     "reject": lambda e, a: _resolve_cmd(e, _first_or_usage(a, "reject"), False),

@@ -54,7 +54,8 @@ class Node:
                  sources: list[str] | None = None, ntype: str = "semantic",
                  status: str = "probation",
                  recall_count: int = 0, recall_queries: list[str] | None = None,
-                 last_recalled: str | None = None):
+                 last_recalled: str | None = None,
+                 observed_at: str | None = None, context: str | None = None):
         self.text = text
         self.id = id or uuid.uuid4().hex[:12]
         self.created = created or _now_iso()
@@ -80,6 +81,10 @@ class Node:
         self.recall_count = int(recall_count or 0)
         self.recall_queries = list(recall_queries or [])
         self.last_recalled = last_recalled
+        # Episodic layer (Phase 1): when/where this observation was made.
+        # Only meaningful for ntype="episodic"; None for semantic/procedural.
+        self.observed_at = observed_at
+        self.context = context
 
     def to_markdown(self) -> str:
         tags = "[" + ", ".join(self.tags) + "]" if self.tags else "[]"
@@ -92,6 +97,13 @@ class Node:
         # the rewrite "changes" the file without any content gain.
         lines.append("sources: [" + ", ".join(self.sources) + "]")
         lines.append(f"tags: {tags}")
+        # Episodic metadata only when present — semantic/procedural nodes
+        # stay unchanged (no frontmatter churn).
+        if self.ntype == "episodic":
+            if self.observed_at:
+                lines.append(f"observed_at: {self.observed_at}")
+            if self.context:
+                lines.append(f"context: {self.context}")
         # Recall stats only when they exist — writing them unconditionally
         # would rewrite all ~2k node files for zero information.
         if self.recall_count:
@@ -129,7 +141,9 @@ class Node:
                    source=meta.get("source", "human"), tags=tags, sources=sources,
                    ntype=meta.get("type", "semantic"), status=meta.get("status", "probation"),
                    recall_count=recall_count, recall_queries=recall_queries,
-                   last_recalled=meta.get("last_recalled"))
+                   last_recalled=meta.get("last_recalled"),
+                   observed_at=meta.get("observed_at"),
+                   context=meta.get("context"))
 
     def to_dict(self) -> dict:
         return {"id": self.id, "text": self.text, "created": self.created,
@@ -137,7 +151,8 @@ class Node:
                 "type": self.ntype, "status": self.status,
                 "recall_count": self.recall_count,
                 "recall_queries": self.recall_queries,
-                "last_recalled": self.last_recalled}
+                "last_recalled": self.last_recalled,
+                "observed_at": self.observed_at, "context": self.context}
 
 
 class Edge:
