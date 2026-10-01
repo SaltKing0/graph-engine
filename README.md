@@ -123,6 +123,7 @@ ig timeline [--since X] [--until Y] # query episodic nodes by time range
 ig valid-at <ISO-8601>             # graph as it was at a point in time
 ig history <node_id>               # how a node's edges evolved over time
 ig when <ISO-8601> <query>         # retrieval restricted to what was known then
+ig context <query> [--budget N]     # build a context window for a prompt
 ig search "attention"              # hybrid search (dense + BM25 via RRF)
 ig pending / accept / reject       # review edge suggestions
 ig accept-pending [--max-intent-per-source 2] [--dry-run]

@@ -214,6 +214,32 @@ def cmd_when(engine: BrainEngine, args: list[str]) -> None:
         print(f"  {score:.4f}  {node_id[:8]}  {text}")
 
 
+def cmd_context(engine: BrainEngine, args: list[str]) -> None:
+    """Build a context window for a query (Phase 3: context management)."""
+    budget = 4000
+    as_json = "--json" in args
+    args = [a for a in args if a != "--json"]
+    i = 0
+    while i < len(args):
+        if args[i] == "--budget" and i + 1 < len(args):
+            budget = int(args[i + 1])
+            i += 2
+        else:
+            i += 1
+    if not args:
+        print("Usage: ig context <query> [--budget <tokens>] [--json]")
+        sys.exit(1)
+    query = " ".join(args)
+    result = engine.build_context(query, budget=budget)
+    if as_json:
+        import json as _json
+        print(_json.dumps(result, ensure_ascii=False, indent=2))
+    else:
+        print(result["context"])
+        print(f"\n--- {result['tokens']} tokens (budget {result['budget']})"
+              f"{', truncated' if result['truncated'] else ''} ---")
+
+
 def cmd_ingest(engine: BrainEngine, args: list[str]) -> None:
     source = "human"
     allow_dup = False
@@ -950,6 +976,7 @@ COMMANDS = {
     "valid-at": cmd_valid_at,
     "history": cmd_history,
     "when": cmd_when,
+    "context": cmd_context,
     "pending": lambda e, a: cmd_pending(e, a),
     "accept": lambda e, a: _resolve_cmd(e, _first_or_usage(a, "accept"), True),
     "reject": lambda e, a: _resolve_cmd(e, _first_or_usage(a, "reject"), False),

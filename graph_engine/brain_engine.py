@@ -430,6 +430,24 @@ class BrainEngine:
         from .temporal import when
         return when(self, query, at, k=k)
 
+    def build_context(self, query: str, budget: int = 4000, **kwargs) -> dict:
+        """Assemble a context window for a query (Phase 3: context management).
+
+        Returns {context, tokens, nodes, budget, truncated}. Read-only.
+        """
+        from .context import build_context
+        return build_context(self, query, budget, **kwargs)
+
+    def context_for_prompt(self, query: str, max_tokens: int = 2000) -> str:
+        """Build a context string ready for a prompt (Phase 3). Read-only."""
+        from .context import context_for_prompt
+        return context_for_prompt(self, query, max_tokens=max_tokens)
+
+    def context_stats(self, query: str, budget: int = 4000) -> dict:
+        """Statistics about a context build (Phase 3). Read-only."""
+        from .context import context_stats
+        return context_stats(self, query, budget)
+
     def _heal_after_failed_commit(self) -> None:
         """Audit #31: after a failed commit, restore the derived state to a
         consistent, rebuildable condition and tell the operator what happened."""
