@@ -103,6 +103,11 @@ def test_cycle_dry_run_on_empty_brain(tmp_path, brain):
 def test_cycle_real_ingest_metrics(tmp_path, brain):
     """Real-ingest cycle (local mode via IG_BRAIN_PATH) writes metrics with
     true_merges (#28) and duplicates become merges, not new nodes."""
+    from graph_engine.brain import Brain, Node
+    memory = Brain(brain, mode="local")
+    memory.write_node(Node(id="episode", text="User prefers tea with breakfast",
+                           ntype="episodic", status="active", recall_count=1,
+                           created="2020-01-01T00:00:00Z"))
     findings = tmp_path / "findings"
     findings.mkdir()
     text = "The scheduler assigns one worker per queued job.\n"
@@ -116,10 +121,14 @@ def test_cycle_real_ingest_metrics(tmp_path, brain):
                IDEAGRAPH_INTENT_PENDING="1")
     r1 = subprocess.run(base_cmd, capture_output=True, text=True, env=env, timeout=300)
     assert r1.returncode == 0, r1.stderr[-500:]
+    assert "dream: consolidate: 1 fact(s) created" in r1.stdout
+    assert any(n.ntype == "semantic" and n.text == "User prefers tea with breakfast"
+               for n in memory.read_nodes())
     # second cycle with the SAME finding -> duplicate -> merge
     (findings / "dogfood_b.txt").write_text(text, encoding="utf-8")
     r2 = subprocess.run(base_cmd, capture_output=True, text=True, env=env, timeout=300)
     assert r2.returncode == 0, r2.stderr[-500:]
+    assert "dream: consolidate: 0 fact(s) created" in r2.stdout
     rows = [json.loads(l) for l in
             metrics.read_text(encoding="utf-8").strip().splitlines()]
     assert rows[-1].get("true_merges", 0) >= 1

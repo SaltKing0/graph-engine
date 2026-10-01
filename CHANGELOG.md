@@ -7,6 +7,12 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- `ig consolidate` automatically derives semantic memories from eligible
+  episodic observations, with configurable recall/age/count gates, dry-run/JSON
+  output and optional model refinement. Original events are retained, exact
+  semantic matches reused, and provenance prevents repeat extraction. New facts
+  enter probation; forgotten facts are not recreated. Available through
+  `ig dream --consolidate` and completed autonomous ingest cycles.
 - `ig explain <node_id> --query "..." [--json]` explains a fresh search with
   BM25/dense scores and ranks, per-channel RRF contributions, candidate/final
   ranks, reranker scores and accepted live connections to other results.

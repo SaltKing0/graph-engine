@@ -522,6 +522,19 @@ def report(results: list[EvalResult]) -> tuple[int, list[EvalResult]]:
 # Golden set — regression on every engine change (MUST be green)
 # ---------------------------------------------------------------------------
 
+def _seed_episodic_consolidation(engine: BrainEngine) -> None:
+    for _ in range(2):
+        engine.observe("User requested brief replies", allow_duplicates=True,
+                       observed_at="2000-01-01T00:00:00Z")
+    engine.observe("A button was clicked", observed_at="2000-01-01T00:00:00Z")
+
+
+def _consolidate_episodic(engine: BrainEngine) -> None:
+    from .consolidation import ConsolidationConfig, consolidate
+    consolidate(engine.brain, config=ConsolidationConfig(),
+                extractor=lambda evidence: "User prefers concise answers")
+
+
 def _dream_lifecycle() -> Callable[[BrainEngine], None]:
     """Test action: the lifecycle pass under the case's gates."""
     def action(engine: BrainEngine) -> None:
@@ -1148,6 +1161,29 @@ GOLDEN_SET: list[EvalTask] = [
             },
         ),
     ),
+    EvalTask(
+        id="episodic-auto-consolidation",
+        name="Used episodes yield one semantic fact with both sources; repeats do no work",
+        ingests=[],
+        actions=[
+            _seed_episodic_consolidation,
+            _record_recall("reply preferences", ["User requested brief replies"]),
+            _dream_refresh,
+            _consolidate_episodic,
+            _consolidate_episodic,
+        ],
+        oracle=EvalOracle(
+            node_count=4,
+            nodes_present=["User requested brief replies", "User prefers concise answers",
+                           "A button was clicked"],
+            node_status={"User prefers concise answers": "probation"},
+            edges=[EdgeExpectation("User prefers concise answers",
+                                   "User requested brief replies", "extends", pending=False)],
+            no_edge=[EdgeExpectation("User prefers concise answers", "A button was clicked", "*")],
+            min_edges_by_origin={"consolidator": 2},
+        ),
+    ),
+
 ]
 
 

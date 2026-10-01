@@ -315,16 +315,16 @@ def main() -> int:
         print(f"report: skipped ({str(e)[-160:]})")
 
     # Dream pass (Welle B/C): deterministic maintenance, community distillation
-    # and the status lifecycle, in one engine command — never destructive, one
+    # episodic extraction and the status lifecycle, in one engine command — one
     # commit per step. Like the report step, a failure must never fail the cycle.
     # `--distill` only writes what is new (deterministic summary ids), so the
     # first cycle after this landed adds 30 summaries and later cycles add none
     # until the topology actually changes.
     try:
         out = run([eng_py, "-m", "graph_engine", "dream", "--refresh", "--distill",
-                   "--lifecycle"], git_env, args.engine)
+                   "--consolidate", "--lifecycle"], git_env, args.engine)
         for line in out.strip().splitlines():
-            if line.startswith(("refresh:", "distill:", "lifecycle:")):
+            if line.startswith(("refresh:", "consolidate:", "distill:", "lifecycle:")):
                 print(f"dream: {line}")
     except RuntimeError as e:
         print(f"dream: skipped ({str(e)[-160:]})")
