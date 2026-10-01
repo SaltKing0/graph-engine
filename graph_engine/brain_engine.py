@@ -403,6 +403,33 @@ class BrainEngine:
         nodes.sort(key=lambda n: n.observed_at or n.created, reverse=True)
         return nodes[:limit]
 
+    def valid_at(self, timestamp: str) -> dict:
+        """The graph as it was at a point in time (Phase 2: temporal reasoning).
+
+        Returns {nodes: [...], edges: [...]} — only nodes and edges that were
+        live at the given timestamp. Read-only.
+        """
+        from .temporal import valid_at
+        return valid_at(self.brain, timestamp)
+
+    def history(self, node_id: str) -> list[dict]:
+        """How a node's edges evolved over time (Phase 2: temporal reasoning).
+
+        Returns a chronological list of edge events (creation, invalidation)
+        involving this node. Read-only.
+        """
+        from .temporal import history
+        return history(self.brain, node_id)
+
+    def when(self, query: str, at: str, k: int = 5) -> list[tuple[str, float]]:
+        """Retrieval restricted to what was known at a point in time (Phase 2).
+
+        Runs the normal hybrid retrieval, then filters the results to only
+        include nodes that existed at the given timestamp. Read-only.
+        """
+        from .temporal import when
+        return when(self, query, at, k=k)
+
     def _heal_after_failed_commit(self) -> None:
         """Audit #31: after a failed commit, restore the derived state to a
         consistent, rebuildable condition and tell the operator what happened."""

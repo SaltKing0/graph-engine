@@ -150,6 +150,70 @@ def cmd_timeline(engine: BrainEngine, args: list[str]) -> None:
         print(f"  {ts}  {n.id[:8]}  {_short(n.text, 60)}{ctx}")
 
 
+def cmd_valid_at(engine: BrainEngine, args: list[str]) -> None:
+    """Show the graph as it was at a point in time (Phase 2: temporal reasoning)."""
+    if not args:
+        print("Usage: ig valid-at <ISO-8601>")
+        sys.exit(1)
+    timestamp = args[0]
+    try:
+        result = engine.valid_at(timestamp)
+    except ValueError as e:
+        print(f"Error: {e}")
+        sys.exit(1)
+    nodes = result["nodes"]
+    edges = result["edges"]
+    print(f"Graph at {timestamp}: {len(nodes)} nodes, {len(edges)} edges")
+    for n in nodes[:20]:
+        print(f"  {n.id[:8]}  [{n.ntype}]  {_short(n.text, 60)}")
+    if len(nodes) > 20:
+        print(f"  … and {len(nodes) - 20} more nodes")
+    for e in edges[:20]:
+        print(f"  {e.source[:8]} --[{e.kind}]--> {e.target[:8]}  (from {e.valid_from})")
+    if len(edges) > 20:
+        print(f"  … and {len(edges) - 20} more edges")
+
+
+def cmd_history(engine: BrainEngine, args: list[str]) -> None:
+    """Show how a node's edges evolved over time (Phase 2: temporal reasoning)."""
+    if not args:
+        print("Usage: ig history <node_id>")
+        sys.exit(1)
+    node_id = args[0]
+    events = engine.history(node_id)
+    if not events:
+        print(f"No edge history for node {node_id}.")
+        return
+    print(f"History of node {node_id} ({len(events)} events):")
+    for ev in events:
+        other = ev.get("other_node", "?")
+        origin = f" [{ev['origin']}]" if ev.get("origin") else ""
+        rejected = " (rejected)" if ev.get("rejected") else ""
+        print(f"  {ev['timestamp']}  {ev['event']:12s}  --[{ev['kind']}]-->  {other[:8]}{origin}{rejected}")
+
+
+def cmd_when(engine: BrainEngine, args: list[str]) -> None:
+    """Retrieval restricted to what was known at a point in time (Phase 2)."""
+    if len(args) < 2:
+        print("Usage: ig when <ISO-8601> <query>")
+        sys.exit(1)
+    timestamp = args[0]
+    query = " ".join(args[1:])
+    try:
+        results = engine.when(query, timestamp)
+    except ValueError as e:
+        print(f"Error: {e}")
+        sys.exit(1)
+    if not results:
+        print(f"No results for {query!r} at {timestamp}.")
+        return
+    print(f"Results for {query!r} at {timestamp}:")
+    for node_id, score in results:
+        node = engine.brain.read_node(node_id)
+        text = _short(node.text, 60) if node else "?"
+        print(f"  {score:.4f}  {node_id[:8]}  {text}")
+
+
 def cmd_ingest(engine: BrainEngine, args: list[str]) -> None:
     source = "human"
     allow_dup = False
@@ -883,6 +947,9 @@ COMMANDS = {
     "observe": cmd_observe,
     "extract": cmd_extract,
     "timeline": cmd_timeline,
+    "valid-at": cmd_valid_at,
+    "history": cmd_history,
+    "when": cmd_when,
     "pending": lambda e, a: cmd_pending(e, a),
     "accept": lambda e, a: _resolve_cmd(e, _first_or_usage(a, "accept"), True),
     "reject": lambda e, a: _resolve_cmd(e, _first_or_usage(a, "reject"), False),

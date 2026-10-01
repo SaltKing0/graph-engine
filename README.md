@@ -120,6 +120,9 @@ ig ingest "New idea ..."           # ingest (duplicates are merged)
 ig observe "Event ..."              # store raw episodic event (no dedupe)
 ig extract <episodic_id> ["text"]   # extract semantic fact from episodic node
 ig timeline [--since X] [--until Y] # query episodic nodes by time range
+ig valid-at <ISO-8601>             # graph as it was at a point in time
+ig history <node_id>               # how a node's edges evolved over time
+ig when <ISO-8601> <query>         # retrieval restricted to what was known then
 ig search "attention"              # hybrid search (dense + BM25 via RRF)
 ig pending / accept / reject       # review edge suggestions
 ig accept-pending [--max-intent-per-source 2] [--dry-run]
