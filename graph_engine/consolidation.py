@@ -9,12 +9,14 @@ An optional extractor can refine it or return None to decline extraction.
 from __future__ import annotations
 
 import datetime
-import hashlib
+import json
 import math
 from dataclasses import asdict, dataclass
 from typing import Callable
 
-from .brain import Brain, Edge, Node
+from .brain import Brain, Edge, Node, _atomic_write
+
+CURSOR_FILE = "consolidation-cursor.json"
 
 
 @dataclass(frozen=True)
@@ -44,6 +46,19 @@ def _timestamp(node: Node) -> datetime.datetime | None:
         return stamp.replace(tzinfo=datetime.timezone.utc) if stamp.tzinfo is None else stamp
     except (ValueError, TypeError):
         return None
+
+
+def _read_cursor(brain: Brain) -> tuple[datetime.datetime, str] | None:
+    """Resume after the last examined event, including events that were skipped."""
+    try:
+        data = json.loads((brain.path / CURSOR_FILE).read_text(encoding="utf-8"))
+        stamp = datetime.datetime.fromisoformat(data["observed_at"])
+        nid = data["id"]
+        if stamp.tzinfo is not None and isinstance(nid, str):
+            return stamp, nid
+    except (FileNotFoundError, ValueError, TypeError, KeyError):
+        pass
+    return None
 
 
 def consolidation_plan(brain: Brain, *, config: ConsolidationConfig | None = None,
@@ -76,6 +91,12 @@ def consolidation_plan(brain: Brain, *, config: ConsolidationConfig | None = Non
         if age >= config.min_age_days and node.recall_count >= config.threshold:
             eligible.append((stamp, node.id))
     eligible.sort()
+    cursor = _read_cursor(brain)
+    if cursor is not None:
+        # Walk the chronological queue in rounds. A decline remains retryable,
+        # but cannot consume the first slot of every bounded pass forever.
+        eligible = ([item for item in eligible if item > cursor]
+                    + [item for item in eligible if item <= cursor])
     triggered = len(eligible) >= config.min_count
     return {"episodic": len(episodic),
             "processed": sum(n.id in processed for n in episodic),
@@ -129,10 +150,9 @@ def consolidate(brain: Brain, *, config: ConsolidationConfig | None = None,
             key = _key(text)
             fact = semantic.get(key)
             if fact is None:
-                fact_id = "fact-" + hashlib.sha256(key.encode()).hexdigest()[:24]
-                if fact_id in nodes:
-                    raise ValueError(f"consolidation fact ID collision: {fact_id}")
-                fact = Node(id=fact_id, text=text, source="consolidator",
+                # Node identity must survive edits/merges independently of its
+                # text. Exact reuse is handled by `semantic`, not a content ID.
+                fact = Node(text=text, source="consolidator",
                             tags=["episodic-extraction"], ntype="semantic",
                             status="probation")
                 semantic[key] = fact
@@ -153,9 +173,17 @@ def consolidate(brain: Brain, *, config: ConsolidationConfig | None = None,
         if links:
             brain.write_edges(brain.read_edges(include_rejected=True) + links)
             brain.rebuild_index()
-            if commit:
-                brain.commit_and_push(
-                    f"consolidate episodic: {result['created']} facts, "
-                    f"{result['reused']} reused, {len(links)} provenance edges")
+        cursor_changed = False
+        if plan["eligible"] > len(plan["candidates"]):
+            last_id = plan["candidates"][-1]
+            stamp = _timestamp(nodes[last_id])
+            if (stamp, last_id) != _read_cursor(brain):
+                _atomic_write(brain.path / CURSOR_FILE, json.dumps(
+                    {"observed_at": stamp.isoformat(), "id": last_id}) + "\n")
+                cursor_changed = True
+        if commit and (links or cursor_changed):
+            brain.commit_and_push(
+                f"consolidate episodic: {result['created']} facts, "
+                f"{result['reused']} reused, {len(links)} provenance edges")
         result["edges"] = len(links)
         return result

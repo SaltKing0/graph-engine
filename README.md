@@ -304,9 +304,16 @@ text. An unchanged second pass writes nothing.
 Configure the time gate with `--min-age-days`, the recall threshold with
 `--threshold`, and the minimum **eligible, unprocessed** pool size with
 `--min-count`. Gates combine; the count check runs before the per-pass `--limit`
-(oldest first), so a remaining pool below `--min-count` waits for more events.
+(oldest first within each round), so a remaining pool below `--min-count` waits
+for more events. Bounded passes save their position in `consolidation-cursor.json`
+inside the brain and resume after the last examined event, wrapping back to the
+oldest. Skipped or declined events remain retryable without blocking newer
+candidates. Dry runs read this position but never advance it.
 CLI flags override the environment. For a deliberate pass over fresh, unused
 events, use `ig consolidate --threshold 0 --min-age-days 0`.
+
+Fact IDs are independent of text. Editing or merging a fact keeps its identity;
+a later extraction reuses an exact current-text match or creates a new fact.
 
 The command does not start a daemon: run `ig dream --refresh --consolidate` from
 your scheduler for time-based checks, or invoke it manually. Completed ingest

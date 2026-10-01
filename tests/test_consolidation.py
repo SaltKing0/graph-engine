@@ -9,6 +9,7 @@ from graph_engine.brain import Brain, Edge, Node
 from graph_engine.brain_engine import BrainEngine, consolidation_config_from_env
 from graph_engine.consolidation import ConsolidationConfig, consolidate, consolidation_plan
 from graph_engine.embedder import HashEmbedder
+from graph_engine.merge import merge_nodes
 
 NOW = datetime.datetime(2026, 10, 2, tzinfo=datetime.timezone.utc)
 OPEN = ConsolidationConfig(threshold=0, min_age_days=0)
@@ -143,6 +144,90 @@ def test_forgotten_text_is_not_recreated_from_another_event(brain):
     assert snapshot(brain) == before
 
 
+@pytest.mark.parametrize("skip_reason", ["forgotten", "declined"])
+def test_skipped_event_yields_to_later_events_across_restarts(brain, skip_reason):
+    old = event(brain, "old", "Obsolete fact", observed_at="2026-09-01T00:00:00Z")
+    new = event(brain, "new", "Useful fact", observed_at="2026-09-02T00:00:00Z")
+    original = {n.id: brain.node_path(n.id).read_bytes() for n in (old, new)}
+    if skip_reason == "forgotten":
+        brain.write_node(Node(id="forgotten", text=old.text, status="tombstone"))
+    extractor = (lambda text: None if text == old.text else text) if skip_reason == "declined" else None
+    config = ConsolidationConfig(threshold=0, min_age_days=0, limit=1)
+    first = consolidate(brain, config=config, now=NOW, extractor=extractor)
+    assert first["candidates"] == ["old"] and first["skipped"] == 1
+
+    # A scheduler launches a fresh process/Brain for the next pass. Its preview
+    # must use the same persisted ordering without advancing the cursor.
+    restarted = Brain(brain.path, mode="local")
+    before_preview = snapshot(restarted)
+    def forbidden(text):
+        pytest.fail("preview called the extractor")
+    preview = consolidate(restarted, config=config, now=NOW, dry_run=True, extractor=forbidden)
+    assert preview["candidates"] == ["new"]
+    assert snapshot(restarted) == before_preview
+    second = consolidate(restarted, config=config, now=NOW, extractor=extractor)
+    assert second["candidates"] == ["new"] and second["created"] == 1
+    assert {n.id: brain.node_path(n.id).read_bytes() for n in (old, new)} == original
+
+    # Skips are still retryable after later events have had their turn.
+    third = consolidate(restarted, config=config, now=NOW,
+                        extractor=(lambda text: text) if skip_reason == "declined" else None)
+    assert third["candidates"] == ["old"]
+    assert third["created"] == (1 if skip_reason == "declined" else 0)
+    if skip_reason == "forgotten":
+        assert brain.read_node("forgotten").status == "tombstone"
+
+
+def test_default_limit_of_forgotten_events_does_not_block_new_fact(brain):
+    brain.write_node(Node(id="forgotten", text="Obsolete fact", status="tombstone"))
+    for i in range(50):
+        event(brain, f"old-{i:02}", "Obsolete fact", recall_count=1,
+              observed_at="2026-09-01T00:00:00Z")
+    event(brain, "new", "Useful fact", recall_count=1,
+          observed_at="2026-09-02T00:00:00Z")
+    assert consolidate(brain, now=NOW)["skipped"] == 50
+    result = consolidate(brain, now=NOW)
+    assert result["candidates"][0] == "new"
+    assert result["created"] == 1 and result["edges"] == 1
+    assert [n.text for n in brain.read_nodes()
+            if n.ntype == "semantic" and n.status != "tombstone"] == ["Useful fact"]
+
+
+@pytest.mark.parametrize("mutation", ["merge", "edit"])
+@pytest.mark.parametrize("legacy_id", [False, True])
+def test_fact_text_changes_do_not_abort_later_batches(brain, mutation, legacy_id):
+    event(brain, "first", "Prefers short answers")
+    if legacy_id:
+        # A content-derived ID written by the original PR is still a valid
+        # node identity; it does not need to be renamed or migrated.
+        brain.write_node(Node(id="fact-0fc969de0f2fd325b0a12d12", text="Prefers short answers",
+                              source="consolidator", tags=["episodic-extraction"]))
+        brain.write_edges([Edge(source="fact-0fc969de0f2fd325b0a12d12", target="first",
+                                kind="extends", origin="consolidator", pending=False)])
+    else:
+        consolidate(brain, config=OPEN, now=NOW)
+    fact = next(n for n in brain.read_nodes() if n.ntype == "semantic")
+    if mutation == "merge":
+        brain.write_node(Node(id="extra", text="Prefers bullet points"))
+        merge_nodes(brain, fact.id, "extra", commit=False)
+    else:
+        fact.text = "Prefers detailed answers"
+        brain.write_node(fact)
+    changed_bytes = brain.node_path(fact.id).read_bytes()
+    event(brain, "second", "Prefers short answers")
+    event(brain, "third", "An unrelated useful fact")
+    result = consolidate(brain, config=OPEN, now=NOW)
+    assert result["created"] == result["edges"] == 2
+    assert brain.node_path(fact.id).read_bytes() == changed_bytes
+    new_fact = next(n for n in brain.read_nodes()
+                    if n.ntype == "semantic" and n.text == "Prefers short answers")
+    assert new_fact.id != fact.id
+    assert any(e.source == new_fact.id and e.target == "second" for e in brain.read_edges())
+    before_repeat = snapshot(brain)
+    assert consolidate(brain, config=OPEN, now=NOW)["candidates"] == []
+    assert snapshot(brain) == before_repeat
+
+
 def test_dry_run_never_calls_extractor_sync_or_commit(brain, monkeypatch):
     event(brain)
     before = snapshot(brain)
@@ -165,6 +250,7 @@ def test_dry_run_on_missing_brain_does_not_initialize(tmp_path):
 def test_extractor_failure_leaves_entire_batch_unwritten(brain, bad_result):
     event(brain, "a", "First")
     event(brain, "b", "Second")
+    event(brain, "c", "Third")
     before = snapshot(brain)
     def extractor(text):
         if text == "First":
@@ -173,8 +259,41 @@ def test_extractor_failure_leaves_entire_batch_unwritten(brain, bad_result):
             raise RuntimeError("provider failed")
         return bad_result
     with pytest.raises((ValueError, RuntimeError)):
-        consolidate(brain, config=OPEN, now=NOW, extractor=extractor)
+        consolidate(brain, config=ConsolidationConfig(threshold=0, min_age_days=0, limit=2),
+                    now=NOW, extractor=extractor)
     assert snapshot(brain) == before
+
+
+def test_failed_batch_does_not_advance_retry_cursor(brain):
+    event(brain, "a", "First")
+    event(brain, "b", "Second")
+    event(brain, "c", "Third")
+    config = ConsolidationConfig(threshold=0, min_age_days=0, limit=1)
+    consolidate(brain, config=config, now=NOW, extractor=lambda text: None)
+    before = snapshot(brain)
+    def failing(text):
+        raise RuntimeError("provider failed")
+    with pytest.raises(RuntimeError):
+        consolidate(brain, config=config, now=NOW, extractor=failing)
+    assert snapshot(brain) == before
+    assert consolidation_plan(brain, config=config, now=NOW)["candidates"] == ["b"]
+
+
+def test_git_skipped_batch_commits_cursor_once(tmp_path):
+    brain = Brain(tmp_path / "brain", mode="git")
+    brain.ensure_ready()
+    event(brain, "a", "First")
+    event(brain, "b", "Second")
+    brain.commit_and_push("seed")
+    config = ConsolidationConfig(threshold=0, min_age_days=0, limit=1)
+    def count():
+        return int(subprocess.check_output(["git", "-C", str(brain.path),
+                                            "rev-list", "--count", "HEAD"], text=True))
+    before = count()
+    consolidate(brain, config=config, now=NOW, extractor=lambda text: None)
+    assert count() == before + 1
+    assert consolidation_plan(Brain(brain.path, mode="git"), config=config, now=NOW)["candidates"] == ["b"]
+    assert subprocess.check_output(["git", "-C", str(brain.path), "status", "--porcelain"], text=True) == ""
 
 
 def test_optional_extractor_refines_or_declines(brain):
