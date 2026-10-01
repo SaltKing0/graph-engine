@@ -132,6 +132,9 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
   past damage.
 
 ### Fixed
+- Explain reports actual cross-encoder predictions separately from the RRF
+  scores returned by search, including predictions for candidates outside
+  the final top-k. Ordering-only rerankers retain the RRF score label.
 - **Unreviewed intent-edge stream.** Intent edges carry `confidence=None`, so
   the 0.95 auto-accept band could never judge them, while the marker heuristic
   auto-accepted every edge it produced. Measured on the live brain before the

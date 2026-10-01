@@ -170,8 +170,12 @@ limit (default 30), matching the search defaults.
 
 The explanation shows raw BM25 and dense cosine scores, each channel's
 one-based rank and RRF contribution (`1 / (60 + rank)`), the fused score/rank,
-matched lexical terms, and the final score. With a reranker enabled, the final
-score is labelled `reranker` and is distinct from the RRF score. Dense scores
+matched lexical terms, and the final score. With the cross-encoder enabled,
+the final score is its model prediction, labelled `reranker`, and is distinct
+from the RRF score. `retrieval_score` retains the score returned by search;
+`reranker_score` exposes the model prediction even for a scored candidate
+outside the final top-k. Ordering-only or legacy rerankers without separate
+predictions retain the `rrf` label and have a null `reranker_score`. Dense scores
 are `null` when the cached vector is incompatible with the query dimension.
 A node outside the results is explained too: `no_overlap`,
 `outside_candidate_limit`, or `outside_top_k`.

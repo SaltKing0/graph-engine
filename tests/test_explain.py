@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+from unittest.mock import Mock
+
+import numpy as np
 import pytest
 
 from graph_engine.brain import Brain, Edge, Node
 from graph_engine.brain_engine import BrainEngine
 from graph_engine.retrieval import explain, retrieve
+from graph_engine.reranker import CrossEncoderReranker, ReverseReranker
 
 
 class FixtureEmbedder:
@@ -93,20 +97,77 @@ def test_negative_dense_score_keeps_actual_fusion_rank_for_bm25_match(engine):
     assert result["rrf"]["score"] == dict(retrieve(engine, "alpha", persist=False))["a"]
 
 
-def test_reranker_final_score_and_rank_are_separate_from_rrf(engine):
-    class FixedReranker:
-        def rerank(self, query, candidates, k):
-            # Return b alone with a reranker score unrelated to RRF.
-            return [(nid, text, 9.5) for nid, text, _ in candidates if nid == "b"][:k]
+@pytest.fixture
+def cross_encoder(engine):
+    # Exercise the production class without importing ST or loading a model.
+    reranker = CrossEncoderReranker.__new__(CrossEncoderReranker)
+    reranker.model = Mock()
+    reranker.model.predict.side_effect = lambda pairs, **kwargs: np.array(
+        [9.5 if text == "alpha beta" else -3.0 for _, text in pairs], dtype=np.float32)
+    engine.reranker = reranker
+    return reranker
 
-    engine.reranker = FixedReranker()
-    result = explain(engine, "b", "alpha", k=1)
+
+def test_reranker_final_score_and_rank_are_separate_from_rrf(engine, cross_encoder):
+    before = snapshot(engine.brain)
+    result = explain(engine, "a", "alpha", k=1)
     assert result["rank"] == 1
+    assert result["rrf"]["rank"] == 2
     assert result["final_score"] == 9.5
+    assert result["reranker_score"] == 9.5
     assert result["final_score_kind"] == "reranker"
-    assert result["rrf"]["score"] < 1
-    assert result["final_score"] == dict(retrieve(engine, "alpha", k=1, persist=False))["b"]
-    assert explain(engine, "a", "alpha", k=1)["reason"] == "outside_top_k"
+    assert result["rrf"]["score"] == pytest.approx(1 / 61 + 1 / 62)
+    assert result["retrieval_score"] == result["rrf"]["score"]
+    # Each operation predicts once; public retrieval still returns RRF scores.
+    assert cross_encoder.model.predict.call_count == 1
+    assert retrieve(engine, "alpha", k=1, persist=False) == [("a", result["rrf"]["score"])]
+    assert cross_encoder.model.predict.call_count == 2
+    assert snapshot(engine.brain) == before
+    import json
+    json.dumps(result)  # numpy predictions must be converted to Python floats.
+
+
+def test_excluded_candidate_keeps_model_prediction(engine, cross_encoder):
+    result = explain(engine, "b", "alpha", k=1)
+    assert result["reason"] == "outside_top_k"
+    assert result["reranker_score"] == -3.0
+    assert result["final_score"] is None
+    assert result["retrieval_score"] is None
+    assert result["final_score_kind"] == "reranker"
+    result = explain(engine, "a", "alpha", rerank_k=1)
+    assert result["reason"] == "outside_candidate_limit"
+    assert result["reranker_score"] is None
+    assert explain(engine, "c", "alpha")["reranker_score"] is None
+
+
+@pytest.mark.parametrize("legacy", [False, True])
+def test_ordering_only_reranker_does_not_claim_model_scores(engine, legacy):
+    class LegacyReranker:
+        def rerank(self, query, candidates, k):
+            return list(reversed(candidates))[:k]
+
+    engine.reranker = LegacyReranker() if legacy else ReverseReranker()
+    result = explain(engine, "a", "alpha", k=1)
+    assert result["rank"] == 1
+    assert result["final_score_kind"] == "rrf"
+    assert result["reranker_score"] is None
+    assert result["final_score"] == result["rrf"]["score"]
+    assert result["retrieval_score"] == dict(retrieve(engine, "alpha", k=1, persist=False))["a"]
+
+
+def test_explanation_eval_accepts_distinct_model_and_search_scores(engine, cross_encoder):
+    from graph_engine.evals import ExplanationExpectation, verify_explanations
+
+    assert verify_explanations(engine, [
+        ExplanationExpectation(query="alpha", node_text="alpha beta"),
+        ExplanationExpectation(query="alpha", node_text="omega", retrieved=False),
+    ]) == []
+
+
+def test_cross_encoder_empty_candidates_skip_prediction(cross_encoder):
+    assert cross_encoder.rerank_with_scores("alpha", [], 5) == ([], {})
+    assert cross_encoder.rerank("alpha", [], 5) == []
+    cross_encoder.model.predict.assert_not_called()
 
 
 def test_only_accepted_live_edges_to_other_hits_are_context(engine):

@@ -366,7 +366,12 @@ def verify_explanations(engine: BrainEngine,
             continue
         result = explain(engine, node.id, exp.query)
         hits = dict(retrieve(engine, exp.query, persist=False))
-        if result["retrieved"] != exp.retrieved or result["final_score"] != hits.get(node.id):
+        rank = next((i for i, nid in enumerate(hits, start=1) if nid == node.id), None)
+        expected_final = (result["reranker_score"] if result["final_score_kind"] == "reranker"
+                          else hits.get(node.id)) if rank is not None else None
+        if (result["retrieved"] != exp.retrieved or result["rank"] != rank
+                or result["retrieval_score"] != hits.get(node.id)
+                or result["final_score"] != expected_final):
             failures.append(f"explanation disagrees with retrieval: {exp.node_text!r}")
         contributions = sum(result[channel]["rrf_contribution"] for channel in ("bm25", "dense"))
         if not math.isclose(result["rrf"]["score"], contributions):
