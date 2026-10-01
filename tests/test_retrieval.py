@@ -5,7 +5,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from ideagraph.retrieval import tokenize, BM25, rrf_fuse
+from graph_engine.retrieval import tokenize, BM25, rrf_fuse
 
 
 def test_bm25_ranks_shared_terms_higher():

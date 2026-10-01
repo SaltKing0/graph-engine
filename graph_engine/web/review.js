@@ -1,4 +1,4 @@
-// IdeaGraph Review — inbox work + same_as linking, keyboard-first.
+// GraphEngine Review — inbox work + same_as linking, keyboard-first.
 //
 // Security (Audit #11/#12/#14): alle dynamischen Werte (ids, kinds, Text)
 // are strictly escaped; interaction runs via data attributes +

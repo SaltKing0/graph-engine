@@ -3,7 +3,7 @@
 A memory system that does not know which of its entries are ever retrieved
 cannot decide what to keep, promote, or let decay — OpenClaw's dreaming
 promotes a candidate only when it passed `minRecallCount` / `minUniqueQueries`,
-and IdeaGraph had no such signal at all (every node was equally "fresh"
+and GraphEngine had no such signal at all (every node was equally "fresh"
 forever, all 2120 stuck in `probation`).
 
 Two halves, deliberately split so the READ path stays cheap and git-clean:

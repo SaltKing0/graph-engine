@@ -6,10 +6,10 @@ import os
 
 import pytest
 
-from ideagraph.brain import Brain
-from ideagraph.brain_engine import BrainEngine
-from ideagraph.demo import build_demo_brain
-from ideagraph.embedder import HashEmbedder
+from graph_engine.brain import Brain
+from graph_engine.brain_engine import BrainEngine
+from graph_engine.demo import build_demo_brain
+from graph_engine.embedder import HashEmbedder
 
 # The real (semantic) embedder is the optional [st] extra; the default install
 # (and the default CI job) has no sentence-transformers. Tests that need it
@@ -50,7 +50,7 @@ def test_demo_brain_refuses_overwrite(demo_path):
 def test_demo_brain_search_works(demo_path):
     """The precomputed vectors must make hybrid search immediately usable."""
     build_demo_brain(demo_path, commit=False)
-    from ideagraph.retrieval import retrieve
+    from graph_engine.retrieval import retrieve
     engine = BrainEngine(Brain(demo_path, mode="local"), HashEmbedder())
     hits = retrieve(engine, "RAG grounding")
     assert hits, "demo brain should return retrieval hits"
@@ -61,7 +61,7 @@ def test_demo_brain_search_works(demo_path):
 
 def test_demo_brain_hygiene_reports(demo_path):
     """The island demo must actually show up in the connectivity report."""
-    from ideagraph.hygiene import connectivity
+    from graph_engine.hygiene import connectivity
     build_demo_brain(demo_path, commit=False)
     brain = Brain(demo_path, mode="local")
     conn = connectivity(brain)
@@ -76,7 +76,7 @@ def test_demo_near_dup_pair_is_flagged(demo_path):
     install puts the pair outside the 0.78-0.92 band, so this skips without
     the [st] extra instead of asserting a property the demo doesn't have there.
     """
-    from ideagraph.hygiene import near_dup_pairs
+    from graph_engine.hygiene import near_dup_pairs
     build_demo_brain(demo_path, commit=False)
     brain = Brain(demo_path, mode="local")
     pairs = near_dup_pairs(brain, lo=0.78, hi=0.92)

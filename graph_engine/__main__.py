@@ -1,20 +1,20 @@
 """CLI for the brain: init, ingest, pending, accept, reject, link, search.
 
 Examples:
-  python -m ideagraph init [--remote <brain-repo-url>] [--demo]
-  python -m ideagraph ingest "New idea ..." [--source agent/bot] [--allow-dup]
-  cat note.md | python -m ideagraph ingest -
-  python -m ideagraph pending
-  python -m ideagraph accept <edge_id>
-  python -m ideagraph reject <edge_id>
-  python -m ideagraph accept-pending [--max-intent-per-source 2] [--dry-run] [--json]
-  python -m ideagraph recall [--top 10] [--aggregate] [--dry-run] [--json]
-  python -m ideagraph link <node_a> <node_b> [--kind same_as]
-  python -m ideagraph search "attention" [--json]
-  python -m ideagraph gaps [--taxonomy tax.json] [--min 10] [--json]
-  python -m ideagraph merge <survivor_id> <deletee_id>   # consolidate a near-dup
-  python -m ideagraph near-dup [--lo 0.78] [--hi 0.92]   # report near-duplicate pairs
-  python -m ideagraph status [--json]                    # connectivity/hygiene report
+  python -m graph_engine init [--remote <brain-repo-url>] [--demo]
+  python -m graph_engine ingest "New idea ..." [--source agent/bot] [--allow-dup]
+  cat note.md | python -m graph_engine ingest -
+  python -m graph_engine pending
+  python -m graph_engine accept <edge_id>
+  python -m graph_engine reject <edge_id>
+  python -m graph_engine accept-pending [--max-intent-per-source 2] [--dry-run] [--json]
+  python -m graph_engine recall [--top 10] [--aggregate] [--dry-run] [--json]
+  python -m graph_engine link <node_a> <node_b> [--kind same_as]
+  python -m graph_engine search "attention" [--json]
+  python -m graph_engine gaps [--taxonomy tax.json] [--min 10] [--json]
+  python -m graph_engine merge <survivor_id> <deletee_id>   # consolidate a near-dup
+  python -m graph_engine near-dup [--lo 0.78] [--hi 0.92]   # report near-duplicate pairs
+  python -m graph_engine status [--json]                    # connectivity/hygiene report
 
 Env like the server: IG_BRAIN_PATH, IG_BRAIN_REMOTE, IG_BRAIN_MODE,
 IDEAGRAPH_EMBEDDER (st|hash), IDEAGRAPH_EMBEDDER_MODEL.
@@ -162,7 +162,7 @@ def cmd_init(engine: BrainEngine, args: list[str]) -> None:
         print("  ig near-dup                   # find the demo near-dup pair")
         print("  ig pending                    # review the 2 pending suggestions")
         print("  ig search \"RAG\"               # hybrid search (works instantly)")
-        print("  uvicorn ideagraph.server:app --port 8000   # → http://localhost:8000")
+        print("  uvicorn graph_engine.server:app --port 8000   # → http://localhost:8000")
         return
     if (brain.path / "INDEX.md").exists() or (brain.path / "nodes").exists():
         # same #58 principle for plain init: never clobber an existing brain
@@ -177,7 +177,7 @@ def cmd_init(engine: BrainEngine, args: list[str]) -> None:
     print("  Structure: nodes/ · edges.jsonl · vectors.jsonl · INDEX.md")
     print("Get started:")
     print('  ig ingest "First idea ..."            # CLI ingest')
-    print("  uvicorn ideagraph.server:app --port 8000   # → http://localhost:8000")
+    print("  uvicorn graph_engine.server:app --port 8000   # → http://localhost:8000")
 
 
 def cmd_gaps(engine: BrainEngine, args: list[str]) -> None:
@@ -509,7 +509,7 @@ def cmd_mcp(engine: BrainEngine, args: list[str]) -> None:
     try:
         from .mcp.server import main as mcp_main
     except ImportError:
-        print("MCP support is not installed — pip install 'ideagraph-live[mcp]'")
+        print("MCP support is not installed — pip install 'graph-engine[mcp]'")
         sys.exit(1)
     if write:
         from .mcp.server import register_write_tools

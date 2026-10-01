@@ -5,7 +5,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from ideagraph.decay import (
+from graph_engine.decay import (
     weibull_decay,
     retention_from_frequency,
     degradation_level,

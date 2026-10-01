@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ig_cycle — the mechanical research-ingest cycle for the IdeaGraph brain.
+"""ig_cycle — the mechanical research-ingest cycle for the GraphEngine brain.
 
 Runs the full SAFE ingest pipeline for a batch of subagent-produced findings:
   collect (glob /tmp/dogfood_*.txt, dedup) → marker-scan (fail on intent markers)
@@ -17,7 +17,7 @@ swap ("nіcht" with a Cyrillic і) or an innocent word elsewhere in the line
 ("Stätte" whitelisting a "statt" elsewhere) can no longer bypass the gate.
 
 Usage:
-  python3 tools/ig_cycle.py [--glob '/tmp/dogfood_*.txt'] [--brain ~/ideagraph-brain]
+  python3 tools/ig_cycle.py [--glob '/tmp/dogfood_*.txt'] [--brain ~/graph-engine-brain]
                             [--engine <engine-repo>] [--dry-run-only]
 """
 from __future__ import annotations
@@ -35,7 +35,7 @@ import tempfile
 import time
 import unicodedata
 
-DEFAULT_METRICS = os.path.expanduser("~/.cache/ideagraph/ig_metrics.jsonl")
+DEFAULT_METRICS = os.path.expanduser("~/.cache/graph_engine/ig_metrics.jsonl")
 
 # Intent-marker substrings (exact) that must NOT appear in a finding.
 MARKERS = [
@@ -176,11 +176,11 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--glob", default="/tmp/dogfood_*.txt")
     _repo_root = Path(__file__).resolve().parents[1]
-    # `~/…` defaults must be expanded: Path("~/ideagraph-brain") does not
+    # `~/…` defaults must be expanded: Path("~/graph-engine-brain") does not
     # expand the tilde, so the documented cron invocation (no --brain) aborted
     # with "brain not found" even though the brain existed (found 2026-09-15).
     ap.add_argument("--brain", default=os.path.expanduser(
-        os.environ.get("IG_BRAIN_PATH", "~/ideagraph-brain")))
+        os.environ.get("IG_BRAIN_PATH", "~/graph-engine-brain")))
     ap.add_argument("--engine", default=os.environ.get("IG_ENGINE_PATH", str(_repo_root)))
     ap.add_argument("--dry-run-only", action="store_true")
     ap.add_argument("--copy", default="",
@@ -246,7 +246,7 @@ def main() -> int:
                    IDEAGRAPH_INTENT_PENDING="1", IDEAGRAPH_EMBEDDER=cycle_embedder)
     dry_islands = []
     for src, finding in findings:
-        out = run([eng_py, "-m", "ideagraph", "ingest", finding, "--source", src],
+        out = run([eng_py, "-m", "graph_engine", "ingest", finding, "--source", src],
                   dry_env, args.engine)
         n = out.count("Suggestion:")
         m = __import__("re").search(r"Node (\w{12}):", out)
@@ -270,7 +270,7 @@ def main() -> int:
         # aborts mid-batch (earlier findings committed, later lost, no metrics,
         # review_edges never ran). Failed findings are recorded and skipped.
         try:
-            out = run([eng_py, "-m", "ideagraph", "ingest", finding, "--source", src],
+            out = run([eng_py, "-m", "graph_engine", "ingest", finding, "--source", src],
                       git_env, args.engine)
         except RuntimeError as e:
             failed.append(f"{src}: {str(e)[-200:]}")
@@ -288,7 +288,7 @@ def main() -> int:
 
     # Accept pending edges in ONE commit — through the ENGINE's review policy
     # (`ig accept-pending`), which accepts every non-intent pending edge but
-    # caps auto-accepted intent edges per source (ideagraph/review.py;
+    # caps auto-accepted intent edges per source (graph_engine/review.py;
     # ROADMAP_CASE `roadmap-intent-fanout-cap`). The previous path called an
     # accept-ALL script by default, which is exactly the leak the cap closes:
     # intent edges are auto-accepted at birth with confidence=None, so the
@@ -296,7 +296,7 @@ def main() -> int:
     # IG_REVIEW_SCRIPT stays available as an EXPLICIT opt-in escape hatch for a
     # custom policy (no default path — an unset variable must not silently
     # bypass the cap).
-    out = run([eng_py, "-m", "ideagraph", "accept-pending"], git_env, args.engine)
+    out = run([eng_py, "-m", "graph_engine", "accept-pending"], git_env, args.engine)
     print(out.strip().splitlines()[0] if out.strip() else "review: no output")
     review = os.environ.get("IG_REVIEW_SCRIPT", "")
     if review and os.path.exists(review):
@@ -307,7 +307,7 @@ def main() -> int:
     # Regenerate BRAIN_REPORT.md (report #7): rides the cycle as its own commit
     # (one commit per generation). A report failure must never fail the cycle.
     try:
-        out = run([eng_py, "-m", "ideagraph", "report", "--write"],
+        out = run([eng_py, "-m", "graph_engine", "report", "--write"],
                   git_env, args.engine)
         line = out.strip().splitlines()[-1] if out.strip() else ""
         print(f"report: {line or 'no output'}")
@@ -321,7 +321,7 @@ def main() -> int:
     # first cycle after this landed adds 30 summaries and later cycles add none
     # until the topology actually changes.
     try:
-        out = run([eng_py, "-m", "ideagraph", "dream", "--refresh", "--distill",
+        out = run([eng_py, "-m", "graph_engine", "dream", "--refresh", "--distill",
                    "--lifecycle"], git_env, args.engine)
         for line in out.strip().splitlines():
             if line.startswith(("refresh:", "distill:", "lifecycle:")):

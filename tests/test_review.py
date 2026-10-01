@@ -1,4 +1,4 @@
-"""Tests for the intent fan-out dam (`ideagraph/review.py`, `ig accept-pending`).
+"""Tests for the intent fan-out dam (`graph_engine/review.py`, `ig accept-pending`).
 
 The dam is the measurable contract of ROADMAP_CASE `roadmap-intent-fanout-cap`:
 at most `INTENT_AUTO_ACCEPT_MAX` intent edges per source may be auto-accepted;
@@ -17,11 +17,11 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from ideagraph.brain import Brain, Edge, Node
-from ideagraph.brain_engine import BrainEngine
-from ideagraph.embedder import HashEmbedder
-from ideagraph.intent import INTENT_KINDS
-from ideagraph.review import (
+from graph_engine.brain import Brain, Edge, Node
+from graph_engine.brain_engine import BrainEngine
+from graph_engine.embedder import HashEmbedder
+from graph_engine.intent import INTENT_KINDS
+from graph_engine.review import (
     INTENT_AUTO_ACCEPT_MAX,
     INTENT_AUTO_ACCEPT_MAX_ENV,
     accept_pending,

@@ -1,4 +1,4 @@
-"""Tests for the dream pass (`ideagraph/dream.py`, `ig dream`).
+"""Tests for the dream pass (`graph_engine/dream.py`, `ig dream`).
 
 The consolidation half of the memory system: deterministic maintenance
 (`refresh`) and community distillation (`distill`). Both must be non-destructive,
@@ -16,8 +16,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from ideagraph.brain import Brain, Edge, Node
-from ideagraph.dream import (
+from graph_engine.brain import Brain, Edge, Node
+from graph_engine.dream import (
     DECAY_DAYS,
     DECAY_MAX_DEGREE,
     PROMOTE_MIN_DEGREE,
@@ -32,7 +32,7 @@ from ideagraph.dream import (
     refresh,
     refresh_plan,
 )
-from ideagraph.recall import record
+from graph_engine.recall import record
 
 
 def _brain(tmp_path) -> Brain:

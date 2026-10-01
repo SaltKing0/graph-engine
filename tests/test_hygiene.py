@@ -6,9 +6,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from ideagraph.brain import Brain, Node, Edge, VALID_STATUS
-from ideagraph.brain_engine import BrainEngine
-from ideagraph.embedder import HashEmbedder
+from graph_engine.brain import Brain, Node, Edge, VALID_STATUS
+from graph_engine.brain_engine import BrainEngine
+from graph_engine.embedder import HashEmbedder
 
 
 def make_brain(tmp_path) -> Brain:

@@ -7,7 +7,7 @@ copies that could drift (the server adds a process-wide engine cache, the
 CLI does not). One factory, one source of truth.
 
 Env contract (identical for every consumer):
-  IG_BRAIN_PATH          — brain location (default ~/ideagraph-brain, ~ expanded,
+  IG_BRAIN_PATH          — brain location (default ~/graph-engine-brain, ~ expanded,
                            also for explicitly set values — Audit #33)
   IG_BRAIN_REMOTE        — clone URL for FIRST setup only (no personal default)
   IG_BRAIN_MODE          — "git" (real repo) or "local" (FS only, tests)
@@ -36,7 +36,7 @@ _ENGINES: dict[tuple[str, str], BrainEngine] = {}
 def brain_path() -> str:
     """Resolved brain path from the env (~ expanded, Audit #33)."""
     return os.path.expanduser(
-        os.environ.get("IG_BRAIN_PATH", os.path.expanduser("~/ideagraph-brain")))
+        os.environ.get("IG_BRAIN_PATH", os.path.expanduser("~/graph-engine-brain")))
 
 
 def make_brain() -> Brain:

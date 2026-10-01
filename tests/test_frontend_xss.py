@@ -46,15 +46,15 @@ def server():
                IG_BRAIN_PATH=str(brain),
                IDEAGRAPH_EMBEDDER="hash",
                PYTHONPATH=str(REPO))
-    subprocess.run([PY, "-m", "ideagraph", "init"], env=env, check=True,
+    subprocess.run([PY, "-m", "graph_engine", "init"], env=env, check=True,
                    capture_output=True)
     # hostile node text via CLI ingest (escapes through the normal pipeline)
-    subprocess.run([PY, "-m", "ideagraph", "ingest",
+    subprocess.run([PY, "-m", "graph_engine", "ingest",
                     f"Benign note {HOSTILE}", "--source", "attacker"],
                    env=env, check=True, capture_output=True)
     port = _free_port()
     proc = subprocess.Popen(
-        [PY, "-m", "uvicorn", "ideagraph.server:app", "--port", str(port),
+        [PY, "-m", "uvicorn", "graph_engine.server:app", "--port", str(port),
          "--log-level", "warning"],
         env=env, cwd=str(REPO), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     base = f"http://127.0.0.1:{port}"

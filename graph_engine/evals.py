@@ -346,14 +346,14 @@ def verify_retrieval(engine: BrainEngine, expectations: list[RetrievalExpectatio
 def verify_neighborhood(brain: Brain, expectations: list) -> list[str]:
     """Check neighborhood reachability against NeighborhoodExpectation entries.
 
-    Degrades gracefully when ideagraph.graph does not exist: the gate test
+    Degrades gracefully when graph_engine.graph does not exist: the gate test
     must fail for the RIGHT reason (expectation violation), never crash the
     harness with an ImportError (same trap as a missing no-op kwarg stub).
     """
     try:
         from .graph import neighbors
     except ImportError:
-        return ["graph traversal not implemented (ideagraph/graph.py missing)"]
+        return ["graph traversal not implemented (graph_engine/graph.py missing)"]
     failures: list[str] = []
     if not expectations:
         return failures
@@ -1064,7 +1064,7 @@ GOLDEN_SET: list[EvalTask] = [
         ),
     ),
     # Welle B/2 (2026-09-18): the status lifecycle — promotion and decay driven by
-    # the recall signal. Gates are data-derived (see ideagraph/dream.py): the
+    # the recall signal. Gates are data-derived (see graph_engine/dream.py): the
     # case pins them explicitly so it stays readable.
     EvalTask(
         id="roadmap-dream-lifecycle",

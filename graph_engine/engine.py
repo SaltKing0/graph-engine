@@ -44,7 +44,7 @@ def main() -> None:
     else:
         text = " ".join(args)
     if not text.strip():
-        print("Nothing to ingest. Usage: python -m ideagraph <text|->")
+        print("Nothing to ingest. Usage: python -m graph_engine <text|->")
         sys.exit(1)
     store = Store()
     engine = Engine(store, get_embedder(embedder_name))

@@ -11,9 +11,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from ideagraph.brain import Brain, Node
-from ideagraph.dream import refresh
-from ideagraph.recall import aggregate, record
+from graph_engine.brain import Brain, Node
+from graph_engine.dream import refresh
+from graph_engine.recall import aggregate, record
 
 
 def _brain(tmp_path) -> Brain:

@@ -46,7 +46,7 @@ def _write_enabled() -> bool:
 
 
 mcp = FastMCP(
-    "ideagraph",
+    "graph_engine",
     instructions=_INSTRUCTIONS_WRITE if _write_enabled() else _INSTRUCTIONS_READ,
 )
 

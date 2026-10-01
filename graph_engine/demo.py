@@ -1,4 +1,4 @@
-"""ideagraph.demo — a small, generic seed brain for onboarding (`ig init --demo`).
+"""graph_engine.demo — a small, generic seed brain for onboarding (`ig init --demo`).
 
 13 nodes over generic LLM/agent topics (no user-specific content), linked with
 every edge type (similar, extends, contradicts, supersedes, same_as),

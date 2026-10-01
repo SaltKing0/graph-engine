@@ -9,10 +9,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from ideagraph.brain import Brain, Node, Edge
-from ideagraph.brain_engine import BrainEngine
-from ideagraph.embedder import HashEmbedder
-from ideagraph.evals import (
+from graph_engine.brain import Brain, Node, Edge
+from graph_engine.brain_engine import BrainEngine
+from graph_engine.embedder import HashEmbedder
+from graph_engine.evals import (
     EvalOracle,
     EdgeExpectation,
     RetrievalExpectation,
@@ -157,7 +157,7 @@ def test_roadmap_cases_are_not_yet_green(tmp_path):
     if not ROADMAP_CASES:
         assert marker.exists(), (
             "ROADMAP_CASES is empty: either register a new roadmap-* EvalTask in "
-            "ideagraph/evals.py, or document the explicit decision: "
+            "graph_engine/evals.py, or document the explicit decision: "
             f"touch {marker.name} (with date + reason in the file)."
         )
         return  # documented empty
@@ -180,7 +180,7 @@ def test_roadmap_cases_are_not_yet_green(tmp_path):
 
 def test_find_node_by_text_exact_beats_prefix(tmp_path):
     """#27a: oracle texts that are prefixes of each other resolve correctly."""
-    from ideagraph.evals import find_node_by_text
+    from graph_engine.evals import find_node_by_text
     b = _brain(tmp_path)
     b.write_node(Node(id="short", text="Agent memory"))
     b.write_node(Node(id="long", text="Agent memory consolidation improves recall"))
@@ -191,7 +191,7 @@ def test_find_node_by_text_exact_beats_prefix(tmp_path):
 
 def test_find_node_by_text_prefix_prefers_original(tmp_path):
     """#27a: after evolution appends a suffix, the original (shortest) wins."""
-    from ideagraph.evals import find_node_by_text
+    from graph_engine.evals import find_node_by_text
     b = _brain(tmp_path)
     b.write_node(Node(id="evolved", text="Agent memory [evolved from abc123]"))
     b.write_node(Node(id="other", text="Agent memory consolidation improves recall"))

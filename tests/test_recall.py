@@ -1,4 +1,4 @@
-"""Tests for recall tracking (`ideagraph/recall.py`, `ig recall`).
+"""Tests for recall tracking (`graph_engine/recall.py`, `ig recall`).
 
 The signal the consolidation half of the memory system runs on: a memory that
 never records what it is asked for cannot decide what to promote or let decay.
@@ -11,10 +11,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from ideagraph.brain import Brain, Node
-from ideagraph.brain_engine import BrainEngine
-from ideagraph.embedder import HashEmbedder
-from ideagraph.recall import (
+from graph_engine.brain import Brain, Node
+from graph_engine.brain_engine import BrainEngine
+from graph_engine.embedder import HashEmbedder
+from graph_engine.recall import (
     LEDGER_NAME,
     MAX_QUERY_FINGERPRINTS,
     aggregate,
@@ -25,7 +25,7 @@ from ideagraph.recall import (
     top,
     tracking_enabled,
 )
-from ideagraph.retrieval import retrieve
+from graph_engine.retrieval import retrieve
 
 
 def _brain(tmp_path) -> Brain:

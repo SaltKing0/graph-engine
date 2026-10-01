@@ -10,8 +10,8 @@ from __future__ import annotations
 import pytest
 from fastapi.testclient import TestClient
 
-from ideagraph.brain import Brain, Edge, Node
-from ideagraph.server import app
+from graph_engine.brain import Brain, Edge, Node
+from graph_engine.server import app
 
 
 @pytest.fixture

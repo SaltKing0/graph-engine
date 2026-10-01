@@ -3,7 +3,7 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ideagraph-live"
+name = "graph-engine"
 version = "0.5.4"
 description = "Self-growing idea graph: Ingest → Embed → Suggest → Visualize. A generic engine for a persistent knowledge graph backed by your own private git repo (the 'brain')."
 readme = "README.md"
@@ -35,19 +35,19 @@ mcp = ["mcp>=1.28,<2", "sse-starlette>=1.6.1,<3"]
 dev = ["pytest==8.4.0"]
 
 [project.scripts]
-ig = "ideagraph.__main__:main"
-ig-mcp = "ideagraph.mcp.server:main"
+ig = "graph_engine.__main__:main"
+ig-mcp = "graph_engine.mcp.server:main"
 
 [project.urls]
-Homepage = "https://github.com/SaltKing0/ideagraph-live"
-Repository = "https://github.com/SaltKing0/ideagraph-live"
-Issues = "https://github.com/SaltKing0/ideagraph-live/issues"
-Changelog = "https://github.com/SaltKing0/ideagraph-live/blob/main/CHANGELOG.md"
-PyPI = "https://pypi.org/project/ideagraph-live/"
+Homepage = "https://github.com/SaltKing0/graph-engine"
+Repository = "https://github.com/SaltKing0/graph-engine"
+Issues = "https://github.com/SaltKing0/graph-engine/issues"
+Changelog = "https://github.com/SaltKing0/graph-engine/blob/main/CHANGELOG.md"
+PyPI = "https://pypi.org/project/graph-engine/"
 
 [tool.setuptools]
-packages = ["ideagraph", "ideagraph.web", "ideagraph.mcp"]
+packages = ["graph_engine", "graph_engine.web", "graph_engine.mcp"]
 
 [tool.setuptools.package-data]
-"ideagraph.web" = ["*.html", "*.js"]
-"ideagraph.mcp" = ["agent/*.md"]
+"graph_engine.web" = ["*.html", "*.js"]
+"graph_engine.mcp" = ["agent/*.md"]

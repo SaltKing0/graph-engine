@@ -33,7 +33,7 @@ def _env(tmp_path, **extra) -> dict:
 def brain(tmp_path):
     """An initialized local brain."""
     b = tmp_path / "brain"
-    subprocess.run([PY, "-m", "ideagraph", "init"],
+    subprocess.run([PY, "-m", "graph_engine", "init"],
                    capture_output=True, text=True,
                    env=_env(tmp_path, IG_BRAIN_MODE="local", IG_BRAIN_PATH=str(b)),
                    check=True)
@@ -55,13 +55,13 @@ def test_cycle_missing_brain_aborts_cleanly(tmp_path):
 
 
 def test_cycle_default_brain_expands_tilde(tmp_path):
-    """The documented cron invocation passes NO --brain: the `~/ideagraph-brain`
+    """The documented cron invocation passes NO --brain: the `~/graph-engine-brain`
     default must be tilde-expanded, otherwise the run aborts with "brain not
     found" although the brain exists (found 2026-09-15)."""
     home = tmp_path / "home"
     home.mkdir()
-    b = home / "ideagraph-brain"
-    subprocess.run([PY, "-m", "ideagraph", "init"], capture_output=True, text=True,
+    b = home / "graph-engine-brain"
+    subprocess.run([PY, "-m", "graph_engine", "init"], capture_output=True, text=True,
                    env=_env(tmp_path, IG_BRAIN_MODE="local", IG_BRAIN_PATH=str(b)),
                    check=True)
     findings = tmp_path / "findings"

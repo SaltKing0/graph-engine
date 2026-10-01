@@ -12,17 +12,17 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from ideagraph.agent_memory import (
+from graph_engine.agent_memory import (
     AGENT_ORIGIN,
     AGENT_SOURCE,
     forget,
     recall,
     remember,
 )
-from ideagraph.brain import Brain, Edge, Node
-from ideagraph.brain_engine import BrainEngine
-from ideagraph.embedder import HashEmbedder
-from ideagraph.retrieval import retrieve
+from graph_engine.brain import Brain, Edge, Node
+from graph_engine.brain_engine import BrainEngine
+from graph_engine.embedder import HashEmbedder
+from graph_engine.retrieval import retrieve
 
 
 def _engine(tmp_path) -> BrainEngine:
@@ -142,7 +142,7 @@ def test_forget_tombstones_without_deleting(tmp_path):
     # (`read_edges()` is the raw store and keeps invalidated edges on purpose)
     edge = next(e for e in brain.read_edges(include_rejected=True) if e.id == "e1")
     assert edge.valid_to is not None
-    from ideagraph.graph import live_edges
+    from graph_engine.graph import live_edges
     assert [e.id for e in live_edges(brain)] == []
 
 

@@ -11,9 +11,9 @@ from pathlib import Path
 
 import pytest
 
-from ideagraph.brain import Brain, Edge, Node
-from ideagraph.brain_engine import BrainEngine
-from ideagraph.embedder import HashEmbedder
+from graph_engine.brain import Brain, Edge, Node
+from graph_engine.brain_engine import BrainEngine
+from graph_engine.embedder import HashEmbedder
 
 
 def _git(*args: str, cwd: str = None) -> subprocess.CompletedProcess:

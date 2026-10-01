@@ -12,8 +12,8 @@ cleanup, applied once to the whole store:
 
 Usage (dry run first, ALWAYS on a copy — see the skill's data-mutation rule):
 
-    python3 tools/backfill_origin.py --brain ~/ideagraph-brain --mode local
-    python3 tools/backfill_origin.py --brain ~/ideagraph-brain --mode git --apply
+    python3 tools/backfill_origin.py --brain ~/graph-engine-brain --mode local
+    python3 tools/backfill_origin.py --brain ~/graph-engine-brain --mode git --apply
 
 Idempotent: edges that already carry an origin are left untouched.
 """
@@ -26,8 +26,8 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
-from ideagraph.brain import Brain
-from ideagraph.intent import INTENT_KINDS
+from graph_engine.brain import Brain
+from graph_engine.intent import INTENT_KINDS
 
 
 def infer(edge) -> str:
@@ -40,7 +40,7 @@ def infer(edge) -> str:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--brain", default=str(pathlib.Path.home() / "ideagraph-brain"))
+    ap.add_argument("--brain", default=str(pathlib.Path.home() / "graph-engine-brain"))
     ap.add_argument("--mode", default="git", choices=["git", "local"])
     ap.add_argument("--apply", action="store_true")
     args = ap.parse_args()

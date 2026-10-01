@@ -10,10 +10,10 @@ import json
 import shutil
 import tempfile
 
-from ideagraph.brain import Brain, Edge, Node
-from ideagraph.brain_engine import BrainEngine
-from ideagraph.embedder import HashEmbedder
-from ideagraph.report import render_report, report_data, write_report, _md_cell
+from graph_engine.brain import Brain, Edge, Node
+from graph_engine.brain_engine import BrainEngine
+from graph_engine.embedder import HashEmbedder
+from graph_engine.report import render_report, report_data, write_report, _md_cell
 
 
 def _engine() -> BrainEngine:
@@ -211,7 +211,7 @@ def test_write_report_creates_tracked_file(tmp_path):
 def test_write_report_refuses_empty_body(monkeypatch):
     eng = _engine()
     try:
-        import ideagraph.report as rep
+        import graph_engine.report as rep
         monkeypatch.setattr(rep, "render_report", lambda *a, **k: "")
         try:
             rep.write_report(eng.brain)

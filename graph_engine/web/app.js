@@ -1,4 +1,4 @@
-// IdeaGraph: explore ideas, review connections, and undo saved decisions.
+// GraphEngine: explore ideas, review connections, and undo saved decisions.
 (() => {
   "use strict";
   const $ = selector => document.querySelector(selector);

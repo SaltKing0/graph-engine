@@ -1,4 +1,4 @@
-# Contributing to IdeaGraph Live Engine
+# Contributing to GraphEngine
 
 Thanks for helping out! Here are the key rules to keep things running smoothly.
 
@@ -21,7 +21,7 @@ Before a PR: the full suite must be green (run `.venv/bin/python -m pytest
 tests/ -q` and use the count it prints — the number grows with every feature;
 with the `[st]` extra and Playwright installed everything runs, the embedder-
 and browser-dependent tests skip without them). New features need tests — in particular the golden-set evals
-(`ideagraph/evals.py`) and the intent/hygiene integrations.
+(`graph_engine/evals.py`) and the intent/hygiene integrations.
 
 CI runs two jobs: `test` (Python 3.11/3.12, default install) and `test-st`
 (3.12 with the real embedder), so the skipped tests are covered too.
@@ -36,7 +36,7 @@ CI runs two jobs: `test` (Python 3.11/3.12, default install) and `test-st`
 
 ## Architecture notes
 
-- `ideagraph/` = engine logic, `ideagraph/web/` = frontend (d3, shipped as
+- `graph_engine/` = engine logic, `graph_engine/web/` = frontend (d3, shipped as
   package data), `tools/` = pipeline scripts, `tests/` = pytest. `docs/` holds
   the README screenshot.
 - **Brain and engine are separate:** the engine is generic and points to the

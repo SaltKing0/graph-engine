@@ -48,10 +48,10 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
     `readOnlyHint: false`, so clients ask their user before a model writes into
     the private brain; in read-only mode they answer with a `write_disabled`
     envelope. One commit per write.
-  - Engine-level core in `ideagraph/agent_memory.py` (testable without `mcp`),
+  - Engine-level core in `graph_engine/agent_memory.py` (testable without `mcp`),
     `ingest(..., edge_origin=)` for agent-declared relations, golden case
     `roadmap-agent-memory`.
-- **The dream pass** (`ideagraph/dream.py`, `ig dream`) — the consolidation half
+- **The dream pass** (`graph_engine/dream.py`, `ig dream`) — the consolidation half
   of the memory system, split into three explicitly requested steps so nothing
   happens implicitly:
   - `ig dream` (default, read-only) prints the eligibility plan: promotion and
@@ -88,7 +88,7 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
   machine guesses?" by hand from the marker text — a maintenance pass that may
   rewrite heuristic edges but never user-authored ones needs that stored.
   Golden case `roadmap-edge-origin`.
-- **Recall tracking** (`ideagraph/recall.py`, `ig recall`): the read path
+- **Recall tracking** (`graph_engine/recall.py`, `ig recall`): the read path
   appends one line per search to a gitignored ledger (`recalls.jsonl` in the
   brain root, `IG_NO_RECALL_TRACKING=1` disables) — no node rewrite, no commit
   per search; `ig recall --aggregate` folds the ledger into the derived node
@@ -111,7 +111,7 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
   (`--max-intent-per-source`, default 2, env `IG_INTENT_AUTO_ACCEPT_MAX`).
   Everything beyond the cap stays pending for `ig pending`; `--dry-run` shows
   the decision without writing, `--json` is machine-readable.
-- **Intent fan-out dam** (`ideagraph/review.py`, enforced in
+- **Intent fan-out dam** (`graph_engine/review.py`, enforced in
   `brain_engine.ingest` at birth and on the review path): at most 2 intent
   edges (`contradicts`/`supersedes`/`continues`) per source are auto-accepted,
   the rest are born pending — kept and reviewable instead of invisible.
@@ -145,7 +145,7 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
   live uvicorn smoke (UI, `/api/graph`, `/api/report`, `/report`) works on the new pair.
 
 ### Fixed
-- **`pip install 'ideagraph-live[mcp]'` is resolvable again on Python 3.14.** It failed
+- **`pip install 'graph-engine[mcp]'` is resolvable again on Python 3.14.** It failed
   with `ResolutionImpossible`: `fastapi==0.116.0` pinned `starlette>=0.40,<0.47`, while
   `mcp>=1.28` declares `starlette>=0.48.0; python_version >= "3.14"`. A fresh 3.14 install
   now resolves `fastapi 0.141.1 + starlette 1.6.0 + mcp 1.30.0 + sse-starlette 2.4.1`
@@ -162,17 +162,17 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
   graph neighborhood via the new `ideagraph.graph` seam), and `brain_status`
   (size/connectivity/pending load, basename-only path). No write tools by
   design; the engine loads lazily; payloads are capped and escaped in one
-  place (`ideagraph/mcp/format.py`); the vector cache is never written by
+  place (`graph_engine/mcp/format.py`); the vector cache is never written by
   default (`IG_MCP_CACHE_VECTORS=1` opts in) so a cold-clone search cannot
   dirty the private repo. Cold-search cost measured on a 1821-node clone
   (2-core VPS, all-MiniLM-L6-v2): 275 s one-time embed — memoized in-process,
   so subsequent searches in the same server session are warm (~2 s); with
   `persist=True` the fill lands on disk once (352 s incl. write) and warm
   searches stay ~2 s. Opt-in assistant prompt snippet shipped at
-  `ideagraph/mcp/agent/instructions.md`.
+  `graph_engine/mcp/agent/instructions.md`.
 - Engine seams: `Brain.read_node(id)` (single-node fetch without the full
   glob), `vectors_for(..., persist=False)` (compute without writing the cache;
-  threaded through `retrieve()`), `ideagraph/graph.py` (undirected live-edge
+  threaded through `retrieve()`), `graph_engine/graph.py` (undirected live-edge
   neighborhood, shared primitive from report #1).
 - Eval layer: `NeighborhoodExpectation` + `verify_neighborhood` (graceful
   degrade when `graph.py` is absent); golden case `roadmap-neighbors` flipped
@@ -228,7 +228,7 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
   have corrupted a stdio MCP server's JSON-RPC transport.
 
 ### Changed
-- `ideagraph/runtime.py` — one shared brain/engine factory for the CLI and
+- `graph_engine/runtime.py` — one shared brain/engine factory for the CLI and
   the FastAPI server (previously two drifting copies; the server keeps its
   process-wide engine cache, now in one place).
 
@@ -261,11 +261,11 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
   fall back to the running interpreter, like `ig_cycle.py` already did.
 - **`ig_evolve --list` reads an overridable history path** —
   `IG_EVOLVE_HISTORY` replaces the hardcoded
-  `~/.cache/ideagraph/ig_evolve_history.jsonl`, and the test seeds its own file
+  `~/.cache/graph_engine/ig_evolve_history.jsonl`, and the test seeds its own file
   instead of asserting on whatever the machine happens to have (it passed
   locally, where the file existed, and failed in CI).
 - **Installable on current Pythons** — `numpy==2.3.1` ships wheels for
-  cp311–cp313 only, so `pip install ideagraph-live` failed to resolve on
+  cp311–cp313 only, so `pip install graph-engine` failed to resolve on
   Python 3.14 (and on 3.10). The pin now carries an environment marker
   (`>=2.3.2` on 3.14+) and `requires-python` is `>=3.11`.
 - **`tools/ig_cycle.py` respects the caller's embedder** — the cycle hardcoded
@@ -302,7 +302,7 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 - **pip-installable end to end** — the web UI ships inside the package
-  (`ideagraph/web/`), so `pip install` serves the full cockpit; core
+  (`graph_engine/web/`), so `pip install` serves the full cockpit; core
   dependencies are lightweight and the sentence-transformers embedder is
   now the optional `[st]` extra (falls back to the deterministic
   HashEmbedder with a notice when absent).
@@ -365,7 +365,7 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
     (collect → marker-scan abort → dry-run on a copy → real ingest → accept
     edges → report). Never ingests blind; appends one JSON metrics line per run
     (nodes added, islands, duration, timeouts) to
-    `~/.cache/ideagraph/ig_metrics.jsonl`.
+    `~/.cache/graph_engine/ig_metrics.jsonl`.
   - `tools/ig_adapt.py` (Tier 2) — the adaptive controller: reads the metrics,
     writes `cycle_strategy.json` with topic weights (thin areas boosted, focus
     areas weighted 2x), quality-driven findings rules, and an adaptive batch
@@ -425,7 +425,7 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 ## [0.2.0] - 2026-08-23
 
 ### Added
-- **Tab cockpit UI** (`ideagraph/web/index.html` + `app.js`): three tabs —
+- **Tab cockpit UI** (`graph_engine/web/index.html` + `app.js`): three tabs —
   **Ingest** (start page), **Graph**, **Review** — replacing the previous
   single-screen layout.
 - **Graph interaction (Obsidian-like):** wheel zoom, pan by dragging the
@@ -485,16 +485,16 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
   license. Similarity edges (`ähnlich`, `erweitert` — renamed to
   `similar`/`extends` in 0.5.0).
 
-[Unreleased]: https://github.com/SaltKing0/ideagraph-live/compare/v0.5.4...HEAD
-[0.5.4]: https://github.com/SaltKing0/ideagraph-live/compare/v0.5.3...v0.5.4
-[0.5.3]: https://github.com/SaltKing0/ideagraph-live/compare/v0.5.2...v0.5.3
-[0.5.2]: https://github.com/SaltKing0/ideagraph-live/compare/v0.5.1...v0.5.2
-[0.5.1]: https://github.com/SaltKing0/ideagraph-live/compare/v0.5.0...v0.5.1
-[0.5.0]: https://github.com/SaltKing0/ideagraph-live/compare/v0.4.0...v0.5.0
-[0.4.0]: https://github.com/SaltKing0/ideagraph-live/compare/v0.3.1...v0.4.0
-[0.3.1]: https://github.com/SaltKing0/ideagraph-live/compare/v0.3.0...v0.3.1
-[0.3.0]: https://github.com/SaltKing0/ideagraph-live/compare/v0.2.0...v0.3.0
-[0.2.0]: https://github.com/SaltKing0/ideagraph-live/compare/v0.1.1...v0.2.0
-[0.1.1]: https://github.com/SaltKing0/ideagraph-live/compare/v0.1.0...v0.1.1
-[0.1.0]: https://github.com/SaltKing0/ideagraph-live/compare/v0.0.1...v0.1.0
-[0.0.1]: https://github.com/SaltKing0/ideagraph-live/releases/tag/v0.0.1
+[Unreleased]: https://github.com/SaltKing0/graph-engine/compare/v0.5.4...HEAD
+[0.5.4]: https://github.com/SaltKing0/graph-engine/compare/v0.5.3...v0.5.4
+[0.5.3]: https://github.com/SaltKing0/graph-engine/compare/v0.5.2...v0.5.3
+[0.5.2]: https://github.com/SaltKing0/graph-engine/compare/v0.5.1...v0.5.2
+[0.5.1]: https://github.com/SaltKing0/graph-engine/compare/v0.5.0...v0.5.1
+[0.5.0]: https://github.com/SaltKing0/graph-engine/compare/v0.4.0...v0.5.0
+[0.4.0]: https://github.com/SaltKing0/graph-engine/compare/v0.3.1...v0.4.0
+[0.3.1]: https://github.com/SaltKing0/graph-engine/compare/v0.3.0...v0.3.1
+[0.3.0]: https://github.com/SaltKing0/graph-engine/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/SaltKing0/graph-engine/compare/v0.1.1...v0.2.0
+[0.1.1]: https://github.com/SaltKing0/graph-engine/compare/v0.1.0...v0.1.1
+[0.1.0]: https://github.com/SaltKing0/graph-engine/compare/v0.0.1...v0.1.0
+[0.0.1]: https://github.com/SaltKing0/graph-engine/releases/tag/v0.0.1

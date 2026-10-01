@@ -305,8 +305,8 @@ class Brain:
             return
         # Bot identity is configurable (IG_BOT_NAME/IG_BOT_EMAIL); no longer
         # a hard-wired personal identity.
-        bot_name = os.environ.get("IG_BOT_NAME", "ideagraph-bot")
-        bot_email = os.environ.get("IG_BOT_EMAIL", "bot@ideagraph.local")
+        bot_name = os.environ.get("IG_BOT_NAME", "graph-engine-bot")
+        bot_email = os.environ.get("IG_BOT_EMAIL", "bot@graph-engine.local")
         env_user = ["-c", f"user.name={bot_name}", "-c", f"user.email={bot_email}"]
         subprocess.run(["git", "-C", str(self.path), *env_user, "add", "-A"], check=True)
         diff = subprocess.run(["git", "-C", str(self.path), *env_user,

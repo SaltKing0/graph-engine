@@ -14,9 +14,9 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from ideagraph.brain import Brain, Node, Edge
-from ideagraph.brain_engine import BrainEngine, BRAIN_LOCK
-from ideagraph.embedder import HashEmbedder
+from graph_engine.brain import Brain, Node, Edge
+from graph_engine.brain_engine import BrainEngine, BRAIN_LOCK
+from graph_engine.embedder import HashEmbedder
 
 # The real (semantic) embedder is the optional [st] extra. The default install
 # — and the default CI job — has no sentence-transformers, so tests that need
@@ -188,7 +188,7 @@ def test_vectors_for_persists_new_vectors(tmp_path):
 
 def test_retrieve_excludes_tombstones(tmp_path):
     """Audit #7: tombstoned nodes must not come back as search answers."""
-    from ideagraph.retrieval import retrieve
+    from graph_engine.retrieval import retrieve
     engine = make_engine(tmp_path)
     engine.ingest("Transformer Architektur Grundlagen", source="test")
     engine.ingest("KV-Cache Optimierung Details", source="test")
@@ -201,7 +201,7 @@ def test_retrieve_excludes_tombstones(tmp_path):
 
 def test_cosine_rejects_dimension_mismatch():
     """Audit #8: cosine must not silently truncate on foreign dimensions."""
-    from ideagraph.similarity import cosine
+    from graph_engine.similarity import cosine
     import pytest
     with pytest.raises(ValueError):
         cosine([1.0, 2.0, 3.0], [1.0, 2.0, 3.0, 4.0])
@@ -223,7 +223,7 @@ def test_find_duplicate_skips_foreign_dimensions(tmp_path):
 
 def test_retrieve_degrades_gracefully_on_mixed_dims(tmp_path):
     """Demo-like brain (foreign vector dimension): BM25 stage stays effective."""
-    from ideagraph.retrieval import retrieve
+    from graph_engine.retrieval import retrieve
     engine = make_engine(tmp_path)
     engine.ingest("RAG grounding mit Retrieval-Augmented Generation", source="test")
     vecs = engine.brain.read_vectors()
@@ -354,7 +354,7 @@ def test_merge_refreshes_survivor_vector(tmp_path):
     n2, _, _ = engine.ingest("Thema A über Quantenfehlerkorrektur und Surface Codes",
                              source="test", allow_duplicates=True)
     old_vec = engine.brain.read_vectors()[n2.id]
-    from ideagraph.merge import merge_nodes
+    from graph_engine.merge import merge_nodes
     merge_nodes(engine.brain, survivor_id=n2.id, deletee_id=n1.id,
                 commit=False, embedder=engine.embedder)
     new_vec = engine.brain.read_vectors()[n2.id]
@@ -371,7 +371,7 @@ def test_cli_accept_without_arg_prints_usage():
         env = dict(os.environ, IG_BRAIN_PATH=tmp, IG_BRAIN_MODE="local",
                    IDEAGRAPH_EMBEDDER="hash")
         r = subprocess.run(
-            [sys.executable, "-m", "ideagraph", "accept"],
+            [sys.executable, "-m", "graph_engine", "accept"],
             capture_output=True, text=True, env=env,
             cwd=str(Path(__file__).resolve().parent.parent), timeout=60)
     assert r.returncode == 1
@@ -386,7 +386,7 @@ def test_cli_ingest_stdin_marker_rejects_mixed_args():
         env = dict(os.environ, IG_BRAIN_PATH=tmp, IG_BRAIN_MODE="local",
                    IDEAGRAPH_EMBEDDER="hash")
         r = subprocess.run(
-            [sys.executable, "-m", "ideagraph", "ingest", "-", "extra"],
+            [sys.executable, "-m", "graph_engine", "ingest", "-", "extra"],
             capture_output=True, text=True, env=env, input="",
             cwd=str(Path(__file__).resolve().parent.parent), timeout=60)
     assert r.returncode == 1
@@ -396,7 +396,7 @@ def test_cli_ingest_stdin_marker_rejects_mixed_args():
 
 def test_gaps_render_empty_brain_no_zero_division(tmp_path_factory):
     """Audit #24: empty brain (all counts 0) → report, no ZeroDivisionError."""
-    from ideagraph.gaps import analyze_coverage, render
+    from graph_engine.gaps import analyze_coverage, render
     brain = make_brain(tmp_path_factory.mktemp("empty"))
     cov = analyze_coverage(brain)
     out = render(cov, threshold=10)
@@ -405,7 +405,7 @@ def test_gaps_render_empty_brain_no_zero_division(tmp_path_factory):
 
 def test_near_dup_max_zero_means_zero(tmp_path_factory):
     """Audit #60 (part): max_pairs=0 limits to 0, not to unbounded."""
-    from ideagraph.hygiene import near_dup_pairs
+    from graph_engine.hygiene import near_dup_pairs
     brain = make_brain(tmp_path_factory.mktemp("maxzero"))
     a = Node(text="Alpha node")
     b = Node(text="Alpha node two")
@@ -421,7 +421,7 @@ def test_near_dup_max_zero_means_zero(tmp_path_factory):
 def test_server_engine_cache_follows_env(tmp_path, monkeypatch):
     """Audit #16: the engine cache is keyed on (IG_BRAIN_PATH, IDEAGRAPH_EMBEDDER) —
     env changes deliver the matching engine, same env values the cached instance."""
-    from ideagraph import runtime
+    from graph_engine import runtime
     monkeypatch.setenv("IG_BRAIN_PATH", str(tmp_path / "a"))
     monkeypatch.setenv("IG_BRAIN_MODE", "local")
     monkeypatch.setenv("IDEAGRAPH_EMBEDDER", "hash")
@@ -477,7 +477,7 @@ def test_ws_zombie_binary_frame_disconnects(tmp_path):
     """Audit #29: a binary frame (KeyError path) throws the client out of the
     connection list instead of leaving a zombie behind."""
     from fastapi.testclient import TestClient
-    from ideagraph import server as srv
+    from graph_engine import server as srv
     brain = make_brain(tmp_path)
     with TestClient(srv.app) as client:
         with client.websocket_connect("/ws") as ws:
@@ -495,7 +495,7 @@ def test_ws_zombie_binary_frame_disconnects(tmp_path):
 def test_knn_skips_foreign_dim_candidates():
     """Audit #8 follow-up: knn skips foreign-dimensional candidates instead of
     crashing — a brain with legacy vectors of the wrong dimension degrades cleanly."""
-    from ideagraph.similarity import knn
+    from graph_engine.similarity import knn
     query = [1.0, 0.0, 0.0]
     candidates = {
         "same": [1.0, 0.0, 0.0],
@@ -533,7 +533,7 @@ def test_link_allows_same_pair_different_kind_or_direction(tmp_path):
 def test_bm25_scores_after_index_build(tmp_path):
     """Audit #10: scores() looks up the prebuilt index — identical scores to the
     reference formula, but without re-tokenizing per query."""
-    from ideagraph.retrieval import BM25
+    from graph_engine.retrieval import BM25
     bm = BM25(["alpha beta gamma", "alpha alpha delta", "epsilon"])
     s = bm.scores(["alpha", "delta"])
     # alpha alpha delta has double alpha + delta → higher than doc 1
@@ -554,7 +554,7 @@ def test_retrieve_nonsense_query_returns_no_garbage(tmp_path):
     with open(vec_file, "a") as f:
         for nid in ("x1", "x2"):
             f.write(_json.dumps({"id": nid, "vec": [0.1] * 64}) + "\n")
-    from ideagraph.retrieval import retrieve
+    from graph_engine.retrieval import retrieve
     results = retrieve(engine, "zzzqqq unrelatedword")
     assert results == []
 
@@ -564,7 +564,7 @@ def test_near_dup_float64_band_boundary(tmp_path):
     through rounding."""
     import json as _json
     import math
-    from ideagraph.hygiene import near_dup_pairs
+    from graph_engine.hygiene import near_dup_pairs
     brain = make_brain(tmp_path)
     a = brain.write_node(Node(id="vecaaa1", text="Alpha document"))
     b = brain.write_node(Node(id="vecbbb2", text="Alpha document two"))
@@ -583,7 +583,7 @@ def test_near_dup_float64_band_boundary(tmp_path):
 def test_connectivity_ignores_invalidated_edges(tmp_path):
     """Audit #40: an edge with valid_to no longer counts toward degree — the
     status report no longer contradicts the admit-rule logic."""
-    from ideagraph.hygiene import connectivity
+    from graph_engine.hygiene import connectivity
     brain = make_brain(tmp_path)
     brain.write_node(Node(id="conn111", text="A"))
     brain.write_node(Node(id="conn222", text="B"))
@@ -597,7 +597,7 @@ def test_connectivity_ignores_invalidated_edges(tmp_path):
 
 def test_knn_k_zero_returns_empty():
     """Audit #60: k<=0 → [] instead of all items (k=0) or last dropped (k=-1)."""
-    from ideagraph.similarity import knn
+    from graph_engine.similarity import knn
     cands = {"a": [1.0, 0.0], "b": [0.0, 1.0]}
     assert knn([1.0, 0.0], cands, k=0) == []
     assert knn([1.0, 0.0], cands, k=-1) == []
@@ -605,13 +605,13 @@ def test_knn_k_zero_returns_empty():
 def test_knn_skips_empty_vectors():
     """Audit #60: missing/empty vectors are skipped instead of ranked as
     a total mismatch (cos 0.0)."""
-    from ideagraph.similarity import knn
+    from graph_engine.similarity import knn
     result = knn([1.0, 0.0], {"good": [1.0, 0.0], "empty": []}, k=2)
     assert [nid for nid, _ in result] == ["good"]
 
 def test_gaps_keyword_word_boundary(tmp_path):
     """Audit #60: 'test' no longer matches 'latest' — word-boundary matching."""
-    from ideagraph.gaps import analyze_coverage
+    from graph_engine.gaps import analyze_coverage
     brain = make_brain(tmp_path)
     brain.write_node(Node(text="The latest developments in robotics"))
     coverage = analyze_coverage(brain)
@@ -625,47 +625,47 @@ def test_gaps_keyword_word_boundary(tmp_path):
 def test_intent_no_false_positive_from_marker_substring():
     """Audit #35: "versetzt" contains "ersetzt" as a substring — token matching
     must not fire."""
-    from ideagraph.intent import detect_intent
+    from graph_engine.intent import detect_intent
     assert detect_intent("Der Mitarbeiter wird versetzt in die neue Abteilung",
                          "Der Mitarbeiter arbeitet in der Abteilung") is None
 
 
 def test_intent_no_false_positive_from_ordinary_negation():
     """Audit #35: "keine Zeit fuer Review" is not a contradiction about review."""
-    from ideagraph.intent import detect_intent
+    from graph_engine.intent import detect_intent
     assert detect_intent("Ich habe keine Zeit für Review",
                          "Review des Agent-Systems") is None
 
 
 def test_intent_stattfinden_is_not_supersedes():
     """Audit #35: "findet statt" is the stattfinden verb, not a supersedes marker."""
-    from ideagraph.intent import detect_intent
+    from graph_engine.intent import detect_intent
     assert detect_intent("Das Meeting findet statt", "Das Meeting des Teams") is None
 
 
 def test_intent_statt_with_object_still_fires():
-    from ideagraph.intent import detect_intent
+    from graph_engine.intent import detect_intent
     assert detect_intent("Wir nutzen Tool B statt Tool A",
                          "Tool A war das bisherige Tool") == "supersedes"
 
 
 def test_intent_negation_both_directions():
     """Audit #36: old denies, new affirms the same subject -> contradicts."""
-    from ideagraph.intent import detect_intent
+    from graph_engine.intent import detect_intent
     assert detect_intent("Die Erde ist eine Kugel",
                          "Die Erde ist keine Kugel") == "contradicts"
 
 
 def test_intent_punctuation_does_not_break_shared_words():
     """Audit #36: "Erde," is the same word as "Erde" after tokenization."""
-    from ideagraph.intent import detect_intent
+    from graph_engine.intent import detect_intent
     assert detect_intent("Die Erde, wie sie ist, bleibt eine Kugel",
                          "Die Erde ist keine Kugel") is not None
 
 
 def test_intent_english_markers():
     """Audit #61: marker sets are bilingual."""
-    from ideagraph.intent import detect_intent
+    from graph_engine.intent import detect_intent
     assert detect_intent("The new scheduler replaces the old scheduler",
                          "The old scheduler of the system") == "supersedes"
     assert detect_intent("This finding contradicts the earlier claim",
@@ -676,7 +676,7 @@ def test_intent_english_markers():
 
 def test_intent_marker_priority_deterministic():
     """Audit #51: supersedes > contradicts > continues — deterministic."""
-    from ideagraph.intent import detect_intent
+    from graph_engine.intent import detect_intent
     both = "Die neue API ersetzt die alte API, die alte Behauptung ist falsch"
     old = "Die alte API der Plattform"
     assert detect_intent(both, old) == "supersedes"
@@ -687,9 +687,9 @@ def test_intent_marker_priority_deterministic():
 def test_ingest_failed_commit_raises_actionable_error(tmp_path, monkeypatch, capsys):
     """Audit #31: commit_and_push failure → index heal + clear message instead of
     a bare CalledProcessError; the node stays on disk (no fake rollback)."""
-    from ideagraph.brain import Brain
-    from ideagraph.brain_engine import BrainEngine
-    from ideagraph.embedder import HashEmbedder
+    from graph_engine.brain import Brain
+    from graph_engine.brain_engine import BrainEngine
+    from graph_engine.embedder import HashEmbedder
     eng = BrainEngine(Brain(str(tmp_path), mode="local"), HashEmbedder())
     # commit_and_push is a no-op in local mode — force the failure path:
     calls = {"n": 0}
@@ -713,7 +713,7 @@ def test_flip_gate_marker_required(tmp_path):
     from pathlib import Path
     repo = Path(__file__).resolve().parent.parent
     marker = repo / "ROADMAP_CASES_EMPTY"
-    from ideagraph.evals import ROADMAP_CASES
+    from graph_engine.evals import ROADMAP_CASES
     if not ROADMAP_CASES:
         assert marker.exists(), "empty ROADMAP_CASES requires the marker file"
 
@@ -724,7 +724,7 @@ def test_flip_gate_marker_required(tmp_path):
 
 def test_embedder_batch_contract():
     """embed_batch matches per-text embed() exactly (HashEmbedder determinism)."""
-    from ideagraph.embedder import HashEmbedder
+    from graph_engine.embedder import HashEmbedder
     e = HashEmbedder()
     texts = ["alpha beta", "gamma delta", ""]
     batch = e.embed_batch(texts)
@@ -733,7 +733,7 @@ def test_embedder_batch_contract():
 
 def test_vectors_for_batch_path(tmp_path):
     """vectors_for with batch_fn embeds all missing nodes in one call."""
-    from ideagraph.brain import Brain, Node
+    from graph_engine.brain import Brain, Node
     calls = []
 
     class CountingEmbedder:
@@ -761,7 +761,7 @@ def test_vectors_for_batch_path(tmp_path):
 @pytest.mark.skipif(not _HAS_ST, reason=_NEEDS_ST)
 def test_get_embedder_model_override():
     """#60: get_embedder honors the model parameter."""
-    from ideagraph.embedder import get_embedder, Embedder
+    from graph_engine.embedder import get_embedder, Embedder
     e = get_embedder("st", "paraphrase-MiniLM-L3-v2")
     assert isinstance(e, Embedder)
     assert e.model_name == "paraphrase-MiniLM-L3-v2"
@@ -772,8 +772,8 @@ def test_get_embedder_model_override():
 def test_hygiene_vector_cache_hit_and_invalidate(tmp_path):
     """#60: _load_vectors caches by (path, mtime, size); a write invalidates."""
     import time as _t
-    from ideagraph.brain import Brain, Node
-    from ideagraph import hygiene
+    from graph_engine.brain import Brain, Node
+    from graph_engine import hygiene
     b = Brain(str(tmp_path / "brain"), mode="local")
     b.write_node(Node(id="a", text="alpha", ntype="fact"))
     b.write_node(Node(id="b", text="beta", ntype="fact"))
@@ -794,24 +794,24 @@ def test_hygiene_vector_cache_hit_and_invalidate(tmp_path):
 
 def test_web_ui_ships_inside_package():
     """The UI files live inside the package so pip installs serve them too."""
-    import ideagraph
-    web = Path(ideagraph.__file__).resolve().parent / "web"
+    import graph_engine
+    web = Path(graph_engine.__file__).resolve().parent / "web"
     for name in ("index.html", "app.js", "review.html", "review.js"):
         assert (web / name).is_file(), f"missing shipped UI asset: {name}"
 
 
 def test_server_serves_ui_from_package_dir():
     """DOCS_DIR points at the in-package web dir, not a repo-root docs/."""
-    import ideagraph.server as srv
+    import graph_engine.server as srv
     assert srv.DOCS_DIR.name == "web"
-    assert srv.DOCS_DIR.parent.name == "ideagraph"
+    assert srv.DOCS_DIR.parent.name == "graph_engine"
     assert (srv.DOCS_DIR / "index.html").is_file()
 
 
 def test_get_embedder_falls_back_without_sentence_transformers(monkeypatch):
     """A light install (no [st] extra) degrades to HashEmbedder, no crash."""
     import builtins
-    import ideagraph.embedder as emb
+    import graph_engine.embedder as emb
 
     real_import = builtins.__import__
 
@@ -828,7 +828,7 @@ def test_get_embedder_falls_back_without_sentence_transformers(monkeypatch):
 @pytest.mark.skipif(not _HAS_ST, reason=_NEEDS_ST)
 def test_get_embedder_st_returns_real_embedder():
     """With ST available, 'st' returns the real embedder."""
-    import ideagraph.embedder as emb
+    import graph_engine.embedder as emb
     e = emb.get_embedder("st")
     assert isinstance(e, emb.Embedder)
 
@@ -843,7 +843,7 @@ def test_get_embedder_fallback_notice_goes_to_stderr_not_stdout(monkeypatch, cap
     import builtins
     import io
     import contextlib
-    import ideagraph.embedder as emb
+    import graph_engine.embedder as emb
 
     real_import = builtins.__import__
 

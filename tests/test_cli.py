@@ -28,7 +28,7 @@ def run_cli(args: list[str], tmp_path, env_extra: dict | None = None,
                PYTHONPATH=str(REPO))
     if env_extra:
         env.update(env_extra)
-    return subprocess.run([PY, "-m", "ideagraph", *args],
+    return subprocess.run([PY, "-m", "graph_engine", *args],
                           capture_output=True, text=True, env=env,
                           input=stdin, timeout=120)
 
@@ -36,7 +36,7 @@ def run_cli(args: list[str], tmp_path, env_extra: dict | None = None,
 def test_help_exits_zero(tmp_path):
     r = run_cli(["--help"], tmp_path)
     assert r.returncode == 0
-    assert "ideagraph init" in r.stdout
+    assert "graph_engine init" in r.stdout
 
 
 def test_unknown_command_exits_one_with_message(tmp_path):

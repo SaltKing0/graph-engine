@@ -10,8 +10,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from ideagraph.brain import Brain, Node, Edge
-from ideagraph.merge import merge_nodes
+from graph_engine.brain import Brain, Node, Edge
+from graph_engine.merge import merge_nodes
 
 
 def _brain(tmp_path) -> Brain:

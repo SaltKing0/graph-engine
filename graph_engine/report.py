@@ -121,7 +121,7 @@ def _load_structural(brain: Brain) -> list[dict]:
     """Structural-gap provider seam (report #7 §3.6).
 
     The report renders structural findings, it never computes them:
-    provider is `ideagraph.communities.structural_gaps(brain)` when
+    provider is `graph_engine.communities.structural_gaps(brain)` when
     importable, else a JSON file at $IG_STRUCTURAL_PATH. Returns []
     when absent — the section is then omitted entirely, never empty.
     Contract: list of {"kind": "community"|"god"|"hole", "label": str,

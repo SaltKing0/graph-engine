@@ -5,7 +5,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from ideagraph.intent import detect_intent
+from graph_engine.intent import detect_intent
 
 
 def test_supersedes_replacement_marker():

@@ -1,4 +1,4 @@
-# IdeaGraph Live Engine 🕸️
+# GraphEngine 🕸️
 
 **A self-maintaining, self-improving knowledge graph engine.**
 
@@ -6,7 +6,7 @@ Ingest ideas as Markdown nodes into your own private git repo (the "brain"),
 let the engine embed, link, and consolidate them — then steer research with
 coverage gaps and grow the engine itself through an eval-gated feedback loop.
 
-![IdeaGraph — demo brain in the web UI](docs/screenshot.png)
+![GraphEngine — demo brain in the web UI](docs/screenshot.png)
 
 ## Quickstart
 
@@ -21,23 +21,23 @@ ig init --demo     # 13 nodes, 19 edges, 2 pending suggestions,
                    # 1 island (ig status), 1 near-dup pair (ig near-dup)
 
 # 3) see it in the web UI
-uvicorn ideagraph.server:app --port 8000   # → http://localhost:8000
+uvicorn graph_engine.server:app --port 8000   # → http://localhost:8000
 ```
 
 Or install from PyPI (recommended — versioned releases):
 
 ```bash
-pip install ideagraph-live
+pip install graph-engine
 # with the real (semantic) embedder — pulls PyTorch:
-pip install "ideagraph-live[st]"
+pip install "graph-engine[st]"
 ```
 
 Or install straight from the repository (latest main):
 
 ```bash
-pip install git+https://github.com/SaltKing0/ideagraph-live.git
+pip install git+https://github.com/SaltKing0/graph-engine.git
 # with the real (semantic) embedder — pulls PyTorch:
-pip install "ideagraph-live[st] @ git+https://github.com/SaltKing0/ideagraph-live.git"
+pip install "graph-engine[st] @ git+https://github.com/SaltKing0/graph-engine.git"
 ```
 
 The web UI ships inside the package, so a pip install serves it out of the
@@ -154,7 +154,7 @@ Expose the brain to MCP-capable assistants (Claude Desktop, Claude Code, …)
 as a **strictly read-only** tool surface:
 
 ```bash
-pip install 'ideagraph-live[mcp]'
+pip install 'graph-engine[mcp]'
 ig mcp   # or: ig-mcp — stdio JSON-RPC, nothing else touches stdout
 ```
 
@@ -163,9 +163,9 @@ Register it in `claude_desktop_config.json` / `.mcp.json`:
 ```json
 {
   "mcpServers": {
-    "ideagraph": {
+    "graph_engine": {
       "command": "ig-mcp",
-      "env": { "IG_BRAIN_PATH": "~/ideagraph-brain" }
+      "env": { "IG_BRAIN_PATH": "~/graph-engine-brain" }
     }
   }
 }
@@ -201,12 +201,12 @@ the private brain. In read-only mode they return a `write_disabled` envelope.
 Design guarantees: the read-only default stays strict — ingest commits and pushes
 to a private repo, so model-initiated writes are an explicit operator decision,
 not a default; the engine loads lazily (first search, not import),
-response payloads are capped and escaped in one place (`ideagraph/mcp/format.py`),
+response payloads are capped and escaped in one place (`graph_engine/mcp/format.py`),
 and by default even the derived vector cache is **never written** — a search on
 a cold clone does not dirty the private repo (`IG_MCP_CACHE_VECTORS=1` opts
 back in; measured cold-search cost: see CHANGELOG). `brain_status` returns the
 brain path basename only. Optional opt-in prompt snippet for your
-`CLAUDE.md`/`AGENTS.md`: `ideagraph/mcp/agent/instructions.md`.
+`CLAUDE.md`/`AGENTS.md`: `graph_engine/mcp/agent/instructions.md`.
 
 ## Memory lifecycle (promotion and decay)
 
@@ -230,7 +230,7 @@ searchable, and leaves the promotion pool. `recall` (MCP write mode) and
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `IG_BRAIN_PATH` | `~/ideagraph-brain` | path to the brain clone |
+| `IG_BRAIN_PATH` | `~/graph-engine-brain` | path to the brain clone |
 | `IG_BRAIN_REMOTE` | *(none)* | remote brain URL — auto-clones on first use |
 | `IG_BRAIN_MODE` | `git` | `local` = filesystem only (tests) |
 | `IDEAGRAPH_EMBEDDER` | `st` | `hash` = deterministic test embedder |
@@ -240,7 +240,7 @@ searchable, and leaves the promotion pool. `recall` (MCP write mode) and
 | `IG_MCP_MAX_NEIGHBORS` | `20` | neighbors result cap (hard max 50) |
 | `IDEAGRAPH_INTENT_PENDING` | off | `1` = intent edges become pending (HITL) |
 | `IDEAGRAPH_RERANKER` | none | optional cross-encoder rerank pass |
-| `IG_BOT_NAME` / `IG_BOT_EMAIL` | ideagraph-bot | git commit author |
+| `IG_BOT_NAME` / `IG_BOT_EMAIL` | graph-engine-bot | git commit author |
 
 Dedupe: near-duplicate ingests (cosine ≥ 0.92) merge into the existing node
 (`sources:` provenance); opt out with `allow_duplicates: true`.

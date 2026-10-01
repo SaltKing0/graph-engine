@@ -1,4 +1,4 @@
-"""Unit tests for ideagraph/graph.py traversal (report #1 phase 1).
+"""Unit tests for graph_engine/graph.py traversal (report #1 phase 1).
 
 All fixtures use deterministic node ids (the LPA lesson applies to BFS
 ordering too) and the HashEmbedder; measured cosines put the fixture
@@ -9,8 +9,8 @@ from __future__ import annotations
 import shutil
 import tempfile
 
-from ideagraph.brain import Brain, Edge, Node
-from ideagraph.graph import live_edges, neighbors, shortest_path
+from graph_engine.brain import Brain, Edge, Node
+from graph_engine.graph import live_edges, neighbors, shortest_path
 
 TEXTS = {
     "hub": "agent memory systems store knowledge graphs for retrieval",

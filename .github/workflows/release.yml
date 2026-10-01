@@ -35,5 +35,5 @@ jobs:
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         # No API token needed — OIDC trusted publishing, matched to the
-        # Trusted Publisher configured on PyPI (project ideagraph-live,
+        # Trusted Publisher configured on PyPI (project graph-engine,
         # owner SaltKing0, workflow release.yml, environment pypi).

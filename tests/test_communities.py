@@ -11,8 +11,8 @@ import shutil
 
 import pytest
 
-from ideagraph.brain import Brain, Edge, Node
-from ideagraph.communities import (
+from graph_engine.brain import Brain, Edge, Node
+from graph_engine.communities import (
     analyze_communities,
     betweenness,
     build_graph,

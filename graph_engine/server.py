@@ -1,7 +1,7 @@
 """FastAPI server on top of the Brain (private git repo as storage).
 
 Env control:
-  IG_BRAIN_PATH   — path to the brain clone (default: ~/ideagraph-brain)
+  IG_BRAIN_PATH   — path to the brain clone (default: ~/graph-engine-brain)
   IG_BRAIN_REMOTE — SSH/GitHub URL (only used for `git clone` on first
                     setup; no personal default, existing clones keep
                     their own origin)
@@ -24,7 +24,7 @@ from . import runtime
 # (repo-root docs/ would not exist in site-packages).
 DOCS_DIR = Path(__file__).resolve().parent / "web"
 
-app = FastAPI(title="IdeaGraph Live Engine")
+app = FastAPI(title="GraphEngine")
 
 
 class ConnectionManager:

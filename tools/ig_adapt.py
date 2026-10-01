@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ig_adapt — the adaptive controller for the self-evolving IdeaGraph cycle.
+"""ig_adapt — the adaptive controller for the self-evolving GraphEngine cycle.
 
 Reads metrics.jsonl (written by ig_cycle.py) and updates cycle_strategy.json,
 which the cron orchestrator consumes to steer the NEXT cycle. This closes the
@@ -14,8 +14,8 @@ Strategy decisions (all data-driven):
 
 Usage:
   python3 tools/ig_adapt.py [--engine <engine-repo>]
-                            [--metrics ~/.cache/ideagraph/ig_metrics.jsonl]
-                            [--strategy ~/.cache/ideagraph/cycle_strategy.json]
+                            [--metrics ~/.cache/graph_engine/ig_metrics.jsonl]
+                            [--strategy ~/.cache/graph_engine/cycle_strategy.json]
                             [--engine <engine-repo>] [--print]
 """
 from __future__ import annotations
@@ -27,8 +27,8 @@ from pathlib import Path
 import subprocess
 import sys
 
-DEFAULT_METRICS = os.path.expanduser("~/.cache/ideagraph/ig_metrics.jsonl")
-DEFAULT_STRATEGY = os.path.expanduser("~/.cache/ideagraph/cycle_strategy.json")
+DEFAULT_METRICS = os.path.expanduser("~/.cache/graph_engine/ig_metrics.jsonl")
+DEFAULT_STRATEGY = os.path.expanduser("~/.cache/graph_engine/cycle_strategy.json")
 DEFAULT_ENGINE = str(Path(__file__).resolve().parents[1])
 
 FOCUS_AREAS = {"Multi-Agent-Systeme", "Agent-Harness & Orchestrierung"}
@@ -60,13 +60,13 @@ def gap_counts(engine: str, brain: str = "") -> dict[str, int]:
     if brain:
         env["IG_BRAIN_PATH"] = os.path.abspath(os.path.expanduser(brain))
     elif not env.get("IG_BRAIN_PATH"):
-        env["IG_BRAIN_PATH"] = "~/ideagraph-brain"  # engine's neutral default
+        env["IG_BRAIN_PATH"] = "~/graph-engine-brain"  # engine's neutral default
     eng_py = os.path.join(engine, ".venv", "bin", "python")
     if not os.path.exists(eng_py):
         # No venv (CI, plain `pip install`): the running interpreter has the
         # engine importable, so use it instead of silently dropping the weights.
         eng_py = sys.executable
-    r = subprocess.run([eng_py, "-m", "ideagraph", "gaps", "--json"],
+    r = subprocess.run([eng_py, "-m", "graph_engine", "gaps", "--json"],
                        capture_output=True, text=True, env=env, cwd=engine)
     if r.returncode != 0:
         return {}

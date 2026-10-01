@@ -4,7 +4,7 @@ Read-only reports that support brain maintenance:
 
 - `near_dup_pairs` — finds near-duplicate pairs in the cosine band below the
   auto-dedup threshold (0.92). These pairs need a manual
-  `ig merge` decision (see `ideagraph.merge`).
+  `ig merge` decision (see `graph_engine.merge`).
 - `connectivity` / `status_counts` — islands, weak nodes, orphans and
   status distribution, so underpopulation and the hygiene backlog become visible.
 

@@ -9,8 +9,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from ideagraph.brain import Brain, Node, Edge
-from ideagraph.hygiene import (
+from graph_engine.brain import Brain, Node, Edge
+from graph_engine.hygiene import (
     near_dup_pairs,
     connectivity,
     status_counts,
@@ -119,7 +119,7 @@ def test_connectivity_ignores_tombstones(tmp_path):
 def test_gaps_coverage_ignores_tombstones(tmp_path):
     """Coverage counts live knowledge: a tombstone must not inflate the total
     or the UNCLASSIFIED bucket."""
-    from ideagraph.gaps import analyze_coverage
+    from graph_engine.gaps import analyze_coverage
     b = _brain(tmp_path)
     b.write_node(Node(id="live", text="Ein Subagent uebernimmt eine Delegation."))
     b.write_node(Node(id="dead", text="voelliger unsinn ohne stichwort",

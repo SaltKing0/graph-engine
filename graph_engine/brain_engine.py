@@ -163,7 +163,7 @@ class BrainEngine:
         # (live: 39 % of all intent edges ever created were invalidated again).
         # At most `intent_auto_accept_max()` intent edges per source are
         # auto-accepted; the rest are born PENDING (kept, reviewable, not
-        # dropped) — see ideagraph/review.py for the policy and its bounds.
+        # dropped) — see graph_engine/review.py for the policy and its bounds.
         intent_auto_left = intent_auto_accept_max(env)
         text = text.strip()
         if not text:

@@ -22,7 +22,7 @@ MCP_AVAILABLE = importlib.util.find_spec("mcp") is not None
 
 # ---------------------------------------------------------------- format.py
 
-from ideagraph.mcp import format as fmt
+from graph_engine.mcp import format as fmt
 
 
 def test_snippet_truncates_then_escapes():
@@ -109,7 +109,7 @@ def _call(tool: str, args: dict):
     """In-process MCP call: client session <-> server over memory streams."""
     import anyio
     from mcp.shared.memory import create_connected_server_and_client_session
-    from ideagraph.mcp.server import mcp as server
+    from graph_engine.mcp.server import mcp as server
 
     async def _run():
         low = server._mcp_server
@@ -199,7 +199,7 @@ class TestMCPTools:
         """The cold-search cost is paid ONCE per process: a second
         persist=False search must not re-embed (the runtime memo)."""
         import sys
-        from ideagraph.runtime import make_engine, reset_engine_cache
+        from graph_engine.runtime import make_engine, reset_engine_cache
         reset_engine_cache()
         calls = {"n": 0}
         engine = make_engine()
@@ -210,7 +210,7 @@ class TestMCPTools:
             return orig(text)
 
         engine.embedder.embed = counting
-        from ideagraph.retrieval import retrieve
+        from graph_engine.retrieval import retrieve
         retrieve(engine, "agent memory", k=2, persist=False)
         first = calls["n"]
         assert first > 0
@@ -249,7 +249,7 @@ class TestMCPWriteTools:
 
     def test_write_disabled_by_default(self, mcp_env, monkeypatch):
         monkeypatch.delenv("IG_MCP_WRITE", raising=False)
-        from ideagraph.mcp import server
+        from graph_engine.mcp import server
         calls = [server.remember(text="x"),
                  server.recall(query="x"),
                  server.forget(id="aaaaaaaaaaaa", reason="cleanup")]
@@ -259,7 +259,7 @@ class TestMCPWriteTools:
             assert "ig mcp --write" in payload["error"]["message"]
 
     def test_remember_creates_a_node(self, write_env):
-        from ideagraph.mcp import server
+        from graph_engine.mcp import server
         payload = server.remember(text="a note the agent decided to keep")
         assert payload["ok"] is True and payload["duplicate"] is False
         node_file = write_env / "nodes" / f"{payload['node_id']}.md"
@@ -267,20 +267,20 @@ class TestMCPWriteTools:
         assert "source: agent" in node_file.read_text(encoding="utf-8")
 
     def test_remember_rejects_empty_text(self, write_env):
-        from ideagraph.mcp import server
+        from graph_engine.mcp import server
         payload = server.remember(text="   ")
         assert payload["ok"] is False
         assert payload["error"]["code"] == "invalid_params"
 
     def test_remember_enforces_the_size_cap(self, write_env, monkeypatch):
-        from ideagraph.mcp import server
+        from graph_engine.mcp import server
         monkeypatch.setattr(server, "MAX_REMEMBER_CHARS", 20)
         payload = server.remember(text="x" * 50)
         assert payload["error"]["code"] == "invalid_params"
         assert "20" in payload["error"]["message"]
 
     def test_recall_tracks_and_reports_recall_count(self, write_env):
-        from ideagraph.mcp import server
+        from graph_engine.mcp import server
         payload = server.recall(query="agent memory", k=3)
         assert payload["ok"] is True and payload["tracked"] is True
         assert payload["count"] >= 1
@@ -288,23 +288,23 @@ class TestMCPWriteTools:
         assert (write_env / "recalls.jsonl").exists()
 
     def test_recall_validates_like_search(self, write_env):
-        from ideagraph.mcp import server
+        from graph_engine.mcp import server
         assert server.recall(query="  ")["error"]["code"] == "invalid_params"
         assert server.recall(query="x", k=99)["error"]["code"] == "invalid_params"
 
     def test_forget_requires_a_reason(self, write_env):
-        from ideagraph.mcp import server
+        from graph_engine.mcp import server
         payload = server.forget(id="aaaaaaaaaaaa", reason="   ")
         assert payload["error"]["code"] == "invalid_params"
         assert "reason" in payload["error"]["message"]
 
     def test_forget_unknown_node(self, write_env):
-        from ideagraph.mcp import server
+        from graph_engine.mcp import server
         payload = server.forget(id="zzzzzzzzzzzz", reason="cleanup")
         assert payload["error"]["code"] == "node_not_found"
 
     def test_forget_tombstones_without_deleting(self, write_env):
-        from ideagraph.mcp import server
+        from graph_engine.mcp import server
         payload = server.forget(id="aaaaaaaaaaaa", reason="obsolete note")
         assert payload["ok"] is True
         assert payload["status"] == "tombstone"
@@ -318,7 +318,7 @@ REGISTRATION_SCRIPT = r'''
 import json, os
 import anyio
 from mcp.shared.memory import create_connected_server_and_client_session
-from ideagraph.mcp.server import mcp as srv, register_write_tools
+from graph_engine.mcp.server import mcp as srv, register_write_tools
 
 register_write_tools()
 

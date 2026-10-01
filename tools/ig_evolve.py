@@ -44,7 +44,7 @@ def engine_python(engine: str) -> str:
 PY = engine_python(ENGINE)
 HISTORY = os.environ.get(
     "IG_EVOLVE_HISTORY",
-    os.path.expanduser("~/.cache/ideagraph/ig_evolve_history.jsonl"))
+    os.path.expanduser("~/.cache/graph_engine/ig_evolve_history.jsonl"))
 
 
 def run(cmd: list[str], cwd: str = ENGINE) -> tuple[int, str]:
@@ -55,7 +55,7 @@ def run(cmd: list[str], cwd: str = ENGINE) -> tuple[int, str]:
 def eval_state() -> dict:
     """Import the eval module and count roadmap/golden cases."""
     code = (
-        "from ideagraph.evals import ROADMAP_CASES, GOLDEN_SET;"
+        "from graph_engine.evals import ROADMAP_CASES, GOLDEN_SET;"
         "import json;"
         "print(json.dumps({"
         "'roadmap': [t.id for t in ROADMAP_CASES],"
@@ -71,17 +71,17 @@ def run_case(case_id: str) -> dict:
     """Run ONE roadmap case via run_eval with the test factory (HashEmbedder)."""
     code = f"""
 import json, tempfile
-from ideagraph.evals import ROADMAP_CASES, run_eval
-from ideagraph.brain import Brain
-from ideagraph.brain_engine import BrainEngine
-from ideagraph.embedder import HashEmbedder
+from graph_engine.evals import ROADMAP_CASES, run_eval
+from graph_engine.brain import Brain
+from graph_engine.brain_engine import BrainEngine
+from graph_engine.embedder import HashEmbedder
 
 task = next((t for t in ROADMAP_CASES if t.id == {case_id!r}), None)
 if task is None:
     # After a flip the case lives in GOLDEN_SET; --flip must still be able
     # to re-verify and record it (the ROADMAP gate test forces the move
     # BEFORE the suite can go green — audit #52 deadlock found 2026-09-15).
-    from ideagraph.evals import GOLDEN_SET
+    from graph_engine.evals import GOLDEN_SET
     task = next((t for t in GOLDEN_SET if t.id == {case_id!r}), None)
 if task is None:
     print(json.dumps({{"error": "case not found"}}))
@@ -178,7 +178,7 @@ def main() -> int:
         st = eval_state()
         if case_id not in st.get("roadmap", []):
             print(f"case {case_id} not yet in ROADMAP_CASES — the orchestrator must"
-                  f" add the EvalTask to ideagraph/evals.py first, then re-run --propose")
+                  f" add the EvalTask to graph_engine/evals.py first, then re-run --propose")
             return 1
         res = run_case(case_id)
         passed = res.get("passed")
@@ -221,7 +221,7 @@ def main() -> int:
                         "passed": True, "suite_tail": suite["tail"]})
         print(f"FLIPPED {case_id} → GOLDEN_SET (suite green: {suite['tail']})")
         print("NOTE: the orchestrator must now MOVE the EvalTask from ROADMAP_CASES"
-              " to GOLDEN_SET in ideagraph/evals.py and commit.")
+              " to GOLDEN_SET in graph_engine/evals.py and commit.")
         return 0
 
     ap.print_help()

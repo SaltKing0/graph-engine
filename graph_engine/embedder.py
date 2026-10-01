@@ -77,7 +77,7 @@ def get_embedder(name: str = "st", model: str | None = None) -> Embedder | HashE
         print(
             "NOTE: sentence-transformers is not installed — falling back to the "
             "deterministic HashEmbedder (64-dim, lower quality). Install the "
-            "real embedder with: pip install 'ideagraph-live[st]'",
+            "real embedder with: pip install 'graph-engine[st]'",
             file=sys.stderr,
         )
         return HashEmbedder()

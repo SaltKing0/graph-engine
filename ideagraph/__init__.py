@@ -1,1 +1,0 @@
-"""IdeaGraph Live Engine."""

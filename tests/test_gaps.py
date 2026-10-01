@@ -9,8 +9,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from ideagraph.brain import Brain, Node
-from ideagraph.gaps import (
+from graph_engine.brain import Brain, Node
+from graph_engine.gaps import (
     DEFAULT_TAXONOMY,
     analyze_coverage,
     find_gaps,
