@@ -37,6 +37,7 @@ def test_help_exits_zero(tmp_path):
     r = run_cli(["--help"], tmp_path)
     assert r.returncode == 0
     assert "graph_engine init" in r.stdout
+    assert "graph_engine consolidate" in r.stdout
 
 
 def test_unknown_command_exits_one_with_message(tmp_path):
@@ -332,3 +333,124 @@ def test_report_write_local_mode_no_commit(tmp_path):
     f = tmp_path / "brain" / "BRAIN_REPORT.md"
     assert f.exists()
     assert "# BRAIN_REPORT" in f.read_text(encoding="utf-8")
+
+
+def _seed_consolidation(tmp_path, *, recall_count=0):
+    from graph_engine.brain import Brain, Node
+    brain = Brain(tmp_path / "brain", mode="local")
+    brain.write_node(Node(id="event", text="User prefers concise responses",
+                          ntype="episodic", status="active", recall_count=recall_count,
+                          created="2020-01-01T00:00:00Z"))
+    return brain
+
+
+def test_consolidate_cli_env_overrides_preview_and_repeat(tmp_path):
+    import json
+    brain = _seed_consolidation(tmp_path)
+    env = {"IG_CONSOLIDATE_THRESHOLD": "99", "IG_CONSOLIDATE_MIN_AGE_DAYS": "0"}
+    before = brain.node_path("event").read_bytes()
+    blocked = run_cli(["consolidate", "--json"], tmp_path, env)
+    assert blocked.returncode == 0, blocked.stderr
+    assert json.loads(blocked.stdout)["candidates"] == []
+    preview = run_cli(["consolidate", "--threshold", "0", "--dry-run", "--json"], tmp_path, env)
+    assert preview.returncode == 0, preview.stderr
+    assert json.loads(preview.stdout)["candidates"] == ["event"]
+    assert len(brain.read_nodes()) == 1
+    real = run_cli(["consolidate", "--threshold", "0", "--json"], tmp_path, env)
+    assert real.returncode == 0, real.stderr
+    assert json.loads(real.stdout)["created"] == 1
+    assert brain.node_path("event").read_bytes() == before
+    again = run_cli(["consolidate", "--threshold", "0", "--json"], tmp_path, env)
+    assert json.loads(again.stdout)["edges"] == 0
+
+
+def test_dream_plan_and_consolidation_json(tmp_path):
+    import json
+    brain = _seed_consolidation(tmp_path)
+    plan = run_cli(["dream", "--threshold", "0", "--json"], tmp_path)
+    assert plan.returncode == 0, plan.stderr
+    assert json.loads(plan.stdout)["consolidation"]["candidates"] == ["event"]
+    assert len(brain.read_nodes()) == 1
+    result = run_cli(["dream", "--consolidate", "--threshold", "0",
+                      "--consolidate-limit", "1", "--json"], tmp_path)
+    assert result.returncode == 0, result.stderr
+    assert json.loads(result.stdout)["consolidation"]["created"] == 1
+
+
+def test_dream_refresh_folds_recall_before_extracting(tmp_path):
+    import json
+    from graph_engine.recall import record
+    brain = _seed_consolidation(tmp_path)
+    record(brain, "preferences", ["event"])
+    result = run_cli(["dream", "--refresh", "--consolidate", "--json"], tmp_path)
+    assert result.returncode == 0, result.stderr
+    data = json.loads(result.stdout)
+    assert data["refresh"]["recalls"] == 1
+    assert data["consolidation"]["created"] == 1
+
+
+@pytest.mark.parametrize("command", ["consolidate", "dream"])
+@pytest.mark.parametrize("option,value", [
+    ("--threshold", "-1"), ("--min-age-days", "nan"),
+    ("--min-count", "0"), ("--threshold", "words"),
+])
+def test_consolidation_invalid_flags_abort_before_writes(tmp_path, command, option, value):
+    brain = _seed_consolidation(tmp_path)
+    args = [command]
+    if command == "dream":
+        args += ["--refresh", "--consolidate"]
+    result = run_cli(args + [option, value], tmp_path)
+    assert result.returncode != 0
+    assert "Traceback" not in result.stderr
+    assert len(brain.read_nodes()) == 1
+    assert not (brain.path / "INDEX.md").exists()  # refresh never ran
+
+
+def test_dream_missing_consolidation_gate_value_is_usage_error(tmp_path):
+    result = run_cli(["dream", "--consolidate", "--threshold"], tmp_path)
+    assert result.returncode == 1
+    assert "Usage" in result.stdout and "Traceback" not in result.stderr
+
+
+@pytest.mark.parametrize("command", [["consolidate"], ["dream", "--consolidate"]])
+def test_consolidation_llm_is_separate_from_dream_summarizer(tmp_path, command):
+    import json
+    brain = _seed_consolidation(tmp_path, recall_count=1)
+    result = run_cli(command + ["--llm", "--json"], tmp_path, {
+        "IG_CONSOLIDATE_LLM_CMD": "printf 'Prefers concise answers'",
+        "IG_DREAM_LLM_CMD": "",
+    })
+    assert result.returncode == 0, result.stderr
+    assert next(n.text for n in brain.read_nodes() if n.ntype == "semantic") == "Prefers concise answers"
+    assert json.loads(result.stdout)
+
+
+def test_consolidation_llm_failure_or_preview_never_writes(tmp_path):
+    import json
+    brain = _seed_consolidation(tmp_path, recall_count=1)
+    env = {"IG_CONSOLIDATE_LLM_CMD": "exit 7"}
+    preview = run_cli(["consolidate", "--llm", "--dry-run", "--json"], tmp_path, env)
+    assert preview.returncode == 0, preview.stderr
+    assert json.loads(preview.stdout)["candidates"] == ["event"]
+    real = run_cli(["consolidate", "--llm"], tmp_path, env)
+    assert real.returncode == 1
+    assert "failed (7)" in real.stderr and "Traceback" not in real.stderr
+    assert len(brain.read_nodes()) == 1
+
+
+def test_consolidation_llm_empty_output_declines(tmp_path):
+    import json
+    brain = _seed_consolidation(tmp_path, recall_count=1)
+    result = run_cli(["consolidate", "--llm", "--json"], tmp_path,
+                     {"IG_CONSOLIDATE_LLM_CMD": "true"})
+    assert result.returncode == 0, result.stderr
+    assert json.loads(result.stdout)["skipped"] == 1
+    assert len(brain.read_nodes()) == 1
+
+
+def test_consolidation_llm_requires_configured_command(tmp_path):
+    result = run_cli(["consolidate", "--llm"], tmp_path,
+                     {"IG_CONSOLIDATE_LLM_CMD": ""})
+    assert result.returncode == 1
+    assert "IG_CONSOLIDATE_LLM_CMD" in result.stdout
+    assert "Traceback" not in result.stderr

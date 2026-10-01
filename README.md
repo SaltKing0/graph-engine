@@ -119,6 +119,7 @@ ig init [--remote <url>] [--demo]  # create a brain (empty / connected / demo)
 ig ingest "New idea ..."           # ingest (duplicates are merged)
 ig observe "Event ..."              # store raw episodic event (no dedupe)
 ig extract <episodic_id> ["text"]   # extract semantic fact from episodic node
+ig consolidate [--dry-run] [--json] # automatically extract eligible episodic nodes
 ig timeline [--since X] [--until Y] # query episodic nodes by time range
 ig valid-at <ISO-8601>             # graph as it was at a point in time
 ig history <node_id>               # how a node's edges evolved over time
@@ -148,6 +149,7 @@ ig dream                           # dream plan (read-only): promotion/decay
                                    # candidates, near-dup review list, distillable
                                    # communities, what a refresh would change
 ig dream --refresh                 # deterministic maintenance, one commit
+ig dream --consolidate             # episodic → semantic extraction (env gates)
 ig dream --distill [--llm]         # one abstraction node per community
                                    # (extractive by default; --llm needs
                                    #  IG_DREAM_LLM_CMD)
@@ -270,6 +272,66 @@ searchable, and leaves the promotion pool. `recall` (MCP write mode) and
 `ig search` feed the signal it reads. Override the gates with
 `--min-recall / --min-degree / --stale-days / --max-degree`.
 
+## Automatic episodic consolidation
+
+`ig consolidate` selects live episodic observations and derives semantic nodes
+without changing the original events. Defaults are conservative: the event must
+have an **aggregated recall count >= 1** and be **at least one day old**. These
+are selection gates, not a confidence score or proof that an observation is true.
+Age uses `observed_at`, falling back to `created`; timestamps without a timezone
+are interpreted as UTC, and malformed or future timestamps are held back.
+
+```bash
+ig recall --aggregate              # fold search/recall usage into node counters
+ig consolidate --dry-run --json    # preview source IDs and gates; no writes/LLM calls
+ig consolidate                    # extract up to 50 eligible events, one commit
+ig dream --refresh --consolidate   # fold usage, then extract, in the dream pipeline
+ig dream --json                    # read-only plan includes extraction candidates
+```
+
+The default extractor copies the observation's text, matching `ig extract`:
+it preserves evidence without generating an abstraction or inferring new facts.
+New semantic nodes have `status="probation"`, `source="consolidator"` and an
+`episodic-extraction` tag. An accepted `extends` edge points from the fact to
+each episodic source. Exact semantic matches (case and whitespace normalized)
+are reused; episodic/procedural nodes and community summaries are never used
+as semantic matches.
+Existing extraction links, including manually created, rejected or invalidated
+links, prevent repeat extraction. Community-summary links do not count as fact
+extraction. Tombstoned facts are never resurrected or recreated from matching
+text. An unchanged second pass writes nothing.
+
+Configure the time gate with `--min-age-days`, the recall threshold with
+`--threshold`, and the minimum **eligible, unprocessed** pool size with
+`--min-count`. Gates combine; the count check runs before the per-pass `--limit`
+(oldest first within each round), so a remaining pool below `--min-count` waits
+for more events. Bounded passes save their position in `consolidation-cursor.json`
+inside the brain and resume after the last examined event, wrapping back to the
+oldest. Skipped or declined events remain retryable without blocking newer
+candidates. Dry runs read this position but never advance it.
+CLI flags override the environment. For a deliberate pass over fresh, unused
+events, use `ig consolidate --threshold 0 --min-age-days 0`.
+
+Fact IDs are independent of text. Editing or merging a fact keeps its identity;
+a later extraction reuses an exact current-text match or creates a new fact.
+
+The command does not start a daemon: run `ig dream --refresh --consolidate` from
+your scheduler for time-based checks, or invoke it manually. Completed ingest
+cycles in `tools/ig_cycle.py` now include `--consolidate`; cycles that abort before
+the dream step still perform no extraction. `ig dream` without action flags
+remains read-only. Dream accepts the same gate flags, using `--consolidate-limit`
+for extraction because its existing `--limit` controls community distillation.
+
+For optional refinement, set `IG_CONSOLIDATE_LLM_CMD` to a command that reads an
+evidence prompt on stdin and prints **one grounded fact** on stdout, then run
+`ig consolidate --llm` or `ig dream --consolidate --llm`. Blank stdout declines
+extraction and leaves the event eligible for a later run. Nonzero exit status or
+a 300-second timeout aborts the extraction batch before any facts are written.
+The model's output still requires review; no automatic grounding check is made.
+Dry runs never invoke the command and report candidate events rather than
+model-dependent output counts. When dream combines `--distill --consolidate --llm`,
+distillation also requires its separate `IG_DREAM_LLM_CMD`.
+
 ## Configuration
 
 | Variable | Default | Meaning |
@@ -285,6 +347,11 @@ searchable, and leaves the promotion pool. `recall` (MCP write mode) and
 | `IDEAGRAPH_INTENT_PENDING` | off | `1` = intent edges become pending (HITL) |
 | `IDEAGRAPH_RERANKER` | none | optional cross-encoder rerank pass |
 | `IG_BOT_NAME` / `IG_BOT_EMAIL` | graph-engine-bot | git commit author |
+| `IG_CONSOLIDATE_THRESHOLD` | `1` | minimum aggregated recall count (integer >= 0) |
+| `IG_CONSOLIDATE_MIN_AGE_DAYS` | `1` | minimum observation age in days (finite number >= 0) |
+| `IG_CONSOLIDATE_MIN_COUNT` | `1` | minimum eligible, unprocessed events before a pass (integer >= 1) |
+| `IG_CONSOLIDATE_LIMIT` | `50` | maximum events per pass (integer >= 1) |
+| `IG_CONSOLIDATE_LLM_CMD` | *(none)* | optional stdin/stdout fact extractor, invoked only with `--llm` |
 
 Dedupe: near-duplicate ingests (cosine ≥ 0.92) merge into the existing node
 (`sources:` provenance); opt out with `allow_duplicates: true`.

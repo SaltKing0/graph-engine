@@ -9,6 +9,10 @@ from __future__ import annotations
 import os
 import sys
 import threading
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .consolidation import ConsolidationConfig
 
 from .brain import Brain, Node, Edge
 from .embedder import get_embedder
@@ -37,6 +41,33 @@ INTENT_PENDING_ENV = "IDEAGRAPH_INTENT_PENDING"
 # other's writes (Audit #1/#15). One lock suffices because all mutations
 # run through the same process (server, CLI, pipeline tools).
 BRAIN_LOCK = threading.RLock()
+
+CONSOLIDATE_THRESHOLD_ENV = "IG_CONSOLIDATE_THRESHOLD"
+CONSOLIDATE_MIN_AGE_DAYS_ENV = "IG_CONSOLIDATE_MIN_AGE_DAYS"
+CONSOLIDATE_MIN_COUNT_ENV = "IG_CONSOLIDATE_MIN_COUNT"
+CONSOLIDATE_LIMIT_ENV = "IG_CONSOLIDATE_LIMIT"
+CONSOLIDATE_LLM_CMD_ENV = "IG_CONSOLIDATE_LLM_CMD"
+
+
+def consolidation_config_from_env(overrides: dict | None = None) -> "ConsolidationConfig":
+    """Read gates at call time; explicit CLI/API values override environment."""
+    from .consolidation import ConsolidationConfig
+    overrides = overrides or {}
+    values = {}
+    for key, env_name, cast, default in (
+        ("threshold", CONSOLIDATE_THRESHOLD_ENV, int, 1),
+        ("min_age_days", CONSOLIDATE_MIN_AGE_DAYS_ENV, float, 1.0),
+        ("min_count", CONSOLIDATE_MIN_COUNT_ENV, int, 1),
+        ("limit", CONSOLIDATE_LIMIT_ENV, int, 50),
+    ):
+        raw = overrides.get(key)
+        if raw is None:
+            raw = os.environ.get(env_name, default)
+        try:
+            values[key] = cast(raw)
+        except (ValueError, TypeError, OverflowError) as exc:
+            raise ValueError(f"{env_name}: invalid {key}: {raw!r}") from exc
+    return ConsolidationConfig(**values)
 
 
 def auto_accept_from_env() -> bool:

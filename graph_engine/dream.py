@@ -44,6 +44,7 @@ from typing import Callable
 
 from .brain import Brain, Edge, Node
 from .communities import analyze_communities
+from .consolidation import ConsolidationConfig, consolidation_plan
 from .hygiene import connectivity, near_dup_pairs
 from .intent import INTENT_KINDS
 from .similarity import cosine
@@ -85,6 +86,7 @@ class DreamPlan:
     merge_candidates: list[tuple[str, str, float]] = field(default_factory=list)
     distill_candidates: list[tuple[int, int]] = field(default_factory=list)  # (cid, size)
     refresh: dict = field(default_factory=dict)
+    consolidation: dict = field(default_factory=dict)
 
     def render(self) -> str:
         lines = ["# DREAM PLAN (dry run — nothing written)", ""]
@@ -92,6 +94,8 @@ class DreamPlan:
         lines.append("")
         lines.append(f"## Promotion candidates: {len(self.promotion_candidates)}")
         lines.append(f"## Decay candidates: {len(self.decay_candidates)}")
+        lines.append(f"## Episodic extraction candidates: {len(self.consolidation.get('candidates', []))}")
+        lines.append(f"  gates: {self.consolidation.get('gates', {})}")
         lines.append(f"## Merge candidates (review, never auto): {len(self.merge_candidates)}")
         for a, b, score in self.merge_candidates[:5]:
             lines.append(f"  {score:.3f}  {a!r}")
@@ -206,7 +210,8 @@ def lifecycle(brain: Brain, *, min_recall: int = PROMOTE_MIN_RECALL,
 def plan(brain: Brain, *, min_recall: int = PROMOTE_MIN_RECALL,
          min_degree: int = PROMOTE_MIN_DEGREE, stale_days: int = DECAY_DAYS,
          min_community: int = DREAM_MIN_COMMUNITY,
-         merge_band: tuple[float, float] = (0.78, 0.92)) -> DreamPlan:
+         merge_band: tuple[float, float] = (0.78, 0.92),
+         consolidation_config: ConsolidationConfig | None = None) -> DreamPlan:
     """Eligibility report for every axis. Read-only."""
     nodes, degree, edges = _live_graph(brain)
     life = lifecycle_plan(brain, min_recall=min_recall, min_degree=min_degree,
@@ -227,7 +232,8 @@ def plan(brain: Brain, *, min_recall: int = PROMOTE_MIN_RECALL,
     return DreamPlan(nodes=len(nodes), edges=len(edges),
                      promotion_candidates=promotion, decay_candidates=decay,
                      merge_candidates=merges, distill_candidates=distill,
-                     refresh=refresh)
+                     refresh=refresh,
+                     consolidation=consolidation_plan(brain, config=consolidation_config))
 
 
 def refresh_plan(brain: Brain) -> dict:
