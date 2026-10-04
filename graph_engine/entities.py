@@ -255,6 +255,16 @@ def command_extractor(command: str | None = None) -> Callable:
     return extract
 
 
+def _same_validity(edge: Edge, validity: dict) -> bool:
+    if edge.extracted_validity is not None:
+        return edge.extracted_validity == validity
+    # Legacy records did not distinguish an extraction window from a later
+    # invalidation. Preserve their decisions; never guess a new live window.
+    return (validity["valid_from"] is None
+            or (edge.valid_from == validity["valid_from"]
+                and (edge.is_invalidated or edge.valid_to == validity["valid_to"])))
+
+
 def extract_entities(brain: Brain, text: str | None = None, *, node_id: str | None = None,
                      source: str = "human", extractor: Callable | None = None,
                      dry_run: bool = False, accept_facts: bool = False,
@@ -332,20 +342,21 @@ def extract_entities(brain: Brain, text: str | None = None, *, node_id: str | No
         facts, new_facts = [], 0
         for item in data["facts"]:
             subj, obj = linked[_key(item["subject"])], linked[_key(item["object"])]
+            validity = {key: item[key] for key in ("valid_from", "valid_to")}
             match = next((e for e in edges if e.kind == "fact" and e.source == subj.id
                           and e.target == obj.id and e.predicate == item["predicate"]
-                          and (item["valid_from"] is None or
-                               (e.valid_from == item["valid_from"] and e.valid_to == item["valid_to"]))), None)
+                          and _same_validity(e, validity)), None)
             support = dict(node_id=evidence_node.id, text=item["evidence"])
             if match is None:
                 match = Edge(source=subj.id, target=obj.id, kind="fact", origin=ORIGIN,
                              predicate=item["predicate"], evidence=[support],
                              confidence=item["confidence"], pending=not accept_facts,
-                             valid_from=item["valid_from"], valid_to=item["valid_to"])
+                             valid_from=item["valid_from"], valid_to=item["valid_to"],
+                             extracted_validity=validity)
                 edges.append(match)
                 new_facts += 1
                 edges_changed = True
-            elif not match.rejected and match.valid_to is None and support not in match.evidence:
+            elif not match.rejected and not match.is_invalidated and support not in match.evidence:
                 # Keep the original validity/confidence/review decision when adding support.
                 match.evidence.append(support)
                 edges_changed = True

@@ -89,7 +89,8 @@ def cmd_entities(engine: BrainEngine, args: list[str]) -> None:
     for node in result["entities"]:
         print(f"  {node['id']} [{node['entity_type']}] {node['entity_name']}")
     for fact in result["facts"]:
-        state = "rejected" if fact.get("rejected") else "invalidated" if fact["valid_to"] else "pending" if fact["pending"] else "accepted"
+        invalidated = fact.get("invalidated_at") or ("extracted_validity" not in fact and fact["valid_to"])
+        state = "rejected" if fact.get("rejected") else "invalidated" if invalidated else "pending" if fact["pending"] else "accepted"
         print(f"  {fact['id']}: {names[fact['source']]} --[{fact['predicate']}]--> "
               f"{names[fact['target']]} ({state})")
 
@@ -337,7 +338,7 @@ def cmd_ingest(engine: BrainEngine, args: list[str]) -> None:
 
 
 def cmd_pending(engine: BrainEngine, args: list[str]) -> None:
-    edges = [e for e in engine.brain.read_edges() if e.pending]
+    edges = [e for e in engine.brain.read_edges() if e.pending and not e.is_invalidated]
     texts = {n.id: n.text for n in engine.brain.read_nodes()}
     if not edges:
         print("No pending suggestions.")

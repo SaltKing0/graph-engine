@@ -57,7 +57,7 @@ async function refresh() {
   }
   nodes = {};
   g.nodes.forEach(n => nodes[n.id] = n);
-  pending = g.edges.filter(e => e.pending);
+  pending = g.edges.filter(e => e.pending && !(e.invalidated ?? Boolean(e.valid_to)));
   if (selectedId == null && pending.length) selectedId = pending[0].id;
   if (selectedId != null && !pending.some(e => e.id === selectedId)) {
     selectedId = pending.length ? pending[0].id : null;

@@ -123,7 +123,7 @@ def _live_graph(brain: Brain) -> tuple[dict[str, Node], collections.Counter, lis
     """Live nodes (no tombstones) + degree over live edges + those edges."""
     nodes = {n.id: n for n in brain.read_nodes() if n.status != "tombstone"}
     edges = [e for e in brain.read_edges(include_rejected=True)
-             if not e.pending and not e.rejected and e.valid_to is None]
+             if not e.pending and not e.rejected and e.is_current]
     degree: collections.Counter = collections.Counter()
     for e in edges:
         degree[e.source] += 1
@@ -240,7 +240,7 @@ def refresh_plan(brain: Brain) -> dict:
     """What `refresh()` would change (read-only)."""
     from .recall import read_ledger
     edges = [e for e in brain.read_edges(include_rejected=True)
-             if not e.pending and not e.rejected and e.valid_to is None]
+             if not e.pending and not e.rejected and e.is_current]
     mismatched = [e for e in edges
                   if e.origin == "suggester" and e.confidence is not None
                   and e.kind in ("extends", "similar")
@@ -276,7 +276,7 @@ def refresh(brain: Brain, *, dry_run: bool = False, commit: bool = True) -> dict
     for edge in edges:
         if (edge.origin == "suggester" and edge.confidence is not None
                 and edge.kind in ("extends", "similar")
-                and edge.valid_to is None and not edge.rejected):
+                and edge.is_current and not edge.rejected):
             expected = _expected_kind(edge.confidence)
             if edge.kind != expected:
                 changed.append((edge.id, edge.kind, expected))
@@ -328,7 +328,7 @@ def distill(brain: Brain, *, min_size: int = DREAM_MIN_COMMUNITY,
     """
     nodes = {n.id: n for n in brain.read_nodes() if n.status != "tombstone"}
     edges = [e for e in brain.read_edges(include_rejected=True)
-             if not e.pending and not e.rejected and e.valid_to is None]
+             if not e.pending and not e.rejected and e.is_current]
     degree: collections.Counter = collections.Counter()
     for e in edges:
         degree[e.source] += 1

@@ -151,7 +151,7 @@ def _load_structural(brain: Brain) -> list[dict]:
 def report_data(brain: Brain, **opts) -> dict:
     """Machine-readable report payload (--json and GET /api/report)."""
     nodes = [n for n in brain.read_nodes() if n.status != "tombstone"]
-    edges = [e for e in brain.read_edges() if e.valid_to is None]
+    edges = [e for e in brain.read_edges() if e.is_current]
     id2node = {n.id: n for n in nodes}
     since = _parse_since(opts)
     top = max(int(opts.get("top") or DEFAULT_TOP), 0)

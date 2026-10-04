@@ -202,7 +202,7 @@ def explain(engine: BrainEngine, node_id: str, query: str, *, k: int = 5,
     # Only accepted, live connections to other returned hits are evidence.
     hit_ids = set(final_ranks) - {node_id}
     edges = [edge for edge in engine.brain.read_edges()
-             if not edge.pending and not edge.rejected and edge.valid_to is None
+             if not edge.pending and not edge.rejected and edge.is_current
              and ((edge.source == node_id and edge.target in hit_ids)
                   or (edge.target == node_id and edge.source in hit_ids))]
     return {

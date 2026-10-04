@@ -259,7 +259,14 @@ inferred. Explicit dates are normalized to UTC (timezone-free dates use UTC),
 and `valid_to` requires a preceding `valid_from`. Explicitly different validity
 windows remain separate edges. New observations do not automatically invalidate
 conflicting facts. Use the existing temporal API to inspect accepted facts by
-validity. `--dry-run` never syncs or writes the brain, but **with `--llm` it does
+validity. A dated fact remains reviewable even if its window is past or future;
+accepted facts appear in live views only within `[valid_from, valid_to)`.
+Invalidation is recorded separately as `invalidated_at`, so it cannot change
+the original extraction window or allow a repeat to recreate that fact.
+New facts store this original window in `extracted_validity` (including null
+dates). Legacy edges without that metadata retain their old interpretation:
+a set `valid_to` means invalidated; reads do not migrate or revive them.
+`--dry-run` never syncs or writes the brain, but **with `--llm` it does
 invoke the configured model command** so it can show the actual extraction.
 Preview node/edge IDs are temporary until a real pass writes them.
 

@@ -524,3 +524,30 @@ def test_entities_cli_review_shows_directed_predicate_and_evidence(tmp_path):
     assert f"evidence {data['source_node_id']}: Alice works at Acme" in pending.stdout
     accepted = run_cli(["accept", data["facts"][0]["id"]], tmp_path)
     assert accepted.returncode == 0 and "[works_at]" in accepted.stdout
+
+
+def test_entities_cli_dated_fact_review_and_invalidation(tmp_path):
+    import json
+    import shlex
+    from graph_engine.brain import Brain
+
+    payload = {
+        "entities": [{"name": "Alice", "type": "person"}, {"name": "Acme", "type": "org"}],
+        "facts": [{"subject": "Alice", "predicate": "works_at", "object": "Acme",
+                   "evidence": "Alice works at Acme", "valid_from": "2000-01-01",
+                   "valid_to": "2001-01-01"}],
+    }
+    env = {"IG_ENTITIES_LLM_CMD": "printf %s " + shlex.quote(json.dumps(payload))}
+    args = ["entities", "Alice works at Acme.", "--llm"]
+    result = run_cli(args, tmp_path, env)
+    assert result.returncode == 0 and "(pending)" in result.stdout
+    brain = Brain(tmp_path / "brain", mode="local")
+    edge = next(e for e in brain.read_edges() if e.kind == "fact")
+    assert edge.id in run_cli(["pending"], tmp_path).stdout
+    assert run_cli(["accept", edge.id], tmp_path).returncode == 0
+    assert "(accepted)" in run_cli(args, tmp_path, env).stdout
+    brain.invalidate_edge(edge.id)
+    repeated = run_cli([*args, "--accept-facts"], tmp_path, env)
+    assert repeated.returncode == 0 and "(invalidated)" in repeated.stdout
+    assert edge.id not in run_cli(["pending"], tmp_path).stdout
+    assert len([e for e in brain.read_edges() if e.kind == "fact"]) == 1

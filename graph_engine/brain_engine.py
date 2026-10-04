@@ -153,7 +153,7 @@ class BrainEngine:
     def _has_relation(self, node_id: str) -> bool:
         """V2#3 admit rule: does the node have an active edge (in/out)?"""
         return any(e.source == node_id or e.target == node_id
-                   for e in self.brain.read_edges() if e.valid_to is None)
+                   for e in self.brain.read_edges() if e.is_current)
 
     def demote_forgotten(self, level_fn) -> int:
         """Graceful degradation (V2#2): active nodes whose level_fn=='tombstone'
@@ -536,7 +536,7 @@ class BrainEngine:
             # coexist, and A→B also blocked B→A. Dedupe is now
             # kind-aware and direction-sensitive; only exact duplicates block.
             existing = [(e.source, e.target, e.kind) for e in self.brain.read_edges()
-                        if e.valid_to is None and not e.rejected]
+                        if e.is_current and not e.rejected]
             if (source_id, target_id, kind) in existing:
                 raise ValueError("This edge already exists.")
             edge = Edge(source=source_id, target=target_id, kind=kind, pending=False,

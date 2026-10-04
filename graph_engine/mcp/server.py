@@ -144,7 +144,7 @@ def get_node(id: str, max_chars: int = fmt.DEFAULT_NODE_CHARS) -> dict:
         return fmt.node_not_found(node_id)
     text = node.text or ""
     edges = [e for e in brain.read_edges()
-             if e.valid_to is None and not e.rejected
+             if e.is_current and not e.rejected
              and node_id in (e.source, e.target)]
     out_edges = []
     id2node = {n.id: n for n in brain.read_nodes()}

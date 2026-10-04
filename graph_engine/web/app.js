@@ -107,7 +107,7 @@ const short = (text, length = 36) => {
   }
 
   function highlight() {
-    const selected = edges.find(edge => edge.id === selectedEdge);
+    const selected = pending.find(edge => edge.id === selectedEdge) || edges.find(edge => edge.id === selectedEdge);
     const ids = new Set(selected ? [selected.source, selected.target] : selectedNode ? [selectedNode] : []);
     const searching = $("#search").value.trim().toLowerCase();
     if (graph3D) {
@@ -151,7 +151,7 @@ const short = (text, length = 36) => {
     // Audit #45: auto-fit only until the user pans/zooms themselves — otherwise
     // every resize oscillation (mobile URL bar) clobbers the user's view.
     if (loaded && initialFit) {
-      const edge = edges.find(item => item.id === selectedEdge);
+      const edge = pending.find(item => item.id === selectedEdge) || edges.find(item => item.id === selectedEdge);
       const targets = edge ? nodes.filter(node => node.id === edge.source || node.id === edge.target) : selectedNode ? nodes.filter(node => node.id === selectedNode) : nodes;
       fitNodes(targets);
     }
@@ -245,7 +245,7 @@ const short = (text, length = 36) => {
 
   function selectEdge(id, reveal = false) {
     selectedEdge = id; selectedNode = null; initialFit = false;
-    const edge = edges.find(item => item.id === id);
+    const edge = pending.find(item => item.id === id) || edges.find(item => item.id === id);
     if (!edge) return;
     document.querySelectorAll(".card").forEach(card => card.classList.toggle("active", card.dataset.id === id));
     if (reveal) setView("graph");
@@ -280,9 +280,11 @@ const short = (text, length = 36) => {
       const existing = new Map(nodes.map(node => [node.id, node]));
       nodes = graph.nodes.map(node => Object.assign(existing.get(node.id) || {}, node));
       const ids = new Set(nodes.map(node => node.id));
-      edges = graph.edges.filter(edge => ids.has(edge.source) && ids.has(edge.target) && !edge.rejected && !edge.valid_to);
+      const eligible = graph.edges.filter(edge => ids.has(edge.source) && ids.has(edge.target) && !edge.rejected);
+      edges = eligible.filter(edge => edge.current ?? !edge.valid_to);
       links = edges.map(edge => ({ ...edge }));
-      pending = edges.filter(edge => edge.pending);
+      // Historical and scheduled facts still need review, even off the live graph.
+      pending = eligible.filter(edge => edge.pending && !(edge.invalidated ?? Boolean(edge.valid_to)));
       if (!pending.some(edge => edge.id === selectedEdge)) selectedEdge = null;
       if (!ids.has(selectedNode)) selectedNode = null;
       // Clear old links before replacing nodes, so deleted endpoints cannot leak into the simulation.

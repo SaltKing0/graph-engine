@@ -85,8 +85,8 @@ def _redirect_edges(edges: list, survivor: str, deletee: str,
         if s == deletee or t == deletee:
             if e.kind in DIRECTIONAL_KINDS and s == deletee:
                 # The statement no longer holds about the survivor — historicize the edge.
-                if e.valid_to is None:
-                    e.valid_to = now_iso
+                if not e.is_invalidated:
+                    e.invalidate(now_iso)
                     invalidated += 1
                     invalidated_ids.append(e.id)
                 else:
