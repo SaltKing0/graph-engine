@@ -105,6 +105,15 @@ class Node:
         self.aliases = list(aliases or [])
 
     def to_markdown(self) -> str:
+        # This frontmatter format stores scalars and simple lists on one line.
+        # Untrusted source/tags must never introduce another metadata key (in
+        # particular an id with different access permissions). Check at write
+        # time too: merge_node updates sources on an existing Node instance.
+        for name in ("id", "created", "source", "last_recalled", "observed_at", "context"):
+            self._validate_metadata(name, getattr(self, name))
+        for name in ("tags", "sources", "recall_queries"):
+            for value in getattr(self, name):
+                self._validate_metadata(name, value)
         tags = "[" + ", ".join(self.tags) + "]" if self.tags else "[]"
         lines = [f"id: {self.id}", f"created: {self.created}",
                  f"source: {self.source}", f"type: {self.ntype}",
@@ -140,6 +149,12 @@ class Node:
                 lines.append(f"last_recalled: {self.last_recalled}")
         return "---\n" + "\n".join(lines) + "\n---\n\n" + f"{self.text}\n"
 
+    @staticmethod
+    def _validate_metadata(name: str, value: str | None) -> None:
+        if value is not None and (not isinstance(value, str) or any(
+                char in value for char in "\r\n\v\f\x1c\x1d\x1e\x85\u2028\u2029")):
+            raise ValueError(f"{name} must be a single-line string")
+
     @classmethod
     def from_markdown(cls, raw: str) -> "Node":
         m = re.match(r"^---\n(.*?)\n---\n\n?(.*)$", raw, re.DOTALL)
@@ -150,6 +165,8 @@ class Node:
         for line in meta_raw.splitlines():
             if ":" in line:
                 key, _, val = line.partition(":")
+                if key.strip() in meta:
+                    raise ValueError(f"Duplicate frontmatter key: {key.strip()}")
                 meta[key.strip()] = val.strip()
         # Audit #56: a hand-edited file without id: should raise an
         # understandable error (with path context so the caller can skip it),
@@ -503,7 +520,9 @@ class Brain:
         out = []
         for p in sorted(nodes_dir.glob("*.md")):
             try:
-                out.append(Node.from_markdown(p.read_text(encoding="utf-8")))
+                node = Node.from_markdown(p.read_text(encoding="utf-8"))
+                if node.id == p.stem:
+                    out.append(node)
             except (ValueError, KeyError):
                 continue  # skip broken files instead of crashing
         return out
@@ -516,7 +535,8 @@ class Brain:
         if path is None or not path.exists():
             return None
         try:
-            return Node.from_markdown(path.read_text(encoding="utf-8"))
+            node = Node.from_markdown(path.read_text(encoding="utf-8"))
+            return node if node.id == node_id else None
         except (ValueError, KeyError, OSError):
             return None
 

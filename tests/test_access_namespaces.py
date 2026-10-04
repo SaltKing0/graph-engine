@@ -125,6 +125,7 @@ def test_http_auth_read_write_report_and_websocket(protected, monkeypatch, tmp_p
 
 
 def test_mcp_hidden_node_and_missing_identity(protected, monkeypatch):
+    pytest.importorskip("mcp")
     from graph_engine.mcp.server import get_node, brain_status
     assert get_node("private")["ok"] is False
     monkeypatch.setenv("IG_PRINCIPAL", "unknown")
@@ -221,3 +222,131 @@ def test_editor_global_maintenance_denied_before_writes(protected):
         merge_nodes(brain, "public", "readonly")
     after = {str(p.relative_to(raw.path)): p.read_bytes() for p in raw.path.rglob("*") if p.is_file()}
     assert before == after
+
+
+@pytest.mark.parametrize("factory", [runtime.make_brain, runtime.make_engine])
+def test_graph_identity_and_path_use_one_selection(protected, tmp_path, monkeypatch, factory):
+    _, policy_file, policy = protected
+    monkeypatch.setenv("IG_GRAPH_HOME", str(tmp_path / "graphs"))
+    monkeypatch.delenv("IG_ACCESS_POLICY")
+    for name in ("allowed", "secret"):
+        namespaces.create_graph(name)
+        Brain(str(namespaces.graph_path(name))).write_node(Node(id="same", text=name))
+    policy["graphs"]["allowed"] = {"roles": {"alice": "viewer"}}
+    policy["graphs"]["secret"] = {"roles": {"owner": "admin"}}
+    policy_file.write_text(json.dumps(policy))
+    monkeypatch.setenv("IG_ACCESS_POLICY", str(policy_file))
+    selections = iter(["allowed", "secret"])
+    monkeypatch.setattr(namespaces, "selected", lambda: next(selections))
+    result = factory()
+    brain = result.brain if isinstance(result, BrainEngine) else result
+    assert brain.graph_name == "allowed"
+    assert brain.read_node("same").text == "allowed"
+    assert next(selections) == "secret"  # no second selection during construction
+
+
+@pytest.mark.parametrize("factory", [runtime.brain_path, runtime.make_brain, runtime.make_engine])
+def test_explicit_graph_without_home_fails_instead_of_using_legacy(monkeypatch, factory):
+    monkeypatch.delenv("IG_GRAPH_HOME", raising=False)
+    monkeypatch.delenv("IG_ACCESS_POLICY", raising=False)
+    monkeypatch.setenv("IG_GRAPH", "personal")
+    with pytest.raises(ValueError, match="IG_GRAPH_HOME"):
+        factory()
+
+
+def test_mcp_call_pins_graph_across_selection_change(tmp_path, monkeypatch):
+    pytest.importorskip("mcp")
+    from graph_engine.mcp.server import _access_guard
+    monkeypatch.delenv("IG_ACCESS_POLICY", raising=False)
+    monkeypatch.delenv("IG_GRAPH", raising=False)
+    monkeypatch.setenv("IG_GRAPH_HOME", str(tmp_path / "graphs"))
+    monkeypatch.setenv("IG_BRAIN_MODE", "local")
+    for name in ("one", "two"):
+        namespaces.create_graph(name)
+    namespaces.switch_graph("one")
+
+    def operation():
+        before = runtime.brain_path()
+        namespaces.switch_graph("two")
+        return before, runtime.brain_path()
+
+    before, after = _access_guard(operation, "read")()
+    assert before == after
+    assert after.endswith("/one")
+    assert namespaces.selected() == "two"
+
+
+@pytest.mark.parametrize("metadata", [
+    {"source": "human\nid: readonly"},
+    {"source": "human\rid: readonly"},
+    {"tags": ["safe\nid: readonly"]},
+    {"tags": ["safe\u2028id: readonly"]},
+])
+def test_http_rejects_metadata_identity_injection(protected, metadata):
+    from graph_engine.server import app
+    raw, _, _ = protected
+    before = {n.id: n.to_dict() for n in raw.read_nodes()}
+    result = TestClient(app).post("/api/ingest", headers={"Authorization": "Bearer editor-token"},
+                                 json={"text": "injected data", "allow_duplicates": True, **metadata})
+    assert result.status_code == 400
+    assert {n.id: n.to_dict() for n in raw.read_nodes()} == before
+
+
+def test_duplicate_ingest_rejects_multiline_source(protected):
+    from graph_engine.server import app
+    raw, _, _ = protected
+    client = TestClient(app)
+    headers = {"Authorization": "Bearer editor-token"}
+    first = client.post("/api/ingest", headers=headers, json={"text": "a distinct new memory"})
+    assert first.status_code == 200
+    before = {n.id: n.to_dict() for n in raw.read_nodes()}
+    result = client.post("/api/ingest", headers=headers,
+                         json={"text": "a distinct new memory", "source": "human\nid: readonly"})
+    assert result.status_code == 400
+    assert {n.id: n.to_dict() for n in raw.read_nodes()} == before
+
+
+def test_stored_identity_must_match_filename(protected):
+    raw, _, _ = protected
+    raw.node_path("forged").write_text(Node(id="readonly", text="spoof").to_markdown())
+    assert raw.read_node("forged") is None
+    assert len([n for n in raw.read_nodes() if n.id == "readonly"]) == 1
+    raw.node_path("forged").write_text("---\nid: forged\nid: readonly\n---\nspoof")
+    assert raw.read_node("forged") is None
+
+
+def test_forget_preflights_all_affected_permissions(protected):
+    from graph_engine.agent_memory import forget
+    raw, _, _ = protected
+    raw.add_edge(Edge("public", "readonly", "similar", pending=False))
+    before = {str(p.relative_to(raw.path)): p.read_bytes() for p in raw.path.rglob("*") if p.is_file()}
+    with pytest.raises(PermissionError):
+        forget(runtime.make_brain(), "public", reason="test", commit=False)
+    after = {str(p.relative_to(raw.path)): p.read_bytes() for p in raw.path.rglob("*") if p.is_file()}
+    assert before == after
+
+
+def test_feedback_tiers_and_inference_respect_node_access(protected, monkeypatch):
+    from graph_engine.feedback import record_feedback, read_feedback
+    from graph_engine.inference import infer
+    from graph_engine.retrieval import explain
+    from graph_engine.tiers import set_tier
+    raw, _, _ = protected
+    monkeypatch.setenv("IG_PRINCIPAL", "owner")
+    record_feedback(runtime.make_engine(), "knowledge private", "private", "relevant", commit=False)
+    monkeypatch.setenv("IG_PRINCIPAL", "alice")
+    engine = runtime.make_engine()
+    assert read_feedback(engine.brain) == []
+    assert explain(engine, "public", "knowledge private")["learning"]["expansion_terms"] == []
+    for nid in ("readonly", "private"):
+        with pytest.raises(PermissionError):
+            record_feedback(engine, "knowledge", nid, "relevant", commit=False)
+        with pytest.raises(PermissionError):
+            set_tier(engine.brain, nid, "main", commit=False)
+    with pytest.raises(ValueError, match="No live node"):
+        infer(engine.brain, "public -> private")
+    record_feedback(engine, "knowledge", "public", "relevant", commit=False)
+    set_tier(engine.brain, "public", "main", commit=False)
+    assert raw.read_node("public").tier_locked
+    monkeypatch.setenv("IG_PRINCIPAL", "owner")
+    assert {r["node_id"] for r in read_feedback(runtime.make_brain())} == {"public", "private"}

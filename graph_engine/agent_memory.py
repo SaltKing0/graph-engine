@@ -71,6 +71,7 @@ def forget(brain: Brain, node_id: str, *, reason: str,
     reason = (reason or "").strip()
     if not reason:
         raise ValueError("forget requires a reason — it lands in the commit message.")
+    brain.authorize("write", node_id)
     node = brain.read_node(node_id)
     if node is None:
         raise ValueError(f"No node with id {node_id!r}.")
@@ -83,6 +84,10 @@ def forget(brain: Brain, node_id: str, *, reason: str,
     invalidated = 0
     for e in edges:
         if not e.is_invalidated and not e.rejected and node_id in (e.source, e.target):
+            # Check every affected record before writing the tombstone. A
+            # readable edge can connect to a node the caller cannot modify.
+            for affected in [e.source, e.target, *(item.get("node_id") for item in e.evidence)]:
+                brain.authorize("write", affected)
             e.invalidate(now)        # Also invalidate scheduled/expired extracted facts.
             invalidated += 1
     node.status = FORGET_STATUS

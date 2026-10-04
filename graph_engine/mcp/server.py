@@ -70,13 +70,16 @@ def _cache_vectors() -> bool:
 def _access_guard(fn, action: str):
     @wraps(fn)
     def guarded(*args, **kwargs):
-        from .. import access, runtime
+        from .. import access, runtime, namespaces
+        graph_token = namespaces.request_graph.set(namespaces.selected())
         try:
             if access.policy_path():
                 runtime.make_brain().authorize(action)
             return fn(*args, **kwargs)
         except PermissionError:
             return fmt.err("forbidden", "Access denied")
+        finally:
+            namespaces.request_graph.reset(graph_token)
     return guarded
 
 

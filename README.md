@@ -547,17 +547,7 @@ implemented; release `v0.5.4` is published — see [CHANGELOG.md](CHANGELOG.md).
   review list; the top pairs on a mature brain are demonstrably distinct topics,
   and nothing merges automatically.
 
-## Open source / privacy
-
-The **engine is generic** (this public repo) — the **brain is your private
-repo** with your data. The engine contains no brain data.
-
-## License
-
-MIT — see `LICENSE`.
-
-
-### Storage tiers and retrieval feedback
+## Storage tiers and retrieval feedback
 
 Storage tier is independent of `type` (semantic, episodic, procedural, entity)
 and lifecycle `status` (probation, active, stale, tombstone). The persisted
@@ -601,7 +591,8 @@ or external service; without feedback, the existing equal-weight RRF is retained
 query, learned weights, weighted channel contributions, and feedback adjustment.
 Use explicit feedback to teach preferences; recall counts alone are not relevance
 judgments. The policy does not claim measured ranking improvements on every corpus.
-### Isolated graphs and access control
+
+## Isolated graphs and access control
 
 Named graphs have separate nodes, edges, embeddings, recall ledgers and git
 histories. With no `IG_GRAPH_HOME`, existing single-brain behavior is unchanged.
@@ -691,3 +682,12 @@ stored node; it cannot retract information already copied into another node,
 derived summary, git history or external export. Policy updates and brain
 mutations are not a multi-file transaction. Use one writer process per brain,
 as with the existing storage model.
+
+## Open source / privacy
+
+The **engine is generic** (this public repo) — the **brain is your private
+repo** with your data. The engine contains no brain data.
+
+## License
+
+MIT — see `LICENSE`.
