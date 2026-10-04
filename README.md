@@ -60,7 +60,7 @@ graph grows as visible history.
 ```
 
 - **Nodes** — one Markdown file per idea (`nodes/<id>.md`, YAML frontmatter:
-  `type: semantic|episodic|procedural`, `status: probation|active|tombstone`).
+  `type: semantic|episodic|procedural|entity`, `status: probation|active|tombstone`).
   Episodic nodes carry `observed_at` (when the event happened) and `context`
   (where/how it was observed) — they are raw observations, not deduplicated.
 - **Edges** — `edges.jsonl`, typed (`similar`, `extends`,
@@ -117,6 +117,9 @@ The engine doesn't just store knowledge — it improves itself, in three tiers:
 ```bash
 ig init [--remote <url>] [--demo]  # create a brain (empty / connected / demo)
 ig ingest "New idea ..."           # ingest (duplicates are merged)
+ig entities "Alice works at Acme. She uses Python." [--dry-run] [--json]
+                                  # typed entities + pending fact triples
+ig entities --node <node_id>       # extract from an existing note/event
 ig observe "Event ..."              # store raw episodic event (no dedupe)
 ig extract <episodic_id> ["text"]   # extract semantic fact from episodic node
 ig consolidate [--dry-run] [--json] # automatically extract eligible episodic nodes
@@ -161,6 +164,115 @@ ig merge <survivor> <deletee>      # consolidate a near-duplicate pair
 ig mcp                             # read-only MCP server over stdio (AI assistants)
 ig mcp --write                     # + remember/recall/forget (agent memory, opt-in)
 ```
+
+## Extract entities and facts
+
+`ig entities` creates an entity subgraph linked to the semantic or episodic
+evidence. Each entity is a node with `type: entity`, `entity_name`,
+`entity_type` (`person`, `org`, `concept`, `location`, `product`, `unknown`)
+and explicit `aliases`. A fact is a directed edge with `kind: fact`:
+its `source` is the subject entity ID, `predicate` names the relation, and
+`target` is the object entity ID. `evidence` retains exact quotes and their
+source node IDs. Accepted `mentions` edges link the evidence node to its
+entities. These are ordinary graph nodes/edges: search can retrieve entities,
+and the web graph shows their relationships and fact predicates.
+
+```bash
+ig entities "Alice works at Acme. She uses Python." --dry-run --json
+ig entities "Alice works at Acme. She uses Python."
+# person Alice, org Acme, concept Python;
+# Alice --works_at--> Acme, Alice --uses--> Python
+cat note.txt | ig entities - --source research --json
+ig entities --node <semantic_or_episodic_node_id> --json
+ig pending                         # review extracted fact edges
+ig accept <fact_edge_id>            # accept in CLI or web UI
+```
+
+The default extractor needs no model download or new dependencies. It recognizes
+a small grammar of complete English/German sentences: `works at` / `works for`
+/ `arbeitet bei`, `founded` / `gründete`, `lives in` / `wohnt in`,
+`is based in`, and `uses` / `nutzt`. Names must consist of capitalized words,
+or match an already known name/alias. Explicit declarations such as
+`Alice is a person`, `Python is a concept`, or `Berlin ist ein Ort` create
+typed entities without asserting a relation. Relation roles suggest entity
+types; `uses` assigns an otherwise unknown subject type and a concept object,
+preserving a known object's explicit type (for example, `product`).
+These are heuristic labels, not a general named-entity recognition model.
+Unsupported prose can yield no extraction; it does not create an empty graph
+or an evidence node. Ordinary `ig ingest` does not extract automatically.
+
+`International Business Machines (IBM)` declares an acronym alias. Later
+`Alice works at IBM` reuses that organization. Names/explicit aliases are
+matched by Unicode normalization, whitespace and case, **within the same
+entity type**. No similarity or surname matching is used. Different people
+with the same name require distinguishing names; name matching alone cannot
+prove identity. Ambiguous alias matches abort the batch before writing.
+`he`/`she`/`er`/`sie` and `it`/`es` resolve only if there is exactly one
+compatible person/organization earlier in the current input; otherwise that
+sentence is skipped. Cross-document pronouns are never guessed.
+
+Raw input, with outer whitespace trimmed, is stored in an exact-text-deduplicated
+semantic evidence node;
+`--node` uses a live semantic, episodic or procedural node unchanged. Entity
+identities are excluded from ingest/dedup consolidation and cannot be merged
+with `ig merge`. Identical typed entities and fact triples are reused across
+inputs, adding source evidence to existing facts. An unchanged repeat writes
+nothing; a changed pass commits once. Rejected/invalidated facts stay decided,
+and a forgotten matching entity causes an error instead of being recreated.
+`--accept-facts` accepts **new** fact edges immediately; the default is pending
+review, including for model output. The web review card shows the predicate
+and quoted evidence. Existing decisions are preserved.
+
+### Optional model extraction
+
+For free prose or richer coreference, configure `IG_ENTITIES_LLM_CMD` and pass
+`--llm`. The shell command receives a JSON request on stdin containing `text`,
+`known_entities`, an extraction `instruction`, `entity_types` and a `schema`.
+It must print one JSON object on stdout (no Markdown):
+
+```json
+{
+  "entities": [
+    {"name": "Alice", "type": "person", "aliases": []},
+    {"name": "Acme", "type": "org", "aliases": []}
+  ],
+  "facts": [
+    {"subject": "Alice", "predicate": "works_at", "object": "Acme",
+     "evidence": "Alice works at Acme", "confidence": null,
+     "valid_from": null, "valid_to": null}
+  ]
+}
+```
+
+Fact endpoints refer to canonical names in that response. Aliases, confidence
+and dates are optional. The engine validates types, references, literal entity
+mentions, exact evidence quotes, finite confidence in `[0, 1]`, and ordered
+ISO-8601 validity windows before writing. Aliases can anchor a canonical name
+that is absent from the input. Quote validation checks provenance; it does
+not verify the model's interpretation or identity claims. Negation, hypothetical
+claims and ambiguous coreference should be declined by the extractor and still
+require review. Predicate names are normalized to lowercase with underscores.
+Failure, malformed output or a 300-second timeout aborts extraction.
+
+Without a validity date, `valid_from` records extraction time; no event date is
+inferred. Explicit dates are normalized to UTC (timezone-free dates use UTC),
+and `valid_to` requires a preceding `valid_from`. Explicitly different validity
+windows remain separate edges. New observations do not automatically invalidate
+conflicting facts. Use the existing temporal API to inspect accepted facts by
+validity. `--dry-run` never syncs or writes the brain, but **with `--llm` it does
+invoke the configured model command** so it can show the actual extraction.
+Preview node/edge IDs are temporary until a real pass writes them.
+
+```bash
+export IG_ENTITIES_LLM_CMD='your-json-extraction-command'
+ig entities --node <node_id> --llm --dry-run --json
+ig entities --node <node_id> --llm --json
+```
+
+Python callers can use `engine.entities(text, ...)` or
+`extract_entities(brain, text, extractor=...)` from `graph_engine.entities`.
+An extractor callable receives `(text, known_entities)` and returns the same
+JSON-compatible structure.
 
 ## Explain a search result
 
@@ -352,6 +464,7 @@ distillation also requires its separate `IG_DREAM_LLM_CMD`.
 | `IG_CONSOLIDATE_MIN_COUNT` | `1` | minimum eligible, unprocessed events before a pass (integer >= 1) |
 | `IG_CONSOLIDATE_LIMIT` | `50` | maximum events per pass (integer >= 1) |
 | `IG_CONSOLIDATE_LLM_CMD` | *(none)* | optional stdin/stdout fact extractor, invoked only with `--llm` |
+| `IG_ENTITIES_LLM_CMD` | *(none)* | optional JSON stdin/stdout entity and triple extractor for `ig entities --llm` |
 
 Dedupe: near-duplicate ingests (cosine ≥ 0.92) merge into the existing node
 (`sources:` provenance); opt out with `allow_duplicates: true`.

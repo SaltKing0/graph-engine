@@ -94,7 +94,8 @@ class BrainEngine:
 
     def _find_duplicate(self, vec: list[float], exclude_id: str | None = None) -> Node | None:
         """Closest node above the dedupe threshold — or None. Uses the vector cache."""
-        node_ids = {n.id for n in self.brain.read_nodes() if n.id != exclude_id}
+        node_ids = {n.id for n in self.brain.read_nodes()
+                    if n.id != exclude_id and n.ntype != "entity" and n.status != "tombstone"}
         vectors = self.brain.vectors_for(
             node_ids,
             lambda t: self.embedder.embed(_normalize(t)),
@@ -128,7 +129,7 @@ class BrainEngine:
         with BRAIN_LOCK:
             promoted, merged = 0, 0
             for pn in self.brain.read_nodes():
-                if pn.status != "probation":
+                if pn.status != "probation" or pn.ntype == "entity":
                     continue
                 pvec = self.brain.vectors_for(
                     {pn.id}, lambda t: self.embedder.embed(_normalize(t))
@@ -224,7 +225,8 @@ class BrainEngine:
             node = Node(text=text, source=source, tags=tags, ntype=ntype)
             self.brain.write_node(node)
             # Embedding cache: only new nodes get embedded, the rest comes from vectors.jsonl
-            others = {n.id for n in self.brain.read_nodes() if n.id != node.id}
+            others = {n.id for n in self.brain.read_nodes()
+                      if n.id != node.id and n.ntype != "entity"}
             candidates = self.brain.vectors_for(
                 others,
                 lambda t: self.embedder.embed(_normalize(t)),
@@ -238,7 +240,7 @@ class BrainEngine:
             # Sorted by target id: which edges fall inside the cap must not
             # depend on the filesystem's node read order (determinism).
             for ex in sorted(self.brain.read_nodes(), key=lambda n: n.id):
-                if ex.id == node.id:
+                if ex.id == node.id or ex.ntype == "entity":
                     continue
                 intent = detect_intent(node.text, ex.text)
                 if not intent:
@@ -315,7 +317,7 @@ class BrainEngine:
                 if not e.pending and e.kind == "similar":
                         target_node = next((n for n in self.brain.read_nodes()
                                             if n.id == e.target), None)
-                        if target_node is None or target_node.status == "tombstone":
+                        if target_node is None or target_node.status == "tombstone" or target_node.ntype == "entity":
                             continue
                         existing = target_node.text.count("[evolved ")
                         if existing >= EVOLVED_ANNOTATION_CAP:
@@ -348,6 +350,11 @@ class BrainEngine:
                 self._heal_after_failed_commit()
                 raise
             return node, new_edges, False
+
+    def entities(self, text: str | None = None, **kwargs) -> dict:
+        """Extract typed entities/facts and link them to an evidence node."""
+        from .entities import extract_entities
+        return extract_entities(self.brain, text, **kwargs)
 
     def observe(self, text: str, source: str = "human", tags: list[str] | None = None,
                 observed_at: str | None = None, context: str | None = None,

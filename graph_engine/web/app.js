@@ -4,6 +4,7 @@
   const $ = selector => document.querySelector(selector);
   const colors = { "similar": "#6ed5a0", "contradicts": "#ff9393", "extends": "#83b9ff", "same_as": "#bc8cff", "supersedes": "#f0883e", "continues": "#58a6ff" };
   const labels = { "similar": "Similar", "contradicts": "Contradiction", "extends": "Extension", "same_as": "Same idea", "supersedes": "Supersedes", "continues": "Continues" };
+  const edgeLabel = edge => edge.kind === "fact" ? edge.predicate || "Fact" : labels[edge.kind] || edge.kind;
   const esc = value => String(value).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   // Audit #50: slice by code points — UTF-16 indexing split surrogate pairs (emoji).
 const short = (text, length = 36) => {
@@ -218,7 +219,7 @@ const short = (text, length = 36) => {
           .width(width).height(height).backgroundColor("#0d1117")
           .nodeRelSize(5).nodeLabel(node => esc(node.text))
           .nodeThreeObjectExtend(true).nodeThreeObject(label3D)
-          .linkOpacity(.65).linkLabel(edge => esc(`${labels[edge.kind] || edge.kind}${edge.pending ? " · Suggestion" : ""}`))
+          .linkOpacity(.65).linkLabel(edge => esc(`${edgeLabel(edge)}${edge.pending ? " · Suggestion" : ""}`))
           .onNodeClick(node => showDetail(node.id)).onBackgroundClick(clearSelection)
           .warmupTicks(80).cooldownTicks(100);
         update3D();
@@ -335,9 +336,10 @@ const short = (text, length = 36) => {
     }
     cards.innerHTML = pending.map(edge => `
       <article class="card ${edge.id === selectedEdge ? "active" : ""}" data-id="${esc(edge.id)}">
-        <div class="card-heading"><span class="kind" data-kind="${esc(edge.kind)}">${esc(labels[edge.kind] || edge.kind)}</span><button class="select-pair quiet" data-action="select">Show in graph</button></div>
+        <div class="card-heading"><span class="kind" data-kind="${esc(edge.kind)}">${esc(edgeLabel(edge))}</span><button class="select-pair quiet" data-action="select">Show in graph</button></div>
         <button class="idea-preview" data-action="source" aria-label="Read first idea in full"><span class="excerpt">${esc(textOf(edge.source))}</span><span class="read">Read idea ↗</span></button>
         <button class="idea-preview" data-action="target" aria-label="Read second idea in full"><span class="excerpt">${esc(textOf(edge.target))}</span><span class="read">Read idea ↗</span></button>
+        ${edge.kind === "fact" ? (edge.evidence || []).slice(0, 3).map(item => `<p class="fact-evidence">${esc(short(item.text, 240))}</p>`).join("") : ""}
         <div class="actions"><button class="ok" data-action="accept" ${resolving ? "disabled" : ""}>&#10003; Accept</button><button class="quiet" data-action="reject" ${resolving ? "disabled" : ""}>Dismiss</button></div>
       </article>`).join("");
     if (focusedId && focusedAction) {
@@ -435,11 +437,11 @@ const short = (text, length = 36) => {
     if (!node) { $("#detail").close(); return; }
     $("#detail-text").textContent = node.text;
     const date = new Date(node.created);
-    $("#detail-meta").textContent = [node.source, Number.isNaN(date.getTime()) ? null : date.toLocaleDateString("en-US"), ...(node.tags || []).map(tag => `#${tag}`)].filter(Boolean).join(" · ");
+    $("#detail-meta").textContent = [node.entity_type, ...(node.aliases || []), node.source, Number.isNaN(date.getTime()) ? null : date.toLocaleDateString("en-US"), ...(node.tags || []).map(tag => `#${tag}`)].filter(Boolean).join(" · ");
     const relations = edges.filter(edge => edge.source === id || edge.target === id);
     $("#detail-relations").innerHTML = `<h3>Connections (${relations.length})</h3>${relations.map(edge => {
       const target = edge.source === id ? edge.target : edge.source;
-      return `<button class="relation quiet" data-node="${esc(target)}"><span>${esc(labels[edge.kind] || edge.kind)}${edge.pending ? " · Suggestion" : " · Accepted"}</span>${esc(short(textOf(target), 160))}</button>`;
+      return `<button class="relation quiet" data-node="${esc(target)}"><span>${esc(edgeLabel(edge))}${edge.pending ? " · Suggestion" : " · Accepted"}</span>${esc(short(textOf(target), 160))}</button>`;
     }).join("") || '<p style="color:var(--dim)">No connections yet.</p>'}`;
   }
   function showDetail(id) {

@@ -22,6 +22,7 @@ class Neighbor:
     pending: bool
     confidence: float | None
     hops: int
+    predicate: str | None = None
 
 
 def live_edges(brain: Brain, include_pending: bool = False) -> list[Edge]:
@@ -87,6 +88,7 @@ def neighbors(brain: Brain, node_id: str, hops: int = 1,
                 pending=edge.pending,
                 confidence=edge.confidence,
                 hops=depth + 1,
+                predicate=edge.predicate,
             ))
             queue.append(other)
     results.sort(key=lambda nb: (nb.hops, nb.kind, nb.id))

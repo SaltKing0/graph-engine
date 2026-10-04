@@ -75,6 +75,12 @@ def _redirect_edges(edges: list, survivor: str, deletee: str,
     redirected_ids: list[str] = []
     invalidated_ids: list[str] = []
     for e in edges:
+        if e.kind == "fact":
+            # Entity identities cannot be text-merged (guard below). Preserve
+            # all fact predicates, directions, validity windows and historical
+            # evidence references when unrelated semantic notes are merged.
+            new_edges.append(e)
+            continue
         s, t = e.source, e.target
         if s == deletee or t == deletee:
             if e.kind in DIRECTIONAL_KINDS and s == deletee:
@@ -143,6 +149,8 @@ def merge_nodes(
     if deletee_id not in nodes:
         raise ValueError(f"Node not found: {deletee_id}")
     survivor, deletee = nodes[survivor_id], nodes[deletee_id]
+    if survivor.ntype == "entity" or deletee.ntype == "entity":
+        raise ValueError("Entity identities cannot be merged as near-duplicate text; use explicit aliases.")
     now_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     # Redirect + deduplicate edges — BEFORE deleting the deletee file

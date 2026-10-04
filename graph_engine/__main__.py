@@ -3,6 +3,8 @@
 Examples:
   python -m graph_engine init [--remote <brain-repo-url>] [--demo]
   python -m graph_engine ingest "New idea ..." [--source agent/bot] [--allow-dup]
+  python -m graph_engine entities "Alice works at Acme. She uses Python." [--dry-run] [--json] [--llm]
+  python -m graph_engine entities --node <node_id> [--accept-facts]
   cat note.md | python -m graph_engine ingest -
   python -m graph_engine pending
   python -m graph_engine accept <edge_id>
@@ -46,6 +48,50 @@ make_engine = runtime.make_engine
 def _short(text: str, n: int = 70) -> str:
     text = text.replace("\n", " ")
     return text[: n - 1] + "…" if len(text) > n else text
+
+
+def cmd_entities(engine: BrainEngine, args: list[str]) -> None:
+    """Extract from text/stdin or an existing evidence node."""
+    import argparse
+    import json
+    from .entities import command_extractor
+
+    parser = argparse.ArgumentParser(prog="ig entities")
+    parser.add_argument("text", nargs="*", help="text, or '-' for stdin")
+    parser.add_argument("--node", dest="node_id", help="existing evidence node ID")
+    parser.add_argument("--source", default="human")
+    parser.add_argument("--json", action="store_true")
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--llm", action="store_true")
+    parser.add_argument("--accept-facts", action="store_true", help="accept new facts immediately")
+    opts = parser.parse_args(args)
+    if opts.node_id and opts.text:
+        parser.error("--node cannot be combined with text")
+    if not opts.node_id and not opts.text:
+        parser.error("provide text, '-' for stdin, or --node")
+    if "-" in opts.text and opts.text != ["-"]:
+        parser.error("'-' (stdin) cannot be combined with text arguments")
+    text = None if opts.node_id else (sys.stdin.read() if opts.text == ["-"] else " ".join(opts.text))
+    try:
+        extractor = command_extractor() if opts.llm else None
+        result = engine.entities(text, node_id=opts.node_id, source=opts.source,
+                                 extractor=extractor, dry_run=opts.dry_run,
+                                 accept_facts=opts.accept_facts)
+    except (ValueError, RuntimeError) as exc:
+        print(f"entities: {exc}", file=sys.stderr)
+        sys.exit(1)
+    if opts.json:
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return
+    print(f"Entities: {len(result['entities'])}, facts: {len(result['facts'])}"
+          + (" (dry run)" if opts.dry_run else ""))
+    names = {n["id"]: n["entity_name"] for n in result["entities"]}
+    for node in result["entities"]:
+        print(f"  {node['id']} [{node['entity_type']}] {node['entity_name']}")
+    for fact in result["facts"]:
+        state = "rejected" if fact.get("rejected") else "invalidated" if fact["valid_to"] else "pending" if fact["pending"] else "accepted"
+        print(f"  {fact['id']}: {names[fact['source']]} --[{fact['predicate']}]--> "
+              f"{names[fact['target']]} ({state})")
 
 
 def cmd_observe(engine: BrainEngine, args: list[str]) -> None:
@@ -297,8 +343,13 @@ def cmd_pending(engine: BrainEngine, args: list[str]) -> None:
         print("No pending suggestions.")
         return
     for e in edges:
-        print(f"{e.id}  [{e.kind}]  {_short(texts.get(e.source, e.source), 40)}"
-              f"  ↔  {_short(texts.get(e.target, e.target), 40)}")
+        kind = e.predicate if e.kind == "fact" and e.predicate else e.kind
+        direction = "→" if e.kind == "fact" else "↔"
+        print(f"{e.id}  [{kind}]  {_short(texts.get(e.source, e.source), 40)}"
+              f"  {direction}  {_short(texts.get(e.target, e.target), 40)}")
+        if e.kind == "fact":
+            for evidence in e.evidence[:3]:
+                print(f"  evidence {evidence['node_id']}: {_short(evidence['text'], 160)}")
     print(f"\n{len(edges)} pending · akzeptieren: ig accept {edges[0].id}")
 
 
@@ -316,7 +367,8 @@ def _resolve_cmd(engine: BrainEngine, edge_id: str, accept: bool) -> None:
     if edge is None:
         print(f"Edge {edge_id} not found or not pending.")
         sys.exit(1)
-    print(f"{'accepted' if accept else 'rejected'}: {edge_id} [{edge.kind}]")
+    kind = edge.predicate if edge.kind == "fact" and edge.predicate else edge.kind
+    print(f"{'accepted' if accept else 'rejected'}: {edge_id} [{kind}]")
 
 
 def cmd_link(engine: BrainEngine, args: list[str]) -> None:
@@ -1119,6 +1171,7 @@ def _dream_summarizer():
 COMMANDS = {
     "init": cmd_init,
     "ingest": cmd_ingest,
+    "entities": cmd_entities,
     "observe": cmd_observe,
     "extract": cmd_extract,
     "consolidate": cmd_consolidate,

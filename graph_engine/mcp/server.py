@@ -161,12 +161,20 @@ def get_node(id: str, max_chars: int = fmt.DEFAULT_NODE_CHARS) -> dict:
             "confidence": e.confidence,
             "valid_from": e.valid_from,
             "valid_to": e.valid_to,
+            **({"predicate": e.predicate,
+                "evidence": [{"node_id": item.get("node_id"),
+                              "text": fmt.snippet(item.get("text", ""), 200)}
+                             for item in e.evidence[:5]]} if e.kind == "fact" else {}),
         })
     return {"ok": True,
             "node": {"id": node.id, "text": text[:max_chars],
                      "created": node.created, "source": node.source,
                      "sources": node.sources, "type": node.ntype,
-                     "status": node.status, "tags": node.tags},
+                     "status": node.status, "tags": node.tags,
+                     **({"entity_name": fmt.snippet(node.entity_name or "", 200),
+                         "entity_type": node.entity_type,
+                         "aliases": [fmt.snippet(a, 200) for a in node.aliases[:20]]}
+                        if node.ntype == "entity" else {})},
             "truncated": len(text) > max_chars,
             "text_chars": len(text),
             "edges": out_edges,
@@ -206,7 +214,8 @@ def neighbors(id: str, hops: int = 1, kinds: list[str] | None = None,
             "neighbors": [{"id": nb.id, "snippet": fmt.snippet(nb.snippet),
                            "kind": nb.kind, "direction": nb.direction,
                            "pending": nb.pending,
-                           "confidence": nb.confidence, "hops": nb.hops}
+                           "confidence": nb.confidence, "hops": nb.hops,
+                           **({"predicate": nb.predicate} if nb.predicate else {})}
                           for nb in found],
             "kinds_present": kinds_present}
 

@@ -454,3 +454,73 @@ def test_consolidation_llm_requires_configured_command(tmp_path):
     assert result.returncode == 1
     assert "IG_CONSOLIDATE_LLM_CMD" in result.stdout
     assert "Traceback" not in result.stderr
+
+
+# Entity/fact extraction: CLI parsing and persisted graph across processes.
+def test_entities_cli_preview_stdin_and_alias_linking(tmp_path):
+    import json
+    from graph_engine.brain import Brain
+    preview = run_cli(["entities", "Alice works at Acme.", "--dry-run", "--json"], tmp_path)
+    assert preview.returncode == 0, preview.stderr
+    assert json.loads(preview.stdout)["created_entities"] == 2
+    assert not (tmp_path / "brain").exists()
+    first = run_cli(["entities", "-", "--json"], tmp_path,
+                    stdin="Alice works at International Business Machines (IBM).\n")
+    assert first.returncode == 0, first.stderr
+    second = run_cli(["entities", "Alice founded IBM.", "--json", "--accept-facts"], tmp_path)
+    assert second.returncode == 0, second.stderr
+    assert json.loads(second.stdout)["created_entities"] == 0
+    assert not json.loads(second.stdout)["facts"][0]["pending"]
+    brain = Brain(tmp_path / "brain", mode="local")
+    assert len([n for n in brain.read_nodes() if n.ntype == "entity"]) == 2
+    human = run_cli(["entities", "Alice founded IBM."], tmp_path)
+    assert "--[founded]-->" in human.stdout and "(accepted)" in human.stdout
+
+
+def test_entities_cli_existing_source_and_clean_failure(tmp_path):
+    import json
+    from graph_engine.brain import Brain, Node
+    brain = Brain(tmp_path / "brain", mode="local")
+    node = Node("Alice works at Acme.", id="episode", ntype="episodic")
+    brain.write_node(node)
+    result = run_cli(["entities", "--node", "episode", "--json"], tmp_path)
+    assert result.returncode == 0, result.stderr
+    assert json.loads(result.stdout)["source_node_id"] == "episode"
+    missing = run_cli(["entities", "--node", "missing"], tmp_path)
+    assert missing.returncode == 1 and "source node" in missing.stderr
+    assert "Traceback" not in missing.stderr
+
+
+@pytest.mark.parametrize("args", [[], ["--node"], ["text", "--node", "id"],
+                                 ["text", "--source"], ["text", "--unknown"], ["-", "extra"]])
+def test_entities_cli_usage_errors(tmp_path, args):
+    result = run_cli(["entities", *args], tmp_path)
+    assert result.returncode != 0 and "usage: ig entities" in result.stderr
+    assert "Traceback" not in result.stderr
+    assert not (tmp_path / "brain").exists()
+
+
+def test_entities_cli_llm_errors_and_preview(tmp_path):
+    import json
+    for command in ("", "exit 7", "printf invalid"):
+        result = run_cli(["entities", "Alice works at Acme", "--llm"], tmp_path,
+                         {"IG_ENTITIES_LLM_CMD": command})
+        assert result.returncode == 1 and "IG_ENTITIES_LLM_CMD" in result.stderr
+        assert "Traceback" not in result.stderr
+    result = run_cli(["entities", "Alice works at Acme", "--llm", "--dry-run", "--json"], tmp_path,
+                     {"IG_ENTITIES_LLM_CMD": 'printf \'{"entities":[],"facts":[]}\''})
+    assert result.returncode == 0, result.stderr
+    assert not json.loads(result.stdout)["changed"]
+    assert not list((tmp_path / "brain").rglob("*.md"))
+
+
+def test_entities_cli_review_shows_directed_predicate_and_evidence(tmp_path):
+    import json
+    result = run_cli(["entities", "Alice works at Acme.", "--json"], tmp_path)
+    assert result.returncode == 0, result.stderr
+    data = json.loads(result.stdout)
+    pending = run_cli(["pending"], tmp_path)
+    assert "[works_at]" in pending.stdout and "Alice  →  Acme" in pending.stdout
+    assert f"evidence {data['source_node_id']}: Alice works at Acme" in pending.stdout
+    accepted = run_cli(["accept", data["facts"][0]["id"]], tmp_path)
+    assert accepted.returncode == 0 and "[works_at]" in accepted.stdout

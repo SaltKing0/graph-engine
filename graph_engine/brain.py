@@ -55,7 +55,9 @@ class Node:
                  status: str = "probation",
                  recall_count: int = 0, recall_queries: list[str] | None = None,
                  last_recalled: str | None = None,
-                 observed_at: str | None = None, context: str | None = None):
+                 observed_at: str | None = None, context: str | None = None,
+                 entity_name: str | None = None, entity_type: str | None = None,
+                 aliases: list[str] | None = None):
         self.text = text
         self.id = id or uuid.uuid4().hex[:12]
         self.created = created or _now_iso()
@@ -67,8 +69,8 @@ class Node:
         # from_markdown passes [] explicitly → old files without the line
         # stay unchanged until they really mutate.
         self.sources = sources if sources is not None else [source]
-        # Taxonomy (LangGraph/survey lesson): semantic | episodic | procedural
-        self.ntype = ntype if ntype in ("semantic", "episodic", "procedural") else "semantic"
+        # Memory taxonomy plus structured entity identities.
+        self.ntype = ntype if ntype in ("semantic", "episodic", "procedural", "entity") else "semantic"
         # V2#2 memory hygiene: dual buffer — new nodes start in probation,
         # get promoted after dedup/verification, or end up as tombstones.
         self.status = status if status in VALID_STATUS else "probation"
@@ -85,6 +87,16 @@ class Node:
         # Only meaningful for ntype="episodic"; None for semantic/procedural.
         self.observed_at = observed_at
         self.context = context
+        if entity_name is not None and not isinstance(entity_name, str):
+            raise ValueError("entity_name must be a string")
+        if entity_type is not None and not isinstance(entity_type, str):
+            raise ValueError("entity_type must be a string")
+        if aliases is not None and (not isinstance(aliases, list)
+                                    or not all(isinstance(a, str) for a in aliases)):
+            raise ValueError("aliases must be a list of strings")
+        self.entity_name = entity_name
+        self.entity_type = entity_type
+        self.aliases = list(aliases or [])
 
     def to_markdown(self) -> str:
         tags = "[" + ", ".join(self.tags) + "]" if self.tags else "[]"
@@ -97,6 +109,12 @@ class Node:
         # the rewrite "changes" the file without any content gain.
         lines.append("sources: [" + ", ".join(self.sources) + "]")
         lines.append(f"tags: {tags}")
+        if self.ntype == "entity":
+            # JSON values are also valid YAML and safely preserve commas,
+            # quotes, colons and Unicode in names/aliases.
+            lines.append("entity_name: " + json.dumps(self.entity_name, ensure_ascii=False))
+            lines.append("entity_type: " + json.dumps(self.entity_type, ensure_ascii=False))
+            lines.append("aliases: " + json.dumps(self.aliases, ensure_ascii=False))
         # Episodic metadata only when present — semantic/procedural nodes
         # stay unchanged (no frontmatter churn).
         if self.ntype == "episodic":
@@ -143,16 +161,23 @@ class Node:
                    recall_count=recall_count, recall_queries=recall_queries,
                    last_recalled=meta.get("last_recalled"),
                    observed_at=meta.get("observed_at"),
-                   context=meta.get("context"))
+                   context=meta.get("context"),
+                   entity_name=json.loads(meta.get("entity_name", "null")),
+                   entity_type=json.loads(meta.get("entity_type", "null")),
+                   aliases=json.loads(meta.get("aliases", "[]")))
 
     def to_dict(self) -> dict:
-        return {"id": self.id, "text": self.text, "created": self.created,
+        result = {"id": self.id, "text": self.text, "created": self.created,
                 "source": self.source, "tags": self.tags, "sources": self.sources,
                 "type": self.ntype, "status": self.status,
                 "recall_count": self.recall_count,
                 "recall_queries": self.recall_queries,
                 "last_recalled": self.last_recalled,
                 "observed_at": self.observed_at, "context": self.context}
+        if self.ntype == "entity":
+            result.update(entity_name=self.entity_name, entity_type=self.entity_type,
+                          aliases=self.aliases)
+        return result
 
 
 class Edge:
@@ -161,7 +186,8 @@ class Edge:
                  valid_from: str | None = None, valid_to: str | None = None,
                  confidence: float | None = None,
                  invalidated_by: str | None = None, rejected: bool = False,
-                 origin: str | None = None):
+                 origin: str | None = None, predicate: str | None = None,
+                 evidence: list[dict] | None = None):
         self.source = source
         self.target = target
         self.kind = kind
@@ -184,6 +210,8 @@ class Edge:
         # V1#1: provenance — which edge/event invalidated this edge.
         self.invalidated_by = invalidated_by
         self.rejected = rejected
+        self.predicate = predicate
+        self.evidence = list(evidence or [])
 
     def to_dict(self) -> dict:
         result = {"id": self.id, "source": self.source, "target": self.target,
@@ -195,6 +223,10 @@ class Edge:
             result["origin"] = self.origin
         if self.rejected:
             result["rejected"] = True
+        if self.predicate is not None:
+            result["predicate"] = self.predicate
+        if self.evidence:
+            result["evidence"] = self.evidence
         return result
 
 
@@ -525,7 +557,8 @@ class Brain:
                             confidence=d.get("confidence"),
                             invalidated_by=d.get("invalidated_by"),
                             rejected=d.get("rejected", False),
-                            origin=d.get("origin"))
+                            origin=d.get("origin"), predicate=d.get("predicate"),
+                            evidence=d.get("evidence", []))
             except (json.JSONDecodeError, KeyError, TypeError):
                 continue
             if edge.rejected and not include_rejected:
