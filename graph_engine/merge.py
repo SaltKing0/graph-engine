@@ -136,6 +136,7 @@ def merge_nodes(
     would dedupe/rank against the PRE-merge text (audit finding
     "survivor vector stale"). The CLI always passes the engine embedder.
     """
+    brain.authorize("admin")
     if survivor_id == deletee_id:
         raise ValueError("Survivor and deletee are identical.")
     # Git mode: repo existence + fresh pull BEFORE the mutation — otherwise

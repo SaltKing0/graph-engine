@@ -1,6 +1,7 @@
 """CLI for the brain: init, ingest, pending, accept, reject, link, search.
 
 Examples:
+  python -m graph_engine graph list | create <name> | switch <name>
   python -m graph_engine init [--remote <brain-repo-url>] [--demo]
   python -m graph_engine ingest "New idea ..." [--source agent/bot] [--allow-dup]
   python -m graph_engine entities "Alice works at Acme. She uses Python." [--dry-run] [--json] [--llm]
@@ -410,6 +411,7 @@ def cmd_init(engine: BrainEngine, args: list[str]) -> None:
     if demo:
         from .demo import build_demo_brain
         try:
+            brain.authorize("admin")
             stats = build_demo_brain(str(brain.path))
         except FileExistsError:
             # Audit #58: friendly message instead of a raw traceback — a
@@ -1198,6 +1200,19 @@ def _dream_summarizer():
     return summarizer
 
 
+def cmd_graph(args: list[str]) -> None:
+    """Manage isolated brain namespaces without loading an embedder."""
+    from .namespaces import create_graph, list_graphs, selected, switch_graph
+    if args == ["list"]:
+        for name in list_graphs():
+            print(("* " if name == selected() else "  ") + name)
+    elif len(args) == 2 and args[0] in ("create", "switch"):
+        (create_graph if args[0] == "create" else switch_graph)(args[1])
+        print(f"Graph {args[0]}: {args[1]}")
+    else:
+        raise ValueError("Usage: ig graph list | create <name> | switch <name>")
+
+
 COMMANDS = {
     "init": cmd_init,
     "ingest": cmd_ingest,
@@ -1238,11 +1253,22 @@ def main() -> None:
         print(__doc__)
         sys.exit(0)
     cmd, rest = args[0], args[1:]
+    if cmd == "graph":
+        try:
+            cmd_graph(rest)
+        except (ValueError, PermissionError, FileExistsError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            sys.exit(1)
+        return
     fn = COMMANDS.get(cmd)
     if fn is None:
         print(f"Unknown command: {cmd}. Available: {', '.join(COMMANDS)}")
         sys.exit(1)
-    fn(make_engine(), rest)
+    try:
+        fn(make_engine(), rest)
+    except PermissionError as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

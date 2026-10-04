@@ -308,6 +308,12 @@ class Brain:
         # lock combine cleanly for that (RLock).
         self._lock = threading.RLock()
 
+    def authorize(self, action: str, node_id: str | None = None) -> None:
+        """Unprotected local brain; SecuredBrain enforces this shared hook."""
+
+    def can_access(self, action: str, node_id: str | None = None) -> bool:
+        return True
+
     # ---------- Git sync ----------
 
     @staticmethod

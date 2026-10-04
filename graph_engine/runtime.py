@@ -20,6 +20,7 @@ from __future__ import annotations
 import os
 
 from .brain import Brain
+from . import access, namespaces
 from .brain_engine import BrainEngine
 from .embedder import get_embedder
 
@@ -35,21 +36,31 @@ _ENGINES: dict[tuple[str, str], BrainEngine] = {}
 
 def brain_path() -> str:
     """Resolved brain path from the env (~ expanded, Audit #33)."""
+    if namespaces.home() is not None:
+        return str(namespaces.graph_path(namespaces.selected()))
     return os.path.expanduser(
         os.environ.get("IG_BRAIN_PATH", os.path.expanduser("~/graph-engine-brain")))
 
 
 def make_brain() -> Brain:
     """A Brain from the env contract. No personal defaults."""
-    return Brain(
+    cls = access.SecuredBrain if access.policy_path() else Brain
+    kwargs = {"graph_name": namespaces.selected(), "identity": access.principal()} if access.policy_path() else {}
+    return cls(
+        **kwargs,
         path=brain_path(),
-        remote=os.environ.get("IG_BRAIN_REMOTE", "") or None,
+        remote=(os.environ.get("IG_BRAIN_REMOTE", "") or None) if namespaces.home() is None else None,
         mode=os.environ.get("IG_BRAIN_MODE", "git"),
     )
 
 
 def make_engine() -> BrainEngine:
     """A BrainEngine from the env contract, process-wide cached."""
+    if access.policy_path():
+        # Never cache identities/policies across requests or policy revocation.
+        return BrainEngine(make_brain(), get_embedder(
+            os.environ.get("IDEAGRAPH_EMBEDDER", "st"),
+            os.environ.get("IDEAGRAPH_EMBEDDER_MODEL")))
     embedder_name = os.environ.get("IDEAGRAPH_EMBEDDER", "st")
     key = (brain_path(), embedder_name)
     eng = _ENGINES.get(key)

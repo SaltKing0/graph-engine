@@ -20,6 +20,7 @@ cost instead of once-per-call.
 from __future__ import annotations
 
 import os
+from functools import wraps
 
 from mcp.server.fastmcp import FastMCP
 from mcp.types import ToolAnnotations
@@ -66,10 +67,23 @@ def _cache_vectors() -> bool:
     return os.environ.get("IG_MCP_CACHE_VECTORS", "0") == "1"
 
 
+def _access_guard(fn, action: str):
+    @wraps(fn)
+    def guarded(*args, **kwargs):
+        from .. import access, runtime
+        try:
+            if access.policy_path():
+                runtime.make_brain().authorize(action)
+            return fn(*args, **kwargs)
+        except PermissionError:
+            return fmt.err("forbidden", "Access denied")
+    return guarded
+
+
 def _tool(fn):
     """Register with the readOnlyHint annotation so untrusted-server clients
     skip approval prompts."""
-    return mcp.tool(annotations={"readOnlyHint": True})(fn)
+    return mcp.tool(annotations={"readOnlyHint": True})(_access_guard(fn, "read"))
 
 
 def _hits_payload(brain, hits: list[tuple[str, float]]) -> list[dict]:
@@ -364,7 +378,7 @@ def forget(id: str, reason: str) -> dict:
 def _write_tool(fn):
     """Register a WRITE tool: `readOnlyHint: False` so clients ask their user
     before letting a model write into the private brain."""
-    return mcp.tool(annotations=ToolAnnotations(readOnlyHint=False))(fn)
+    return mcp.tool(annotations=ToolAnnotations(readOnlyHint=False))(_access_guard(fn, "write"))
 
 
 def register_write_tools() -> int:

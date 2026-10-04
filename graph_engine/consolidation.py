@@ -50,6 +50,7 @@ def _timestamp(node: Node) -> datetime.datetime | None:
 
 def _read_cursor(brain: Brain) -> tuple[datetime.datetime, str] | None:
     """Resume after the last examined event, including events that were skipped."""
+    brain.authorize("admin")
     try:
         data = json.loads((brain.path / CURSOR_FILE).read_text(encoding="utf-8"))
         stamp = datetime.datetime.fromisoformat(data["observed_at"])
@@ -115,6 +116,7 @@ def consolidate(brain: Brain, *, config: ConsolidationConfig | None = None,
     (never episodic/procedural nodes); tombstoned matches are never revived.
     Dry runs report source candidates, not model-dependent output counts.
     """
+    brain.authorize("admin")
     from .brain_engine import BRAIN_LOCK, consolidation_config_from_env
     config = config or consolidation_config_from_env()
     with BRAIN_LOCK:

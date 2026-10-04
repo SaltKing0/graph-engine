@@ -182,6 +182,7 @@ def lifecycle(brain: Brain, *, min_recall: int = PROMOTE_MIN_RECALL,
     deleted and nothing leaves the file: `stale` is a demotion, not a removal —
     it takes the node out of the promotion pool and marks it for the report.
     """
+    brain.authorize("admin")
     plan_ = lifecycle_plan(brain, min_recall=min_recall, min_degree=min_degree,
                            stale_days=stale_days, max_degree=max_degree)
     promote, revive, decay = plan_["promote"], plan_["revive"], plan_["decay"]
@@ -268,6 +269,7 @@ def refresh(brain: Brain, *, dry_run: bool = False, commit: bool = True) -> dict
     3. Rebuild INDEX.md and regenerate the tracked BRAIN_REPORT.md.
     One commit for the whole pass.
     """
+    brain.authorize("admin")
     from .recall import aggregate as aggregate_recalls
     from .report import write_report
 
@@ -326,6 +328,7 @@ def distill(brain: Brain, *, min_size: int = DREAM_MIN_COMMUNITY,
     `status="active"` (a distillation is a deliberate consolidation act) and
     carry the `community-summary` tag; their edges are `origin="consolidator"`.
     """
+    brain.authorize("admin")
     nodes = {n.id: n for n in brain.read_nodes() if n.status != "tombstone"}
     edges = [e for e in brain.read_edges(include_rejected=True)
              if not e.pending and not e.rejected and e.is_current]
