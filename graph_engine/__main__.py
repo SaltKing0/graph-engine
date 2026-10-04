@@ -10,6 +10,9 @@ Examples:
   python -m graph_engine accept <edge_id>
   python -m graph_engine reject <edge_id>
   python -m graph_engine accept-pending [--max-intent-per-source 2] [--dry-run] [--json]
+  python -m graph_engine tier <node_id> [main|recall|archival|auto] [--json]
+  python -m graph_engine tier --rebalance [--dry-run] [--json]
+  python -m graph_engine feedback "query" <node_id> <relevant|irrelevant> [--json]
   python -m graph_engine recall [--top 10] [--aggregate] [--dry-run] [--json]
   python -m graph_engine consolidate [--threshold 1] [--min-age-days 1] [--min-count 1] [--limit 50] [--dry-run] [--json] [--llm]
   python -m graph_engine dream [--refresh] [--consolidate] [--distill] [--lifecycle] [--dry-run] [--json]
@@ -42,6 +45,8 @@ from .hygiene import near_dup_pairs, connectivity, status_counts, render_near_du
 from .merge import merge_nodes
 from .retrieval import retrieve
 from .inference import cmd_infer
+from .tiers import cmd_tier
+from .feedback import cmd_feedback
 
 # Shared factory (one source of truth for CLI, server and future MCP surface).
 make_engine = runtime.make_engine
@@ -740,6 +745,7 @@ def cmd_search(engine: BrainEngine, args: list[str]) -> None:
                 "score": round(score, 4),
                 "snippet": _short(n.text, 200),
                 "status": n.status,
+                "storage_tier": n.storage_tier,
                 "type": n.ntype,
                 "tags": list(n.tags or []),
                 "created": n.created,
@@ -1221,6 +1227,8 @@ COMMANDS = {
     "accept-pending": cmd_accept_pending,
     "dream": cmd_dream,
     "recall": cmd_recall,
+    "tier": cmd_tier,
+    "feedback": cmd_feedback,
 }
 
 

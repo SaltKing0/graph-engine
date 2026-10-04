@@ -551,3 +551,49 @@ repo** with your data. The engine contains no brain data.
 ## License
 
 MIT — see `LICENSE`.
+
+
+### Storage tiers and retrieval feedback
+
+Storage tier is independent of `type` (semantic, episodic, procedural, entity)
+and lifecycle `status` (probation, active, stale, tombstone). The persisted
+`storage_tier` frontmatter field is `main`, `recall`, or `archival`; older nodes
+without it default to `recall`. All tiers keep stable `nodes/<id>.md` paths.
+They are logical storage classes, with no deletion or change to graph identity.
+Retrieval orders matching main memories first, then recall, then archival,
+preserving relevance order within each tier. This priority applies before the
+candidate limit and after optional reranking; archival memories remain searchable.
+
+```bash
+ig tier <node_id>                         # inspect tier and automatic/manual mode
+ig tier <node_id> main                    # set and pin main (also recall/archival)
+ig tier <node_id> auto                    # unpin and apply automatic policy
+ig tier --rebalance --dry-run --json      # preview automatic tier changes
+ig tier --rebalance                       # apply them
+ig feedback "query text" <node_id> relevant
+ig feedback "query text" <node_id> irrelevant
+```
+
+Automatic tier maintenance runs with `ig recall --aggregate`, including when its
+ledger is empty, and `ig dream --refresh`. At least three aggregated recalls and
+a recall in the last seven days promote a memory to main. Main memories remain
+there until 30 days idle, then move to recall. Any unpinned memory idle for 90
+days moves to archival; age is measured from last recall, or creation when never
+recalled. A newly recalled archival memory returns to recall, or main if it
+meets the promotion gate. Manual choices remain pinned until `auto`; tombstones
+are excluded. Searches and read-only explanations never rebalance or write tiers.
+
+Explicit relevance judgments are persisted in tracked `feedback.json` and sync
+with the brain. The latest judgment for each case/whitespace-normalized query
+and node replaces earlier judgments, so repeated votes do not amplify learning.
+Retrieval adapts dense/BM25 RRF weights within 0.5–1.5 from the baseline channel
+ranks of judged results. Exact-query judgments also apply a relevance boost or
+penalty. Similar successful queries (at least 0.5 token-set overlap) supply up
+to five expansion terms from their relevant memories. Irrelevant judgments do
+not teach expansion terms. Feedback for inaccessible or tombstoned memories is
+excluded from learning. These bounded, deterministic heuristics need no model
+or external service; without feedback, the existing equal-weight RRF is retained.
+`ig explain <node_id> --query "query text" --json` includes tier priority, expanded
+query, learned weights, weighted channel contributions, and feedback adjustment.
+Use explicit feedback to teach preferences; recall counts alone are not relevance
+judgments. The policy does not claim measured ranking improvements on every corpus.

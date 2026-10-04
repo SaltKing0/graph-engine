@@ -31,6 +31,7 @@ def _now_iso() -> str:
 
 
 VALID_STATUS = ("probation", "active", "stale", "tombstone")
+STORAGE_TIERS = ("main", "recall", "archival")
 
 
 def _atomic_write(path: Path, content: str) -> None:
@@ -57,7 +58,12 @@ class Node:
                  last_recalled: str | None = None,
                  observed_at: str | None = None, context: str | None = None,
                  entity_name: str | None = None, entity_type: str | None = None,
-                 aliases: list[str] | None = None):
+                 aliases: list[str] | None = None,
+                 storage_tier: str = "recall", tier_locked: bool = False):
+        if storage_tier not in STORAGE_TIERS:
+            raise ValueError(f"Unknown storage tier: {storage_tier!r}")
+        self.storage_tier = storage_tier
+        self.tier_locked = bool(tier_locked)
         self.text = text
         self.id = id or uuid.uuid4().hex[:12]
         self.created = created or _now_iso()
@@ -103,6 +109,9 @@ class Node:
         lines = [f"id: {self.id}", f"created: {self.created}",
                  f"source: {self.source}", f"type: {self.ntype}",
                  f"status: {self.status}"]
+        lines.append(f"storage_tier: {self.storage_tier}")
+        if self.tier_locked:
+            lines.append("tier_locked: true")
         # always write sources (even empty) — otherwise the file gains a
         # purely cosmetic sources: line on the first dup ingest (history churn,
         # Audit #54): from_markdown returns [], merge_node inserts node.source,
@@ -164,12 +173,15 @@ class Node:
                    context=meta.get("context"),
                    entity_name=json.loads(meta.get("entity_name", "null")),
                    entity_type=json.loads(meta.get("entity_type", "null")),
-                   aliases=json.loads(meta.get("aliases", "[]")))
+                   aliases=json.loads(meta.get("aliases", "[]")),
+                   storage_tier=meta.get("storage_tier", "recall"),
+                   tier_locked=meta.get("tier_locked", "false").lower() == "true")
 
     def to_dict(self) -> dict:
         result = {"id": self.id, "text": self.text, "created": self.created,
                 "source": self.source, "tags": self.tags, "sources": self.sources,
                 "type": self.ntype, "status": self.status,
+                "storage_tier": self.storage_tier, "tier_locked": self.tier_locked,
                 "recall_count": self.recall_count,
                 "recall_queries": self.recall_queries,
                 "last_recalled": self.last_recalled,

@@ -14,6 +14,8 @@ from dataclasses import dataclass, field
 import numpy as np
 
 from .brain_engine import BrainEngine
+from .feedback import LearningProfile, learning_profile
+from .tiers import order_by_tier
 
 
 def tokenize(text: str) -> list[str]:
@@ -64,17 +66,21 @@ class BM25:
         return out
 
 
-def rrf_fuse(ranked_lists: list[list[tuple[str, float]]], k: int = 60) -> list[tuple[str, float]]:
+def rrf_fuse(ranked_lists: list[list[tuple[str, float]]], k: int = 60,
+             weights: list[float] | None = None) -> list[tuple[str, float]]:
     """Reciprocal Rank Fusion: merges multiple (id, score) rankings into one.
 
     Each ranking is sorted by score descending; each rank contributes
     1/(k + rank). k=60 is the usual RRF standard.
     """
     fused: dict[str, float] = {}
-    for rl in ranked_lists:
+    weights = weights if weights is not None else [1.0] * len(ranked_lists)
+    if len(weights) != len(ranked_lists) or any(not math.isfinite(w) or w < 0 for w in weights):
+        raise ValueError("one finite non-negative weight is required per ranking")
+    for rl, weight in zip(ranked_lists, weights):
         ordered = sorted(rl, key=lambda x: x[1], reverse=True)
         for rank, (nid, _) in enumerate(ordered):
-            fused[nid] = fused.get(nid, 0.0) + 1.0 / (k + rank + 1)
+            fused[nid] = fused.get(nid, 0.0) + weight / (k + rank + 1)
     return sorted(fused.items(), key=lambda x: x[1], reverse=True)
 
 
@@ -89,16 +95,22 @@ class _RetrievalTrace:
     bm25_ranks: dict[str, int] = field(default_factory=dict)
     fused: list[tuple[str, float]] = field(default_factory=list)
     reranker_scores: dict[str, float] = field(default_factory=dict)
+    tiers: dict[str, str] = field(default_factory=dict)
+    learning: LearningProfile | None = None
+    feedback_adjustments: dict[str, float] = field(default_factory=dict)
 
 
 def _retrieve_trace(engine: BrainEngine, query: str, rerank_k: int,
-                    persist: bool) -> _RetrievalTrace:
+                    persist: bool, *, learn: bool = True) -> _RetrievalTrace:
     """One scoring path for normal retrieval and its explanation."""
     nodes = engine.brain.read_nodes()
     # Audit #7: tombstones are "forgotten" — they must not come back as
     # search answers (consolidate/_find_duplicate already exclude them).
     nodes = [n for n in nodes if n.status != "tombstone"]
     trace = _RetrievalTrace([n.id for n in nodes], {n.id: n.text for n in nodes})
+    trace.tiers = {n.id: n.storage_tier for n in nodes}
+    trace.learning = learning_profile(engine.brain, query, nodes) if learn else LearningProfile(query)
+    query = trace.learning.expanded_query
     if not nodes:
         return trace
     node_ids = [n.id for n in nodes]
@@ -148,7 +160,14 @@ def _retrieve_trace(engine: BrainEngine, query: str, rerank_k: int,
         sorted(dense, key=lambda hit: hit[1], reverse=True), start=1)}
     trace.bm25_ranks = {nid: rank for rank, (nid, _) in enumerate(
         sorted(bm_rank, key=lambda hit: hit[1], reverse=True), start=1)}
-    trace.fused = rrf_fuse([dense, bm_rank], k=60)
+    trace.fused = rrf_fuse([dense, bm_rank], k=60,
+                           weights=[trace.learning.dense_weight, trace.learning.bm25_weight])
+    trace.feedback_adjustments = {
+        nid: max(-score, trace.learning.adjustments.get(nid, 0.0))
+        for nid, score in trace.fused}
+    trace.fused = sorted([(nid, score + trace.feedback_adjustments[nid])
+                          for nid, score in trace.fused], key=lambda hit: hit[1], reverse=True)
+    trace.fused = order_by_tier(trace.fused, trace.tiers)
     trace.candidates = trace.fused[:rerank_k]
     return trace
 
@@ -180,18 +199,18 @@ def explain(engine: BrainEngine, node_id: str, query: str, *, k: int = 5,
     trace = _retrieve_trace(engine, query, rerank_k, persist=False)
     reranked = getattr(engine, "reranker", None) is not None
     hits = (_rerank(engine, query, k, trace.text_by_id, trace.candidates,
-                    reranker_scores=trace.reranker_scores)
+                    reranker_scores=trace.reranker_scores, tiers=trace.tiers)
             if reranked and trace.candidates else trace.candidates[:k])
     final_ranks = {nid: rank for rank, (nid, _) in enumerate(hits, start=1)}
     fused_ranks = {nid: rank for rank, (nid, _) in enumerate(trace.fused, start=1)}
 
-    def channel(scores: dict[str, float], ranks: dict[str, int]) -> dict:
+    def channel(scores: dict[str, float], ranks: dict[str, int], weight: float) -> dict:
         rank = ranks.get(node_id)
         return {"score": scores.get(node_id), "rank": rank,
-                "rrf_contribution": 1.0 / (60 + rank) if rank is not None else 0.0}
+                "rrf_contribution": weight / (60 + rank) if rank is not None else 0.0}
 
-    dense = channel(trace.dense_scores, trace.dense_ranks)
-    bm25 = channel(trace.bm25_scores, trace.bm25_ranks)
+    dense = channel(trace.dense_scores, trace.dense_ranks, trace.learning.dense_weight)
+    bm25 = channel(trace.bm25_scores, trace.bm25_ranks, trace.learning.bm25_weight)
     candidate = any(nid == node_id for nid, _ in trace.candidates)
     retrieved = node_id in final_ranks
     retrieval_score = dict(hits).get(node_id)
@@ -207,6 +226,13 @@ def explain(engine: BrainEngine, node_id: str, query: str, *, k: int = 5,
                   or (edge.target == node_id and edge.source in hit_ids))]
     return {
         "query": query, "node_id": node_id, "retrieved": retrieved,
+        "storage_tier": trace.tiers.get(node_id),
+        "tier_priority": ["main", "recall", "archival"],
+        "learning": {"expanded_query": trace.learning.expanded_query,
+                     "expansion_terms": trace.learning.expansion_terms,
+                     "dense_weight": trace.learning.dense_weight,
+                     "bm25_weight": trace.learning.bm25_weight,
+                     "feedback_adjustment": trace.feedback_adjustments.get(node_id, 0.0)},
         "reason": reason, "rank": final_ranks.get(node_id),
         "k": k, "rerank_k": rerank_k, "candidate": candidate,
         "dense": dense, "bm25": bm25,
@@ -229,7 +255,9 @@ def retrieve(engine: BrainEngine, query: str, k: int = 5, rerank_k: int = 30,
 
     Dense: cosine of the query embedding against the cached node vectors.
     BM25: lexical overlap against the node texts.
-    Fusion: RRF over the two rankings.
+    Fusion: RRF over the two rankings with optional learned weights and
+    explicit feedback adjustments. Matching tiers precede relevance: main,
+    recall, archival, including after reranking.
     Rerank (V2#1, optional): hybrid yields top-`rerank_k` candidates; a
     `reranker` set on the engine (cross-encoder or stub) re-sorts them to
     top-`k`. Without a reranker (default) the behavior is identical.
@@ -238,14 +266,14 @@ def retrieve(engine: BrainEngine, query: str, k: int = 5, rerank_k: int = 30,
     read-only; CLI/HTTP pass True. The ledger write is an append to a
     gitignored file — it never dirties the brain repo.
     """
-    node_ids, text_by_id, candidates = retrieve_candidates(engine, query, rerank_k,
-                                                           persist=persist)
+    trace = _retrieve_trace(engine, query, rerank_k, persist)
+    text_by_id, candidates = trace.text_by_id, trace.candidates
     if not candidates:
         return []
 
     reranker = getattr(engine, "reranker", None)
     result = candidates[:k] if reranker is None else _rerank(engine, query, k,
-                                                             text_by_id, candidates)
+                                                             text_by_id, candidates, tiers=trace.tiers)
     if track:
         from .recall import record, tracking_enabled
         if tracking_enabled():
@@ -255,13 +283,14 @@ def retrieve(engine: BrainEngine, query: str, k: int = 5, rerank_k: int = 30,
 
 def _rerank(engine: BrainEngine, query: str, k: int, text_by_id: dict[str, str],
             candidates: list[tuple[str, float]], *,
-            reranker_scores: dict[str, float] | None = None) -> list[tuple[str, float]]:
+            reranker_scores: dict[str, float] | None = None,
+            tiers: dict[str, str] | None = None) -> list[tuple[str, float]]:
     with_text = [(nid, text_by_id[nid], score) for nid, score in candidates]
     with_scores = getattr(engine.reranker, "rerank_with_scores", None)
     if with_scores is None:
-        reranked = engine.reranker.rerank(query, with_text, k)
+        reranked = engine.reranker.rerank(query, with_text, len(with_text))
     else:
-        reranked, scores = with_scores(query, with_text, k)
+        reranked, scores = with_scores(query, with_text, len(with_text))
         if reranker_scores is not None:
             reranker_scores.update(scores)
-    return [(nid, score) for nid, _, score in reranked]
+    return order_by_tier([(nid, score) for nid, _, score in reranked], tiers or {})[:k]

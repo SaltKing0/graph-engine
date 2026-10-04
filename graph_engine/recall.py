@@ -78,8 +78,10 @@ def aggregate(brain: Brain, *, dry_run: bool = False, commit: bool = True) -> di
     is then MOVED to `<ledger>.processed` (audit trail) and truncated, so a
     second run is idempotent instead of double-counting.
     """
+    from .tiers import rebalance
     entries = read_ledger(brain)
     if not entries:
+        rebalance(brain, dry_run=dry_run, commit=commit)
         return {"nodes": 0, "recalls": 0, "ledger_entries": 0, "dry_run": dry_run}
 
     counts: Counter = Counter()
@@ -124,6 +126,7 @@ def aggregate(brain: Brain, *, dry_run: bool = False, commit: bool = True) -> di
         with open(processed, "a", encoding="utf-8") as fh:
             fh.write(path.read_text(encoding="utf-8"))
         path.write_text("", encoding="utf-8")
+        rebalance(brain, commit=False)
         if commit:
             brain.commit_and_push(
                 f"recall: aggregate {sum(counts.values())} recalls into {touched} nodes")
