@@ -1,693 +1,86 @@
 # GraphEngine 🕸️
 
-**A self-maintaining, self-improving knowledge graph engine.**
+**A Git-backed knowledge graph for agents and humans.**
 
-Ingest ideas as Markdown nodes into your own private git repo (the "brain"),
-let the engine embed, link, and consolidate them — then steer research with
-coverage gaps and grow the engine itself through an eval-gated feedback loop.
+Store knowledge as Markdown in your own private repository. GraphEngine adds
+search, relationships, memory maintenance and a web UI, with every change
+recorded in Git.
 
 ![GraphEngine — demo brain in the web UI](docs/screenshot.png)
 
+- Search with embeddings and BM25; explain results and graph connections.
+- Extract entities and facts with source evidence and a review queue.
+- Consolidate observations, organize memory into tiers and learn from feedback.
+- Connect agents through the CLI, HTTP API or optional MCP server.
+- Keep separate graphs with optional role and node access control.
+
 ## Quickstart
 
+Requires **Python 3.11+** and **Git**. These instructions use current `main`;
+published packages may have fewer features.
+
 ```bash
-# 1) set up the engine (Python 3.11+) — lightweight core, HashEmbedder works
-#    out of the box; add the real embedder with: pip install -e ".[st]"
+git clone https://github.com/SaltKing0/graph-engine.git
+cd graph-engine
 python3 -m venv .venv
-.venv/bin/pip install -e ".[dev]"
+source .venv/bin/activate
+python -m pip install -e ".[dev]"
 
-# 2) create a brain — `--demo` seeds it with an example graph
-ig init --demo     # 13 nodes, 19 edges, 2 pending suggestions,
-                   # 1 island (ig status), 1 near-dup pair (ig near-dup)
-
-# 3) see it in the web UI
-uvicorn graph_engine.server:app --port 8000   # → http://localhost:8000
+export IG_BRAIN_PATH="$PWD/demo-brain"
+export IDEAGRAPH_EMBEDDER=hash
+ig init --demo
+python -m uvicorn graph_engine.server:app --host 127.0.0.1 --port 8000
 ```
 
-Or install from PyPI (recommended — versioned releases):
+Open <http://localhost:8000>. The demo uses deterministic hash embeddings with
+no model download. For semantic search, install `python -m pip install -e ".[st]"`
+and set `IDEAGRAPH_EMBEDDER=st` before starting a fresh brain.
+
+On Windows, activate with `.venv\Scripts\Activate.ps1` and set environment
+variables using PowerShell's `$env:NAME="value"` syntax.
+
+For a released package, use `python -m pip install graph-engine` in a virtual
+environment. Optional extras: `[st]` for semantic embeddings, `[mcp]` for MCP.
+
+## Everyday use
 
 ```bash
-pip install graph-engine
-# with the real (semantic) embedder — pulls PyTorch:
-pip install "graph-engine[st]"
+ig ingest "User prefers short answers" --source agent
+ig search "answer preferences"
+ig entities "Alice works at Acme." --dry-run --json
+ig pending
+ig accept <edge_id>
+ig explain <node_id> --query "answer preferences"
+ig dream                          # preview memory maintenance
 ```
 
-Or install straight from the repository (latest main):
+For your own brain, set `IG_BRAIN_PATH` and run `ig init` without `--demo`.
+The default path is `~/graph-engine-brain`. Connect a private remote with
+`ig init --remote <url>`; Git mode commits changes and syncs with that remote.
+Use one writer process per brain.
+
+To connect an MCP client, install the MCP extra and run `ig mcp`.
+It is read-only by default; `ig mcp --write` enables remember, recall and forget.
+See the [MCP setup](docs/guide.md#mcp-server-ai-assistants) for client configuration.
+
+## Documentation
+
+- [CLI reference](docs/guide.md#cli) and [configuration](docs/guide.md#configuration)
+- [Entities and facts](docs/guide.md#extract-entities-and-facts)
+- [Memory lifecycle](docs/guide.md#memory-lifecycle-promotion-and-decay),
+  [storage tiers and feedback](docs/guide.md#storage-tiers-and-retrieval-feedback)
+- [Isolated graphs and access control](docs/guide.md#isolated-graphs-and-access-control)
+- [Known limitations](docs/guide.md#known-limitations)
+- [Changelog](CHANGELOG.md) and [contributing](CONTRIBUTING.md)
+
+The engine is public; your brain is a separate repository under your control.
+Extracted facts and heuristic relationships are claims to review, not verified truth.
+
+## Development
 
 ```bash
-pip install git+https://github.com/SaltKing0/graph-engine.git
-# with the real (semantic) embedder — pulls PyTorch:
-pip install "graph-engine[st] @ git+https://github.com/SaltKing0/graph-engine.git"
+python -m pip install -e ".[dev,mcp]"
+python -m pytest tests/ -q
 ```
 
-The web UI ships inside the package, so a pip install serves it out of the
-box. Without the `[st]` extra the engine falls back to the deterministic
-HashEmbedder (lower quality, zero model download) with a notice on first use.
-
-Start from scratch instead with `ig init` (empty brain), connect a private
-remote with `ig init --remote <url>`, or auto-clone an existing brain on
-first use via `IG_BRAIN_REMOTE=<url>`. Every ingest is a git commit — the
-graph grows as visible history.
-
-## How it works
-
-```
-┌──────────────┐   git commit+push   ┌────────────────────┐   git pull   ┌─────────────────┐
-│ your agent   │ ──────────────────▶ │ your brain repo    │ ◀──────────▶ │ Live Engine     │
-│ (CLI/API)    │   (knowledge)       │ (private, Markdown)│  (sync)      │ Ingest→Embed→   │
-└──────────────┘                     └────────────────────┘              Suggest→Viz+HITL │
-                                                                          └─────────────────┘
-```
-
-- **Nodes** — one Markdown file per idea (`nodes/<id>.md`, YAML frontmatter:
-  `type: semantic|episodic|procedural|entity`, `status: probation|active|tombstone`).
-  Episodic nodes carry `observed_at` (when the event happened) and `context`
-  (where/how it was observed) — they are raw observations, not deduplicated.
-- **Edges** — `edges.jsonl`, typed (`similar`, `extends`,
-  `contradicts`, `supersedes`, `continues`, `same_as`),
-  bi-temporal (`valid_from`/`valid_to`) with confidence + provenance
-- **vectors.jsonl** — embedding cache · **INDEX.md** — generated TOC
-- **Human in the loop** — similarity edges ≥ 0.95 auto-accept, the rest go
-  pending for review (CLI `ig pending`/`ig accept` or the web UI)
-
-## Connect your agent
-
-The engine is built for agents — the web UI is the human side, the CLI/API is
-the agent side. Any agent that can run shell commands can own a brain:
-
-```bash
-# the agent ingests what it learns (source is logged per node)
-ig ingest "User prefers short answers over long essays" --source agent
-cat research-note.md | ig ingest - --source research   # from stdin
-
-# suggestions pile up in pending; the human reviews when they feel like it
-ig pending                     # what needs a decision
-ig accept <edge_id>            # or in the web UI, with one click
-```
-
-Because the brain is a git repo, the agent and the human can work from
-different machines: point the brain at a private remote (`ig init --remote`)
-and every ingest pulls, commits, and pushes — the graph syncs itself, and the
-git history shows exactly what the agent learned and when.
-
-Prefer HTTP? Run the server and `POST /api/ingest` with
-`{"text": "...", "source": "agent"}` — same dedupe, same pending flow,
-live updates in the web UI over WebSocket.
-
-A realistic loop: the agent ingests findings as it works, `ig gaps` tells it
-which topics are thin, `ig status`/`ig near-dup` flag hygiene work — the
-self-evolving pipeline below automates exactly that cycle.
-
-## The self-evolving loop (`tools/`)
-
-The engine doesn't just store knowledge — it improves itself, in three tiers:
-
-1. **Measure** (`ig_cycle`) — safe mechanical ingest runs (marker-scan →
-   dry-run → real ingest) record per-run metrics: nodes added, islands,
-   duration, acceptance.
-2. **Adapt** (`ig_adapt`) — an adaptive controller reads the metrics and
-   steers the next runs: research topics with the thinnest coverage get
-   higher weight, batch size adapts to timeout history.
-3. **Extend** (`ig_evolve`) — brain research becomes engine features via
-   red-spec eval cases in the roadmap harness, flipped to the golden set
-   only after implementation (first self-extension: `IG_EDGE_CONF_FLOOR`).
-
-## CLI
-
-```bash
-ig init [--remote <url>] [--demo]  # create a brain (empty / connected / demo)
-ig ingest "New idea ..."           # ingest (duplicates are merged)
-ig entities "Alice works at Acme. She uses Python." [--dry-run] [--json]
-                                  # typed entities + pending fact triples
-ig entities --node <node_id>       # extract from an existing note/event
-ig observe "Event ..."              # store raw episodic event (no dedupe)
-ig extract <episodic_id> ["text"]   # extract semantic fact from episodic node
-ig consolidate [--dry-run] [--json] # automatically extract eligible episodic nodes
-ig timeline [--since X] [--until Y] # query episodic nodes by time range
-ig valid-at <ISO-8601>             # graph as it was at a point in time
-ig history <node_id>               # how a node's edges evolved over time
-ig when <ISO-8601> <query>         # retrieval restricted to what was known then
-ig context <query> [--budget N]     # build a context window for a prompt
-ig search "attention"              # hybrid search (dense + BM25 via RRF)
-ig infer "How does Alice relate to Acme?" [--json]
-                                   # recorded relations, transitive proofs, contradictions
-ig explain <node_id> [--max-depth 2] [--limit 20] [--json]
-                                   # current graph paths and their supporting edges
-ig explain <node_id> --query "attention" [--json]
-                                   # explain scores/ranks for a fresh query;
-                                   # read-only, including graph context
-ig pending / accept / reject       # review edge suggestions
-ig accept-pending [--max-intent-per-source 2] [--dry-run]
-                                   # accept pending suggestions in ONE commit,
-                                   # but hold intent edges beyond the cap
-                                   # (contradicts/supersedes fan-out) for review
-ig gaps [--min 10] [--json]        # coverage report + under-covered areas
-ig communities [--min-size 15] [--top 10] [--json]
-                                   # topology: communities, god nodes, structural gaps
-ig report [--since 24h|--top 5] [--json] [--write]
-                                   # one-page BRAIN_REPORT digest (deltas, intent
-                                   # review queue, hubs, hygiene, research next);
-                                   # --write regenerates the tracked BRAIN_REPORT.md
-ig status / near-dup               # hygiene: islands, orphans, near-dup pairs
-ig recall [--top 10] [--aggregate] # what the memory is actually asked for
-                                   # (--aggregate folds the local recall ledger
-                                   #  into the node counters, one commit)
-ig dream                           # dream plan (read-only): promotion/decay
-                                   # candidates, near-dup review list, distillable
-                                   # communities, what a refresh would change
-ig dream --refresh                 # deterministic maintenance, one commit
-ig dream --consolidate             # episodic → semantic extraction (env gates)
-ig dream --distill [--llm]         # one abstraction node per community
-                                   # (extractive by default; --llm needs
-                                   #  IG_DREAM_LLM_CMD)
-ig dream --lifecycle               # promotion/decay from the recall signal:
-                                   # used + connected -> active, unused + weak +
-                                   # old -> stale (a demotion, never a deletion;
-                                   # gates are flags, see the section below)
-ig merge <survivor> <deletee>      # consolidate a near-duplicate pair
-ig mcp                             # read-only MCP server over stdio (AI assistants)
-ig mcp --write                     # + remember/recall/forget (agent memory, opt-in)
-```
-
-## Relationship inference and explanations
-
-`ig infer "A -> B"` accepts exact node IDs, entity names, aliases, or complete
-node text. It also accepts `"How does A relate to B?"` and `"what is the
-relationship between A and B?"`. Ambiguous names require an explicit ID.
-Results include recorded relations in their original direction, a shortest
-connection path, and additional proof paths for transitive conclusions.
-`--max-depth` bounds traversal (default 4; maximum 20). `--json` includes node
-IDs, edge IDs, traversal directions, provenance and stored evidence quotes.
-
-Only homogeneous directed `is_a` and `part_of` **fact predicates**, plus
-explicit symmetric `same_as` chains, support transitive conclusions. Other
-predicates, `similar`, `extends`, and mixed paths establish connectivity only.
-The engine reports recorded `contradicts` edges and opposing `p` / `not_p`
-facts within the returned evidence, including conflicts with transitive
-proofs. Contradictions never propagate transitively. These are explanations
-of accepted graph assertions, not independent verification of their truth;
-a missing bounded path means no connection was found within that bound.
-Pending, rejected, expired, future, invalidated, dangling, and tombstone-linked
-edges are excluded. Inference needs no LLM and never writes inferred edges.
-
-`ig explain <node_id>` shows one shortest current graph path per reachable
-node (default depth 2, limit 20) and supporting edges. It reports truncation
-when the result limit is reached. These paths are contextual: hybrid retrieval
-does not traverse graph edges. Add `--query "..."` to recompute the existing
-BM25/dense/RRF/reranker score explanation for a fresh query; that mode retains
-its `--top` and `--rerank-k` options. Both modes and `infer` are read-only and
-do not update recall statistics or vector files.
-
-## Extract entities and facts
-
-`ig entities` creates an entity subgraph linked to the semantic or episodic
-evidence. Each entity is a node with `type: entity`, `entity_name`,
-`entity_type` (`person`, `org`, `concept`, `location`, `product`, `unknown`)
-and explicit `aliases`. A fact is a directed edge with `kind: fact`:
-its `source` is the subject entity ID, `predicate` names the relation, and
-`target` is the object entity ID. `evidence` retains exact quotes and their
-source node IDs. Accepted `mentions` edges link the evidence node to its
-entities. These are ordinary graph nodes/edges: search can retrieve entities,
-and the web graph shows their relationships and fact predicates.
-
-```bash
-ig entities "Alice works at Acme. She uses Python." --dry-run --json
-ig entities "Alice works at Acme. She uses Python."
-# person Alice, org Acme, concept Python;
-# Alice --works_at--> Acme, Alice --uses--> Python
-cat note.txt | ig entities - --source research --json
-ig entities --node <semantic_or_episodic_node_id> --json
-ig pending                         # review extracted fact edges
-ig accept <fact_edge_id>            # accept in CLI or web UI
-```
-
-The default extractor needs no model download or new dependencies. It recognizes
-a small grammar of complete English/German sentences: `works at` / `works for`
-/ `arbeitet bei`, `founded` / `gründete`, `lives in` / `wohnt in`,
-`is based in`, and `uses` / `nutzt`. Names must consist of capitalized words,
-or match an already known name/alias. Explicit declarations such as
-`Alice is a person`, `Python is a concept`, or `Berlin ist ein Ort` create
-typed entities without asserting a relation. Relation roles suggest entity
-types; `uses` assigns an otherwise unknown subject type and a concept object,
-preserving a known object's explicit type (for example, `product`).
-These are heuristic labels, not a general named-entity recognition model.
-Unsupported prose can yield no extraction; it does not create an empty graph
-or an evidence node. Ordinary `ig ingest` does not extract automatically.
-
-`International Business Machines (IBM)` declares an acronym alias. Later
-`Alice works at IBM` reuses that organization. Names/explicit aliases are
-matched by Unicode normalization, whitespace and case, **within the same
-entity type**. No similarity or surname matching is used. Different people
-with the same name require distinguishing names; name matching alone cannot
-prove identity. Ambiguous alias matches abort the batch before writing.
-`he`/`she`/`er`/`sie` and `it`/`es` resolve only if there is exactly one
-compatible person/organization earlier in the current input; otherwise that
-sentence is skipped. Cross-document pronouns are never guessed.
-
-Raw input, with outer whitespace trimmed, is stored in an exact-text-deduplicated
-semantic evidence node;
-`--node` uses a live semantic, episodic or procedural node unchanged. Entity
-identities are excluded from ingest/dedup consolidation and cannot be merged
-with `ig merge`. Identical typed entities and fact triples are reused across
-inputs, adding source evidence to existing facts. An unchanged repeat writes
-nothing; a changed pass commits once. Rejected/invalidated facts stay decided,
-and a forgotten matching entity causes an error instead of being recreated.
-`--accept-facts` accepts **new** fact edges immediately; the default is pending
-review, including for model output. The web review card shows the predicate
-and quoted evidence. Existing decisions are preserved.
-
-### Optional model extraction
-
-For free prose or richer coreference, configure `IG_ENTITIES_LLM_CMD` and pass
-`--llm`. The shell command receives a JSON request on stdin containing `text`,
-`known_entities`, an extraction `instruction`, `entity_types` and a `schema`.
-It must print one JSON object on stdout (no Markdown):
-
-```json
-{
-  "entities": [
-    {"name": "Alice", "type": "person", "aliases": []},
-    {"name": "Acme", "type": "org", "aliases": []}
-  ],
-  "facts": [
-    {"subject": "Alice", "predicate": "works_at", "object": "Acme",
-     "evidence": "Alice works at Acme", "confidence": null,
-     "valid_from": null, "valid_to": null}
-  ]
-}
-```
-
-Fact endpoints refer to canonical names in that response. Aliases, confidence
-and dates are optional. The engine validates types, references, literal entity
-mentions, exact evidence quotes, finite confidence in `[0, 1]`, and ordered
-ISO-8601 validity windows before writing. Aliases can anchor a canonical name
-that is absent from the input. Quote validation checks provenance; it does
-not verify the model's interpretation or identity claims. Negation, hypothetical
-claims and ambiguous coreference should be declined by the extractor and still
-require review. Predicate names are normalized to lowercase with underscores.
-Failure, malformed output or a 300-second timeout aborts extraction.
-
-Without a validity date, `valid_from` records extraction time; no event date is
-inferred. Explicit dates are normalized to UTC (timezone-free dates use UTC),
-and `valid_to` requires a preceding `valid_from`. Explicitly different validity
-windows remain separate edges. New observations do not automatically invalidate
-conflicting facts. Use the existing temporal API to inspect accepted facts by
-validity. A dated fact remains reviewable even if its window is past or future;
-accepted facts appear in live views only within `[valid_from, valid_to)`.
-Invalidation is recorded separately as `invalidated_at`, so it cannot change
-the original extraction window or allow a repeat to recreate that fact.
-New facts store this original window in `extracted_validity` (including null
-dates). Legacy edges without that metadata retain their old interpretation:
-a set `valid_to` means invalidated; reads do not migrate or revive them.
-`--dry-run` never syncs or writes the brain, but **with `--llm` it does
-invoke the configured model command** so it can show the actual extraction.
-Preview node/edge IDs are temporary until a real pass writes them.
-
-```bash
-export IG_ENTITIES_LLM_CMD='your-json-extraction-command'
-ig entities --node <node_id> --llm --dry-run --json
-ig entities --node <node_id> --llm --json
-```
-
-Python callers can use `engine.entities(text, ...)` or
-`extract_entities(brain, text, extractor=...)` from `graph_engine.entities`.
-An extractor callable receives `(text, known_entities)` and returns the same
-JSON-compatible structure.
-
-## Explain a search result
-
-`ig explain <node_id> --query "your search"` recomputes the search against the
-current brain and embedder. The query is required: a node ID alone cannot
-explain a query-dependent ranking. Use `--json` for structured output,
-`--top N` for the result count (default 5), and `--rerank-k N` for the candidate
-limit (default 30), matching the search defaults.
-
-The explanation shows raw BM25 and dense cosine scores, each channel's
-one-based rank and RRF contribution (`1 / (60 + rank)`), the fused score/rank,
-matched lexical terms, and the final score. With the cross-encoder enabled,
-the final score is its model prediction, labelled `reranker`, and is distinct
-from the RRF score. `retrieval_score` retains the score returned by search;
-`reranker_score` exposes the model prediction even for a scored candidate
-outside the final top-k. Ordering-only or legacy rerankers without separate
-predictions retain the `rrf` label and have a null `reranker_score`. Dense scores
-are `null` when the cached vector is incompatible with the query dimension.
-A node outside the results is explained too: `no_overlap`,
-`outside_candidate_limit`, or `outside_top_k`.
-
-Accepted, live edges connecting the node to other returned results appear as
-`graph_context`, with their direction, type, confidence and provenance.
-Hybrid search currently uses text and vectors; these connections are context
-and do not contribute to the ranking. Pending, rejected, invalidated edges and
-connections to tombstoned nodes are excluded. Unknown or tombstoned target
-nodes produce a clear error.
-
-Explain does not record a recall, persist vectors, or modify the brain. It
-explains a fresh search, rather than reconstructing a past result after the
-corpus, embedder or reranker has changed. RRF scores are rank-fusion scores,
-not confidence values or similarities.
-
-## MCP server (AI assistants)
-
-Expose the brain to MCP-capable assistants (Claude Desktop, Claude Code, …)
-as a **strictly read-only** tool surface:
-
-```bash
-pip install 'graph-engine[mcp]'
-ig mcp   # or: ig-mcp — stdio JSON-RPC, nothing else touches stdout
-```
-
-Register it in `claude_desktop_config.json` / `.mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "graph_engine": {
-      "command": "ig-mcp",
-      "env": { "IG_BRAIN_PATH": "~/graph-engine-brain" }
-    }
-  }
-}
-```
-
-Four tools, all annotated `readOnlyHint`:
-
-| Tool | Purpose |
-|---|---|
-| `search_brain` | hybrid search (dense + BM25, RRF-fused); `score` is a rank-fusion score, **not** a similarity |
-| `get_node` | one node: full text (capped at 2000 chars) + its live edges |
-| `neighbors` | undirected graph neighborhood, 1–2 hops — the question vector search cannot answer |
-| `brain_status` | cheap orientation: size, connectivity, pending-review load |
-
-### Agent memory: `ig mcp --write` (opt-in)
-
-```bash
-ig mcp --write   # or IG_MCP_WRITE=1 — adds three write tools
-```
-
-| Tool | Purpose |
-|---|---|
-| `remember` | store one note; recorded with `source="agent"`, dedupe-aware (a near-duplicate merges into the existing node) |
-| `recall` | search whose hits **count as use** (`recall_count`) — the promotion signal the dream pass consumes; use `search_brain` for pure exploration |
-| `forget` | remove a node from every live view — it **tombstones and invalidates, it never deletes**, and a mandatory `reason` lands in the commit message |
-
-Write mode keeps the same discipline as the rest of the engine: **provenance**
-(so "what did a model write?" stays a query), **never destructive**, **one commit
-per write**. The write tools are registered only in write mode and carry
-`readOnlyHint: false`, so a client asks its user before letting a model write into
-the private brain. In read-only mode they return a `write_disabled` envelope.
-
-Design guarantees: the read-only default stays strict — ingest commits and pushes
-to a private repo, so model-initiated writes are an explicit operator decision,
-not a default; the engine loads lazily (first search, not import),
-response payloads are capped and escaped in one place (`graph_engine/mcp/format.py`),
-and by default even the derived vector cache is **never written** — a search on
-a cold clone does not dirty the private repo (`IG_MCP_CACHE_VECTORS=1` opts
-back in; measured cold-search cost: see CHANGELOG). `brain_status` returns the
-brain path basename only. Optional opt-in prompt snippet for your
-`CLAUDE.md`/`AGENTS.md`: `graph_engine/mcp/agent/instructions.md`.
-
-## Memory lifecycle (promotion and decay)
-
-`ig dream --lifecycle` is what makes the dual buffer mean something. The gates are
-**derived from your brain's measured distribution**, not from another project's
-numbers — `ig dream` (read-only) prints the candidates under any gate before you
-apply anything:
-
-| Transition | Gate | Default |
-|---|---|---|
-| `probation → active` | used **and** connected | `recall_count >= 1`, degree >= 2 |
-| `probation/active → stale` | unused, weak, old | `recall_count == 0`, degree <= 2, age >= 30 d |
-| `stale → active` | used again | same as promotion — decay is reversible |
-
-`stale` is a **demotion, never a deletion**: the node keeps its file, stays
-searchable, and leaves the promotion pool. `recall` (MCP write mode) and
-`ig search` feed the signal it reads. Override the gates with
-`--min-recall / --min-degree / --stale-days / --max-degree`.
-
-## Automatic episodic consolidation
-
-`ig consolidate` selects live episodic observations and derives semantic nodes
-without changing the original events. Defaults are conservative: the event must
-have an **aggregated recall count >= 1** and be **at least one day old**. These
-are selection gates, not a confidence score or proof that an observation is true.
-Age uses `observed_at`, falling back to `created`; timestamps without a timezone
-are interpreted as UTC, and malformed or future timestamps are held back.
-
-```bash
-ig recall --aggregate              # fold search/recall usage into node counters
-ig consolidate --dry-run --json    # preview source IDs and gates; no writes/LLM calls
-ig consolidate                    # extract up to 50 eligible events, one commit
-ig dream --refresh --consolidate   # fold usage, then extract, in the dream pipeline
-ig dream --json                    # read-only plan includes extraction candidates
-```
-
-The default extractor copies the observation's text, matching `ig extract`:
-it preserves evidence without generating an abstraction or inferring new facts.
-New semantic nodes have `status="probation"`, `source="consolidator"` and an
-`episodic-extraction` tag. An accepted `extends` edge points from the fact to
-each episodic source. Exact semantic matches (case and whitespace normalized)
-are reused; episodic/procedural nodes and community summaries are never used
-as semantic matches.
-Existing extraction links, including manually created, rejected or invalidated
-links, prevent repeat extraction. Community-summary links do not count as fact
-extraction. Tombstoned facts are never resurrected or recreated from matching
-text. An unchanged second pass writes nothing.
-
-Configure the time gate with `--min-age-days`, the recall threshold with
-`--threshold`, and the minimum **eligible, unprocessed** pool size with
-`--min-count`. Gates combine; the count check runs before the per-pass `--limit`
-(oldest first within each round), so a remaining pool below `--min-count` waits
-for more events. Bounded passes save their position in `consolidation-cursor.json`
-inside the brain and resume after the last examined event, wrapping back to the
-oldest. Skipped or declined events remain retryable without blocking newer
-candidates. Dry runs read this position but never advance it.
-CLI flags override the environment. For a deliberate pass over fresh, unused
-events, use `ig consolidate --threshold 0 --min-age-days 0`.
-
-Fact IDs are independent of text. Editing or merging a fact keeps its identity;
-a later extraction reuses an exact current-text match or creates a new fact.
-
-The command does not start a daemon: run `ig dream --refresh --consolidate` from
-your scheduler for time-based checks, or invoke it manually. Completed ingest
-cycles in `tools/ig_cycle.py` now include `--consolidate`; cycles that abort before
-the dream step still perform no extraction. `ig dream` without action flags
-remains read-only. Dream accepts the same gate flags, using `--consolidate-limit`
-for extraction because its existing `--limit` controls community distillation.
-
-For optional refinement, set `IG_CONSOLIDATE_LLM_CMD` to a command that reads an
-evidence prompt on stdin and prints **one grounded fact** on stdout, then run
-`ig consolidate --llm` or `ig dream --consolidate --llm`. Blank stdout declines
-extraction and leaves the event eligible for a later run. Nonzero exit status or
-a 300-second timeout aborts the extraction batch before any facts are written.
-The model's output still requires review; no automatic grounding check is made.
-Dry runs never invoke the command and report candidate events rather than
-model-dependent output counts. When dream combines `--distill --consolidate --llm`,
-distillation also requires its separate `IG_DREAM_LLM_CMD`.
-
-## Configuration
-
-| Variable | Default | Meaning |
-|---|---|---|
-| `IG_BRAIN_PATH` | `~/graph-engine-brain` | path to the brain clone |
-| `IG_BRAIN_REMOTE` | *(none)* | remote brain URL — auto-clones on first use |
-| `IG_BRAIN_MODE` | `git` | `local` = filesystem only (tests) |
-| `IG_GRAPH_HOME` | *(none)* | opt into named graphs under `<home>/graphs/<name>`; takes precedence over `IG_BRAIN_PATH` |
-| `IG_GRAPH` | persisted selection or `default` | per-process graph override; requires `IG_GRAPH_HOME` |
-| `IG_ACCESS_POLICY` | *(none)* | trusted JSON policy path; setting it enables fail-closed authorization |
-| `IG_PRINCIPAL` | *(none)* | trusted CLI/MCP process identity in protected mode; never used to authenticate HTTP |
-| `IDEAGRAPH_EMBEDDER` | `st` | `hash` = deterministic test embedder |
-| `IDEAGRAPH_AUTO_ACCEPT` | off | `1` = auto-accept all suggested edges |
-| `IG_MCP_CACHE_VECTORS` | `0` | `1` = MCP search may fill the on-disk vector cache (default: strictly read-only) |
-| `IG_MCP_MAX_SNIPPET_CHARS` | `200` | search-result snippet cap |
-| `IG_MCP_MAX_NEIGHBORS` | `20` | neighbors result cap (hard max 50) |
-| `IDEAGRAPH_INTENT_PENDING` | off | `1` = intent edges become pending (HITL) |
-| `IDEAGRAPH_RERANKER` | none | optional cross-encoder rerank pass |
-| `IG_BOT_NAME` / `IG_BOT_EMAIL` | graph-engine-bot | git commit author |
-| `IG_CONSOLIDATE_THRESHOLD` | `1` | minimum aggregated recall count (integer >= 0) |
-| `IG_CONSOLIDATE_MIN_AGE_DAYS` | `1` | minimum observation age in days (finite number >= 0) |
-| `IG_CONSOLIDATE_MIN_COUNT` | `1` | minimum eligible, unprocessed events before a pass (integer >= 1) |
-| `IG_CONSOLIDATE_LIMIT` | `50` | maximum events per pass (integer >= 1) |
-| `IG_CONSOLIDATE_LLM_CMD` | *(none)* | optional stdin/stdout fact extractor, invoked only with `--llm` |
-| `IG_ENTITIES_LLM_CMD` | *(none)* | optional JSON stdin/stdout entity and triple extractor for `ig entities --llm` |
-
-Dedupe: near-duplicate ingests (cosine ≥ 0.92) merge into the existing node
-(`sources:` provenance); opt out with `allow_duplicates: true`.
-
-## Tests
-
-```bash
-.venv/bin/python -m pytest tests/ -q   # prints the current suite count
-```
-
-## Status
-
-Core features, the hygiene loop, the topology/digest reports, the MCP server
-(read-only by default, `--write` for the agent memory path), the dream pass
-(maintenance, distillation, status lifecycle) and the self-evolving pipeline are
-implemented; release `v0.5.4` is published — see [CHANGELOG.md](CHANGELOG.md).
-
-### Known limitations
-
-- **The intent heuristics are marker-based, not semantic.** `contradicts` /
-  `supersedes` / `continues` edges come from marker words plus a similarity gate;
-  measured on real prose, **every** live intent edge created so far turned out to
-  be a false positive (168 created, all invalidated by hand — the marker usually
-  sits in an EXISTING node's descriptive text, not in the new one). Mitigations:
-  intent edges are born pending under `IDEAGRAPH_INTENT_PENDING=1`, the fan-out
-  cap (`ig accept-pending`, max 2 per source) stops mass-firing, and
-  `scripts/intent_edge_cleanup.py` triages a batch. Treat a live intent edge as a
-  claim to verify, not as a fact.
-- **Promotion/decay is a usage signal, so it measures who asked.** A node is
-  promoted for being recalled, not for being important; a young brain with few
-  searches promotes almost nothing, and decay (30 days of silence) cannot fire
-  before the corpus is that old.
-- **Distillation is extractive by default.** `--llm` needs `IG_DREAM_LLM_CMD`;
-  the summaries are structured evidence, not prose abstractions.
-- **`ig near-dup` flags related-but-distinct pairs.** The 0.78–0.92 band is a
-  review list; the top pairs on a mature brain are demonstrably distinct topics,
-  and nothing merges automatically.
-
-## Storage tiers and retrieval feedback
-
-Storage tier is independent of `type` (semantic, episodic, procedural, entity)
-and lifecycle `status` (probation, active, stale, tombstone). The persisted
-`storage_tier` frontmatter field is `main`, `recall`, or `archival`; older nodes
-without it default to `recall`. All tiers keep stable `nodes/<id>.md` paths.
-They are logical storage classes, with no deletion or change to graph identity.
-Retrieval orders matching main memories first, then recall, then archival,
-preserving relevance order within each tier. This priority applies before the
-candidate limit and after optional reranking; archival memories remain searchable.
-
-```bash
-ig tier <node_id>                         # inspect tier and automatic/manual mode
-ig tier <node_id> main                    # set and pin main (also recall/archival)
-ig tier <node_id> auto                    # unpin and apply automatic policy
-ig tier --rebalance --dry-run --json      # preview automatic tier changes
-ig tier --rebalance                       # apply them
-ig feedback "query text" <node_id> relevant
-ig feedback "query text" <node_id> irrelevant
-```
-
-Automatic tier maintenance runs with `ig recall --aggregate`, including when its
-ledger is empty, and `ig dream --refresh`. At least three aggregated recalls and
-a recall in the last seven days promote a memory to main. Main memories remain
-there until 30 days idle, then move to recall. Any unpinned memory idle for 90
-days moves to archival; age is measured from last recall, or creation when never
-recalled. A newly recalled archival memory returns to recall, or main if it
-meets the promotion gate. Manual choices remain pinned until `auto`; tombstones
-are excluded. Searches and read-only explanations never rebalance or write tiers.
-
-Explicit relevance judgments are persisted in tracked `feedback.json` and sync
-with the brain. The latest judgment for each case/whitespace-normalized query
-and node replaces earlier judgments, so repeated votes do not amplify learning.
-Retrieval adapts dense/BM25 RRF weights within 0.5–1.5 from the baseline channel
-ranks of judged results. Exact-query judgments also apply a relevance boost or
-penalty. Similar successful queries (at least 0.5 token-set overlap) supply up
-to five expansion terms from their relevant memories. Irrelevant judgments do
-not teach expansion terms. Feedback for inaccessible or tombstoned memories is
-excluded from learning. These bounded, deterministic heuristics need no model
-or external service; without feedback, the existing equal-weight RRF is retained.
-`ig explain <node_id> --query "query text" --json` includes tier priority, expanded
-query, learned weights, weighted channel contributions, and feedback adjustment.
-Use explicit feedback to teach preferences; recall counts alone are not relevance
-judgments. The policy does not claim measured ranking improvements on every corpus.
-
-## Isolated graphs and access control
-
-Named graphs have separate nodes, edges, embeddings, recall ledgers and git
-histories. With no `IG_GRAPH_HOME`, existing single-brain behavior is unchanged.
-
-```bash
-export IG_GRAPH_HOME="$HOME/graph-engine-graphs"
-ig graph create work
-ig graph create personal
-ig graph list
-ig graph switch work
-ig ingest "A work note"
-IG_GRAPH=personal ig search "a personal note"
-```
-
-`switch` persists the selection in `<IG_GRAPH_HOME>/selected`; `IG_GRAPH`
-overrides that selection for a process. Graph commands do not load a model.
-Names accept letters, digits, underscores and hyphens, up to 64 characters;
-path traversal and symlink graph directories are rejected. Named graphs do
-not inherit `IG_BRAIN_REMOTE`: configure each initialized graph's git origin
-separately. No cross-graph search is performed. For a long-running service,
-set `IG_GRAPH` explicitly to pin its graph instead of following CLI switches.
-
-Access control is **opt-in**. Configure a JSON file outside every brain repo,
-owned by the trusted service account, and set `IG_ACCESS_POLICY` to its path.
-Use `default` as the policy graph key for a legacy single brain. Example:
-
-```json
-{
-  "graphs": {
-    "work": {
-      "roles": {"owner": "admin", "alice": "editor", "bob": "viewer"},
-      "nodes": {
-        "confidential-node-id": {"read": ["owner", "alice"], "write": ["owner"]},
-        "shared-readonly-id": {"write": []}
-      }
-    }
-  },
-  "tokens": {"SHA256_HEX_OF_RANDOM_HTTP_BEARER_TOKEN": "bob"}
-}
-```
-
-Graph roles grant admin (all operations), editor (read and write) or viewer
-(read only). Missing principals and unknown graphs are denied. Per-node
-`read` and `write` principal lists restrict the graph role; `[]` denies everyone
-except admins, `"*"` in a list allows any principal with the corresponding graph
-role, and an omitted list inherits the role. Writing also requires reading.
-Admins bypass node ACLs. Edit this trusted file to grant/revoke roles or change
-node ACLs; each protected operation checks the current policy. Pre-provision
-an admin role for a new graph before `ig graph create` in protected mode.
-Invalid/missing policy files fail closed.
-
-CLI and stdio MCP use `IG_PRINCIPAL=alice`, supplied by the trusted launcher.
-HTTP requires `Authorization: Bearer <token>` on every request and maps the
-SHA-256 digest of the token through `tokens`. Generate a strong random token
-and place its SHA-256 hex digest in that mapping; keep the original token with
-the client. HTTP ignores identity headers and `IG_PRINCIPAL`; it uses a
-request-local identity, including threadpool work. Deploy behind TLS if
-accessing beyond localhost. The shipped browser UI has no token login flow;
-use an authenticated API client or a trusted proxy that injects the bearer
-header. Protected WebSockets are disabled to avoid broadcasting another
-principal's data. Unprotected WebSocket broadcasts are scoped to their graph.
-
-Authorization filters node reads, search, vector caches, edges, embedded
-edge evidence, reports, MCP tools and graph listings. Editors cannot mutate
-restricted nodes or edges touching them. Automatic ingest links consider
-writable targets. Bulk edge/vector rewrites preserve records hidden from the
-caller. Protected searches do not persist embedding caches; viewer searches
-do not write recall events. Global maintenance (merge, dream mutations,
-consolidation, recall aggregation and saved reports) requires admin access.
-External precomputed structural-report files are not exposed in protected
-mode because they lack namespace/permission provenance.
-
-Allow/deny decisions append JSON lines to `<policy-stem>.audit.jsonl` beside
-the policy, including timestamp, principal, graph, action and optional node ID;
-node text and bearer tokens are not logged. New audit files use mode `0600`.
-Keep this directory writable to the service: inability to append the audit
-record fails the operation. Logs are separate from brain git commits. They
-record authorization decisions, not transactional mutation success, and are
-not tamper-proof against the OS account.
-
-**Trust boundary:** this controls application access, not local filesystem
-access or arbitrary Python execution. Protect the policy, logs, brain files,
-git remotes and process environment with OS permissions. Direct `Brain(...)`
-construction and maintenance scripts are trusted local APIs; untrusted clients
-must use the protected runtime/HTTP/MCP entry points. A node ACL governs that
-stored node; it cannot retract information already copied into another node,
-derived summary, git history or external export. Policy updates and brain
-mutations are not a multi-file transaction. Use one writer process per brain,
-as with the existing storage model.
-
-## Open source / privacy
-
-The **engine is generic** (this public repo) — the **brain is your private
-repo** with your data. The engine contains no brain data.
-
-## License
-
-MIT — see `LICENSE`.
+MIT — see [LICENSE](LICENSE).
