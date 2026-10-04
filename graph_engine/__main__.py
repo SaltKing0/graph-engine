@@ -15,7 +15,8 @@ Examples:
   python -m graph_engine dream [--refresh] [--consolidate] [--distill] [--lifecycle] [--dry-run] [--json]
   python -m graph_engine link <node_a> <node_b> [--kind same_as]
   python -m graph_engine search "attention" [--json]
-  python -m graph_engine explain <node_id> --query "attention" [--json]
+  python -m graph_engine explain <node_id> [--query "attention"] [--json]
+  python -m graph_engine infer "How does A relate to B?" [--json]
   python -m graph_engine gaps [--taxonomy tax.json] [--min 10] [--json]
   python -m graph_engine merge <survivor_id> <deletee_id>   # consolidate a near-dup
   python -m graph_engine near-dup [--lo 0.78] [--hi 0.92]   # report near-duplicate pairs
@@ -40,6 +41,7 @@ from .gaps import analyze_coverage, find_gaps, render, load_taxonomy
 from .hygiene import near_dup_pairs, connectivity, status_counts, render_near_dup, render_status
 from .merge import merge_nodes
 from .retrieval import retrieve
+from .inference import cmd_infer
 
 # Shared factory (one source of truth for CLI, server and future MCP surface).
 make_engine = runtime.make_engine
@@ -753,18 +755,39 @@ def cmd_search(engine: BrainEngine, args: list[str]) -> None:
 
 
 def cmd_explain(engine: BrainEngine, args: list[str]) -> None:
-    """Explain a node's ranking for an explicit query (read-only)."""
+    """Explain graph paths, or retrieval ranking with --query (read-only)."""
     import argparse
     import json
     from .retrieval import explain
 
     parser = argparse.ArgumentParser(prog="ig explain", description=cmd_explain.__doc__)
     parser.add_argument("node_id")
-    parser.add_argument("--query", required=True)
+    parser.add_argument("--query")
+    parser.add_argument("--max-depth", type=int, default=2)
+    parser.add_argument("--limit", type=int, default=20)
     parser.add_argument("--top", type=int, default=5)
     parser.add_argument("--rerank-k", type=int, default=30)
     parser.add_argument("--json", action="store_true")
     options = parser.parse_args(args)
+    if options.query is None:
+        from .inference import explain_node, print_paths
+        try:
+            result = explain_node(engine.brain, options.node_id,
+                                  max_depth=options.max_depth, limit=options.limit)
+        except ValueError as exc:
+            print(f"Error: {exc}")
+            sys.exit(1)
+        if options.json:
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+        else:
+            print(f"Node {result['node_id']}: {result['text']}")
+            print(result["explanation"])
+            print_paths(result["paths"])
+            print(f"{len(result['graph_context'])} supporting edges; "
+                  f"{len(result['contradictions'])} conflicts")
+            if result["truncated"]:
+                print("More paths available; increase --limit.")
+        return
     try:
         result = explain(engine, options.node_id, options.query,
                          k=options.top, rerank_k=options.rerank_k)
@@ -1187,6 +1210,7 @@ COMMANDS = {
     "link": cmd_link,
     "search": cmd_search,
     "explain": cmd_explain,
+    "infer": cmd_infer,
     "gaps": cmd_gaps,
     "merge": cmd_merge,
     "near-dup": cmd_near_dup,

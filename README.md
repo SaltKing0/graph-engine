@@ -129,6 +129,10 @@ ig history <node_id>               # how a node's edges evolved over time
 ig when <ISO-8601> <query>         # retrieval restricted to what was known then
 ig context <query> [--budget N]     # build a context window for a prompt
 ig search "attention"              # hybrid search (dense + BM25 via RRF)
+ig infer "How does Alice relate to Acme?" [--json]
+                                   # recorded relations, transitive proofs, contradictions
+ig explain <node_id> [--max-depth 2] [--limit 20] [--json]
+                                   # current graph paths and their supporting edges
 ig explain <node_id> --query "attention" [--json]
                                    # explain scores/ranks for a fresh query;
                                    # read-only, including graph context
@@ -164,6 +168,35 @@ ig merge <survivor> <deletee>      # consolidate a near-duplicate pair
 ig mcp                             # read-only MCP server over stdio (AI assistants)
 ig mcp --write                     # + remember/recall/forget (agent memory, opt-in)
 ```
+
+## Relationship inference and explanations
+
+`ig infer "A -> B"` accepts exact node IDs, entity names, aliases, or complete
+node text. It also accepts `"How does A relate to B?"` and `"what is the
+relationship between A and B?"`. Ambiguous names require an explicit ID.
+Results include recorded relations in their original direction, a shortest
+connection path, and additional proof paths for transitive conclusions.
+`--max-depth` bounds traversal (default 4; maximum 20). `--json` includes node
+IDs, edge IDs, traversal directions, provenance and stored evidence quotes.
+
+Only homogeneous directed `is_a` and `part_of` **fact predicates**, plus
+explicit symmetric `same_as` chains, support transitive conclusions. Other
+predicates, `similar`, `extends`, and mixed paths establish connectivity only.
+The engine reports recorded `contradicts` edges and opposing `p` / `not_p`
+facts within the returned evidence, including conflicts with transitive
+proofs. Contradictions never propagate transitively. These are explanations
+of accepted graph assertions, not independent verification of their truth;
+a missing bounded path means no connection was found within that bound.
+Pending, rejected, expired, future, invalidated, dangling, and tombstone-linked
+edges are excluded. Inference needs no LLM and never writes inferred edges.
+
+`ig explain <node_id>` shows one shortest current graph path per reachable
+node (default depth 2, limit 20) and supporting edges. It reports truncation
+when the result limit is reached. These paths are contextual: hybrid retrieval
+does not traverse graph edges. Add `--query "..."` to recompute the existing
+BM25/dense/RRF/reranker score explanation for a fresh query; that mode retains
+its `--top` and `--rerank-k` options. Both modes and `infer` are read-only and
+do not update recall statistics or vector files.
 
 ## Extract entities and facts
 

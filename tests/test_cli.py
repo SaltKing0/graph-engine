@@ -181,7 +181,7 @@ def test_explain_roundtrip_and_no_file_changes(tmp_path):
     assert {p: p.read_bytes() for p in brain.path.rglob("*") if p.is_file()} == before
 
 
-@pytest.mark.parametrize("args", [[], ["a"], ["a", "--query", "alpha", "--top", "bad"],
+@pytest.mark.parametrize("args", [[], ["a", "--query", "alpha", "--top", "bad"],
                                  ["a", "--query", "alpha", "--unknown"]])
 def test_explain_usage_errors(tmp_path, args):
     r = run_cli(["explain", *args], tmp_path)
