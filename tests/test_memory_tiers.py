@@ -100,3 +100,27 @@ def test_tier_cli_read_set_and_rebalance(tmp_path, capsys):
     assert '"dry_run": true' in capsys.readouterr().out
     with pytest.raises(SystemExit):
         cmd_tier(engine, ["a", "--dry-run"])
+
+
+def test_ingest_evolution_preserves_pinned_tier_and_all_metadata(tmp_path):
+    class RelatedEmbedder:
+        def embed(self, text):
+            return [0.8, 0.6]
+
+    brain = Brain(tmp_path)
+    original = Node("old knowledge", id="old", storage_tier="main", tier_locked=True,
+                    ntype="episodic", status="active", created="2020-01-01T00:00:00Z",
+                    observed_at="2020-01-01T00:00:00Z", context="meeting",
+                    recall_count=9, recall_queries=["abc"],
+                    last_recalled="2026-10-03T00:00:00Z", tags=["important"])
+    brain.write_node(original)
+    brain.write_vectors({"old": [1.0, 0.0]})
+    engine = BrainEngine(brain, RelatedEmbedder())
+    engine.ingest("related new knowledge", allow_duplicates=True, auto_accept=True)
+    updated = brain.read_node("old")
+    assert "[evolved " in updated.text  # require the rewrite branch to execute
+    expected = original.to_dict()
+    actual = updated.to_dict()
+    expected.pop("text")
+    actual.pop("text")
+    assert actual == expected

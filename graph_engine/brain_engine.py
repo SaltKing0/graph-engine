@@ -345,18 +345,10 @@ class BrainEngine:
                             continue
                         ref = f"[evolved {self._now_short()}: connected to {node.id[:8]} “{_normalize(text)[:40]}…”]"
                         if "evolved" not in target_node.text or node.id[:8] not in target_node.text:
-                            self.brain.write_node(Node(
-                                text=target_node.text + "\n\n" + ref,
-                                id=target_node.id, created=target_node.created,
-                                source=target_node.source, tags=target_node.tags,
-                                sources=getattr(target_node, 'sources', []),
-                                ntype=target_node.ntype,
-                                status=target_node.status,
-                                # Recall stats must survive a text rewrite:
-                                # they are the input for promotion/decay.
-                                recall_count=getattr(target_node, "recall_count", 0),
-                                recall_queries=list(getattr(target_node, "recall_queries", [])),
-                                last_recalled=getattr(target_node, "last_recalled", None)))
+                            # Enrich the existing object: reconstructing a Node
+                            # resets newer metadata (including pinned tiers).
+                            target_node.text += "\n\n" + ref
+                            self.brain.write_node(target_node)
                             evolved += 1
             self.brain.rebuild_index()
             suffix = f", {evolved} nodes evolved" if evolved else ""
