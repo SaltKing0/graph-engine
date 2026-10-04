@@ -129,6 +129,10 @@ ig history <node_id>               # how a node's edges evolved over time
 ig when <ISO-8601> <query>         # retrieval restricted to what was known then
 ig context <query> [--budget N]     # build a context window for a prompt
 ig search "attention"              # hybrid search (dense + BM25 via RRF)
+ig infer "How does Alice relate to Acme?" [--json]
+                                   # recorded relations, transitive proofs, contradictions
+ig explain <node_id> [--max-depth 2] [--limit 20] [--json]
+                                   # current graph paths and their supporting edges
 ig explain <node_id> --query "attention" [--json]
                                    # explain scores/ranks for a fresh query;
                                    # read-only, including graph context
@@ -164,6 +168,35 @@ ig merge <survivor> <deletee>      # consolidate a near-duplicate pair
 ig mcp                             # read-only MCP server over stdio (AI assistants)
 ig mcp --write                     # + remember/recall/forget (agent memory, opt-in)
 ```
+
+## Relationship inference and explanations
+
+`ig infer "A -> B"` accepts exact node IDs, entity names, aliases, or complete
+node text. It also accepts `"How does A relate to B?"` and `"what is the
+relationship between A and B?"`. Ambiguous names require an explicit ID.
+Results include recorded relations in their original direction, a shortest
+connection path, and additional proof paths for transitive conclusions.
+`--max-depth` bounds traversal (default 4; maximum 20). `--json` includes node
+IDs, edge IDs, traversal directions, provenance and stored evidence quotes.
+
+Only homogeneous directed `is_a` and `part_of` **fact predicates**, plus
+explicit symmetric `same_as` chains, support transitive conclusions. Other
+predicates, `similar`, `extends`, and mixed paths establish connectivity only.
+The engine reports recorded `contradicts` edges and opposing `p` / `not_p`
+facts within the returned evidence, including conflicts with transitive
+proofs. Contradictions never propagate transitively. These are explanations
+of accepted graph assertions, not independent verification of their truth;
+a missing bounded path means no connection was found within that bound.
+Pending, rejected, expired, future, invalidated, dangling, and tombstone-linked
+edges are excluded. Inference needs no LLM and never writes inferred edges.
+
+`ig explain <node_id>` shows one shortest current graph path per reachable
+node (default depth 2, limit 20) and supporting edges. It reports truncation
+when the result limit is reached. These paths are contextual: hybrid retrieval
+does not traverse graph edges. Add `--query "..."` to recompute the existing
+BM25/dense/RRF/reranker score explanation for a fresh query; that mode retains
+its `--top` and `--rerank-k` options. Both modes and `infer` are read-only and
+do not update recall statistics or vector files.
 
 ## Extract entities and facts
 
@@ -458,6 +491,10 @@ distillation also requires its separate `IG_DREAM_LLM_CMD`.
 | `IG_BRAIN_PATH` | `~/graph-engine-brain` | path to the brain clone |
 | `IG_BRAIN_REMOTE` | *(none)* | remote brain URL — auto-clones on first use |
 | `IG_BRAIN_MODE` | `git` | `local` = filesystem only (tests) |
+| `IG_GRAPH_HOME` | *(none)* | opt into named graphs under `<home>/graphs/<name>`; takes precedence over `IG_BRAIN_PATH` |
+| `IG_GRAPH` | persisted selection or `default` | per-process graph override; requires `IG_GRAPH_HOME` |
+| `IG_ACCESS_POLICY` | *(none)* | trusted JSON policy path; setting it enables fail-closed authorization |
+| `IG_PRINCIPAL` | *(none)* | trusted CLI/MCP process identity in protected mode; never used to authenticate HTTP |
 | `IDEAGRAPH_EMBEDDER` | `st` | `hash` = deterministic test embedder |
 | `IDEAGRAPH_AUTO_ACCEPT` | off | `1` = auto-accept all suggested edges |
 | `IG_MCP_CACHE_VECTORS` | `0` | `1` = MCP search may fill the on-disk vector cache (default: strictly read-only) |
@@ -509,6 +546,142 @@ implemented; release `v0.5.4` is published — see [CHANGELOG.md](CHANGELOG.md).
 - **`ig near-dup` flags related-but-distinct pairs.** The 0.78–0.92 band is a
   review list; the top pairs on a mature brain are demonstrably distinct topics,
   and nothing merges automatically.
+
+## Storage tiers and retrieval feedback
+
+Storage tier is independent of `type` (semantic, episodic, procedural, entity)
+and lifecycle `status` (probation, active, stale, tombstone). The persisted
+`storage_tier` frontmatter field is `main`, `recall`, or `archival`; older nodes
+without it default to `recall`. All tiers keep stable `nodes/<id>.md` paths.
+They are logical storage classes, with no deletion or change to graph identity.
+Retrieval orders matching main memories first, then recall, then archival,
+preserving relevance order within each tier. This priority applies before the
+candidate limit and after optional reranking; archival memories remain searchable.
+
+```bash
+ig tier <node_id>                         # inspect tier and automatic/manual mode
+ig tier <node_id> main                    # set and pin main (also recall/archival)
+ig tier <node_id> auto                    # unpin and apply automatic policy
+ig tier --rebalance --dry-run --json      # preview automatic tier changes
+ig tier --rebalance                       # apply them
+ig feedback "query text" <node_id> relevant
+ig feedback "query text" <node_id> irrelevant
+```
+
+Automatic tier maintenance runs with `ig recall --aggregate`, including when its
+ledger is empty, and `ig dream --refresh`. At least three aggregated recalls and
+a recall in the last seven days promote a memory to main. Main memories remain
+there until 30 days idle, then move to recall. Any unpinned memory idle for 90
+days moves to archival; age is measured from last recall, or creation when never
+recalled. A newly recalled archival memory returns to recall, or main if it
+meets the promotion gate. Manual choices remain pinned until `auto`; tombstones
+are excluded. Searches and read-only explanations never rebalance or write tiers.
+
+Explicit relevance judgments are persisted in tracked `feedback.json` and sync
+with the brain. The latest judgment for each case/whitespace-normalized query
+and node replaces earlier judgments, so repeated votes do not amplify learning.
+Retrieval adapts dense/BM25 RRF weights within 0.5–1.5 from the baseline channel
+ranks of judged results. Exact-query judgments also apply a relevance boost or
+penalty. Similar successful queries (at least 0.5 token-set overlap) supply up
+to five expansion terms from their relevant memories. Irrelevant judgments do
+not teach expansion terms. Feedback for inaccessible or tombstoned memories is
+excluded from learning. These bounded, deterministic heuristics need no model
+or external service; without feedback, the existing equal-weight RRF is retained.
+`ig explain <node_id> --query "query text" --json` includes tier priority, expanded
+query, learned weights, weighted channel contributions, and feedback adjustment.
+Use explicit feedback to teach preferences; recall counts alone are not relevance
+judgments. The policy does not claim measured ranking improvements on every corpus.
+
+## Isolated graphs and access control
+
+Named graphs have separate nodes, edges, embeddings, recall ledgers and git
+histories. With no `IG_GRAPH_HOME`, existing single-brain behavior is unchanged.
+
+```bash
+export IG_GRAPH_HOME="$HOME/graph-engine-graphs"
+ig graph create work
+ig graph create personal
+ig graph list
+ig graph switch work
+ig ingest "A work note"
+IG_GRAPH=personal ig search "a personal note"
+```
+
+`switch` persists the selection in `<IG_GRAPH_HOME>/selected`; `IG_GRAPH`
+overrides that selection for a process. Graph commands do not load a model.
+Names accept letters, digits, underscores and hyphens, up to 64 characters;
+path traversal and symlink graph directories are rejected. Named graphs do
+not inherit `IG_BRAIN_REMOTE`: configure each initialized graph's git origin
+separately. No cross-graph search is performed. For a long-running service,
+set `IG_GRAPH` explicitly to pin its graph instead of following CLI switches.
+
+Access control is **opt-in**. Configure a JSON file outside every brain repo,
+owned by the trusted service account, and set `IG_ACCESS_POLICY` to its path.
+Use `default` as the policy graph key for a legacy single brain. Example:
+
+```json
+{
+  "graphs": {
+    "work": {
+      "roles": {"owner": "admin", "alice": "editor", "bob": "viewer"},
+      "nodes": {
+        "confidential-node-id": {"read": ["owner", "alice"], "write": ["owner"]},
+        "shared-readonly-id": {"write": []}
+      }
+    }
+  },
+  "tokens": {"SHA256_HEX_OF_RANDOM_HTTP_BEARER_TOKEN": "bob"}
+}
+```
+
+Graph roles grant admin (all operations), editor (read and write) or viewer
+(read only). Missing principals and unknown graphs are denied. Per-node
+`read` and `write` principal lists restrict the graph role; `[]` denies everyone
+except admins, `"*"` in a list allows any principal with the corresponding graph
+role, and an omitted list inherits the role. Writing also requires reading.
+Admins bypass node ACLs. Edit this trusted file to grant/revoke roles or change
+node ACLs; each protected operation checks the current policy. Pre-provision
+an admin role for a new graph before `ig graph create` in protected mode.
+Invalid/missing policy files fail closed.
+
+CLI and stdio MCP use `IG_PRINCIPAL=alice`, supplied by the trusted launcher.
+HTTP requires `Authorization: Bearer <token>` on every request and maps the
+SHA-256 digest of the token through `tokens`. Generate a strong random token
+and place its SHA-256 hex digest in that mapping; keep the original token with
+the client. HTTP ignores identity headers and `IG_PRINCIPAL`; it uses a
+request-local identity, including threadpool work. Deploy behind TLS if
+accessing beyond localhost. The shipped browser UI has no token login flow;
+use an authenticated API client or a trusted proxy that injects the bearer
+header. Protected WebSockets are disabled to avoid broadcasting another
+principal's data. Unprotected WebSocket broadcasts are scoped to their graph.
+
+Authorization filters node reads, search, vector caches, edges, embedded
+edge evidence, reports, MCP tools and graph listings. Editors cannot mutate
+restricted nodes or edges touching them. Automatic ingest links consider
+writable targets. Bulk edge/vector rewrites preserve records hidden from the
+caller. Protected searches do not persist embedding caches; viewer searches
+do not write recall events. Global maintenance (merge, dream mutations,
+consolidation, recall aggregation and saved reports) requires admin access.
+External precomputed structural-report files are not exposed in protected
+mode because they lack namespace/permission provenance.
+
+Allow/deny decisions append JSON lines to `<policy-stem>.audit.jsonl` beside
+the policy, including timestamp, principal, graph, action and optional node ID;
+node text and bearer tokens are not logged. New audit files use mode `0600`.
+Keep this directory writable to the service: inability to append the audit
+record fails the operation. Logs are separate from brain git commits. They
+record authorization decisions, not transactional mutation success, and are
+not tamper-proof against the OS account.
+
+**Trust boundary:** this controls application access, not local filesystem
+access or arbitrary Python execution. Protect the policy, logs, brain files,
+git remotes and process environment with OS permissions. Direct `Brain(...)`
+construction and maintenance scripts are trusted local APIs; untrusted clients
+must use the protected runtime/HTTP/MCP entry points. A node ACL governs that
+stored node; it cannot retract information already copied into another node,
+derived summary, git history or external export. Policy updates and brain
+mutations are not a multi-file transaction. Use one writer process per brain,
+as with the existing storage model.
 
 ## Open source / privacy
 

@@ -49,6 +49,18 @@ CONSOLIDATE_LIMIT_ENV = "IG_CONSOLIDATE_LIMIT"
 CONSOLIDATE_LLM_CMD_ENV = "IG_CONSOLIDATE_LLM_CMD"
 
 
+GRAPH_HOME_ENV = "IG_GRAPH_HOME"
+GRAPH_ENV = "IG_GRAPH"
+ACCESS_POLICY_ENV = "IG_ACCESS_POLICY"
+PRINCIPAL_ENV = "IG_PRINCIPAL"
+
+
+def graph_access_config_from_env() -> dict[str, str]:
+    """Trusted local process configuration for namespaces and access control."""
+    return {key: os.environ.get(key, "") for key in
+            (GRAPH_HOME_ENV, GRAPH_ENV, ACCESS_POLICY_ENV, PRINCIPAL_ENV)}
+
+
 def consolidation_config_from_env(overrides: dict | None = None) -> "ConsolidationConfig":
     """Read gates at call time; explicit CLI/API values override environment."""
     from .consolidation import ConsolidationConfig
@@ -95,7 +107,8 @@ class BrainEngine:
     def _find_duplicate(self, vec: list[float], exclude_id: str | None = None) -> Node | None:
         """Closest node above the dedupe threshold — or None. Uses the vector cache."""
         node_ids = {n.id for n in self.brain.read_nodes()
-                    if n.id != exclude_id and n.ntype != "entity" and n.status != "tombstone"}
+                    if n.id != exclude_id and n.ntype != "entity" and n.status != "tombstone"
+                    and self.brain.can_access("write", n.id)}
         vectors = self.brain.vectors_for(
             node_ids,
             lambda t: self.embedder.embed(_normalize(t)),
@@ -207,6 +220,12 @@ class BrainEngine:
         with BRAIN_LOCK:
             self.brain.ensure_ready()  # onboarding: creates a missing brain repo
             self.brain.pull()
+            if relations:
+                for ref, _kind in relations:
+                    target = next((n for n in self.brain.read_nodes()
+                                   if n.id == ref or n.text.strip().lower() == ref.strip().lower()), None)
+                    if target is not None:
+                        self.brain.authorize("write", target.id)
             vec = self.embedder.embed(_normalize(text))
             if not allow_duplicates:
                 dup = self._find_duplicate(vec)
@@ -226,7 +245,8 @@ class BrainEngine:
             self.brain.write_node(node)
             # Embedding cache: only new nodes get embedded, the rest comes from vectors.jsonl
             others = {n.id for n in self.brain.read_nodes()
-                      if n.id != node.id and n.ntype != "entity"}
+                      if n.id != node.id and n.ntype != "entity"
+                      and self.brain.can_access("write", n.id)}
             candidates = self.brain.vectors_for(
                 others,
                 lambda t: self.embedder.embed(_normalize(t)),
@@ -240,7 +260,8 @@ class BrainEngine:
             # Sorted by target id: which edges fall inside the cap must not
             # depend on the filesystem's node read order (determinism).
             for ex in sorted(self.brain.read_nodes(), key=lambda n: n.id):
-                if ex.id == node.id or ex.ntype == "entity":
+                if (ex.id == node.id or ex.ntype == "entity"
+                        or not self.brain.can_access("write", ex.id)):
                     continue
                 intent = detect_intent(node.text, ex.text)
                 if not intent:
@@ -324,18 +345,10 @@ class BrainEngine:
                             continue
                         ref = f"[evolved {self._now_short()}: connected to {node.id[:8]} “{_normalize(text)[:40]}…”]"
                         if "evolved" not in target_node.text or node.id[:8] not in target_node.text:
-                            self.brain.write_node(Node(
-                                text=target_node.text + "\n\n" + ref,
-                                id=target_node.id, created=target_node.created,
-                                source=target_node.source, tags=target_node.tags,
-                                sources=getattr(target_node, 'sources', []),
-                                ntype=target_node.ntype,
-                                status=target_node.status,
-                                # Recall stats must survive a text rewrite:
-                                # they are the input for promotion/decay.
-                                recall_count=getattr(target_node, "recall_count", 0),
-                                recall_queries=list(getattr(target_node, "recall_queries", [])),
-                                last_recalled=getattr(target_node, "last_recalled", None)))
+                            # Enrich the existing object: reconstructing a Node
+                            # resets newer metadata (including pinned tiers).
+                            target_node.text += "\n\n" + ref
+                            self.brain.write_node(target_node)
                             evolved += 1
             self.brain.rebuild_index()
             suffix = f", {evolved} nodes evolved" if evolved else ""

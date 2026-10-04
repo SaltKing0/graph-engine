@@ -67,6 +67,8 @@ def _git(brain: Brain, *args: str) -> str | None:
 
 
 def _provenance(brain: Brain) -> dict:
+    if not brain.can_access("admin"):
+        return {"head_sha": None, "dirty_files": 0}
     sha = _git(brain, "rev-parse", "--short", "HEAD")
     behind = 0
     if sha:
@@ -137,6 +139,8 @@ def _load_structural(brain: Brain) -> list[dict]:
         pass
     # Importable provider absent or empty (e.g. no community qualifies at
     # min_size on a small brain) → fall back to the JSON file seam.
+    if hasattr(brain, "identity"):
+        return []  # externally precomputed findings have no graph/ACL provenance
     path = os.environ.get("IG_STRUCTURAL_PATH", "")
     if path and os.path.exists(path):
         try:
@@ -233,7 +237,7 @@ def report_data(brain: Brain, **opts) -> dict:
 
     return {
         "generated_at": _now_iso(),
-        "brain": str(brain.path),
+        "brain": str(brain.path) if brain.can_access("admin") else brain.path.name,
         "head_sha": _provenance(brain)["head_sha"],
         "dirty_files": _provenance(brain)["dirty_files"],
         "nodes": len(nodes),
@@ -387,6 +391,7 @@ def write_report(brain: Brain, **opts) -> str:
     in a cron cycle the write rides the cycle's commit (one commit per
     generation, report #7 §5); from the CLI pass commit=True.
     """
+    brain.authorize("admin")
     md = render_report(brain, **opts)
     if not md.strip():
         # A blank generated artifact destroys the workflow value (the

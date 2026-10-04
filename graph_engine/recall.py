@@ -47,7 +47,8 @@ def fingerprint(query: str) -> str:
 
 def record(brain: Brain, query: str, node_ids: list[str], ts: str | None = None) -> int:
     """Append one recall event. Returns the number of node ids recorded."""
-    ids = [nid for nid in node_ids if nid]
+    brain.authorize("read")
+    ids = [nid for nid in node_ids if nid and brain.can_access("write", nid)]
     if not ids:
         return 0
     entry = {"ts": ts or _now(), "q": fingerprint(query), "ids": ids}
@@ -57,6 +58,7 @@ def record(brain: Brain, query: str, node_ids: list[str], ts: str | None = None)
 
 
 def read_ledger(brain: Brain) -> list[dict]:
+    brain.authorize("read")
     path = ledger_path(brain)
     if not path.exists():
         return []
@@ -64,7 +66,10 @@ def read_ledger(brain: Brain) -> list[dict]:
     for line in path.read_text(encoding="utf-8").splitlines():
         if line.strip():
             try:
-                out.append(json.loads(line))
+                entry = json.loads(line)
+                entry["ids"] = [nid for nid in entry.get("ids", []) if brain.can_access("read", nid)]
+                if entry["ids"]:
+                    out.append(entry)
             except json.JSONDecodeError:
                 continue
     return out
@@ -78,8 +83,11 @@ def aggregate(brain: Brain, *, dry_run: bool = False, commit: bool = True) -> di
     is then MOVED to `<ledger>.processed` (audit trail) and truncated, so a
     second run is idempotent instead of double-counting.
     """
+    from .tiers import rebalance
+    brain.authorize("admin")
     entries = read_ledger(brain)
     if not entries:
+        rebalance(brain, dry_run=dry_run, commit=commit)
         return {"nodes": 0, "recalls": 0, "ledger_entries": 0, "dry_run": dry_run}
 
     counts: Counter = Counter()
@@ -124,6 +132,7 @@ def aggregate(brain: Brain, *, dry_run: bool = False, commit: bool = True) -> di
         with open(processed, "a", encoding="utf-8") as fh:
             fh.write(path.read_text(encoding="utf-8"))
         path.write_text("", encoding="utf-8")
+        rebalance(brain, commit=False)
         if commit:
             brain.commit_and_push(
                 f"recall: aggregate {sum(counts.values())} recalls into {touched} nodes")

@@ -47,6 +47,15 @@ def _load_vectors(brain: Brain) -> tuple[list[str], np.ndarray]:
     Audit #60: results are cached keyed by (path, mtime, size) — repeated
     report calls within one process skip the re-parse; any write to the file
     invalidates the entry automatically."""
+    if hasattr(brain, "identity"):
+        vecs = brain.read_vectors()
+        if not vecs:
+            return [], np.zeros((0, 0), dtype=np.float64)
+        lens = Counter(len(v) for v in vecs.values())
+        dom = max(lens, key=lens.get)
+        ids = [nid for nid, v in vecs.items() if len(v) == dom]
+        values = np.array([vecs[nid] for nid in ids], dtype=np.float64)
+        return ids, values / (np.linalg.norm(values, axis=1, keepdims=True) + 1e-12)
     vec_file = brain.path / "vectors.jsonl"
     if not vec_file.exists():
         return [], np.zeros((0, 0), dtype=np.float64)

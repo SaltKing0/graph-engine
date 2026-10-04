@@ -31,6 +31,7 @@ def _now_iso() -> str:
 
 
 VALID_STATUS = ("probation", "active", "stale", "tombstone")
+STORAGE_TIERS = ("main", "recall", "archival")
 
 
 def _atomic_write(path: Path, content: str) -> None:
@@ -57,7 +58,12 @@ class Node:
                  last_recalled: str | None = None,
                  observed_at: str | None = None, context: str | None = None,
                  entity_name: str | None = None, entity_type: str | None = None,
-                 aliases: list[str] | None = None):
+                 aliases: list[str] | None = None,
+                 storage_tier: str = "recall", tier_locked: bool = False):
+        if storage_tier not in STORAGE_TIERS:
+            raise ValueError(f"Unknown storage tier: {storage_tier!r}")
+        self.storage_tier = storage_tier
+        self.tier_locked = bool(tier_locked)
         self.text = text
         self.id = id or uuid.uuid4().hex[:12]
         self.created = created or _now_iso()
@@ -99,10 +105,22 @@ class Node:
         self.aliases = list(aliases or [])
 
     def to_markdown(self) -> str:
+        # This frontmatter format stores scalars and simple lists on one line.
+        # Untrusted source/tags must never introduce another metadata key (in
+        # particular an id with different access permissions). Check at write
+        # time too: merge_node updates sources on an existing Node instance.
+        for name in ("id", "created", "source", "last_recalled", "observed_at", "context"):
+            self._validate_metadata(name, getattr(self, name))
+        for name in ("tags", "sources", "recall_queries"):
+            for value in getattr(self, name):
+                self._validate_metadata(name, value)
         tags = "[" + ", ".join(self.tags) + "]" if self.tags else "[]"
         lines = [f"id: {self.id}", f"created: {self.created}",
                  f"source: {self.source}", f"type: {self.ntype}",
                  f"status: {self.status}"]
+        lines.append(f"storage_tier: {self.storage_tier}")
+        if self.tier_locked:
+            lines.append("tier_locked: true")
         # always write sources (even empty) — otherwise the file gains a
         # purely cosmetic sources: line on the first dup ingest (history churn,
         # Audit #54): from_markdown returns [], merge_node inserts node.source,
@@ -131,6 +149,12 @@ class Node:
                 lines.append(f"last_recalled: {self.last_recalled}")
         return "---\n" + "\n".join(lines) + "\n---\n\n" + f"{self.text}\n"
 
+    @staticmethod
+    def _validate_metadata(name: str, value: str | None) -> None:
+        if value is not None and (not isinstance(value, str) or any(
+                char in value for char in "\r\n\v\f\x1c\x1d\x1e\x85\u2028\u2029")):
+            raise ValueError(f"{name} must be a single-line string")
+
     @classmethod
     def from_markdown(cls, raw: str) -> "Node":
         m = re.match(r"^---\n(.*?)\n---\n\n?(.*)$", raw, re.DOTALL)
@@ -141,6 +165,8 @@ class Node:
         for line in meta_raw.splitlines():
             if ":" in line:
                 key, _, val = line.partition(":")
+                if key.strip() in meta:
+                    raise ValueError(f"Duplicate frontmatter key: {key.strip()}")
                 meta[key.strip()] = val.strip()
         # Audit #56: a hand-edited file without id: should raise an
         # understandable error (with path context so the caller can skip it),
@@ -164,12 +190,15 @@ class Node:
                    context=meta.get("context"),
                    entity_name=json.loads(meta.get("entity_name", "null")),
                    entity_type=json.loads(meta.get("entity_type", "null")),
-                   aliases=json.loads(meta.get("aliases", "[]")))
+                   aliases=json.loads(meta.get("aliases", "[]")),
+                   storage_tier=meta.get("storage_tier", "recall"),
+                   tier_locked=meta.get("tier_locked", "false").lower() == "true")
 
     def to_dict(self) -> dict:
         result = {"id": self.id, "text": self.text, "created": self.created,
                 "source": self.source, "tags": self.tags, "sources": self.sources,
                 "type": self.ntype, "status": self.status,
+                "storage_tier": self.storage_tier, "tier_locked": self.tier_locked,
                 "recall_count": self.recall_count,
                 "recall_queries": self.recall_queries,
                 "last_recalled": self.last_recalled,
@@ -295,6 +324,12 @@ class Brain:
         # across several calls — the engine-wide BRAIN_LOCK and this instance
         # lock combine cleanly for that (RLock).
         self._lock = threading.RLock()
+
+    def authorize(self, action: str, node_id: str | None = None) -> None:
+        """Unprotected local brain; SecuredBrain enforces this shared hook."""
+
+    def can_access(self, action: str, node_id: str | None = None) -> bool:
+        return True
 
     # ---------- Git sync ----------
 
@@ -485,7 +520,9 @@ class Brain:
         out = []
         for p in sorted(nodes_dir.glob("*.md")):
             try:
-                out.append(Node.from_markdown(p.read_text(encoding="utf-8")))
+                node = Node.from_markdown(p.read_text(encoding="utf-8"))
+                if node.id == p.stem:
+                    out.append(node)
             except (ValueError, KeyError):
                 continue  # skip broken files instead of crashing
         return out
@@ -498,7 +535,8 @@ class Brain:
         if path is None or not path.exists():
             return None
         try:
-            return Node.from_markdown(path.read_text(encoding="utf-8"))
+            node = Node.from_markdown(path.read_text(encoding="utf-8"))
+            return node if node.id == node_id else None
         except (ValueError, KeyError, OSError):
             return None
 

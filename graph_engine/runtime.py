@@ -20,6 +20,7 @@ from __future__ import annotations
 import os
 
 from .brain import Brain
+from . import access, namespaces
 from .brain_engine import BrainEngine
 from .embedder import get_embedder
 
@@ -35,27 +36,44 @@ _ENGINES: dict[tuple[str, str], BrainEngine] = {}
 
 def brain_path() -> str:
     """Resolved brain path from the env (~ expanded, Audit #33)."""
+    return _brain_path(namespaces.selected())
+
+
+def _brain_path(graph_name: str) -> str:
+    """Use the same selection snapshot for the path and its permissions."""
+    if namespaces.home() is not None:
+        return str(namespaces.graph_path(graph_name))
     return os.path.expanduser(
         os.environ.get("IG_BRAIN_PATH", os.path.expanduser("~/graph-engine-brain")))
 
 
 def make_brain() -> Brain:
     """A Brain from the env contract. No personal defaults."""
-    return Brain(
-        path=brain_path(),
-        remote=os.environ.get("IG_BRAIN_REMOTE", "") or None,
+    graph_name = namespaces.selected()
+    cls = access.SecuredBrain if access.policy_path() else Brain
+    kwargs = {"graph_name": graph_name, "identity": access.principal()} if access.policy_path() else {}
+    return cls(
+        **kwargs,
+        path=_brain_path(graph_name),
+        remote=(os.environ.get("IG_BRAIN_REMOTE", "") or None) if namespaces.home() is None else None,
         mode=os.environ.get("IG_BRAIN_MODE", "git"),
     )
 
 
 def make_engine() -> BrainEngine:
     """A BrainEngine from the env contract, process-wide cached."""
+    brain = make_brain()
+    if access.policy_path():
+        # Never cache identities/policies across requests or policy revocation.
+        return BrainEngine(brain, get_embedder(
+            os.environ.get("IDEAGRAPH_EMBEDDER", "st"),
+            os.environ.get("IDEAGRAPH_EMBEDDER_MODEL")))
     embedder_name = os.environ.get("IDEAGRAPH_EMBEDDER", "st")
-    key = (brain_path(), embedder_name)
+    key = (str(brain.path), embedder_name)
     eng = _ENGINES.get(key)
     if eng is None:
         model = os.environ.get("IDEAGRAPH_EMBEDDER_MODEL")  # audit #60
-        eng = BrainEngine(make_brain(), get_embedder(embedder_name, model))
+        eng = BrainEngine(brain, get_embedder(embedder_name, model))
         _ENGINES[key] = eng
     return eng
 

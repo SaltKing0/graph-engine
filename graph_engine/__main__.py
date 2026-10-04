@@ -1,6 +1,7 @@
 """CLI for the brain: init, ingest, pending, accept, reject, link, search.
 
 Examples:
+  python -m graph_engine graph list | create <name> | switch <name>
   python -m graph_engine init [--remote <brain-repo-url>] [--demo]
   python -m graph_engine ingest "New idea ..." [--source agent/bot] [--allow-dup]
   python -m graph_engine entities "Alice works at Acme. She uses Python." [--dry-run] [--json] [--llm]
@@ -10,12 +11,16 @@ Examples:
   python -m graph_engine accept <edge_id>
   python -m graph_engine reject <edge_id>
   python -m graph_engine accept-pending [--max-intent-per-source 2] [--dry-run] [--json]
+  python -m graph_engine tier <node_id> [main|recall|archival|auto] [--json]
+  python -m graph_engine tier --rebalance [--dry-run] [--json]
+  python -m graph_engine feedback "query" <node_id> <relevant|irrelevant> [--json]
   python -m graph_engine recall [--top 10] [--aggregate] [--dry-run] [--json]
   python -m graph_engine consolidate [--threshold 1] [--min-age-days 1] [--min-count 1] [--limit 50] [--dry-run] [--json] [--llm]
   python -m graph_engine dream [--refresh] [--consolidate] [--distill] [--lifecycle] [--dry-run] [--json]
   python -m graph_engine link <node_a> <node_b> [--kind same_as]
   python -m graph_engine search "attention" [--json]
-  python -m graph_engine explain <node_id> --query "attention" [--json]
+  python -m graph_engine explain <node_id> [--query "attention"] [--json]
+  python -m graph_engine infer "How does A relate to B?" [--json]
   python -m graph_engine gaps [--taxonomy tax.json] [--min 10] [--json]
   python -m graph_engine merge <survivor_id> <deletee_id>   # consolidate a near-dup
   python -m graph_engine near-dup [--lo 0.78] [--hi 0.92]   # report near-duplicate pairs
@@ -40,6 +45,9 @@ from .gaps import analyze_coverage, find_gaps, render, load_taxonomy
 from .hygiene import near_dup_pairs, connectivity, status_counts, render_near_dup, render_status
 from .merge import merge_nodes
 from .retrieval import retrieve
+from .inference import cmd_infer
+from .tiers import cmd_tier
+from .feedback import cmd_feedback
 
 # Shared factory (one source of truth for CLI, server and future MCP surface).
 make_engine = runtime.make_engine
@@ -403,6 +411,7 @@ def cmd_init(engine: BrainEngine, args: list[str]) -> None:
     if demo:
         from .demo import build_demo_brain
         try:
+            brain.authorize("admin")
             stats = build_demo_brain(str(brain.path))
         except FileExistsError:
             # Audit #58: friendly message instead of a raw traceback — a
@@ -738,6 +747,7 @@ def cmd_search(engine: BrainEngine, args: list[str]) -> None:
                 "score": round(score, 4),
                 "snippet": _short(n.text, 200),
                 "status": n.status,
+                "storage_tier": n.storage_tier,
                 "type": n.ntype,
                 "tags": list(n.tags or []),
                 "created": n.created,
@@ -753,18 +763,39 @@ def cmd_search(engine: BrainEngine, args: list[str]) -> None:
 
 
 def cmd_explain(engine: BrainEngine, args: list[str]) -> None:
-    """Explain a node's ranking for an explicit query (read-only)."""
+    """Explain graph paths, or retrieval ranking with --query (read-only)."""
     import argparse
     import json
     from .retrieval import explain
 
     parser = argparse.ArgumentParser(prog="ig explain", description=cmd_explain.__doc__)
     parser.add_argument("node_id")
-    parser.add_argument("--query", required=True)
+    parser.add_argument("--query")
+    parser.add_argument("--max-depth", type=int, default=2)
+    parser.add_argument("--limit", type=int, default=20)
     parser.add_argument("--top", type=int, default=5)
     parser.add_argument("--rerank-k", type=int, default=30)
     parser.add_argument("--json", action="store_true")
     options = parser.parse_args(args)
+    if options.query is None:
+        from .inference import explain_node, print_paths
+        try:
+            result = explain_node(engine.brain, options.node_id,
+                                  max_depth=options.max_depth, limit=options.limit)
+        except ValueError as exc:
+            print(f"Error: {exc}")
+            sys.exit(1)
+        if options.json:
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+        else:
+            print(f"Node {result['node_id']}: {result['text']}")
+            print(result["explanation"])
+            print_paths(result["paths"])
+            print(f"{len(result['graph_context'])} supporting edges; "
+                  f"{len(result['contradictions'])} conflicts")
+            if result["truncated"]:
+                print("More paths available; increase --limit.")
+        return
     try:
         result = explain(engine, options.node_id, options.query,
                          k=options.top, rerank_k=options.rerank_k)
@@ -1169,6 +1200,19 @@ def _dream_summarizer():
     return summarizer
 
 
+def cmd_graph(args: list[str]) -> None:
+    """Manage isolated brain namespaces without loading an embedder."""
+    from .namespaces import create_graph, list_graphs, selected, switch_graph
+    if args == ["list"]:
+        for name in list_graphs():
+            print(("* " if name == selected() else "  ") + name)
+    elif len(args) == 2 and args[0] in ("create", "switch"):
+        (create_graph if args[0] == "create" else switch_graph)(args[1])
+        print(f"Graph {args[0]}: {args[1]}")
+    else:
+        raise ValueError("Usage: ig graph list | create <name> | switch <name>")
+
+
 COMMANDS = {
     "init": cmd_init,
     "ingest": cmd_ingest,
@@ -1187,6 +1231,7 @@ COMMANDS = {
     "link": cmd_link,
     "search": cmd_search,
     "explain": cmd_explain,
+    "infer": cmd_infer,
     "gaps": cmd_gaps,
     "merge": cmd_merge,
     "near-dup": cmd_near_dup,
@@ -1197,6 +1242,8 @@ COMMANDS = {
     "accept-pending": cmd_accept_pending,
     "dream": cmd_dream,
     "recall": cmd_recall,
+    "tier": cmd_tier,
+    "feedback": cmd_feedback,
 }
 
 
@@ -1206,11 +1253,22 @@ def main() -> None:
         print(__doc__)
         sys.exit(0)
     cmd, rest = args[0], args[1:]
+    if cmd == "graph":
+        try:
+            cmd_graph(rest)
+        except (ValueError, PermissionError, FileExistsError) as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            sys.exit(1)
+        return
     fn = COMMANDS.get(cmd)
     if fn is None:
         print(f"Unknown command: {cmd}. Available: {', '.join(COMMANDS)}")
         sys.exit(1)
-    fn(make_engine(), rest)
+    try:
+        fn(make_engine(), rest)
+    except PermissionError as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

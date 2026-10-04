@@ -18,7 +18,7 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 
-from . import runtime
+from . import runtime, access, namespaces
 
 # Shipped UI assets live INSIDE the package so a pip install serves them too
 # (repo-root docs/ would not exist in site-packages).
@@ -27,20 +27,54 @@ DOCS_DIR = Path(__file__).resolve().parent / "web"
 app = FastAPI(title="GraphEngine")
 
 
+@app.middleware("http")
+async def access_control(request, call_next):
+    # Pin selection before any awaits: switching the CLI while an ingest runs
+    # must not send the old graph's payload to the new graph's subscribers.
+    graph_token = namespaces.request_graph.set(namespaces.selected())
+    identity_token = None
+    try:
+        if access.policy_path():
+            try:
+                identity = access.token_principal(request.headers.get("authorization", ""))
+            except PermissionError:
+                access.audit("http", "", "authenticate", False)
+                return JSONResponse({"error": "Authentication required"}, status_code=401)
+            identity_token = access.request_principal.set(identity)
+        return await call_next(request)
+    finally:
+        if identity_token is not None:
+            access.request_principal.reset(identity_token)
+        namespaces.request_graph.reset(graph_token)
+
+
+@app.exception_handler(PermissionError)
+async def permission_error_handler(_request, _exc):
+    return JSONResponse({"error": "Access denied"}, status_code=403)
+
+
+
 class ConnectionManager:
     def __init__(self):
         self.active: list[WebSocket] = []
+        self.graphs: dict[WebSocket, str] = {}
 
     async def connect(self, ws: WebSocket):
         await ws.accept()
         self.active.append(ws)
+        self.graphs[ws] = runtime.brain_path()
 
     def disconnect(self, ws: WebSocket):
         if ws in self.active:
             self.active.remove(ws)
+        self.graphs.pop(ws, None)
 
     async def broadcast(self, message: dict):
+        if access.policy_path():
+            return  # protected realtime transport is intentionally disabled
         for ws in list(self.active):
+            if self.graphs.get(ws) != runtime.brain_path():
+                continue
             try:
                 await ws.send_json(message)
             except Exception:
@@ -176,6 +210,9 @@ async def link_edge(body: LinkBody):
 
 @app.websocket("/ws")
 async def ws_endpoint(ws: WebSocket):
+    if access.policy_path():
+        await ws.close(code=1008)
+        return
     await manager.connect(ws)
     try:
         while True:
