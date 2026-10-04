@@ -7,6 +7,15 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- `ig entities <text>` / `ig entities --node <id>` extracts typed entity nodes,
+  directed fact triples with quoted source evidence, and semantic/episodic
+  mention links (issue #3). Includes a dependency-free English/German sentence
+  grammar, typed name/alias linking, conservative pronoun resolution, optional
+  JSON command-based LLM extraction, dry-run/JSON output and validity windows.
+  Facts enter the existing review queue; repeats and past review decisions are
+  preserved. Entity identities are excluded from cosine dedup and text merges.
+  Bounded facts remain reviewable and appear only during their validity window;
+  explicit invalidation and immutable extraction dates preserve decisions on repeats.
 - `ig consolidate` automatically derives semantic memories from eligible
   episodic observations, with configurable recall/age/count gates, dry-run/JSON
   output and optional model refinement. Original events are retained, exact

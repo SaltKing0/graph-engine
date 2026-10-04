@@ -55,7 +55,9 @@ class Node:
                  status: str = "probation",
                  recall_count: int = 0, recall_queries: list[str] | None = None,
                  last_recalled: str | None = None,
-                 observed_at: str | None = None, context: str | None = None):
+                 observed_at: str | None = None, context: str | None = None,
+                 entity_name: str | None = None, entity_type: str | None = None,
+                 aliases: list[str] | None = None):
         self.text = text
         self.id = id or uuid.uuid4().hex[:12]
         self.created = created or _now_iso()
@@ -67,8 +69,8 @@ class Node:
         # from_markdown passes [] explicitly → old files without the line
         # stay unchanged until they really mutate.
         self.sources = sources if sources is not None else [source]
-        # Taxonomy (LangGraph/survey lesson): semantic | episodic | procedural
-        self.ntype = ntype if ntype in ("semantic", "episodic", "procedural") else "semantic"
+        # Memory taxonomy plus structured entity identities.
+        self.ntype = ntype if ntype in ("semantic", "episodic", "procedural", "entity") else "semantic"
         # V2#2 memory hygiene: dual buffer — new nodes start in probation,
         # get promoted after dedup/verification, or end up as tombstones.
         self.status = status if status in VALID_STATUS else "probation"
@@ -85,6 +87,16 @@ class Node:
         # Only meaningful for ntype="episodic"; None for semantic/procedural.
         self.observed_at = observed_at
         self.context = context
+        if entity_name is not None and not isinstance(entity_name, str):
+            raise ValueError("entity_name must be a string")
+        if entity_type is not None and not isinstance(entity_type, str):
+            raise ValueError("entity_type must be a string")
+        if aliases is not None and (not isinstance(aliases, list)
+                                    or not all(isinstance(a, str) for a in aliases)):
+            raise ValueError("aliases must be a list of strings")
+        self.entity_name = entity_name
+        self.entity_type = entity_type
+        self.aliases = list(aliases or [])
 
     def to_markdown(self) -> str:
         tags = "[" + ", ".join(self.tags) + "]" if self.tags else "[]"
@@ -97,6 +109,12 @@ class Node:
         # the rewrite "changes" the file without any content gain.
         lines.append("sources: [" + ", ".join(self.sources) + "]")
         lines.append(f"tags: {tags}")
+        if self.ntype == "entity":
+            # JSON values are also valid YAML and safely preserve commas,
+            # quotes, colons and Unicode in names/aliases.
+            lines.append("entity_name: " + json.dumps(self.entity_name, ensure_ascii=False))
+            lines.append("entity_type: " + json.dumps(self.entity_type, ensure_ascii=False))
+            lines.append("aliases: " + json.dumps(self.aliases, ensure_ascii=False))
         # Episodic metadata only when present — semantic/procedural nodes
         # stay unchanged (no frontmatter churn).
         if self.ntype == "episodic":
@@ -143,16 +161,23 @@ class Node:
                    recall_count=recall_count, recall_queries=recall_queries,
                    last_recalled=meta.get("last_recalled"),
                    observed_at=meta.get("observed_at"),
-                   context=meta.get("context"))
+                   context=meta.get("context"),
+                   entity_name=json.loads(meta.get("entity_name", "null")),
+                   entity_type=json.loads(meta.get("entity_type", "null")),
+                   aliases=json.loads(meta.get("aliases", "[]")))
 
     def to_dict(self) -> dict:
-        return {"id": self.id, "text": self.text, "created": self.created,
+        result = {"id": self.id, "text": self.text, "created": self.created,
                 "source": self.source, "tags": self.tags, "sources": self.sources,
                 "type": self.ntype, "status": self.status,
                 "recall_count": self.recall_count,
                 "recall_queries": self.recall_queries,
                 "last_recalled": self.last_recalled,
                 "observed_at": self.observed_at, "context": self.context}
+        if self.ntype == "entity":
+            result.update(entity_name=self.entity_name, entity_type=self.entity_type,
+                          aliases=self.aliases)
+        return result
 
 
 class Edge:
@@ -161,7 +186,10 @@ class Edge:
                  valid_from: str | None = None, valid_to: str | None = None,
                  confidence: float | None = None,
                  invalidated_by: str | None = None, rejected: bool = False,
-                 origin: str | None = None):
+                 origin: str | None = None, predicate: str | None = None,
+                 evidence: list[dict] | None = None,
+                 extracted_validity: dict | None = None,
+                 invalidated_at: str | None = None):
         self.source = source
         self.target = target
         self.kind = kind
@@ -178,12 +206,56 @@ class Edge:
         # Bi-temporality (Zep/Graphiti lesson): fact validity kept separate
         # from commit time (which the git history provides for free).
         self.valid_from = valid_from or _now_iso()
-        self.valid_to = valid_to  # None = currently valid; set = invalidated
+        self.valid_to = valid_to
         # V2#3: confidence (cosine) of auto suggestions; None for manual links.
         self.confidence = confidence
         # V1#1: provenance — which edge/event invalidated this edge.
         self.invalidated_by = invalidated_by
         self.rejected = rejected
+        self.predicate = predicate
+        self.evidence = list(evidence or [])
+        # Original extractor input is an immutable identity key, including
+        # null dates. Its presence opts facts into bounded validity semantics;
+        # legacy edges still interpret any valid_to as an invalidation.
+        self.extracted_validity = (dict(extracted_validity)
+                                   if extracted_validity is not None else None)
+        self.invalidated_at = invalidated_at
+
+    @property
+    def is_invalidated(self) -> bool:
+        return (self.invalidated_at is not None
+                or (self.extracted_validity is None and self.valid_to is not None))
+
+    def is_valid_at(self, at: datetime) -> bool:
+        """Half-open validity interval, additionally cut off by invalidation."""
+        if at.tzinfo is None:
+            at = at.replace(tzinfo=timezone.utc)
+        for value, is_start in ((self.valid_from, True), (self.valid_to, False),
+                                (self.invalidated_at, False)):
+            if value is None:
+                continue
+            try:
+                stamp = datetime.fromisoformat(value.replace("Z", "+00:00"))
+                if stamp.tzinfo is None:
+                    stamp = stamp.replace(tzinfo=timezone.utc)
+            except (ValueError, TypeError, AttributeError):
+                continue  # Preserve temporal queries' tolerance of legacy timestamps.
+            if (is_start and at < stamp) or (not is_start and at >= stamp):
+                return False
+        return True
+
+    @property
+    def is_current(self) -> bool:
+        """Validity only: callers choose whether to include pending/rejected edges."""
+        if self.is_invalidated:
+            return False
+        return (self.extracted_validity is None
+                or self.is_valid_at(datetime.now(timezone.utc)))
+
+    def invalidate(self, at: str) -> None:
+        self.invalidated_at = at
+        if self.extracted_validity is None:
+            self.valid_to = at  # Preserve the legacy on-disk/API contract.
 
     def to_dict(self) -> dict:
         result = {"id": self.id, "source": self.source, "target": self.target,
@@ -195,6 +267,14 @@ class Edge:
             result["origin"] = self.origin
         if self.rejected:
             result["rejected"] = True
+        if self.predicate is not None:
+            result["predicate"] = self.predicate
+        if self.evidence:
+            result["evidence"] = self.evidence
+        if self.extracted_validity is not None:
+            result["extracted_validity"] = dict(self.extracted_validity)
+        if self.invalidated_at is not None:
+            result["invalidated_at"] = self.invalidated_at
         return result
 
 
@@ -525,8 +605,11 @@ class Brain:
                             confidence=d.get("confidence"),
                             invalidated_by=d.get("invalidated_by"),
                             rejected=d.get("rejected", False),
-                            origin=d.get("origin"))
-            except (json.JSONDecodeError, KeyError, TypeError):
+                            origin=d.get("origin"), predicate=d.get("predicate"),
+                            evidence=d.get("evidence", []),
+                            extracted_validity=d.get("extracted_validity"),
+                            invalidated_at=d.get("invalidated_at"))
+            except (ValueError, KeyError, TypeError):
                 continue
             if edge.rejected and not include_rejected:
                 continue
@@ -544,15 +627,15 @@ class Brain:
 
     def invalidate_edge(self, edge_id: str, reason: str | None = None,
                         by_edge_id: str | None = None) -> Edge | None:
-        """Invalidate the edge instead of deleting it (Zep lesson): valid_to is set,
-        the edge stays in the file with its full history. `by_edge_id` records
+        """Invalidate without changing an extracted fact's original validity.
+        The edge stays in the file with its full history. `by_edge_id` records
         the provenance of which edge/event invalidated it (V1#1)."""
         with self._lock:
             edges = self.read_edges(include_rejected=True)
             edge = next((e for e in edges if e.id == edge_id and not e.rejected), None)
-            if edge is None or edge.valid_to is not None:
+            if edge is None or edge.is_invalidated:
                 return None
-            edge.valid_to = _now_iso()
+            edge.invalidate(_now_iso())
             if by_edge_id:
                 edge.invalidated_by = by_edge_id
             self.write_edges(edges)
@@ -562,7 +645,7 @@ class Brain:
         with self._lock:
             edges = self.read_edges(include_rejected=True)
             edge = next((e for e in edges if e.id == edge_id and e.pending and not e.rejected
-                         and e.valid_to is None), None)
+                         and not e.is_invalidated), None)
             if edge is None:
                 return None
             edge.pending = False
@@ -575,7 +658,7 @@ class Brain:
         with self._lock:
             edges = self.read_edges(include_rejected=True)
             edge = next((e for e in edges if e.id == edge_id and not e.pending
-                         and e.valid_to is None), None)
+                         and not e.is_invalidated), None)
             if edge is None:
                 return None
             edge.pending = True
@@ -588,7 +671,10 @@ class Brain:
     def graph_state(self) -> dict:
         return {
             "nodes": [n.to_dict() for n in self.read_nodes()],
-            "edges": [e.to_dict() for e in self.read_edges()],
+            "edges": [{**e.to_dict(), **({"current": e.is_current,
+                                         "invalidated": e.is_invalidated}
+                                        if e.extracted_validity is not None else {})}
+                      for e in self.read_edges()],
         }
 
     # ---------- Generated table of contents ----------

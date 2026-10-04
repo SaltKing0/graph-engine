@@ -30,22 +30,10 @@ def _is_valid_at(edge: "Edge", ts: datetime.datetime) -> bool:
 
     An edge is valid at T when:
     - valid_from <= T (it had been created by then)
-    - valid_to is None OR valid_to > T (it had not been invalidated yet)
+    - valid_to is None OR valid_to > T (its validity had not ended)
+    - invalidated_at is None OR invalidated_at > T
     """
-    try:
-        valid_from = _parse_ts(edge.valid_from) if edge.valid_from else None
-    except (ValueError, TypeError):
-        valid_from = None
-    try:
-        valid_to = _parse_ts(edge.valid_to) if edge.valid_to else None
-    except (ValueError, TypeError):
-        valid_to = None
-
-    if valid_from and valid_from > ts:
-        return False
-    if valid_to and valid_to <= ts:
-        return False
-    return True
+    return edge.is_valid_at(ts)
 
 
 def valid_at(brain: "Brain", timestamp: str) -> dict:
@@ -86,7 +74,7 @@ def valid_at(brain: "Brain", timestamp: str) -> dict:
 def history(brain: "Brain", node_id: str) -> list[dict]:
     """How a node's edges evolved over time.
 
-    Returns a chronological list of edge events (creation, invalidation)
+    Returns a chronological list of edge events (creation, expiry, invalidation)
     involving this node, sorted by timestamp. Each entry has:
     {timestamp, event, edge_id, kind, other_node, origin}
     """
@@ -105,11 +93,16 @@ def history(brain: "Brain", node_id: str) -> list[dict]:
             "origin": e.origin,
             "rejected": e.rejected,
         })
-        # Invalidation event
-        if e.valid_to:
+        # Keep an extracted expiry separate from a later review invalidation.
+        endings = [(e.valid_to, "expired" if e.extracted_validity is not None else "invalidated")]
+        if e.extracted_validity is not None:
+            endings.append((e.invalidated_at, "invalidated"))
+        for timestamp, event in endings:
+            if not timestamp:
+                continue
             events.append({
-                "timestamp": e.valid_to,
-                "event": "invalidated",
+                "timestamp": timestamp,
+                "event": event,
                 "edge_id": e.id,
                 "kind": e.kind,
                 "other_node": other,
@@ -165,7 +158,7 @@ def when(engine: "BrainEngine", query: str, at: str, k: int = 5) -> list[tuple[s
 
 def edge_timeline(brain: "Brain", *, since: str | None = None,
                   until: str | None = None) -> list[dict]:
-    """All edge events (created/invalidated) in a time range.
+    """All edge events (created/expired/invalidated) in a time range.
 
     Useful for "what changed in the brain recently?" — the temporal
     equivalent of `ig report --since`.
@@ -178,10 +171,6 @@ def edge_timeline(brain: "Brain", *, since: str | None = None,
             vf = _parse_ts(e.valid_from) if e.valid_from else None
         except (ValueError, TypeError):
             vf = None
-        try:
-            vt = _parse_ts(e.valid_to) if e.valid_to else None
-        except (ValueError, TypeError):
-            vt = None
 
         if vf:
             if since and vf < _parse_ts(since):
@@ -197,10 +186,19 @@ def edge_timeline(brain: "Brain", *, since: str | None = None,
                 "target": e.target,
                 "origin": e.origin,
             })
-        if vt:
+        endings = [(e.valid_to, "expired" if e.extracted_validity is not None else "invalidated")]
+        if e.extracted_validity is not None:
+            endings.append((e.invalidated_at, "invalidated"))
+        for timestamp, event in endings:
+            if not timestamp:
+                continue
+            try:
+                _parse_ts(timestamp)
+            except (ValueError, TypeError):
+                continue
             events.append({
-                "timestamp": e.valid_to,
-                "event": "invalidated",
+                "timestamp": timestamp,
+                "event": event,
                 "edge_id": e.id,
                 "kind": e.kind,
                 "source": e.source,

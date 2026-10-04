@@ -11,7 +11,7 @@ put in here, and what did it connect?" stays a query instead of a guess.
 
 Never destructive (the house rule): `forget` tombstones the node — it leaves
 every live view (`retrieve`, `graph`, `hygiene`) but stays in the file, and its
-live edges get `valid_to` instead of being deleted, so the audit trail survives.
+edges are invalidated instead of deleted, so the audit trail survives.
 """
 from __future__ import annotations
 
@@ -63,7 +63,7 @@ def forget(brain: Brain, node_id: str, *, reason: str,
     """Hide a node from every live view — without deleting it.
 
     Sets `status="tombstone"` (out of `retrieve`, `graph`, `hygiene` — the file
-    and its history stay) and `valid_to` on every live edge touching it, in ONE
+    and its history stay) and invalidates every undecided/live edge touching it, in ONE
     commit. `reason` is mandatory and lands in the commit message: the record of
     WHY must survive with the decision. Idempotent: forgetting a tombstone again
     is a no-op, not an error.
@@ -82,8 +82,8 @@ def forget(brain: Brain, node_id: str, *, reason: str,
     edges = brain.read_edges(include_rejected=True)
     invalidated = 0
     for e in edges:
-        if e.valid_to is None and not e.rejected and node_id in (e.source, e.target):
-            e.valid_to = now          # keep the edge, drop it from live views
+        if not e.is_invalidated and not e.rejected and node_id in (e.source, e.target):
+            e.invalidate(now)        # Also invalidate scheduled/expired extracted facts.
             invalidated += 1
     node.status = FORGET_STATUS
     brain.write_node(node)

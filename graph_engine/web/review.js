@@ -57,7 +57,7 @@ async function refresh() {
   }
   nodes = {};
   g.nodes.forEach(n => nodes[n.id] = n);
-  pending = g.edges.filter(e => e.pending);
+  pending = g.edges.filter(e => e.pending && !(e.invalidated ?? Boolean(e.valid_to)));
   if (selectedId == null && pending.length) selectedId = pending[0].id;
   if (selectedId != null && !pending.some(e => e.id === selectedId)) {
     selectedId = pending.length ? pending[0].id : null;
@@ -80,13 +80,14 @@ function renderCards() {
   const sel = currentIndex();
   box.innerHTML = pending.map((e, i) => `
     <div class="card ${i === sel ? "active" : ""}" data-i="${i}">
-      <span class="kind" data-kind="${esc(e.kind)}">${esc(e.kind)}</span>
+      <span class="kind" data-kind="${esc(e.kind)}">${esc(e.kind === "fact" ? e.predicate || "fact" : e.kind)}</span>
       <div class="side-label">A</div>
       <div class="nodebox pickable" data-pick="${esc(e.source)}">
         <span class="id">${esc(e.source)}</span><br>${esc(short(e.source))}</div>
       <div class="side-label">B</div>
       <div class="nodebox pickable" data-pick="${esc(e.target)}">
         <span class="id">${esc(e.target)}</span><br>${esc(short(e.target))}</div>
+      ${e.kind === "fact" ? (e.evidence || []).slice(0, 3).map(item => `<p>${esc(item.text.slice(0, 240))}</p>`).join("") : ""}
       <div class="actions">
         <button class="ok" data-resolve="${esc(e.id)}" data-accept="1">✓ accept ⏎</button>
         <button class="no" data-resolve="${esc(e.id)}" data-accept="0">✗ reject esc</button>

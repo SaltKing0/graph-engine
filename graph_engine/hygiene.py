@@ -144,10 +144,10 @@ def connectivity(brain: Brain) -> Connectivity:
     # autonomous cycle then tried to re-link a dead node (found 2026-09-15).
     nodes = [n for n in nodes if n.status != "tombstone"]
     edges = brain.read_edges()
-    # Audit #40: invalidated edges (valid_to set) no longer count toward
+    # Audit #40: invalidated or out-of-window edges no longer count toward
     # connectivity — otherwise the status report would contradict the
     # admit-rule logic (_has_relation correctly ignores them).
-    live_edges = [e for e in edges if e.valid_to is None]
+    live_edges = [e for e in edges if e.is_current]
     deg: Counter = Counter()
     for e in live_edges:
         deg[e.source] += 1

@@ -22,16 +22,17 @@ class Neighbor:
     pending: bool
     confidence: float | None
     hops: int
+    predicate: str | None = None
 
 
 def live_edges(brain: Brain, include_pending: bool = False) -> list[Edge]:
-    """Edges that count as real relations: not invalidated (valid_to set),
+    """Edges that count as real relations: currently valid and not invalidated,
     not rejected, endpoints not tombstoned (hygiene.py precedent — tombstones
     are edge-less BY DESIGN), and optionally not pending."""
     node_status = {n.id: n.status for n in brain.read_nodes()}
     out = []
     for e in brain.read_edges():
-        if e.valid_to is not None or e.rejected:
+        if not e.is_current or e.rejected:
             continue
         if e.source in node_status and node_status[e.source] == "tombstone":
             continue
@@ -87,6 +88,7 @@ def neighbors(brain: Brain, node_id: str, hops: int = 1,
                 pending=edge.pending,
                 confidence=edge.confidence,
                 hops=depth + 1,
+                predicate=edge.predicate,
             ))
             queue.append(other)
     results.sort(key=lambda nb: (nb.hops, nb.kind, nb.id))

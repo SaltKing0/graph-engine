@@ -97,7 +97,7 @@ def build_graph(brain: Brain, include_pending: bool = True
     Excludes: tombstoned nodes (they are edge-less append-only history —
     including them manufactures phantom singleton communities, the exact
     bug that once made the autonomous cycle try to re-link a dead node),
-    rejected edges (read_edges default), valid_to-invalidated edges
+    rejected edges (read_edges default), invalidated or out-of-window edges
     (hygiene precedent: they no longer count toward connectivity),
     dangling endpoints, and self-loops. A->B and B->A deduplicate into
     ONE undirected edge (link() is direction-sensitive, so both can
@@ -112,7 +112,7 @@ def build_graph(brain: Brain, include_pending: bool = True
     deg: Counter = Counter()
     m = 0
     for e in brain.read_edges():
-        if e.valid_to is not None or e.rejected:
+        if not e.is_current or e.rejected:
             continue
         if not include_pending and e.pending:
             continue

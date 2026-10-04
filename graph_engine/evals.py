@@ -241,7 +241,7 @@ def verify_end_state(brain: Brain, oracle: EvalOracle) -> list[str]:
         # so direction doesn't matter for "being connected".
         active = [
             e for e in edges
-            if e.valid_to is None
+            if e.is_current
             and ((e.source == s.id and e.target == t.id) or (e.source == t.id and e.target == s.id))
         ]
         if eexp.kind != "*":
@@ -284,7 +284,7 @@ def verify_end_state(brain: Brain, oracle: EvalOracle) -> list[str]:
         # invalidated edge or a different-kind edge is NOT a violation.
         violating = [
             e for e in edges
-            if e.valid_to is None
+            if e.is_current
             and ((e.source == s.id and e.target == t.id) or (e.source == t.id and e.target == s.id))
             and (eexp.kind == "*" or e.kind == eexp.kind)
         ]
@@ -315,7 +315,7 @@ def verify_end_state(brain: Brain, oracle: EvalOracle) -> list[str]:
         per_source: dict[str, int] = {}
         for e in edges:
             if (e.kind in INTENT_KINDS and not e.pending and not e.rejected
-                    and e.valid_to is None):
+                    and e.is_current):
                 per_source[e.source] = per_source.get(e.source, 0) + 1
         over = {s: n for s, n in per_source.items()
                 if n > oracle.max_auto_intent_per_source}
@@ -329,7 +329,7 @@ def verify_end_state(brain: Brain, oracle: EvalOracle) -> list[str]:
     for origin, minimum in oracle.min_edges_by_origin.items():
         found = sum(1 for e in edges
                     if getattr(e, "origin", None) == origin
-                    and not e.pending and not e.rejected and e.valid_to is None)
+                    and not e.pending and not e.rejected and e.is_current)
         if found < minimum:
             failures.append(
                 f"edges with origin {origin!r}: expected >= {minimum} live, got {found}")

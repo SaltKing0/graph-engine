@@ -55,7 +55,7 @@ def intent_auto_accept_max(env: dict[str, str] | None = None) -> int:
 def is_live_intent(edge: Edge) -> bool:
     """A currently valid, accepted intent edge (the thing the cap bounds)."""
     return (edge.kind in INTENT_KINDS and not edge.pending
-            and not edge.rejected and edge.valid_to is None)
+            and not edge.rejected and edge.is_current)
 
 
 def accept_pending(brain: Brain, *, max_intent_per_source: int | None = None,
@@ -77,7 +77,7 @@ def accept_pending(brain: Brain, *, max_intent_per_source: int | None = None,
     live_intent = Counter(e.source for e in edges if is_live_intent(e))
     accepted: list[str] = []
     held: list[str] = []
-    for edge in sorted((e for e in edges if e.pending and not e.rejected),
+    for edge in sorted((e for e in edges if e.pending and not e.rejected and not e.is_invalidated),
                        key=lambda e: e.id):
         if edge.kind in INTENT_KINDS:
             if live_intent[edge.source] >= cap:
