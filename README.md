@@ -80,6 +80,18 @@ Explicit fact replacements create separate pending proposals; review both
 claims, evidence and event dates before accepting, rejecting or undoing them.
 See [replacement review](docs/guide.md#review-fact-replacements).
 
+For structured episodic consolidation, explicitly run `ig consolidate --structured`
+or `ig dream --consolidate --structured`. Exact quotes and event IDs are validated
+before one batch commit. Proposed semantic nodes are labelled and searchable;
+their evidence links require individual review. Quote matching proves provenance,
+not factual entailment. Copy mode and legacy `--llm` remain available.
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `IG_CONSOLIDATE_STRUCTURED_CMD` | *(none)* | Opt-in JSON stdin/stdout proposal command for `--structured`; 300-second timeout, 128 KiB output limit. Separate from legacy `IG_CONSOLIDATE_LLM_CMD`. |
+
+See the [structured protocol and publication policy](docs/guide.md#structured-consolidation-proposals).
+
 ## Documentation
 
 - [CLI reference](docs/guide.md#cli) and [configuration](docs/guide.md#configuration)

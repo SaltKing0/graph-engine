@@ -576,3 +576,41 @@ def test_entities_cli_dated_fact_review_and_invalidation(tmp_path):
     assert repeated.returncode == 0 and "(invalidated)" in repeated.stdout
     assert edge.id not in run_cli(["pending"], tmp_path).stdout
     assert len([e for e in brain.read_edges() if e.kind == "fact"]) == 1
+
+
+@pytest.mark.parametrize("command", [["consolidate"], ["dream", "--consolidate"]])
+def test_structured_consolidation_cli_and_dry_run(tmp_path, command):
+    import json
+    import shlex
+    brain = _seed_consolidation(tmp_path, recall_count=1)
+    payload = dict(version=1, abstain=False, facts=[dict(
+        text="User prefers concise responses", evidence=[dict(
+            node_id="event", quote="User prefers concise responses")])])
+    env = {"IG_CONSOLIDATE_STRUCTURED_CMD": "printf %s " + shlex.quote(json.dumps(payload)),
+           "IG_CONSOLIDATE_LLM_CMD": "exit 9"}
+    before = brain.node_path("event").read_bytes()
+    preview = run_cli([*command, "--structured", "--dry-run", "--json"], tmp_path, env)
+    assert preview.returncode == 0, preview.stderr
+    data = json.loads(preview.stdout)
+    data = data["consolidation"] if command[0] == "dream" else data
+    assert data["protocol"] == "structured-v1" and not data["extraction_ran"]
+    real = run_cli([*command, "--structured", "--json"], tmp_path, env)
+    assert real.returncode == 0, real.stderr
+    data = json.loads(real.stdout)
+    data = data["consolidation"] if command[0] == "dream" else data
+    assert data["created"] == data["pending_proposals"] == 1
+    assert data["proposals"][0]["evidence"][0]["node_id"] == "event"
+    assert brain.node_path("event").read_bytes() == before
+    edge = brain.read_edges()[0]
+    assert edge.pending and edge.id in run_cli(["pending"], tmp_path).stdout
+    assert run_cli(["accept", edge.id], tmp_path).returncode == 0
+    assert brain.read_edges()[0].reviewed_at
+    assert run_cli([*command, "--structured", "--llm"], tmp_path, env).returncode != 0
+
+
+def test_structured_command_requires_separate_configuration(tmp_path):
+    result = run_cli(["consolidate", "--structured"], tmp_path,
+                     {"IG_CONSOLIDATE_STRUCTURED_CMD": "", "IG_CONSOLIDATE_LLM_CMD": "printf fact"})
+    assert result.returncode != 0 and "IG_CONSOLIDATE_STRUCTURED_CMD" in result.stderr
+    result = run_cli(["dream", "--structured"], tmp_path)
+    assert result.returncode != 0 and "requires --consolidate" in result.stderr

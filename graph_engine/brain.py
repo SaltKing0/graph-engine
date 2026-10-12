@@ -250,7 +250,8 @@ class Edge:
         self.origin = origin
         # Bi-temporality (Zep/Graphiti lesson): fact validity kept separate
         # from commit time (which the git history provides for free).
-        self.valid_from = valid_from or _now_iso()
+        self.valid_from = (valid_from if origin == "consolidator" and evidence
+                           and extracted_validity is not None else valid_from or _now_iso())
         self.valid_to = valid_to
         # V2#3: confidence (cosine) of auto suggestions; None for manual links.
         self.confidence = confidence
@@ -741,6 +742,10 @@ class Brain:
                 return None
             edge.pending = False
             edge.rejected = not accept
+            if edge.origin == "consolidator" and edge.evidence:
+                from .access import principal
+                edge.reviewed_at = _now_iso()
+                edge.reviewed_by = principal() or "local"
             self.write_edges(edges)
             return edge
 
@@ -762,6 +767,9 @@ class Brain:
                 return None
             edge.pending = True
             edge.rejected = False
+            if edge.origin == "consolidator" and edge.evidence:
+                edge.reviewed_at = None
+                edge.reviewed_by = None
             self.write_edges(edges)
             return edge
 

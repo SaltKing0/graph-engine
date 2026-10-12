@@ -63,7 +63,8 @@ def accept_pending(brain: Brain, *, max_intent_per_source: int | None = None,
                    commit: bool = True) -> dict:
     """Accept pending edges; hold intent edges beyond the per-source cap.
 
-    Non-intent pending edges are accepted (their confidence is the signal).
+    Structured consolidation and replacement proposals require individual
+    review. Other non-intent pending edges are accepted.
     Intent pending edges are accepted only while the source's live intent count
     stays under the cap; the rest are HELD (still pending) for `ig pending`.
 
@@ -81,9 +82,10 @@ def accept_pending(brain: Brain, *, max_intent_per_source: int | None = None,
                          if e.kind == "fact_replacement" and e.pending and not e.rejected}
     for edge in sorted((e for e in edges if e.pending and not e.rejected and not e.is_invalidated),
                        key=lambda e: e.id):
-        if edge.kind == "fact_replacement" or edge.id in replacement_facts:
+        if (edge.kind == "fact_replacement" or edge.id in replacement_facts
+                or (edge.origin == "consolidator" and edge.evidence)):
             held.append(edge.id)
-            continue  # Replacement decisions always require individual review.
+            continue  # Model proposals and replacements require individual review.
         if edge.kind in INTENT_KINDS:
             if live_intent[edge.source] >= cap:
                 held.append(edge.id)
