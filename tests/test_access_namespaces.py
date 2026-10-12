@@ -385,3 +385,29 @@ def test_http_search_acl_viewer_read_only_and_revocation(protected, monkeypatch)
     policy_path.write_text(json.dumps(policy))
     assert client.get("/api/search", params=query, headers=headers).status_code == 403
     assert client.get("/api/search/public/explain", params=query, headers=headers).status_code == 403
+
+
+def test_context_permission_filtering_main_and_evidence(protected, monkeypatch):
+    from graph_engine.context import build_context
+    raw, _, _ = protected
+    node = raw.read_node("private")
+    node.storage_tier, node.tier_locked = "main", True
+    raw.write_node(node)
+    # Make the hidden fact accepted so filtering must enforce its evidence ACL.
+    edges = raw.read_edges()
+    for edge in edges:
+        edge.pending = False
+    raw.write_edges(edges)
+    engine = BrainEngine(runtime.make_brain(), HashEmbedder())
+    # Even a stale retrieval hit must not bypass visible-node selection.
+    monkeypatch.setattr("graph_engine.retrieval.retrieve", lambda *a, **kw:
+                        [("private", 1.), ("public", .5)])
+    result = build_context(engine, "knowledge")
+    assert result["nodes"] == ["public"]
+    assert "private" not in json.dumps(result) and "secret evidence" not in json.dumps(result)
+    assert result["memories"][0]["evidence"] == []
+    pytest.importorskip("mcp")
+    from graph_engine.mcp.server import build_context as context_tool
+    assert context_tool("knowledge")["nodes"] == ["public"]
+    monkeypatch.setenv("IG_PRINCIPAL", "unknown")
+    assert context_tool("knowledge")["error"]["code"] == "forbidden"

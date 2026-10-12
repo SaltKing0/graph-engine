@@ -77,6 +77,7 @@ See the [MCP setup](docs/guide.md#mcp-server-ai-assistants) for client configura
   [storage tiers and feedback](docs/guide.md#storage-tiers-and-retrieval-feedback)
 - [Isolated graphs and access control](docs/guide.md#isolated-graphs-and-access-control)
 - [Memory answer-quality benchmarks](docs/memory-benchmarks.md)
+- [Budgeted agent context and two-session example](docs/guide.md#budgeted-context-and-a-complete-agent-turn)
 - [Known limitations](docs/guide.md#known-limitations)
 - [Changelog](CHANGELOG.md) and [contributing](CONTRIBUTING.md)
 

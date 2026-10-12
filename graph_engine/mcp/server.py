@@ -146,6 +146,39 @@ def search_brain(query: str, k: int = 5) -> dict:
 
 
 @_tool
+def build_context(query: str, budget: int = 2000, k: int = 5,
+                  include_metadata: bool = True) -> dict:
+    """Budgeted, citation-bearing prompt context by persisted storage tier.
+
+    Strictly read-only even when IG_MCP_CACHE_VECTORS=1. Budget is an
+    approximate token estimate for context alone, not an exact model limit.
+    """
+    query = (query or "").strip()
+    if not query or len(query) > 500:
+        return fmt.invalid("query must contain 1 to 500 characters")
+    if type(budget) is not int or not 0 <= budget <= 8000:
+        return fmt.invalid("budget must be an integer between 0 and 8000")
+    if type(k) is not int or not 1 <= k <= 20:
+        return fmt.invalid("k must be an integer between 1 and 20")
+    if type(include_metadata) is not bool:
+        return fmt.invalid("include_metadata must be a boolean")
+    path = brain_path()
+    if not os.path.isdir(path):
+        return fmt.brain_missing(path)
+    try:
+        from ..context import build_context as assemble
+        result = assemble(make_engine(), query, budget, k=k,
+                          include_metadata=include_metadata)
+    except PermissionError:
+        raise  # let the shared access guard return its forbidden envelope
+    except RuntimeError as exc:
+        return fmt.err("embedder_unavailable", str(exc)[-200:])
+    except Exception as exc:
+        return fmt.err("internal", f"{type(exc).__name__}: {exc}")
+    return {"ok": True, "query": query, **result}
+
+
+@_tool
 def get_node(id: str, max_chars: int = fmt.DEFAULT_NODE_CHARS) -> dict:
     """One node by id: full text (capped) + its live edges."""
     node_id = (id or "").strip()

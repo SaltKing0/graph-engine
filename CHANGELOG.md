@@ -6,6 +6,17 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- Strictly read-only MCP `build_context` with bounded inputs, stable memory
+  citations and visible live evidence references, plus an offline two-session
+  agent example with an optional real-model path (issue #20).
+
+### Fixed
+- Context assembly now groups persisted storage tiers, prioritizes a bounded
+  selection of important main memories, and truncates individual bodies to
+  an estimate counting headers, metadata and separators. Returned IDs now
+  identify only included content; context reads never persist vectors or recalls.
+
 ## [0.6.1] - 2026-10-12
 
 ### Fixed

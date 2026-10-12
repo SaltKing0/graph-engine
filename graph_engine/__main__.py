@@ -277,28 +277,23 @@ def cmd_when(engine: BrainEngine, args: list[str]) -> None:
 
 
 def cmd_context(engine: BrainEngine, args: list[str]) -> None:
-    """Build a context window for a query (Phase 3: context management)."""
-    budget = 4000
-    as_json = "--json" in args
-    args = [a for a in args if a != "--json"]
-    i = 0
-    while i < len(args):
-        if args[i] == "--budget" and i + 1 < len(args):
-            budget = int(args[i + 1])
-            i += 2
-        else:
-            i += 1
-    if not args:
-        print("Usage: ig context <query> [--budget <tokens>] [--json]")
-        sys.exit(1)
-    query = " ".join(args)
-    result = engine.build_context(query, budget=budget)
-    if as_json:
+    """Build citation-bearing context using an approximate token budget."""
+    import argparse
+    parser = argparse.ArgumentParser(prog="ig context")
+    parser.add_argument("query", nargs="+")
+    parser.add_argument("--budget", type=int, default=4000)
+    parser.add_argument("--json", action="store_true")
+    opts = parser.parse_args(args)
+    if opts.budget < 0:
+        parser.error("--budget must be non-negative")
+    query = " ".join(opts.query)
+    result = engine.build_context(query, budget=opts.budget)
+    if opts.json:
         import json as _json
         print(_json.dumps(result, ensure_ascii=False, indent=2))
     else:
         print(result["context"])
-        print(f"\n--- {result['tokens']} tokens (budget {result['budget']})"
+        print(f"\n--- {result['tokens']} estimated tokens (budget {result['budget']})"
               f"{', truncated' if result['truncated'] else ''} ---")
 
 
