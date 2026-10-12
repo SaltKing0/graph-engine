@@ -42,11 +42,12 @@ corpus for each conversation. The GraphEngine adapter writes stable turn IDs
 as active recall-tier nodes and uses the production hybrid retriever. This
 storage adapter intentionally bypasses fact extraction, deduplication, automatic
 links, tier maintenance, and learning history. It does not test their quality.
-It does not access your private brain. Current hybrid ranking does not traverse
-graph edges; the report records `graph_used_for_ranking=false`. These comparisons
-cannot demonstrate a graph traversal benefit. Add a separately named adapter
-and equivalent ingestion policy to test one when available; do not change
-production rankings to fit this fixture.
+It does not access your private brain. The default adapters do not traverse
+graph edges; their report records `graph_used_for_ranking=false`. These default
+comparisons cannot demonstrate a graph traversal benefit. The explicitly
+selected `graph-engine-expanded` adapter uses optional source-declared
+relationships; see [graph comparison](#graph-expansion-comparison). Do not
+change production rankings to fit either fixture.
 
 Ingestion/indexing, retrieval, context assembly, generation, and scoring are
 separate stages. Context assembly packs ranked whole turns under the same
@@ -217,3 +218,82 @@ results, and do not infer that graph features help from the engine's brand name
 or from this small fixture. The
 [issue's evaluation reference](https://docs.mem0.ai/core-concepts/memory-evaluation)
 is context for experiment design, not a comparable score source.
+
+## Graph expansion comparison
+
+`graph-engine-expanded` explicitly selects production `GraphOptions()`
+(two hops, three seeds, weight/decay 0.5, degree 20, candidates 50, visits 500).
+The default three adapters and smoke gate remain unchanged. Each report row
+records the actual graph-used flag, all options and retained paths/evidence.
+The configuration records expansion selection separately from whether any
+contribution was actually applied.
+
+The separately versioned `graph-expansion-de-en-v1.0.0` fixture has two DE/EN
+conversations with five turns each, one two-hop query and one unknown query
+per language. Its accepted `linked` relationships are explicit source
+annotations, written independently of question/reference/evidence labels.
+Both engine adapters ingest identical nodes, vectors and relationships;
+lexical/vector baselines receive the same source documents and ignore edges.
+There is no extraction oracle or relationship generation from answer labels.
+This fixture is deliberately small and synthetic, and does not test whether
+an extractor or curator correctly identifies relationships.
+
+```bash
+.venv/bin/python -m tools.memory_benchmark \
+  --dataset tools/memory_benchmark/data/graph_expansion_v1.json \
+  --adapter graph-engine --adapter graph-engine-expanded --adapter lexical \
+  --output /tmp/graph-comparison.json
+# Also compare unchanged behavior on the original fixture (which has no edges).
+.venv/bin/python -m tools.memory_benchmark \
+  --adapter graph-engine --adapter graph-engine-expanded \
+  --output /tmp/graph-existing-fixture.json
+```
+
+Custom conversation records may optionally contain `relationships` with
+unique `id`, source/target turn IDs, `kind`, optional `predicate` and
+`evidence_ids` referencing source turns. Unknown endpoints/evidence are
+rejected. These are accepted source annotations, not gold answer labels.
+Upstream imports keep relationships absent unless separately annotated.
+
+Measured locally on 12 October 2026, Python 3.14, macOS arm64, HashEmbedder,
+no reranker/answer model, k=5 and context budget=256. Ten runs alternated
+adapter order in one warmed process, after discarding one warm-up per
+dataset. p50 is the median and p95 the nearest-rank percentile of all query
+retrieval timings (including unknown queries); ingestion/context are separate.
+[Recorded metadata and sample results](graph-retrieval-benchmark.json) pin
+source commit, modified-source hash/manifest, dataset hashes and settings.
+
+| Dataset / adapter | Recall@5 | MRR | Context evidence | Retrieval p50 / p95 (ms) |
+| --- | --- | --- | --- | --- |
+| Graph fixture / disabled | 0.00 | 0.00 | 0.00 | 0.676 / 1.205 |
+| Graph fixture / enabled | 1.00 | 0.333 | 1.00 | 0.772 / 1.509 |
+| Original fixture / disabled | 1.00 | 0.950 | 1.00 | 0.693 / 1.612 |
+| Original fixture / enabled | 1.00 | 0.950 | 1.00 | 0.772 / 1.891 |
+
+Retrieval/evidence denominators are two answerable graph questions and ten
+answerable original questions; latency denominators are respectively 40 and
+120 queries per adapter. Unknown-query recall remains null and answer quality
+is unmeasured (no model calls). Both graph targets have no lexical query match;
+the lexical baseline has zero evidence recall on that fixture. Scores/context
+on the original fixture remain unchanged. Small absolute timings vary with
+startup, filesystem caches and concurrent machine work; they establish no
+production latency promise or general quality win. These results support
+keeping graph ranking **opt-in**, not changing the default.
+
+To reproduce the warmed protocol and retain all individual reports:
+
+```python
+from pathlib import Path
+from tools.memory_benchmark.dataset import DEFAULT_DATASET
+from tools.memory_benchmark.runner import run
+
+out = Path('/tmp/graph-warm-runs')
+names = ('graph-engine', 'graph-engine-expanded')
+for label, dataset in [('graph', DEFAULT_DATASET.with_name('graph_expansion_v1.json')),
+                       ('original', DEFAULT_DATASET)]:
+    run(dataset_path=dataset, output=out / f'{label}-warmup.json', adapters=names)
+    for i in range(10):
+        run(dataset_path=dataset, output=out / f'{label}-{i}.json',
+            adapters=names if i % 2 == 0 else tuple(reversed(names)))
+# Aggregate each row's latency_ms.retrieval by adapter; omit warmup reports.
+```

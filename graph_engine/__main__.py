@@ -748,17 +748,34 @@ def cmd_status(engine: BrainEngine, args: list[str]) -> None:
 
 
 def cmd_search(engine: BrainEngine, args: list[str]) -> None:
-    as_json = "--json" in args
-    args = [a for a in args if a != "--json"]
-    if not args:
-        print("Usage: ig search <term> [--json]")
+    import argparse
+    from .graph_retrieval import graph_options
+    from .retrieval import retrieve_with_evidence
+    if not [arg for arg in args if arg != "--json"]:
+        print("Usage: ig search <term> [--json] [--graph-hops 1..3] [--focal-id ID]")
         sys.exit(1)
-    q = " ".join(args)
+    parser = argparse.ArgumentParser(prog="ig search")
+    parser.add_argument("terms", nargs="+")
+    parser.add_argument("--json", action="store_true")
+    parser.add_argument("--graph-hops", type=int, default=0, choices=range(4))
+    parser.add_argument("--focal-id")
+    options = parser.parse_args(args)
+    as_json = options.json
+    q = " ".join(options.terms)
+    try:
+        graph = graph_options(options.graph_hops, options.focal_id)
+    except ValueError as exc:
+        parser.error(str(exc))
     id2node = {n.id: n for n in engine.brain.read_nodes()}
     # track=True: the CLI is the human/agent search surface, so its queries feed
     # the recall ledger (gitignored append, aggregated by `ig recall
     # --aggregate`). The MCP surface stays untracked (strictly read-only).
-    hits = retrieve(engine, q, k=5, track=True)
+    try:
+        response = retrieve_with_evidence(engine, q, k=5, track=graph is None,
+                                         persist=graph is None, graph=graph)
+    except ValueError as exc:
+        parser.error(str(exc))
+    hits = response["hits"]
     if as_json:
         import json as _json
         results = []
@@ -777,8 +794,11 @@ def cmd_search(engine: BrainEngine, args: list[str]) -> None:
                 "type": n.ntype,
                 "tags": list(n.tags or []),
                 "created": n.created,
+                **({"graph_evidence": response["evidence"][nid],
+                    "score_kind": "rrf_graph" if response["graph"]["graph_used_for_ranking"] else "rrf"} if graph else {}),
             })
-        print(_json.dumps({"query": q, "count": len(results), "results": results},
+        print(_json.dumps({"query": q, "count": len(results), "results": results,
+                          **({"graph": response["graph"]} if graph else {})},
                           ensure_ascii=False, indent=2))
         return
     for nid, score in hits:
@@ -801,9 +821,13 @@ def cmd_explain(engine: BrainEngine, args: list[str]) -> None:
     parser.add_argument("--limit", type=int, default=20)
     parser.add_argument("--top", type=int, default=5)
     parser.add_argument("--rerank-k", type=int, default=30)
+    parser.add_argument("--graph-hops", type=int, default=0, choices=range(4))
+    parser.add_argument("--focal-id")
     parser.add_argument("--json", action="store_true")
     options = parser.parse_args(args)
     if options.query is None:
+        if options.graph_hops or options.focal_id:
+            parser.error("graph retrieval options require --query")
         from .inference import explain_node, print_paths
         try:
             result = explain_node(engine.brain, options.node_id,
@@ -823,8 +847,10 @@ def cmd_explain(engine: BrainEngine, args: list[str]) -> None:
                 print("More paths available; increase --limit.")
         return
     try:
+        from .graph_retrieval import graph_options
         result = explain(engine, options.node_id, options.query,
-                         k=options.top, rerank_k=options.rerank_k)
+                         k=options.top, rerank_k=options.rerank_k,
+                         graph=graph_options(options.graph_hops, options.focal_id))
     except ValueError as exc:
         print(f"Error: {exc}")
         sys.exit(1)
@@ -841,7 +867,14 @@ def cmd_explain(engine: BrainEngine, args: list[str]) -> None:
     print(f"  RRF: score={result['rrf']['score']:.6f}, rank={result['rrf']['rank']}")
     print(f"  Final score ({result['final_score_kind']}): {result['final_score']}")
     print(f"  Matched terms: {', '.join(result['matched_terms']) or '(none)'}")
-    print("Graph connections to other results (context only; not used for ranking):")
+    if result["graph"]["enabled"]:
+        print(f"  Graph relevance: {result['graph']['contribution']:.6f}; "
+              f"truncation: {result['graph']['truncation_reasons']}")
+        for path in result["graph"]["paths"]:
+            print(f"  seed {path['seed_id']}: " + " -> ".join(step["to"] for step in path["steps"]))
+        print("  Paths are retrieval context, not logical entailment.")
+    print("Graph connections to other results:" if result["graph"]["enabled"] else
+          "Graph connections to other results (context only; not used for ranking):")
     for edge in result["graph_context"]:
         print(f"  {edge['source']} --{edge['kind']}--> {edge['target']} "
               f"(origin={edge.get('origin')}, confidence={edge['confidence']})")

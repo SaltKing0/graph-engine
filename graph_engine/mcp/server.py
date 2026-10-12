@@ -112,11 +112,15 @@ def _hits_payload(brain, hits: list[tuple[str, float]]) -> list[dict]:
 
 
 @_tool
-def search_brain(query: str, k: int = 5) -> dict:
+def search_brain(query: str, k: int = 5, graph_hops: int = 0,
+                 focal_id: str | None = None) -> dict:
     """Hybrid search (dense + BM25, RRF-fused) over the knowledge brain.
 
     `score` is a rank-fusion score (reciprocal-rank fusion), NOT a similarity
     — do not compare it across queries or read it as a confidence.
+    graph_hops=1..3 explicitly adds accepted graph relevance; focal_id is an
+    exact anchor ID. Graph searches ignore vector-cache opt-in and never track
+    recall. Paths are retrieval context, not logical entailment.
     """
     query = (query or "").strip()
     if not query:
@@ -129,9 +133,17 @@ def search_brain(query: str, k: int = 5) -> dict:
     if not os.path.isdir(brain):
         return fmt.brain_missing(brain)
     try:
-        from ..retrieval import retrieve
+        from ..retrieval import retrieve_with_evidence
+        from ..graph_retrieval import graph_options
+        options = graph_options(graph_hops, focal_id)
         engine = make_engine()
-        hits = retrieve(engine, query, k=k, persist=_cache_vectors())
+        response = retrieve_with_evidence(engine, query, k=k,
+            persist=_cache_vectors() if options is None else False, graph=options)
+        hits = response["hits"]
+    except ValueError as exc:
+        return fmt.invalid(str(exc))
+    except PermissionError:
+        raise
     except RuntimeError as exc:      # embedder unavailable etc.
         return fmt.err("embedder_unavailable", str(exc)[-200:])
     except Exception as exc:         # noqa: BLE001 — the envelope contract:
@@ -139,11 +151,48 @@ def search_brain(query: str, k: int = 5) -> dict:
                        f"{type(exc).__name__}: {exc}")  # as an opaque error
     if not hits:
         return {"ok": True, "query": query, "count": 0, "results": [],
+                **({"graph": response["graph"]} if options else {}),
                 "hint": f"No node matched. Try fewer/more specific terms; "
                         f"the brain has {len(engine.brain.read_nodes())} nodes."}
     results = _hits_payload(engine.brain, hits)
+    if options:
+        for result in results:
+            result["graph_evidence"] = response["evidence"][result["id"]]
+            result["score_kind"] = "rrf_graph" if response["graph"]["graph_used_for_ranking"] else "rrf"
     return {"ok": True, "query": query, "count": len(results),
-            "results": results}
+            "results": results, **({"graph": response["graph"]} if options else {})}
+
+
+@_tool
+def explain_search(id: str, query: str, k: int = 5, graph_hops: int = 0,
+                   focal_id: str | None = None) -> dict:
+    """Recompute read-only ranking, including graph paths with the same search options.
+
+    Connectivity supplies retrieval context, never transitive fact entailment.
+    """
+    if not isinstance(query, str) or not query.strip() or len(query) > 500:
+        return fmt.invalid("query must contain 1 to 500 characters")
+    if not isinstance(id, str) or not id.strip() or len(id) > 200:
+        return fmt.invalid("id must contain 1 to 200 characters")
+    if type(k) is not int or not 1 <= k <= 20:
+        return fmt.invalid("k must be an integer between 1 and 20")
+    path = brain_path()
+    if not os.path.isdir(path):
+        return fmt.brain_missing(path)
+    try:
+        from ..retrieval import explain
+        from ..graph_retrieval import graph_options
+        result = explain(make_engine(), id, query.strip(), k=k,
+                         graph=graph_options(graph_hops, focal_id))
+    except ValueError as exc:
+        return fmt.invalid(str(exc))
+    except PermissionError:
+        raise
+    except RuntimeError as exc:
+        return fmt.err("embedder_unavailable", str(exc)[-200:])
+    except Exception as exc:
+        return fmt.err("internal", f"{type(exc).__name__}: {exc}")
+    return {"ok": True, **result}
 
 
 @_tool

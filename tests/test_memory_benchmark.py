@@ -300,3 +300,45 @@ def test_local_model_pins_bytes_and_blocks_downloads(tmp_path, monkeypatch):
     report = run(output=tmp_path / "semantic.json", embedding_model_path=model_path, smoke=True)
     assert report["metadata"]["embedder"]["semantic_model"]
     assert {row["adapter"] for row in report["results"]} == {"graph-engine", "lexical", "vector"}
+
+
+def test_graph_adapter_compares_identical_sources_and_records_paths(tmp_path):
+    dataset_path = DEFAULT_DATASET.with_name('graph_expansion_v1.json')
+    report = run(dataset_path=dataset_path, output=tmp_path / 'graph.json',
+                 adapters=('graph-engine', 'graph-engine-expanded', 'lexical'))
+    assert report['summary']['graph-engine']['recall_at_k']['mean'] == 0
+    assert report['summary']['lexical']['recall_at_k']['mean'] == 0
+    assert report['summary']['graph-engine-expanded']['recall_at_k']['mean'] == 1
+    assert report['metadata']['configuration']['graph_expansion_enabled']
+    assert report['metadata']['configuration']['graph_used_for_ranking']
+    for row in report['results']:
+        assert row['latency_ms']['retrieval'] >= 0
+        assert row['metrics']['answer_correct_exact'] is None
+        if row['adapter'] == 'graph-engine-expanded' and not row['unanswerable']:
+            assert row['graph']['graph_used_for_ranking']
+            assert row['graph']['options']['hops'] == 2
+            assert any(path['hops'] == 2 for paths in row['graph']['evidence'].values() for path in paths)
+
+
+def test_graph_benchmark_gold_annotations_do_not_affect_ranking(tmp_path):
+    dataset_path = DEFAULT_DATASET.with_name('graph_expansion_v1.json')
+    dataset, _ = load_dataset(dataset_path)
+    first = run(dataset_path=dataset_path, output=tmp_path / 'one.json',
+                 adapters=('graph-engine-expanded',))
+    for question in dataset['questions']:
+        if not question['unanswerable']:
+            question['answers'] = ['gold-only-canary']
+            question['evidence_ids'] = [f"{question['language']}-4"]
+    changed = tmp_path / 'changed.json'; changed.write_text(json.dumps(dataset))
+    second = run(dataset_path=changed, output=tmp_path / 'two.json',
+                 adapters=('graph-engine-expanded',))
+    for left, right in zip(first['results'], second['results']):
+        assert left['retrieved'] == right['retrieved']
+        assert left['prompt_sha256'] == right['prompt_sha256']
+
+
+def test_source_relationships_reject_unknown_evidence(tmp_path):
+    dataset, _ = load_dataset(DEFAULT_DATASET.with_name('graph_expansion_v1.json'))
+    dataset['conversations'][0]['relationships'][0]['evidence_ids'] = ['missing']
+    with pytest.raises(ValueError, match='relationship evidence'):
+        validate_dataset(dataset)

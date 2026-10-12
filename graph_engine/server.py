@@ -121,17 +121,24 @@ def _search_query(query: str) -> str:
 
 @app.get("/api/search")
 def search(query: str = Query(min_length=1, max_length=500),
-           k: int = Query(default=12, ge=1, le=20)):
+           k: int = Query(default=12, ge=1, le=20),
+           graph_hops: int = Query(default=0, ge=0, le=3),
+           focal_id: str | None = Query(default=None, min_length=1, max_length=200)):
     """Rank accessible live nodes; RRF scores are not factual confidence.
 
     Sync handlers run model construction and retrieval in FastAPI's threadpool.
     The secured brain enforces node ACLs and forbids vector-cache writes;
     recall.record additionally filters out nodes the caller cannot write.
     """
-    from .retrieval import retrieve
+    from .retrieval import retrieve_with_evidence
+    from .graph_retrieval import graph_options
     query = _search_query(query)
     engine = runtime.make_engine()
-    hits = retrieve(engine, query, k=k, persist=not bool(access.policy_path()), track=True)
+    options = graph_options(graph_hops, focal_id)
+    response = retrieve_with_evidence(engine, query, k=k,
+        persist=not bool(access.policy_path()) if options is None else False,
+        track=options is None, graph=options)
+    hits = response["hits"]
     live = {node.id: node for node in engine.brain.read_nodes() if node.status != "tombstone"}
     results = []
     for nid, score in hits:
@@ -143,23 +150,31 @@ def search(query: str = Query(min_length=1, max_length=500),
         if len(snippet) > 200:
             snippet = snippet[:199] + "…"
         results.append({"id": nid, "snippet": snippet, "rank": len(results) + 1,
-                        "score": float(score), "score_kind": "rrf"})
+                        "score": float(score),
+                        "score_kind": "rrf_graph" if response["graph"]["graph_used_for_ranking"] else "rrf",
+                        **({"graph_evidence": response["evidence"][nid]} if options else {})})
     return JSONResponse({"query": query, "k": k, "results": results,
-                         "score_note": "RRF scores rank relevance, not factual confidence."},
+                         "score_note": ("Relevance scores are not factual confidence; graph paths do not imply facts."
+                                        if options else "RRF scores rank relevance, not factual confidence."),
+                         **({"graph": response["graph"]} if options else {})},
                         headers=NO_CACHE)
 
 
 @app.get("/api/search/{node_id}/explain")
 def search_explanation(node_id: str, query: str = Query(min_length=1, max_length=500),
-                       k: int = Query(default=12, ge=1, le=20)):
+                       k: int = Query(default=12, ge=1, le=20),
+                       graph_hops: int = Query(default=0, ge=0, le=3),
+                       focal_id: str | None = Query(default=None, min_length=1, max_length=200)):
     """Recompute one explanation on demand, without cache or recall writes."""
     from .retrieval import explain
+    from .graph_retrieval import graph_options
     query = _search_query(query)
     engine = runtime.make_engine()
     node = engine.brain.read_node(node_id)  # checks the node ACL, including direct requests
     if node is None or node.status == "tombstone":
         return JSONResponse({"error": "Idea unavailable"}, status_code=404, headers=NO_CACHE)
-    return JSONResponse(explain(engine, node_id, query, k=k), headers=NO_CACHE)
+    return JSONResponse(explain(engine, node_id, query, k=k,
+                                graph=graph_options(graph_hops, focal_id)), headers=NO_CACHE)
 
 
 @app.get("/report")

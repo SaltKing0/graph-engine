@@ -12,7 +12,7 @@ from typing import Any
 
 from graph_engine.context import estimate_tokens
 
-from .adapters import ADAPTERS, create_adapter
+from .adapters import ADAPTERS, EXPERIMENT_ADAPTERS, create_adapter
 from .answers import HTTPAnswers, PROMPT_VERSION, ReplayAnswers, build_prompt, prompt_hash
 from .dataset import DEFAULT_DATASET, load_dataset, sha256, source_documents
 from .scoring import answer_metrics, retrieval_metrics
@@ -102,7 +102,7 @@ def run(*, dataset_path: Path = DEFAULT_DATASET, output: Path,
         check: bool = False, embedding_model_path: Path | None = None) -> dict[str, Any]:
     if k < 1 or budget < 1 or not adapters or len(set(adapters)) != len(adapters):
         raise ValueError("positive k/budget and unique nonempty adapters are required")
-    if any(adapter not in ADAPTERS for adapter in adapters):
+    if any(adapter not in EXPERIMENT_ADAPTERS for adapter in adapters):
         raise ValueError("unknown adapter")
     if predictions and answerer:
         raise ValueError("select either replay or HTTP generation")
@@ -128,8 +128,10 @@ def run(*, dataset_path: Path = DEFAULT_DATASET, output: Path,
                      "configuration": {"adapters": list(adapters), "k": k,
                                        "context_budget_estimated_tokens": budget, "seed": seed,
                                        "questions": [q["id"] for q in questions],
-                                       "ingestion": "whole dated turns, no extraction/dedup/edges",
+                                       "ingestion": "whole dated turns, no extraction/dedup; optional declared source relationships",
+                                       "graph_expansion_adapters": [name for name in adapters if name == "graph-engine-expanded"],
                                        "graph_used_for_ranking": False,
+                                       "graph_expansion_enabled": "graph-engine-expanded" in adapters,
                                        "context_policy": "ranked-whole-turn-packing-v1",
                                        "prompt_version": PROMPT_VERSION,
                                        "scoring": "normalized-exact-and-proxy-v1"},
@@ -144,7 +146,7 @@ def run(*, dataset_path: Path = DEFAULT_DATASET, output: Path,
                 documents = source_documents(by_id[cid])
                 start = time.perf_counter()
                 adapter = create_adapter(kind, Path(temporary) / kind / cid, embedder)
-                adapter.ingest(documents)
+                adapter.ingest(documents, by_id[cid].get("relationships", []))
                 report["ingestion"].append({"adapter": kind, "conversation_id": cid,
                                             "documents": len(documents),
                                             "latency_ms": (time.perf_counter() - start) * 1000})
@@ -160,6 +162,7 @@ def run(*, dataset_path: Path = DEFAULT_DATASET, output: Path,
                     row = {"adapter": kind, "question_id": question["id"],
                            "conversation_id": cid, "language": question["language"],
                            "category": question["category"], "question": question["question"],
+                           "graph": getattr(adapter, "last_graph", {"enabled": False, "graph_used_for_ranking": False}),
                            "reference_answers": question["answers"],
                            "forbidden_answers": question.get("forbidden_answers", []),
                            "expected_evidence_ids": question["evidence_ids"],
@@ -175,6 +178,8 @@ def run(*, dataset_path: Path = DEFAULT_DATASET, output: Path,
                            "latency_ms": {"retrieval": retrieval_ms, "context": context_ms,
                                           "generation": 0.0, "scoring": 0.0}}
                     planned.append((question, row))
+    report["metadata"]["configuration"]["graph_used_for_ranking"] = any(
+        row["graph"]["graph_used_for_ranking"] for _, row in planned)
     # Verify the entire call/token plan and replay bindings before any paid call.
     if answerer:
         answerer.preflight([row["tokens"]["prompt"] for _, row in planned])
