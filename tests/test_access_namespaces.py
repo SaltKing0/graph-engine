@@ -411,3 +411,49 @@ def test_context_permission_filtering_main_and_evidence(protected, monkeypatch):
     assert context_tool("knowledge")["nodes"] == ["public"]
     monkeypatch.setenv("IG_PRINCIPAL", "unknown")
     assert context_tool("knowledge")["error"]["code"] == "forbidden"
+
+
+def test_capture_extraction_readonly_entity_fails_before_subgraph_writes(protected):
+    raw, path, policy = protected
+    raw.write_node(Node("Alice", id="readonly", ntype="entity", entity_name="Alice", entity_type="person"))
+    engine = runtime.make_engine()
+    _, _, _, failed = engine.capture("Alice works at Acme.", extraction="rules")
+    assert failed["status"] == "failed" and failed["error"] == "access_denied"
+    assert raw.read_node("readonly").aliases == []
+    assert not any(n.entity_name == "Acme" for n in raw.read_nodes())
+    assert not any(e.origin == "entity-extractor" for e in raw.read_edges(True))
+    # Grant the existing entity; the saved capture resumes without a second note.
+    policy["graphs"]["default"]["nodes"]["readonly"]["write"] = ["owner", "alice"]
+    path.write_text(json.dumps(policy))
+    result = engine.capture("Alice works at Acme.", extraction="rules")[3]
+    assert result["status"] == "complete" and result["retried"]
+    assert result["reused_entities"] == 1 and result["created_entities"] == 1
+    assert len([n for n in raw.read_nodes() if n.capture]) == 1
+    assert raw.read_node("private").text == "private knowledge"
+    assert len(raw.read_edges(True)) == 5  # two hidden records + mentions + fact
+
+
+def test_capture_model_only_receives_accessible_entities(protected, monkeypatch):
+    raw, _, _ = protected
+    raw.write_node(Node("Hidden Org", id="private", ntype="entity", entity_name="Hidden Org", entity_type="org"))
+    seen = []
+    def extractor(text, known):
+        seen.extend(known)
+        return {"entities": [], "facts": []}
+    monkeypatch.setenv("IG_ENTITIES_LLM_CMD", "configured-command")
+    monkeypatch.setattr("graph_engine.entities.command_extractor", lambda: extractor)
+    assert runtime.make_engine().capture("plain note", extraction="model")[3]["status"] == "complete"
+    assert seen == []
+    assert raw.read_node("private").entity_name == "Hidden Org"
+
+
+def test_viewer_cannot_capture_or_call_model(protected, monkeypatch):
+    raw, _, _ = protected
+    monkeypatch.setenv("IG_PRINCIPAL", "bob")
+    calls = []
+    monkeypatch.setenv("IG_ENTITIES_LLM_CMD", "configured-command")
+    monkeypatch.setattr("graph_engine.entities.command_extractor",
+                        lambda: lambda *a: calls.append(a))
+    with pytest.raises(PermissionError):
+        runtime.make_engine().capture("Alice works at Acme.", extraction="model")
+    assert not calls and len(raw.read_nodes()) == 3

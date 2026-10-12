@@ -26,24 +26,30 @@ FORGET_STATUS = "tombstone"     # never delete — hide from live views
 def remember(engine: BrainEngine, text: str, *, tags: list[str] | None = None,
              ntype: str = "semantic",
              relations: list[tuple[str, str]] | None = None,
-             allow_duplicates: bool = False) -> dict:
+             allow_duplicates: bool = False, extraction: str | None = None,
+             accept_facts: bool = False) -> dict:
     """Write one note on an agent's behalf.
 
     Dedupe-aware (a near-duplicate merges into the existing node instead of
     creating a second one) and provenance-marked: the node carries
     `source="agent"`, declared relations carry `origin="agent"`. Commits once
-    (that is `ingest`'s own commit), so an agent write is one history entry.
+    (that is `ingest`'s own commit) by default. Optional entity extraction
+    uses a separate commit after exact-input capture; inspect its status even
+    when the note itself was successfully captured.
     """
     if not (text or "").strip():
         raise ValueError("Empty text cannot be remembered.")
-    node, edges, is_dup = engine.ingest(
+    node, edges, is_dup, extracted = engine.capture(
         text, source=AGENT_SOURCE, tags=tags, ntype=ntype,
         relations=relations, allow_duplicates=allow_duplicates,
-        edge_origin=AGENT_ORIGIN)
+        edge_origin=AGENT_ORIGIN, extraction=extraction, accept_facts=accept_facts)
     agent_edges = [e for e in edges if e.origin == AGENT_ORIGIN]
-    return {"node_id": node.id, "duplicate": is_dup, "edges": len(edges),
+    result = {"node_id": node.id, "duplicate": is_dup, "edges": len(edges),
             "agent_edges": len(agent_edges), "status": node.status,
-            "origin": AGENT_ORIGIN, "written": not is_dup}
+            "origin": AGENT_ORIGIN, "written": not is_dup and not (extracted and extracted["retried"])}
+    if extracted is not None:
+        result["extraction"] = extracted
+    return result
 
 
 def recall(engine: BrainEngine, query: str, k: int = 5, *,

@@ -187,7 +187,8 @@ class BrainEngine:
                auto_accept: bool | None = None,
                relations: list[tuple[str, str]] | None = None,
                edge_origin: str = "manual",
-               env: dict[str, str] | None = None) -> tuple[Node, list[Edge], bool]:
+               env: dict[str, str] | None = None,
+               _capture_input: str | None = None) -> tuple[Node, list[Edge], bool]:
         """Ingest with dedupe. Returns: (node, edges, is_duplicate).
 
         On a near-duplicate (cosine >= threshold against the normalized text)
@@ -231,6 +232,12 @@ class BrainEngine:
                 dup = self._find_duplicate(vec)
                 if dup is not None:
                     self.brain.merge_node(dup, source=source)
+                    if _capture_input is not None:
+                        # Cosine equivalence is not evidence equivalence. Store
+                        # a separate exact receipt in the capture commit.
+                        self.brain.write_node(Node(text=text, source=source, ntype=ntype,
+                            capture=dict(input=_capture_input, node_id=dup.id,
+                                         duplicate=True, source=source)))
                     self.brain.rebuild_index()
                     # Audit #31: a failing commit must not look like data loss —
                     # catch, heal the derived index, re-raise with guidance.
@@ -242,6 +249,9 @@ class BrainEngine:
                         raise
                     return dup, [], True
             node = Node(text=text, source=source, tags=tags, ntype=ntype)
+            if _capture_input is not None:
+                node.capture = dict(input=_capture_input, node_id=node.id,
+                                    duplicate=False, source=source)
             self.brain.write_node(node)
             # Embedding cache: only new nodes get embedded, the rest comes from vectors.jsonl
             others = {n.id for n in self.brain.read_nodes()
@@ -363,6 +373,80 @@ class BrainEngine:
                 self._heal_after_failed_commit()
                 raise
             return node, new_edges, False
+
+    def capture(self, text: str, source: str = "human", tags: list[str] | None = None,
+                allow_duplicates: bool = False, *, extraction: str | None = None,
+                accept_facts: bool = False, **kwargs) -> tuple[Node, list[Edge], bool, dict | None]:
+        """Shared opt-in ingestion: capture commit, then extraction commit.
+
+        Default calls retain ingest behavior. Extraction calls persist an exact
+        input receipt; identical input/source/type retries reuse that receipt
+        and skip ingest, including when allow_duplicates is true. Failures
+        after capture return an explicit failed summary, with safe error codes.
+        """
+        from .entities import command_extractor, extract_entities
+
+        if extraction not in (None, "rules", "model"):
+            raise ValueError("extraction must be rules or model")
+        if accept_facts and extraction is None:
+            raise ValueError("accept_facts requires extraction")
+        if extraction is None:
+            node, edges, duplicate = self.ingest(text, source, tags, allow_duplicates, **kwargs)
+            return node, edges, duplicate, None
+        if not isinstance(text, str) or not text.strip():
+            raise ValueError("Empty text cannot be ingested.")
+        if kwargs.get("ntype", "semantic") not in ("semantic", "episodic", "procedural"):
+            raise ValueError("capture requires a semantic, episodic or procedural note")
+        # Reject missing model configuration before capture, but execute the
+        # adapter only after the original input is durably stored.
+        extractor = command_extractor() if extraction == "model" else None
+        with BRAIN_LOCK:
+            self.brain.ensure_ready()
+            self.brain.pull()
+            evidence = next((n for n in self.brain.read_nodes()
+                if n.status != "tombstone" and n.capture
+                and n.capture["input"] == text and n.capture["source"] == source
+                and n.ntype == kwargs.get("ntype", "semantic")
+                and self.brain.can_access("write", n.id)), None)
+            retried = evidence is not None
+            if evidence is None:
+                node, edges, duplicate = self.ingest(text, source, tags, allow_duplicates,
+                                                     _capture_input=text, **kwargs)
+                evidence = next(n for n in self.brain.read_nodes()
+                    if n.capture and n.capture["input"] == text
+                    and n.capture["source"] == source and n.capture["node_id"] == node.id
+                    and n.ntype == kwargs.get("ntype", "semantic") and n.status != "tombstone")
+            else:
+                node = self.brain.read_node(evidence.capture["node_id"])
+                if node is None or node.status == "tombstone":
+                    raise ValueError("Captured note is no longer live; retry cannot revive it")
+                self.brain.authorize("write", node.id)
+                edges, duplicate = [], evidence.capture["duplicate"]
+            summary = dict(mode=extraction, source_node_id=evidence.id,
+                           captured=True, retried=retried)
+            try:
+                if retried:
+                    # Also finish a capture whose commit/sync previously failed.
+                    self.brain.commit_and_push(f"capture retry: {evidence.id}", sync_pending=True)
+                result = extract_entities(self.brain, node_id=evidence.id,
+                    extractor=extractor, accept_facts=accept_facts, commit=False)
+                # Even a no-op retry commits prior writes left by a failed sync.
+                self.brain.commit_and_push(f"capture entities: {evidence.id}", sync_pending=True)
+            except Exception as exc:
+                code = ("access_denied" if isinstance(exc, PermissionError) else
+                        "invalid_extraction" if isinstance(exc, ValueError) else "extraction_failed")
+                summary.update(status="failed", error=code, retryable=True,
+                    created_entities=None, reused_entities=None, created_facts=None,
+                    reused_facts=None, pending_facts=None)
+            else:
+                facts = {f["id"]: f for f in result["facts"]}.values()
+                summary.update(status="complete", created_entities=result["created_entities"],
+                    reused_entities=len(result["entities"]) - result["created_entities"],
+                    created_facts=result["created_facts"],
+                    reused_facts=len(facts) - result["created_facts"],
+                    pending_facts=sum(f["pending"] and not f.get("rejected") and not f.get("invalidated_at")
+                                      for f in facts))
+            return node, edges, duplicate, summary
 
     def entities(self, text: str | None = None, **kwargs) -> dict:
         """Extract typed entities/facts and link them to an evidence node."""

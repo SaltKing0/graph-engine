@@ -10,7 +10,8 @@ are the single highest-risk thing this surface could do. `ig mcp --write` (or
 (Welle C) — which keeps three invariants: provenance (`source="agent"`,
 `origin="agent"`, so "what did a model write?" stays a query), never-destructive
 (`forget` tombstones and invalidates, it never deletes), and one commit per
-write with the reason in the message.
+ordinary write with the reason in the message. Optional entity extraction
+uses a second commit after exact-input capture.
 
 Engine construction is LAZY (first tool call, not import): `list_tools` and
 `brain_status` must never pay the sentence-transformers model load. The
@@ -316,15 +317,20 @@ def _write_guard() -> dict | None:
     return None
 
 
-def remember(text: str, tags: list[str] | None = None) -> dict:
+def remember(text: str, tags: list[str] | None = None,
+             extraction: str | None = None, accept_facts: bool = False) -> dict:
     """Store one note in the brain on the agent's behalf (write mode only).
 
     The node is recorded with `source="agent"` — "what did a model write?" stays
     a query. Dedupe-aware: a near-duplicate merges into the existing node (the
-    response says so) instead of creating a second one. One commit per write.
+    response says so) instead of creating a second one. Optional extraction:
+    rules or model (IG_ENTITIES_LLM_CMD). Facts stay pending unless accept_facts
+    is explicit. Extraction uses two commits and exact-input retry receipts.
     """
-    text = (text or "").strip()
-    if not text:
+    text = text or ""
+    if extraction is None:
+        text = text.strip()
+    if not text.strip():
         return fmt.invalid("text must be a non-empty string")
     if len(text) > MAX_REMEMBER_CHARS:
         return fmt.invalid(f"text exceeds {MAX_REMEMBER_CHARS} characters")
@@ -335,16 +341,23 @@ def remember(text: str, tags: list[str] | None = None) -> dict:
         return blocked
     from ..agent_memory import remember as _remember
     try:
-        res = _remember(make_engine(), text, tags=tags)
+        res = _remember(make_engine(), text, tags=tags,
+                        extraction=extraction, accept_facts=accept_facts)
     except ValueError as exc:
         return fmt.invalid(str(exc)[-200:])
     except Exception as exc:          # noqa: BLE001 — envelope contract
         return fmt.err("internal", f"{type(exc).__name__}: {exc}")
     out = {"ok": True, "node_id": res["node_id"], "status": res["status"],
            "edges": res["edges"], "duplicate": res["duplicate"]}
+    if "extraction" in res:
+        out["extraction"] = res["extraction"]
+        if res["extraction"]["status"] == "failed":
+            out.update(fmt.err("extraction_failed", "Input captured; extraction failed.",
+                       "Retry identical text/source/type to resume extraction."))
     if res["duplicate"]:
         out["hint"] = ("Near-duplicate: merged into the existing node "
-                       "(no second node created).")
+                       + ("(exact evidence is retained)." if extraction is not None
+                          else "(no second node created)."))
     return out
 
 

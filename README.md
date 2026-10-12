@@ -54,6 +54,7 @@ Python imports and the uvicorn module now use `graph_engine` instead of
 ig ingest "User prefers short answers" --source agent
 ig search "answer preferences"
 ig entities "Alice works at Acme." --dry-run --json
+ig ingest "Alice works at Acme." --extract-entities --json
 ig pending
 ig accept <edge_id>
 ig explain <node_id> --query "answer preferences"
@@ -68,6 +69,13 @@ Use one writer process per brain.
 To connect an MCP client, install the MCP extra and run `ig mcp`.
 It is read-only by default; `ig mcp --write` enables remember, recall and forget.
 See the [MCP setup](docs/guide.md#mcp-server-ai-assistants) for client configuration.
+
+Entity extraction during capture is explicit: use `--extract-entities` for rules
+or `--extract-model` with `IG_ENTITIES_LLM_CMD` for the configured JSON adapter.
+HTTP ingest and MCP remember accept `extraction: "rules"` or `"model"`.
+Facts stay pending by default. Capture and extraction use two commits; exact
+input receipts make retries safe even when ingestion merges a similar note.
+See [capture options and retry behavior](docs/guide.md#extract-during-ingestion).
 
 ## Documentation
 

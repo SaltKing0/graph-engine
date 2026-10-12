@@ -7,6 +7,10 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- Opt-in rule/model entity and fact extraction on CLI ingest, HTTP ingest and
+  MCP remember. Exact input receipts preserve evidence through cosine dedupe;
+  structured partial-failure results and two-phase commits support safe retries
+  without duplicate notes or facts (issue #19).
 - Strictly read-only MCP `build_context` with bounded inputs, stable memory
   citations and visible live evidence references, plus an offline two-session
   agent example with an optional real-model path (issue #20).

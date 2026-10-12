@@ -191,9 +191,9 @@ class SecuredBrain(Brain):
         self.authorize("write")
         self._raw.pull()
 
-    def commit_and_push(self, message: str, push: bool = True) -> None:
+    def commit_and_push(self, message: str, push: bool = True, *, sync_pending: bool = False) -> None:
         self.authorize("write")
-        self._raw.commit_and_push(message, push)
+        self._raw.commit_and_push(message, push, sync_pending=sync_pending)
 
     def rebuild_index(self) -> None:
         self.authorize("write")

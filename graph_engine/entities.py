@@ -289,10 +289,11 @@ def extract_entities(brain: Brain, text: str | None = None, *, node_id: str | No
         if node_id:
             if evidence_node is None or evidence_node.status == "tombstone" or evidence_node.ntype == "entity":
                 raise ValueError("source node must be a live semantic, episodic or procedural node")
-            text = evidence_node.text
+            text = evidence_node.capture["input"] if evidence_node.capture else evidence_node.text
         if not isinstance(text, str) or not text.strip():
             raise ValueError("Empty text cannot be extracted")
-        text = text.strip()  # Markdown loading trims outer whitespace too.
+        if not evidence_node or not evidence_node.capture:
+            text = text.strip()  # Legacy standalone extraction normalization.
         if evidence_node is None:
             evidence_node = next((n for n in nodes if n.ntype == "semantic"
                                   and n.status != "tombstone" and n.text == text), None)
@@ -363,6 +364,18 @@ def extract_entities(brain: Brain, text: str | None = None, *, node_id: str | No
             facts.append(match.to_dict())
         changed = bool(writes or edges_changed)
         if changed and not dry_run:
+            # Authorize the entire plan before any write. A readable entity
+            # may still be immutable to this caller. Fact/mention supports
+            # also require write permission on their endpoints and evidence.
+            for node in linked.values():
+                brain.authorize("write", node.id)
+            for node in writes.values():
+                brain.authorize("write", node.id)
+            for edge in edges:
+                if edge.origin == ORIGIN and (edge.source == evidence_node.id
+                        or any(s.get("node_id") == evidence_node.id for s in edge.evidence)):
+                    for nid in [edge.source, edge.target, *(s.get("node_id") for s in edge.evidence)]:
+                        brain.authorize("write", nid)
             for node in writes.values():
                 brain.write_node(node)
             if edges_changed:
