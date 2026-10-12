@@ -245,12 +245,15 @@ def test_failed_model_extraction_can_retry_without_recapture(brain, tmp_path, mo
     from graph_engine.entities import rule_extract
     path = write(tmp_path)
     engine = BrainEngine(brain, HashEmbedder())
-    def failure(text):
+    calls = []
+    def failure(text, known):
+        calls.append(text)
         raise RuntimeError("private adapter detail")
     monkeypatch.setattr("graph_engine.entities.command_extractor", lambda: failure)
     first = import_documents(brain, [path], engine=engine, extraction="model")
     assert first["failed_files"] == 1 and first["created_chunks"] == 1
     assert first["files"][0]["status"] == "partial"
+    assert calls == [path.read_text()]
     assert "private adapter detail" not in json.dumps(first)
     nid = first["files"][0]["chunks"][0]["node_id"]
     monkeypatch.setattr("graph_engine.entities.command_extractor", lambda: rule_extract)
