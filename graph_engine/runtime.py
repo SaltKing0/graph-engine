@@ -30,7 +30,7 @@ from .embedder import get_embedder
 # is provided by brain.write_guard() across threads and local processes. The cache is keyed on (brain path, embedder):
 # a changed env (tests, multi-brain setups) correctly gets a fresh engine
 # instead of the foreign instance.
-_ENGINES: dict[tuple[str, str], BrainEngine] = {}
+_ENGINES: dict[tuple[str, str, str | None], BrainEngine] = {}
 
 
 def brain_path() -> str:
@@ -68,12 +68,15 @@ def make_engine() -> BrainEngine:
             os.environ.get("IDEAGRAPH_EMBEDDER", "st"),
             os.environ.get("IDEAGRAPH_EMBEDDER_MODEL")))
     embedder_name = os.environ.get("IDEAGRAPH_EMBEDDER", "st")
-    key = (str(brain.path), embedder_name)
+    key = (str(brain.path), embedder_name, os.environ.get("IDEAGRAPH_EMBEDDER_MODEL"))
     eng = _ENGINES.get(key)
     if eng is None:
         model = os.environ.get("IDEAGRAPH_EMBEDDER_MODEL")  # audit #60
         eng = BrainEngine(brain, get_embedder(embedder_name, model))
         _ENGINES[key] = eng
+        # Each engine retains one corpus index; bound multi-brain/model use.
+        while len(_ENGINES) > 8:
+            _ENGINES.pop(next(iter(_ENGINES), None), None)
     return eng
 
 

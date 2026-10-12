@@ -119,12 +119,17 @@ def _normalize(text: str) -> str:
 
 class BrainEngine:
     def __init__(self, brain: Brain, embedder=None, dedupe_threshold: float = DEDUPE_THRESHOLD,
-                 reranker=None):
+                 reranker=None, *, search_cache_enabled: bool = True):
         self.brain = brain
         self.embedder = embedder if embedder is not None else get_embedder()
         self.dedupe_threshold = dedupe_threshold
+        self.search_cache_enabled = search_cache_enabled
         # V2#1: optional cross-encoder rerank pass; None/default → no rerank.
         self.reranker = reranker if reranker is not None else get_reranker()
+
+    def clear_search_cache(self) -> None:
+        """Discard this engine's disposable parsed/lexical/dense snapshot."""
+        self.__dict__.pop("_search_index", None)
 
     def _find_duplicate(self, vec: list[float], exclude_id: str | None = None) -> Node | None:
         """Closest node above the dedupe threshold — or None. Uses the vector cache."""

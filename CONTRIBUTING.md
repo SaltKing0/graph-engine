@@ -65,6 +65,16 @@ See [memory benchmarks](docs/memory-benchmarks.md) for full DE/EN comparisons.
 Keep model calls and downloads opt-in; do not replace the engine golden-set
 gates with this small diagnostic fixture.
 
+Large performance measurements are opt-in and stay outside required CI:
+
+```bash
+OPENBLAS_NUM_THREADS=1 .venv/bin/python -m tools.retrieval_benchmark --sizes 1000 10000 --samples 20 --output /tmp/retrieval-performance.json
+```
+
+See [retrieval performance](docs/retrieval-performance.md) for stage timings,
+cached/uncached quality comparisons, freshness guarantees and measurement limits.
+The full test suite includes small deterministic index invalidation checks.
+
 ## Code style
 
 - **Python 3.11+** (uses `str | None` type hints). Type hints are required.

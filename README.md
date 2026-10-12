@@ -128,6 +128,7 @@ deployment](docs/guide.md#background-maintenance-worker).
 - [Isolated graphs and access control](docs/guide.md#isolated-graphs-and-access-control)
 - [Opt-in graph retrieval and scoring](docs/graph-retrieval.md)
 - [Memory answer-quality benchmarks](docs/memory-benchmarks.md)
+- [Retrieval performance and disposable indexes](docs/retrieval-performance.md)
 - [Budgeted agent context and two-session example](docs/guide.md#budgeted-context-and-a-complete-agent-turn)
 - [Known limitations](docs/guide.md#known-limitations)
 - [Changelog](CHANGELOG.md) and [contributing](CONTRIBUTING.md)

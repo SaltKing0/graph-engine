@@ -1,0 +1,606 @@
+{
+  "schema_version": 1,
+  "environment": {
+    "source_commit": "88c7a4e84674842eb7940ea4e5a064df552bb75c",
+    "source_dirty": true,
+    "code_sha256": "41c89b7df0a0dd23738030c259ddf9d81af99ab99e2de253f9ed728557478b21",
+    "code_manifest": {
+      "graph_engine/__init__.py": "8a8d8c7b6d82373e8288533d448f7809f1d7402ae942b8e39238050f6b3904cd",
+      "graph_engine/__main__.py": "4a212ef077b04204b743b819f21f54a2484ba9bd2e2c80979700c8f4ba072e94",
+      "graph_engine/access.py": "9e1d011ce3b590ba983db2c3cfa9128fd4bf96dbe71851a12de721ee095cb688",
+      "graph_engine/agent_memory.py": "5371149e2eefd7a89b48d11834b11dc8f6a82cf5b44cd96b95046d6acf790240",
+      "graph_engine/brain.py": "02feeff49ede0620332dd74b2612d52b4fbfbed6bcb0a2ece588f21e1c9e1fca",
+      "graph_engine/brain_engine.py": "738255b80db60881c18a031e6d186f4a74bae0abb61e6b38b92dfa03bee5a84b",
+      "graph_engine/communities.py": "85eb3e66b3c0e0385e108f6ccadc16646bbc38f2f0acee379eaaef7d9547e958",
+      "graph_engine/consolidation.py": "d463c253d4d1e17448eb23d618989abf1c53e3ea21a8e8f0effcbba8617e9103",
+      "graph_engine/consolidation_protocol.py": "015ef7cccd4b4d53aa5d76463a926c26513124abfb1892400718f0875f6aea0d",
+      "graph_engine/context.py": "def373d0bace62e2b59bff048b0df66c69635c6f5dd90a935442fe944962f133",
+      "graph_engine/decay.py": "4f8d18e6193120b8a6c8696bf7bc6448f2578ffd4a3acfbcecf903bebf3a0822",
+      "graph_engine/demo.py": "8573ede0a4ed95cb09985915e5a5f264fb3fc3f59298d731e9a1efde86737695",
+      "graph_engine/document_import.py": "f3f2ab1f5db984d9b0ffe04e8ae3e14ffa466f5c345df0e68e1a44db251b920e",
+      "graph_engine/dream.py": "8e5782e06863d19a615f5283187ab5f42d4d5bf651a970a75b63f9267d0d155e",
+      "graph_engine/embedder.py": "5f8ff2bdaaa70a5a012a35bd4185769094460d94b288f5041da7b957bf9062bc",
+      "graph_engine/engine.py": "afd83939e362af9ca9f6fcbfce76c7b964a8ac74a5dca497af248b3ebe11b071",
+      "graph_engine/entities.py": "ffd17fbff8869bac98ec85be21ed7cdbcb43fde6a1b81dd08daed63ef18a608c",
+      "graph_engine/evals.py": "89707e51401bb893b91d3209a2fd63b9b7d21b0ac1241b5d64718d9881b76d96",
+      "graph_engine/feedback.py": "1e4962e08365449ac7ad2b43c4f36fb43f0f03340b984bb9b2d8ea366fd20935",
+      "graph_engine/gaps.py": "55157c66838aa66383aee65a06c6c4ee8aafdf308146335cc7a31cbdefa624a8",
+      "graph_engine/graph.py": "1a135b8ab371e5f7fb60141e1291289f415b86ddf6966296f7a57beb51d81b10",
+      "graph_engine/graph_retrieval.py": "2a4b2d5dce255054fb83816a3478dc9aac6c919682c3aa0ae9b537485989c769",
+      "graph_engine/hygiene.py": "8b2f6cb4d5fc238f1f5cf7cb35566ac1e9b650e9a699a2ff6cca88917b184741",
+      "graph_engine/inference.py": "778e83d9ab6dba1d17a0e3fed76dc38e9af011467d8aa6aed9f38eeaf3ca83e4",
+      "graph_engine/intent.py": "42bcd85e156ee3433135b3f9286fbd47036649f25022d5fa93b54636c6b772a5",
+      "graph_engine/maintenance.py": "a0b6470ec60b201b2968edbd2f0a2bbd1473eab067a965f27d138c05dca023be",
+      "graph_engine/mcp/__init__.py": "8d44f4694966bc465fae60344c86a8d7436e2c6de9faaa7119694c9cb67ac649",
+      "graph_engine/mcp/format.py": "c89cfeedc39fbb4adb20c897590123084b94411ce04ee964c295117d8b8cb937",
+      "graph_engine/mcp/server.py": "d084a9bc7e45207bdc8bc57f222ce2040122cc5d08dd1a2576f40ae56d61ae06",
+      "graph_engine/merge.py": "93bb0bf591850d14323850b7816c8aacdc793c5b3bfdcddd74ed4039d35c738d",
+      "graph_engine/model.py": "ff001150b344b9207552180d873c2c2dad492b11fc8e8a23d856c12ba97af60b",
+      "graph_engine/namespaces.py": "04117225ed38c2d4dfa466aff6014af681e9336d07ae8aeacdfaace6528c8dcb",
+      "graph_engine/recall.py": "e3d041c63f01cce62c608fe18e40ea434bbbd43508fdd53cba584a4ec27c0081",
+      "graph_engine/replacements.py": "4401a4bb6ea06c6f9409dd5109c52011cbadb8b39aca55dbd01eb6ae9282fdb9",
+      "graph_engine/report.py": "3f1ee4be9ecc1bd43f981fc7960dd00d6875d5221a11d49651989c8bde63253f",
+      "graph_engine/reranker.py": "80b441a72d1fb52c9ac8e592939062c991a8fac498aa7d56ea0aa68b44f38ea4",
+      "graph_engine/retrieval.py": "9be06b19d03acfc38cfaa90978c323d885c032aee5be3b16c39c4a4ce84649fc",
+      "graph_engine/review.py": "5fd6a954fc731056432f4d17ec7b6124e0f5fbffb50c4d97a0a1525d00b7eaf8",
+      "graph_engine/runtime.py": "0f0b3d235162e1a1e70296a4075f557566075feba0158be98a8e4d4c00da0705",
+      "graph_engine/search_index.py": "d7de9f0ec7c02ed3412ff67f4a98b5b2f9a226e4e0db0f3bf9fb6d32fb6378ed",
+      "graph_engine/server.py": "8a7606ff61c781ad7681f6cff1bc510240bcf8846f79f4c8da7118a9fab9d64b",
+      "graph_engine/similarity.py": "9ffd20d70bdc45b7358858ae34d7d31977db02b72a153d1034195cf7b2b1f82f",
+      "graph_engine/store.py": "e9b478a3ccea228d76c9867d297e9632866865f2fd9b14d39f74b9a26b0f078e",
+      "graph_engine/suggester.py": "39043e874b0fd9d3e8ff51f4815a6f99bf00430038b6ec632344dcaa94c94808",
+      "graph_engine/temporal.py": "b79d09b641de22a0e7fdc27b734c3f68630c3eb97f7d576f7623bb0a58c84291",
+      "graph_engine/tiers.py": "96fab08fc6a2358587e0deff0d5541a602387ae2b385dc91ac12f339c8f177f8",
+      "graph_engine/write_guard.py": "9b589bd35ca3a97db4f9432dcfbe8cdb5d82aa3c5b349cb136bb3b4ea7ab2e3f",
+      "tools/memory_benchmark/__init__.py": "4697afa15d32363557e9e5a66f6625a291d33a04eadca592c682b3b747ecb17f",
+      "tools/memory_benchmark/__main__.py": "6e90c6a8f91b02854c6068a68cc39c6f1718aab4cf24c8067cf0ae252c930d84",
+      "tools/memory_benchmark/adapters.py": "146b187e10dc96409facc39f99e8dc8f092c5014b7b8982c42be3445204d2be4",
+      "tools/memory_benchmark/answers.py": "7334a046def3dc42ebe38cc2e96b47c2f4c3fa7921318a6d58f1a19d39bff3bf",
+      "tools/memory_benchmark/dataset.py": "bfe01cede6465347dfd569ef950a614cbe39317e09d988c9aeded3e7685af122",
+      "tools/memory_benchmark/embeddings.py": "598650374549cace0b5a41f290bb3a06f4d3c2b3109f4f2437fbd2a8dc6ad3cf",
+      "tools/memory_benchmark/runner.py": "c09feaffc9b8c2d2e3b5f27246ba98f0c03992c51b04ae1069ecd5d55dfd3eb5",
+      "tools/memory_benchmark/scoring.py": "a2e53fb042c443a0a8e15a393c10624734596cb99e77fe26d4f799b5ecfc539e"
+    },
+    "python": "3.12.14",
+    "platform": "macOS-26.7.1-arm64-arm-64bit",
+    "dependencies": {
+      "graph-engine-memory": "0.6.1",
+      "numpy": "2.3.1",
+      "httpx": "0.28.1"
+    },
+    "performance_harness_sha256": "ae396b1d57342cd7fc62eaa66f62c219c945afe54737a3e6a1a44e219d4964a4",
+    "cpu_count": 8,
+    "processor": "arm",
+    "machine": "arm64",
+    "mode": "local",
+    "seed": 0,
+    "numpy_version": "2.3.1",
+    "blas_threads": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": null
+    },
+    "reranker": null,
+    "remote": null,
+    "cold_definition": "application indexes/memo cleared; OS page cache not flushed",
+    "warm_definition": "immediate second query or ingest after cold operation",
+    "fixture": "synthetic-v1; deterministic topic/language terms, 19-word records, 64-dimensional hash default",
+    "ingestion": "normal ingest, allow_duplicates=True; cold/warm pairs add two nodes, source corpus grows",
+    "model_cost": "explicit local model loaded separately; document embedding occurs during fixture setup",
+    "git_cost": "local mode calls are no-ops; git mode includes local commits, no remote/network",
+    "reranking_cost": "disabled (zero); configured production rerankers require their own measurement",
+    "rss_definition": "process high-water mark, cumulative across sizes"
+  },
+  "results": [
+    {
+      "nodes": 1000,
+      "ingest_added_nodes": 40,
+      "fixture_setup_ms": 471.8827919859905,
+      "model_load_ms": 0.006332993507385254,
+      "embedder": {
+        "name": "HashEmbedder",
+        "dimension": 64,
+        "semantic_model": false,
+        "projection": "sha256-bag-of-words-v1"
+      },
+      "search": {
+        "uncached": {
+          "n": 20,
+          "p50_ms": 105.34597949299496,
+          "p95_ms": 125.04000001354143
+        },
+        "cold": {
+          "n": 20,
+          "p50_ms": 122.4504380079452,
+          "p95_ms": 149.31758301099762
+        },
+        "warm": {
+          "n": 20,
+          "p50_ms": 12.862500007031485,
+          "p95_ms": 16.56741599435918
+        }
+      },
+      "search_stages": {
+        "uncached": {
+          "reranking": {
+            "n": 20,
+            "p50_ms": 0.0,
+            "p95_ms": 0.0
+          },
+          "freshness_scan": {
+            "n": 20,
+            "p50_ms": 0.0005415058694779873,
+            "p95_ms": 0.0009590003173798323
+          },
+          "filesystem_parsing": {
+            "n": 20,
+            "p50_ms": 36.30054151290096,
+            "p95_ms": 51.872749987524
+          },
+          "query_embedding": {
+            "n": 20,
+            "p50_ms": 0.021896485122852027,
+            "p95_ms": 0.024708017008379102
+          },
+          "vector_loading_embedding": {
+            "n": 20,
+            "p50_ms": 60.65495799703058,
+            "p95_ms": 73.05404197541066
+          },
+          "dense_index_construction": {
+            "n": 20,
+            "p50_ms": 1.592207991052419,
+            "p95_ms": 1.7804999952204525
+          },
+          "dense_scoring": {
+            "n": 20,
+            "p50_ms": 0.10620849207043648,
+            "p95_ms": 0.19699998665601015
+          },
+          "lexical_index_construction": {
+            "n": 20,
+            "p50_ms": 3.3163749903906137,
+            "p95_ms": 4.408957989653572
+          },
+          "lexical_scoring": {
+            "n": 20,
+            "p50_ms": 0.7819379970896989,
+            "p95_ms": 0.8652079850435257
+          }
+        },
+        "cold": {
+          "reranking": {
+            "n": 20,
+            "p50_ms": 0.0,
+            "p95_ms": 0.0
+          },
+          "freshness_scan": {
+            "n": 20,
+            "p50_ms": 17.801291513023898,
+            "p95_ms": 21.03274900582619
+          },
+          "filesystem_parsing": {
+            "n": 20,
+            "p50_ms": 36.818125008721836,
+            "p95_ms": 50.44920899672434
+          },
+          "query_embedding": {
+            "n": 20,
+            "p50_ms": 0.022729000193066895,
+            "p95_ms": 0.025332992663607
+          },
+          "vector_loading_embedding": {
+            "n": 20,
+            "p50_ms": 61.23422899690922,
+            "p95_ms": 70.54108299780637
+          },
+          "dense_index_construction": {
+            "n": 20,
+            "p50_ms": 1.6174170013982803,
+            "p95_ms": 1.844167010858655
+          },
+          "dense_scoring": {
+            "n": 20,
+            "p50_ms": 0.17208349891006947,
+            "p95_ms": 0.23750000400468707
+          },
+          "lexical_index_construction": {
+            "n": 20,
+            "p50_ms": 3.201312501914799,
+            "p95_ms": 3.9172499964479357
+          },
+          "lexical_scoring": {
+            "n": 20,
+            "p50_ms": 0.8078125101746991,
+            "p95_ms": 0.866209011292085
+          }
+        },
+        "warm": {
+          "reranking": {
+            "n": 20,
+            "p50_ms": 0.0,
+            "p95_ms": 0.0
+          },
+          "freshness_scan": {
+            "n": 20,
+            "p50_ms": 9.178937005344778,
+            "p95_ms": 13.190458994358778
+          },
+          "filesystem_parsing": {
+            "n": 20,
+            "p50_ms": 0.00037500285543501377,
+            "p95_ms": 0.0007079797796905041
+          },
+          "query_embedding": {
+            "n": 20,
+            "p50_ms": 0.023166503524407744,
+            "p95_ms": 0.025249988539144397
+          },
+          "vector_loading_embedding": {
+            "n": 20,
+            "p50_ms": 0.00029098009690642357,
+            "p95_ms": 0.00037500285543501377
+          },
+          "dense_index_construction": {
+            "n": 20,
+            "p50_ms": 0.0002500019036233425,
+            "p95_ms": 0.0002910092007368803
+          },
+          "dense_scoring": {
+            "n": 20,
+            "p50_ms": 0.12050049554090947,
+            "p95_ms": 0.21512500825338066
+          },
+          "lexical_index_construction": {
+            "n": 20,
+            "p50_ms": 0.00024998735170811415,
+            "p95_ms": 0.00037500285543501377
+          },
+          "lexical_scoring": {
+            "n": 20,
+            "p50_ms": 0.8071459888014942,
+            "p95_ms": 0.9133749990724027
+          }
+        }
+      },
+      "ingest": {
+        "cold": {
+          "n": 20,
+          "p50_ms": 448.25793748896103,
+          "p95_ms": 464.4057499826886
+        },
+        "warm": {
+          "n": 20,
+          "p50_ms": 449.3914790073177,
+          "p95_ms": 470.38208300364204
+        }
+      },
+      "ingest_stages_inclusive": {
+        "cold:pull": {
+          "n": 20,
+          "p50_ms": 0.043291496695019305,
+          "p95_ms": 0.049708003643900156
+        },
+        "cold:embed": {
+          "n": 20,
+          "p50_ms": 0.018375489162281156,
+          "p95_ms": 0.021374988136813045
+        },
+        "cold:read_nodes": {
+          "n": 20,
+          "p50_ms": 140.40716651652474,
+          "p95_ms": 149.88404198084027
+        },
+        "cold:read_vectors": {
+          "n": 20,
+          "p50_ms": 27.48243699898012,
+          "p95_ms": 30.297374993097037
+        },
+        "cold:rebuild_index": {
+          "n": 20,
+          "p50_ms": 36.118458505370654,
+          "p95_ms": 39.420500019332394
+        },
+        "cold:commit_and_push": {
+          "n": 20,
+          "p50_ms": 0.08679200254846364,
+          "p95_ms": 0.09383299038745463
+        },
+        "warm:pull": {
+          "n": 20,
+          "p50_ms": 0.043708510929718614,
+          "p95_ms": 0.048707996029406786
+        },
+        "warm:embed": {
+          "n": 20,
+          "p50_ms": 0.018437494873069227,
+          "p95_ms": 0.02012500772252679
+        },
+        "warm:read_nodes": {
+          "n": 20,
+          "p50_ms": 140.86035394575447,
+          "p95_ms": 147.48637500451878
+        },
+        "warm:read_vectors": {
+          "n": 20,
+          "p50_ms": 27.560250513488427,
+          "p95_ms": 28.759584005456418
+        },
+        "warm:rebuild_index": {
+          "n": 20,
+          "p50_ms": 36.09656248590909,
+          "p95_ms": 40.98466600407846
+        },
+        "warm:commit_and_push": {
+          "n": 20,
+          "p50_ms": 0.09193751611746848,
+          "p95_ms": 0.10904201189987361
+        }
+      },
+      "memory": {
+        "python_and_numpy_traced_retained_bytes": 5813006,
+        "python_and_numpy_traced_peak_bytes": 7275528,
+        "process_peak_rss_bytes": 66895872
+      },
+      "correctness_mismatches": []
+    },
+    {
+      "nodes": 10000,
+      "ingest_added_nodes": 40,
+      "fixture_setup_ms": 4514.575042005163,
+      "model_load_ms": 0.0017500133253633976,
+      "embedder": {
+        "name": "HashEmbedder",
+        "dimension": 64,
+        "semantic_model": false,
+        "projection": "sha256-bag-of-words-v1"
+      },
+      "search": {
+        "uncached": {
+          "n": 20,
+          "p50_ms": 1254.5087085018167,
+          "p95_ms": 1460.2119580085855
+        },
+        "cold": {
+          "n": 20,
+          "p50_ms": 1481.6309585003182,
+          "p95_ms": 1759.0633750078268
+        },
+        "warm": {
+          "n": 20,
+          "p50_ms": 175.70316650380846,
+          "p95_ms": 226.2144590204116
+        }
+      },
+      "search_stages": {
+        "uncached": {
+          "reranking": {
+            "n": 20,
+            "p50_ms": 0.0,
+            "p95_ms": 0.0
+          },
+          "freshness_scan": {
+            "n": 20,
+            "p50_ms": 0.001124994014389813,
+            "p95_ms": 0.0015420082490891218
+          },
+          "filesystem_parsing": {
+            "n": 20,
+            "p50_ms": 420.8639169955859,
+            "p95_ms": 546.10408298322
+          },
+          "query_embedding": {
+            "n": 20,
+            "p50_ms": 0.027375004719942808,
+            "p95_ms": 0.03283398109488189
+          },
+          "vector_loading_embedding": {
+            "n": 20,
+            "p50_ms": 727.2185625042766,
+            "p95_ms": 837.8711249970365
+          },
+          "dense_index_construction": {
+            "n": 20,
+            "p50_ms": 17.000312509480864,
+            "p95_ms": 18.477208010153845
+          },
+          "dense_scoring": {
+            "n": 20,
+            "p50_ms": 3.030646010302007,
+            "p95_ms": 5.5762919946573675
+          },
+          "lexical_index_construction": {
+            "n": 20,
+            "p50_ms": 34.83462499571033,
+            "p95_ms": 37.58795800968073
+          },
+          "lexical_scoring": {
+            "n": 20,
+            "p50_ms": 8.30308350850828,
+            "p95_ms": 9.501458000158891
+          }
+        },
+        "cold": {
+          "reranking": {
+            "n": 20,
+            "p50_ms": 0.0,
+            "p95_ms": 0.0
+          },
+          "freshness_scan": {
+            "n": 20,
+            "p50_ms": 229.04412499337923,
+            "p95_ms": 385.49179199617356
+          },
+          "filesystem_parsing": {
+            "n": 20,
+            "p50_ms": 417.47658349049743,
+            "p95_ms": 500.7162079855334
+          },
+          "query_embedding": {
+            "n": 20,
+            "p50_ms": 0.02772899460978806,
+            "p95_ms": 0.05920801777392626
+          },
+          "vector_loading_embedding": {
+            "n": 20,
+            "p50_ms": 727.3812289931811,
+            "p95_ms": 769.1290829970967
+          },
+          "dense_index_construction": {
+            "n": 20,
+            "p50_ms": 16.942125002969988,
+            "p95_ms": 17.791874997783452
+          },
+          "dense_scoring": {
+            "n": 20,
+            "p50_ms": 2.782812502118759,
+            "p95_ms": 4.649667011108249
+          },
+          "lexical_index_construction": {
+            "n": 20,
+            "p50_ms": 34.85675001866184,
+            "p95_ms": 40.57491599814966
+          },
+          "lexical_scoring": {
+            "n": 20,
+            "p50_ms": 8.253624517237768,
+            "p95_ms": 8.803624979918823
+          }
+        },
+        "warm": {
+          "reranking": {
+            "n": 20,
+            "p50_ms": 0.0,
+            "p95_ms": 0.0
+          },
+          "freshness_scan": {
+            "n": 20,
+            "p50_ms": 135.2995625056792,
+            "p95_ms": 163.58379201847129
+          },
+          "filesystem_parsing": {
+            "n": 20,
+            "p50_ms": 0.0006250047590583563,
+            "p95_ms": 0.001708976924419403
+          },
+          "query_embedding": {
+            "n": 20,
+            "p50_ms": 0.030187497031874955,
+            "p95_ms": 0.03720898530445993
+          },
+          "vector_loading_embedding": {
+            "n": 20,
+            "p50_ms": 0.00029199873097240925,
+            "p95_ms": 0.0004159810487180948
+          },
+          "dense_index_construction": {
+            "n": 20,
+            "p50_ms": 0.00029199873097240925,
+            "p95_ms": 0.00041601015254855156
+          },
+          "dense_scoring": {
+            "n": 20,
+            "p50_ms": 1.5850835043238476,
+            "p95_ms": 2.1362080005928874
+          },
+          "lexical_index_construction": {
+            "n": 20,
+            "p50_ms": 0.0005420006345957518,
+            "p95_ms": 0.0008750066626816988
+          },
+          "lexical_scoring": {
+            "n": 20,
+            "p50_ms": 8.001437498023733,
+            "p95_ms": 10.315457999240607
+          }
+        }
+      },
+      "ingest": {
+        "cold": {
+          "n": 20,
+          "p50_ms": 4751.528375491034,
+          "p95_ms": 5025.019666994922
+        },
+        "warm": {
+          "n": 20,
+          "p50_ms": 4798.012208499131,
+          "p95_ms": 5022.5267079949845
+        }
+      },
+      "ingest_stages_inclusive": {
+        "cold:pull": {
+          "n": 20,
+          "p50_ms": 0.04545800038613379,
+          "p95_ms": 0.1281249860767275
+        },
+        "cold:embed": {
+          "n": 20,
+          "p50_ms": 0.020728999515995383,
+          "p95_ms": 0.029292015824466944
+        },
+        "cold:read_nodes": {
+          "n": 20,
+          "p50_ms": 1638.7981659936486,
+          "p95_ms": 1769.5584180182777
+        },
+        "cold:read_vectors": {
+          "n": 20,
+          "p50_ms": 290.6451454909984,
+          "p95_ms": 324.08925000345334
+        },
+        "cold:rebuild_index": {
+          "n": 20,
+          "p50_ms": 419.50018699571956,
+          "p95_ms": 470.82883401890285
+        },
+        "cold:commit_and_push": {
+          "n": 20,
+          "p50_ms": 0.10920850036200136,
+          "p95_ms": 0.14099999680183828
+        },
+        "warm:pull": {
+          "n": 20,
+          "p50_ms": 0.045833003241568804,
+          "p95_ms": 0.06758299423381686
+        },
+        "warm:embed": {
+          "n": 20,
+          "p50_ms": 0.020854015019722283,
+          "p95_ms": 0.024333014152944088
+        },
+        "warm:read_nodes": {
+          "n": 20,
+          "p50_ms": 1677.0235204894561,
+          "p95_ms": 1781.036917003803
+        },
+        "warm:read_vectors": {
+          "n": 20,
+          "p50_ms": 290.2534994937014,
+          "p95_ms": 306.1359999992419
+        },
+        "warm:rebuild_index": {
+          "n": 20,
+          "p50_ms": 422.37477099115495,
+          "p95_ms": 492.494624981191
+        },
+        "warm:commit_and_push": {
+          "n": 20,
+          "p50_ms": 0.11045850988011807,
+          "p95_ms": 0.14362498768605292
+        }
+      },
+      "memory": {
+        "python_and_numpy_traced_retained_bytes": 58689891,
+        "python_and_numpy_traced_peak_bytes": 74788759,
+        "process_peak_rss_bytes": 269008896
+      },
+      "correctness_mismatches": []
+    }
+  ],
+  "quality": {
+    "dataset_version": "de-en-memory-v1.0.0",
+    "dataset_sha256": "ecd55eef857eee0975f334b2e31ef6b658e245111c9712b0b9af19b43a37c6e3",
+    "questions": 12,
+    "mismatches": [],
+    "comparison": "exact ordered (ID, score) pairs; same embedding and reranking settings"
+  }
+}

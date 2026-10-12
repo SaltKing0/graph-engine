@@ -9,15 +9,32 @@ cross-encoder reranking of the top-K is added later.
 from __future__ import annotations
 
 import math
+import time
+from contextlib import contextmanager
+from typing import Iterator
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 
 import numpy as np
 
 from .brain_engine import BrainEngine
+from .brain import Brain
+from .search_index import SearchIndex, corpus_stamp, embedder_stamp
 from .feedback import LearningProfile, learning_profile
 from .tiers import order_by_tier
 from .graph_retrieval import GraphOptions, GraphTrace, eligible_edges, expand
+
+
+@contextmanager
+def _stage(engine: BrainEngine, name: str) -> Iterator[None]:
+    """Optional caller-owned timings in milliseconds, never persisted."""
+    timings = getattr(engine, "retrieval_timings", None)
+    start = time.perf_counter() if timings is not None else 0.0
+    try:
+        yield
+    finally:
+        if timings is not None:
+            timings[name] = timings.get(name, 0.0) + (time.perf_counter() - start) * 1000
 
 
 def tokenize(text: str) -> list[str]:
@@ -122,7 +139,19 @@ def _retrieve_trace(engine: BrainEngine, query: str, rerank_k: int,
                     persist: bool, *, learn: bool = True,
                     per_tier: bool = False, graph: GraphOptions | None = None) -> _RetrievalTrace:
     """One scoring path for normal retrieval and its explanation."""
-    nodes = engine.brain.read_nodes()
+    # Protected/custom stores always use fresh authorized reads. Never retain
+    # a principal's corpus or reuse it after revocation or across graphs.
+    cacheable = type(engine.brain) is Brain and getattr(engine, "search_cache_enabled", True)
+    if type(engine.brain) is not Brain:
+        engine.__dict__.pop("_search_index", None)
+    with _stage(engine, "freshness_scan"):
+        key = ((corpus_stamp(engine.brain.path), embedder_stamp(engine.embedder), persist, per_tier)
+               if cacheable else None)
+    index = getattr(engine, "_search_index", None) if cacheable else None
+    if not isinstance(index, SearchIndex) or index.key != key or not index.valid():
+        index = None
+    with _stage(engine, "filesystem_parsing"):
+        nodes = index.nodes if index is not None else engine.brain.read_nodes()
     # Audit #7: tombstones are "forgotten" — they must not come back as
     # search answers (consolidate/_find_duplicate already exclude them).
     nodes = [n for n in nodes if n.status != "tombstone"
@@ -135,10 +164,15 @@ def _retrieve_trace(engine: BrainEngine, query: str, rerank_k: int,
         trace.graph = expand(engine.brain, set(), [], graph)
         return trace
     node_ids = [n.id for n in nodes]
-    qvec = engine.embedder.embed(query)
+    with _stage(engine, "query_embedding"):
+        qvec = engine.embedder.embed(query)
 
-    vecs = engine.brain.vectors_for(set(node_ids), lambda t: engine.embedder.embed(t),
-                                    persist=persist)
+    if index is not None and index.dimension != len(qvec):
+        index = None
+    with _stage(engine, "vector_loading_embedding"):
+        vecs = ({} if index is not None else engine.brain.vectors_for(
+            set(node_ids), lambda t: engine.embedder.embed(t), persist=persist,
+            **({"embedder_key": embedder_stamp(engine.embedder)} if type(engine.brain) is Brain else {})))
     # Audit #8 (follow-up fix): vectors with a foreign dimension are not
     # comparable with the query (different embedder in the same brain, e.g.
     # demo seed with precomputed ST vectors + HashEmbedder engine). Instead of
@@ -147,20 +181,36 @@ def _retrieve_trace(engine: BrainEngine, query: str, rerank_k: int,
     # Audit #60: the dense stage runs as a numpy matmul over L2-normalized
     # vectors instead of a pure-Python cosine loop (0.150 s/query @2k×384-dim →
     # sub-2 ms). Foreign-dimension/empty vectors remain excluded.
-    dense_ids = [nid for nid in node_ids
-                 if nid in vecs and vecs[nid] and len(vecs[nid]) == len(qvec)]
-    if dense_ids:
-        M = np.array([vecs[nid] for nid in dense_ids], dtype=np.float64)
-        M = M / (np.linalg.norm(M, axis=1, keepdims=True) + 1e-12)
-        q = np.asarray(qvec, dtype=np.float64)
-        q = q / (np.linalg.norm(q) + 1e-12)
-        sims = M @ q
-        dense = [(nid, float(s)) for nid, s in zip(dense_ids, sims)]
-    else:
-        dense = []
-
-    bm = BM25([n.text for n in nodes])
-    bm_scores = bm.scores(tokenize(query))
+    with _stage(engine, "dense_index_construction"):
+        if index is not None:
+            dense_ids, M = index.dense_ids, index.matrix
+        else:
+            dense_ids = [nid for nid in node_ids
+                         if nid in vecs and vecs[nid] and len(vecs[nid]) == len(qvec)]
+            M = (np.array([vecs[nid] for nid in dense_ids], dtype=np.float64)
+                 .reshape((-1, len(qvec))) if qvec else np.empty((0, 0)))
+            if dense_ids:
+                M = M / (np.linalg.norm(M, axis=1, keepdims=True) + 1e-12)
+    with _stage(engine, "dense_scoring"):
+        if dense_ids:
+            q = np.asarray(qvec, dtype=np.float64)
+            q = q / (np.linalg.norm(q) + 1e-12)
+            sims = M @ q
+            dense = [(nid, float(s)) for nid, s in zip(dense_ids, sims)]
+        else:
+            dense = []
+    with _stage(engine, "lexical_index_construction"):
+        bm = index.bm25 if index is not None else BM25([n.text for n in nodes])
+    if cacheable and index is None:
+        # Never label an old matrix with a new vector stamp. A writer's first
+        # vector fill also skips publication; its next stable query can cache.
+        with _stage(engine, "freshness_scan"):
+            after = (corpus_stamp(engine.brain.path), embedder_stamp(engine.embedder), persist, per_tier)
+        if after == key:
+            M.setflags(write=False)
+            engine._search_index = SearchIndex(after, nodes, dense_ids, M, bm, len(qvec))
+    with _stage(engine, "lexical_scoring"):
+        bm_scores = bm.scores(tokenize(query))
     bm_rank = [(nid, s) for nid, s in zip(node_ids, bm_scores) if s > 0.0]
     trace.dense_scores = dict(dense)
     trace.bm25_scores = dict(zip(node_ids, bm_scores))
@@ -329,8 +379,9 @@ def _finish_retrieval(engine: BrainEngine, query: str, k: int, trace: _Retrieval
     if reranker is None:
         result = _limit_hits(candidates, k, trace.tiers if per_tier else None)
     else:
-        result = _rerank(engine, query, k, text_by_id, candidates,
-                         tiers=trace.tiers, per_tier=per_tier)
+        with _stage(engine, "reranking"):
+            result = _rerank(engine, query, k, text_by_id, candidates,
+                             tiers=trace.tiers, per_tier=per_tier)
     if track:
         from .recall import record, tracking_enabled
         if tracking_enabled():

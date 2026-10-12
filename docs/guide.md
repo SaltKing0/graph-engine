@@ -1483,3 +1483,11 @@ repo** with your data. The engine contains no brain data.
 ## License
 
 MIT — see [LICENSE](../LICENSE).
+
+## Retrieval performance
+
+Unprotected engines retain disposable parsed/BM25/dense search snapshots in
+memory and check file metadata on every query. Protected reads continue to
+apply current authorization on every call. See [retrieval performance](retrieval-performance.md)
+for reproducible 1k/10k-node measurements, cache freshness/recovery, read-only
+behavior, and the optional larger/local-model runs.
