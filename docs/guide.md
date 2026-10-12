@@ -42,10 +42,10 @@ do not reflect a different model.
 In an activated Python virtual environment:
 
 ```bash
-python -m pip install graph-engine
-# Optional extras (can be combined, for example graph-engine[st,mcp]):
-python -m pip install "graph-engine[st]"   # semantic embeddings
-python -m pip install "graph-engine[mcp]"  # MCP server
+python -m pip install graph-engine-memory
+# Optional extras (can be combined, for example graph-engine-memory[st,mcp]):
+python -m pip install "graph-engine-memory[st]"   # semantic embeddings
+python -m pip install "graph-engine-memory[mcp]"  # MCP server
 ```
 
 To install current `main` without a checkout:
@@ -403,7 +403,7 @@ Expose the brain to MCP-capable assistants (Claude Desktop, Claude Code, …).
 The tool surface is **read-only by default**; agent memory writes are opt-in:
 
 ```bash
-python -m pip install 'graph-engine[mcp]'  # source checkout: pip install -e '.[mcp]'
+python -m pip install 'graph-engine-memory[mcp]'  # source checkout: pip install -e '.[mcp]'
 ig mcp   # or: ig-mcp — stdio JSON-RPC, nothing else touches stdout
 ```
 
@@ -600,7 +600,7 @@ The current source includes entity/fact extraction, episodic consolidation,
 relationship inference, graph and search explanations, storage tiers, retrieval
 feedback, isolated graphs and opt-in access control, alongside the CLI, web UI,
 MCP server and dream maintenance. The package version in `pyproject.toml` is
-`0.6.0`; do not use that version alone to infer which `main` features are in a
+`0.6.1`; do not use that version alone to infer which `main` features are in a
 published package. See [CHANGELOG.md](../CHANGELOG.md) for release notes and
 unreleased changes.
 
