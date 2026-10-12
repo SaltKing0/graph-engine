@@ -21,6 +21,8 @@ truth, the node fields are the queryable projection.
 
 from __future__ import annotations
 
+from .write_guard import write_operation
+
 import hashlib
 import json
 import os
@@ -45,6 +47,7 @@ def fingerprint(query: str) -> str:
     return hashlib.sha1(norm.encode("utf-8")).hexdigest()[:10]
 
 
+@write_operation
 def record(brain: Brain, query: str, node_ids: list[str], ts: str | None = None) -> int:
     """Append one recall event. Returns the number of node ids recorded."""
     brain.authorize("read")
@@ -75,6 +78,7 @@ def read_ledger(brain: Brain) -> list[dict]:
     return out
 
 
+@write_operation
 def aggregate(brain: Brain, *, dry_run: bool = False, commit: bool = True) -> dict:
     """Fold the recall ledger into the node counters (one pass, one commit).
 
@@ -85,6 +89,9 @@ def aggregate(brain: Brain, *, dry_run: bool = False, commit: bool = True) -> di
     """
     from .tiers import rebalance
     brain.authorize("admin")
+    if not dry_run and commit:
+        brain.ensure_ready()
+        brain.pull()
     entries = read_ledger(brain)
     if not entries:
         rebalance(brain, dry_run=dry_run, commit=commit)

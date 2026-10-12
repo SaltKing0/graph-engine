@@ -16,7 +16,7 @@ edges are invalidated instead of deleted, so the audit trail survives.
 from __future__ import annotations
 
 from .brain import Brain, Edge, Node, _now_iso
-from .brain_engine import BRAIN_LOCK, BrainEngine
+from .brain_engine import BrainEngine
 
 AGENT_SOURCE = "agent"          # node provenance: a model wrote this
 AGENT_ORIGIN = "agent"          # edge provenance: a model declared this
@@ -77,8 +77,10 @@ def forget(brain: Brain, node_id: str, *, reason: str,
     reason = (reason or "").strip()
     if not reason:
         raise ValueError("forget requires a reason — it lands in the commit message.")
-    with BRAIN_LOCK:
+    with brain.write_guard():
         brain.authorize("write", node_id)
+        brain.ensure_ready()
+        brain.pull()
         node = brain.read_node(node_id)
         if node is None:
             raise ValueError(f"No node with id {node_id!r}.")

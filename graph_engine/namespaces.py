@@ -70,5 +70,7 @@ def create_graph(name: str) -> None:
     if access.policy_path():
         # Provision roles in the trusted policy before creating a namespace.
         access.require(name, access.principal(), "admin")
-    path.mkdir(parents=True, exist_ok=False)
-    Brain(str(path), mode=os.environ.get("IG_BRAIN_MODE", "git")).init()
+    brain = Brain(str(path), mode=os.environ.get("IG_BRAIN_MODE", "git"))
+    with brain.write_guard():
+        path.mkdir(parents=True, exist_ok=False)
+        brain.init()

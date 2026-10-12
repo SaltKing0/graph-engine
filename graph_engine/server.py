@@ -19,12 +19,19 @@ from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 
 from . import runtime, access, namespaces
+from .write_guard import BrainWriteTimeout
 
 # Shipped UI assets live INSIDE the package so a pip install serves them too
 # (repo-root docs/ would not exist in site-packages).
 DOCS_DIR = Path(__file__).resolve().parent / "web"
 
 app = FastAPI(title="GraphEngine")
+
+
+@app.exception_handler(BrainWriteTimeout)
+async def writer_busy_handler(_request, _exc: BrainWriteTimeout):
+    return JSONResponse({"error": "Brain writer busy; retry after the current writer finishes"},
+                        status_code=503, headers={"Retry-After": "1"})
 
 
 @app.middleware("http")

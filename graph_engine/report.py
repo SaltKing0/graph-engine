@@ -18,6 +18,8 @@ inbox (always empty — the cycle auto-accepts), and a coverage section
 """
 from __future__ import annotations
 
+from .write_guard import write_operation
+
 import json
 import os
 import subprocess
@@ -384,6 +386,7 @@ def render_report(brain: Brain, **opts) -> str:
         lines.append("nothing queued — ingest new material")
     return "\n".join(lines)
 
+@write_operation
 def write_report(brain: Brain, **opts) -> str:
     """Write BRAIN_REPORT.md at the brain root (tracked, renders on GitHub).
 

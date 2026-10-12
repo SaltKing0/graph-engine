@@ -22,12 +22,16 @@ A backup copy is left next to the file as edges.jsonl.bak-<timestamp>.
 
 from __future__ import annotations
 
+from contextlib import nullcontext
 import json
 import os
 import sys
 import tempfile
 import time
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from graph_engine.brain import Brain
 
 KIND_MAP = {
     "aehnlich": "similar",
@@ -39,38 +43,39 @@ KIND_MAP = {
 
 def migrate(edges_path: Path, apply: bool) -> tuple[int, int]:
     """Rewrite kind values in place. Returns (scanned, rewritten)."""
-    rewritten = 0
-    scanned = 0
-    out_lines: list[str] = []
-    with edges_path.open(encoding="utf-8") as fh:
-        for line in fh:
-            stripped = line.strip()
-            if not stripped:
-                out_lines.append(line)
-                continue
-            try:
-                e = json.loads(stripped)
-            except json.JSONDecodeError:
-                out_lines.append(line)  # skip-bad-line policy, unchanged
-                continue
-            scanned += 1
-            kind = e.get("kind")
-            if kind in KIND_MAP:
-                e["kind"] = KIND_MAP[kind]
-                rewritten += 1
-            out_lines.append(json.dumps(e, ensure_ascii=False, sort_keys=True) + "\n")
+    with Brain(str(edges_path.resolve().parent)).write_guard() if apply else nullcontext():
+        rewritten = 0
+        scanned = 0
+        out_lines: list[str] = []
+        with edges_path.open(encoding="utf-8") as fh:
+            for line in fh:
+                stripped = line.strip()
+                if not stripped:
+                    out_lines.append(line)
+                    continue
+                try:
+                    e = json.loads(stripped)
+                except json.JSONDecodeError:
+                    out_lines.append(line)  # skip-bad-line policy, unchanged
+                    continue
+                scanned += 1
+                kind = e.get("kind")
+                if kind in KIND_MAP:
+                    e["kind"] = KIND_MAP[kind]
+                    rewritten += 1
+                out_lines.append(json.dumps(e, ensure_ascii=False, sort_keys=True) + "\n")
 
-    if apply and rewritten:
-        data = "".join(out_lines)
-        backup = edges_path.with_name(
-            f"{edges_path.name}.bak-{time.strftime('%Y%m%d-%H%M%S')}")
-        backup.write_text(edges_path.read_text(encoding="utf-8"), encoding="utf-8")
-        fd, tmp = tempfile.mkstemp(dir=str(edges_path.parent), prefix=".edges-")
-        with os.fdopen(fd, "w", encoding="utf-8") as fh:
-            fh.write(data)
-        os.replace(tmp, edges_path)
-        print(f"backup written: {backup}")
-    return scanned, rewritten
+        if apply and rewritten:
+            data = "".join(out_lines)
+            backup = edges_path.with_name(
+                f"{edges_path.name}.bak-{time.strftime('%Y%m%d-%H%M%S')}")
+            backup.write_text(edges_path.read_text(encoding="utf-8"), encoding="utf-8")
+            fd, tmp = tempfile.mkstemp(dir=str(edges_path.parent), prefix=".edges-")
+            with os.fdopen(fd, "w", encoding="utf-8") as fh:
+                fh.write(data)
+            os.replace(tmp, edges_path)
+            print(f"backup written: {backup}")
+        return scanned, rewritten
 
 
 def main() -> int:

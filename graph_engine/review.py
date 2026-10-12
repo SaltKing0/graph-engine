@@ -23,6 +23,8 @@ plus here on the review path.
 
 from __future__ import annotations
 
+from .write_guard import write_operation
+
 import os
 from collections import Counter
 
@@ -58,6 +60,7 @@ def is_live_intent(edge: Edge) -> bool:
             and not edge.rejected and edge.is_current)
 
 
+@write_operation
 def accept_pending(brain: Brain, *, max_intent_per_source: int | None = None,
                    dry_run: bool = False, env: dict[str, str] | None = None,
                    commit: bool = True) -> dict:
@@ -72,6 +75,10 @@ def accept_pending(brain: Brain, *, max_intent_per_source: int | None = None,
     Deterministic: pending edges are processed in sorted-id order, so two runs
     over the same state decide identically.
     """
+    brain.authorize("write")
+    if not dry_run and commit:
+        brain.ensure_ready()
+        brain.pull()
     cap = (max_intent_per_source if max_intent_per_source is not None
            else intent_auto_accept_max(env))
     edges = brain.read_edges(include_rejected=True)

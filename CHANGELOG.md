@@ -7,6 +7,11 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- Shared per-brain local writer guard for CLI, HTTP, MCP and maintenance,
+  with canonical path identities, reentrant operations, bounded waits and
+  crash-released locks outside tracked brain files. POSIX Git children retain
+  the guard after parent death; competing-process tests cover record integrity,
+  recall aggregation and Git sync (issue #27).
 - Evidence-backed fact replacement proposals with old/new claims, explicit
   dates/reasons and full evidence in CLI/web review. Accept/reject/undo preserve
   extraction windows, permissions and retry decisions; simultaneous objects do

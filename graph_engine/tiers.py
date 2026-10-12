@@ -5,6 +5,8 @@ stable nodes/<id>.md paths: tiers are logical storage classes, not moves.
 """
 from __future__ import annotations
 
+from contextlib import nullcontext
+
 import argparse
 import json
 from datetime import datetime, timezone
@@ -54,9 +56,11 @@ def recommended_tier(node: Node, *, now: datetime | None = None) -> str:
 def rebalance(brain: Brain, *, dry_run: bool = False, commit: bool = True,
               now: datetime | None = None) -> list[dict]:
     """Apply automatic tier policy during maintenance (including idle brains)."""
-    from .brain_engine import BRAIN_LOCK
     getattr(brain, "authorize", lambda **_: None)(action="admin")
-    with BRAIN_LOCK:
+    with nullcontext() if dry_run else brain.write_guard():
+        if not dry_run and commit:
+            brain.ensure_ready()
+            brain.pull()
         changes = []
         for node in brain.read_nodes():
             target = recommended_tier(node, now=now)
@@ -76,8 +80,7 @@ def set_tier(brain: Brain, node_id: str, tier: str | None, *,
     """A manual tier is pinned until reset with tier=None (automatic policy)."""
     if tier is not None and tier not in STORAGE_TIERS:
         raise ValueError(f"Unknown storage tier: {tier!r}")
-    from .brain_engine import BRAIN_LOCK
-    with BRAIN_LOCK:
+    with brain.write_guard():
         getattr(brain, "authorize", lambda **_: None)(action="write", node_id=node_id)
         brain.ensure_ready()
         brain.pull()
@@ -114,12 +117,13 @@ def cmd_tier(engine: BrainEngine, args: list[str]) -> None:
         parser.error("provide a node ID or --rebalance")
     try:
         if opts.rebalance:
-            getattr(engine.brain, "authorize", lambda **_: None)(action="admin")
-            if not opts.dry_run:
-                engine.brain.ensure_ready()
-                engine.brain.pull()
-            result = {"changes": rebalance(engine.brain, dry_run=opts.dry_run),
-                      "dry_run": opts.dry_run}
+            with nullcontext() if opts.dry_run else engine.brain.write_guard():
+                getattr(engine.brain, "authorize", lambda **_: None)(action="admin")
+                if not opts.dry_run:
+                    engine.brain.ensure_ready()
+                    engine.brain.pull()
+                result = {"changes": rebalance(engine.brain, dry_run=opts.dry_run),
+                          "dry_run": opts.dry_run}
         else:
             node = (set_tier(engine.brain, opts.node_id,
                              None if opts.tier == "auto" else opts.tier)

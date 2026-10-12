@@ -64,7 +64,12 @@ ig dream                          # preview memory maintenance
 For your own brain, set `IG_BRAIN_PATH` and run `ig init` without `--demo`.
 The default path is `~/graph-engine-brain`. Connect a private remote with
 `ig init --remote <url>`; Git mode commits changes and syncs with that remote.
-Use one writer process per brain.
+CLI, HTTP and MCP writers on the same local brain now share a bounded write
+guard, including Git sync. `IG_WRITE_LOCK_TIMEOUT=30` sets the maximum wait in
+seconds (0–3600; `0` fails immediately when busy). See
+[local writer coordination](docs/guide.md#local-writer-coordination) for filesystem,
+crash and read-snapshot limits. Keep one writer where clients bypass this guard,
+on network filesystems, or across separate clones/machines.
 
 To connect an MCP client, install the MCP extra and run `ig mcp`.
 It is read-only by default; `ig mcp --write` enables remember, recall and forget.

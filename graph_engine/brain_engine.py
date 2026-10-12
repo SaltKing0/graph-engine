@@ -8,7 +8,8 @@ from __future__ import annotations
 
 import os
 import sys
-import threading
+import math
+from .write_guard import THREAD_LOCK
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -37,10 +38,9 @@ INTENT_PENDING_ENV = "IDEAGRAPH_INTENT_PENDING"
 
 # Serializes all brain write operations per process. The store is a series
 # of whole-file rewrites (read-all → mutate → write-all); without a lock,
-# parallel ingests/resolves interleave and last-writer-wins swallows the
-# other's writes (Audit #1/#15). One lock suffices because all mutations
-# run through the same process (server, CLI, pipeline tools).
-BRAIN_LOCK = threading.RLock()
+# parallel ingests/resolves interleave and lose updates (Audit #1/#15).
+# Kept as a compatibility alias; brain.write_guard() also locks other processes.
+BRAIN_LOCK = THREAD_LOCK  # compatibility alias; use brain.write_guard() for writes
 
 CONSOLIDATE_THRESHOLD_ENV = "IG_CONSOLIDATE_THRESHOLD"
 CONSOLIDATE_MIN_AGE_DAYS_ENV = "IG_CONSOLIDATE_MIN_AGE_DAYS"
@@ -86,6 +86,22 @@ def consolidation_config_from_env(overrides: dict | None = None) -> "Consolidati
         except (ValueError, TypeError, OverflowError) as exc:
             raise ValueError(f"{env_name}: invalid {key}: {raw!r}") from exc
     return ConsolidationConfig(**values)
+
+
+WRITE_LOCK_TIMEOUT = 30.0
+WRITE_LOCK_TIMEOUT_ENV = "IG_WRITE_LOCK_TIMEOUT"
+
+
+def write_lock_timeout_from_env() -> float:
+    """Maximum local writer wait (seconds); invalid values fail explicitly."""
+    raw = os.environ.get(WRITE_LOCK_TIMEOUT_ENV, str(WRITE_LOCK_TIMEOUT))
+    try:
+        value = float(raw)
+    except (ValueError, TypeError):
+        raise ValueError(f"{WRITE_LOCK_TIMEOUT_ENV} must be a number between 0 and 3600") from None
+    if not math.isfinite(value) or not 0 <= value <= 3600:
+        raise ValueError(f"{WRITE_LOCK_TIMEOUT_ENV} must be finite and between 0 and 3600")
+    return value
 
 
 def auto_accept_from_env() -> bool:
@@ -147,7 +163,7 @@ class BrainEngine:
         otherwise it stays in probation. Default False = existing behavior
         (promote all).
         """
-        with BRAIN_LOCK:
+        with self.brain.write_guard():
             promoted, merged = 0, 0
             nodes = self.brain.read_nodes()
             # Receipts and their survivors own exact evidence and retry state.
@@ -186,7 +202,7 @@ class BrainEngine:
         """Graceful degradation (V2#2): active nodes whose level_fn=='tombstone'
         are tombstoned (never hard-deleted). level_fn(node)->str returns the
         decay level (e.g. from decay.decay_level with retrieval counters)."""
-        with BRAIN_LOCK:
+        with self.brain.write_guard():
             count = 0
             for n in self.brain.read_nodes():
                 if n.status == "active" and level_fn(n) == "tombstone":
@@ -232,7 +248,7 @@ class BrainEngine:
         # evolve → index → commit) runs under ONE lock: parallel ingests
         # must not duplicate each other's nodes/edges or lose
         # vector-cache writes (Audit #1/#15).
-        with BRAIN_LOCK:
+        with self.brain.write_guard():
             self.brain.ensure_ready()  # onboarding: creates a missing brain repo
             self.brain.pull()
             if relations:
@@ -418,7 +434,7 @@ class BrainEngine:
         # Reject missing model configuration before capture, but execute the
         # adapter only after the original input is durably stored.
         extractor = command_extractor() if extraction == "model" else None
-        with BRAIN_LOCK:
+        with self.brain.write_guard():
             self.brain.ensure_ready()
             self.brain.pull()
             evidence = next((n for n in self.brain.read_nodes()
@@ -483,7 +499,7 @@ class BrainEngine:
         Returns (node, is_duplicate) — is_duplicate is always False unless
         allow_duplicates=False and an identical text already exists.
         """
-        with BRAIN_LOCK:
+        with self.brain.write_guard():
             self.brain.ensure_ready()
             self.brain.pull()
             text = text.strip()
@@ -515,7 +531,7 @@ class BrainEngine:
         node's text is used as the basis (the caller is expected to have
         already refined it, e.g. via an LLM).
         """
-        with BRAIN_LOCK:
+        with self.brain.write_guard():
             self.brain.ensure_ready()
             self.brain.pull()
             episodic = self.brain.read_node(node_id)
@@ -609,9 +625,9 @@ class BrainEngine:
             self.brain.rebuild_index()
         except Exception:
             pass  # index rebuild is best-effort; nodes/edges/vectors are the truth
-        print("WARNING: brain mutated but commit/push failed — changes are on disk "
-              "UNCOMMITTED. Recovery: `git -C <brain> add -A && git commit`, or "
-              "retry the ingest (its commit will include these changes).", file=sys.stderr)
+        print("WARNING: brain mutated but commit/push failed — changes remain local "
+              "and may already be committed. Inspect `git -C <brain> status` and "
+              "`git -C <brain> log` before retrying sync.", file=sys.stderr)
 
     @staticmethod
     def _now_short() -> str:
@@ -619,7 +635,7 @@ class BrainEngine:
         return datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
     def resolve(self, edge_id: str, accept: bool) -> Edge | None:
-        with BRAIN_LOCK:
+        with self.brain.write_guard():
             self.brain.ensure_ready()
             self.brain.pull()
             edge = self.brain.resolve_edge(edge_id, accept)
@@ -629,7 +645,7 @@ class BrainEngine:
             return edge
 
     def undo(self, edge_id: str) -> Edge | None:
-        with BRAIN_LOCK:
+        with self.brain.write_guard():
             self.brain.ensure_ready()
             self.brain.pull()
             edge = self.brain.restore_edge(edge_id)
@@ -640,7 +656,7 @@ class BrainEngine:
     def link(self, source_id: str, target_id: str,
              kind: str = "same_as") -> Edge:
         """Create a manual edge (e.g. same_as for translation/alias pairs)."""
-        with BRAIN_LOCK:
+        with self.brain.write_guard():
             self.brain.ensure_ready()
             self.brain.pull()
             ids = {n.id for n in self.brain.read_nodes()}
