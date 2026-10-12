@@ -168,6 +168,12 @@ def run_git(args: list[str], **kwargs) -> subprocess.CompletedProcess:
         check = kwargs.pop("check", False)
         if kwargs.pop("capture_output", False):
             kwargs["stdout"], kwargs["stderr"] = subprocess.PIPE, subprocess.PIPE
+        # Worker logs expose only redacted summaries. Commands such as add and
+        # commit do not request capture; their diagnostics/hooks must not inherit
+        # the worker's streams (and discarding avoids unbounded hook capture).
+        for stream in ("stdout", "stderr"):
+            if kwargs.get(stream) is None:
+                kwargs[stream] = subprocess.DEVNULL
         kwargs["start_new_session"] = True
         with subprocess.Popen(args, **kwargs) as proc:
             try:

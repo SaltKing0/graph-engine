@@ -188,7 +188,8 @@ def consolidate(brain: Brain, *, config: ConsolidationConfig | None = None,
                 extractor: Callable[[str], str | None] | None = None,
                 structured_extractor: Callable[[list[dict]], dict] | None = None,
                 dry_run: bool = False, commit: bool = True,
-                now: datetime.datetime | None = None, pending_evidence: bool = False) -> dict:
+                now: datetime.datetime | None = None, pending_evidence: bool = False,
+                sync: bool = True) -> dict:
     """One bounded pass, one commit. Validate all extraction before writing.
 
     Copy/legacy modes reuse exact normalized semantic matches. Structured mode
@@ -197,6 +198,8 @@ def consolidate(brain: Brain, *, config: ConsolidationConfig | None = None,
     Dry runs report source candidates, not model-dependent output counts.
     Background workers use pending_evidence=True for copy provenance; the
     interactive command keeps its existing publication policy by default.
+    With sync=False the caller must hold the guard over an already ready and
+    pulled corpus. The pass still commits and pushes its changes.
     """
     brain.authorize("admin")
     if extractor is not None and structured_extractor is not None:
@@ -204,7 +207,7 @@ def consolidate(brain: Brain, *, config: ConsolidationConfig | None = None,
     from .brain_engine import consolidation_config_from_env
     config = config or consolidation_config_from_env()
     with nullcontext() if dry_run else brain.write_guard():
-        if not dry_run:
+        if not dry_run and sync:
             brain.ensure_ready()
             brain.pull()
         plan = consolidation_plan(brain, config=config, now=now)

@@ -952,6 +952,8 @@ Structured model output retains its existing 32-fact/16-evidence-per-fact and
 128 KiB limits; `--limit` bounds input events rather than output facts. Git pull
 runs under the same guard before input checks; pulled files can exceed the
 ceiling, in which case maintenance stops before processing them.
+Each pass pulls once, then checks and processes that same corpus under the guard.
+Remote updates arriving afterward are checked by the next pass.
 
 In protected mode, configure `IG_ACCESS_POLICY` and `IG_PRINCIPAL` for an admin
 of the selected graph. Each pass constructs a fresh secured brain and checks
@@ -977,7 +979,9 @@ concurrent invocation of the same worker object). Pass summaries identify the
 graph/action and duration, and completed summaries include only numeric counts.
 Failed summaries use safe error codes and an empty count map: partial counts
 are unknown. They exclude node text, evidence, IDs, model stdout/stderr, command
-strings, tokens and raw exception messages. Save logs **outside the brain**:
+strings, tokens and raw exception messages. Git diagnostics and hook output are
+captured for internal handling or discarded; they never inherit worker stdout
+or stderr. Save logs **outside the brain**:
 
 ```bash
 ig maintenance --actions refresh lifecycle consolidate >> "$HOME/graph-engine-maintenance.jsonl"
@@ -1005,7 +1009,8 @@ requires inspection before restart. This avoids replaying a possibly partially
 folded recall ledger. Do not delete lock files, reset the brain or blindly enable
 automatic restart. Inspect `git status`, the affected files/ledger and local
 commits; resolve any Git operation and reconcile partial work first. Safe model
-failures can retry automatically because validation precedes file writes.
+failures can retry automatically because validation precedes file writes. This
+includes pass deadlines that expire during model extraction or its validation.
 
 ### Local Linux deployment
 

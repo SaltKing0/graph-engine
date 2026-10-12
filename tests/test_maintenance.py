@@ -408,3 +408,103 @@ def test_failed_push_stops_worker_and_preserves_local_commit(brain, monkeypatch,
     assert subprocess.check_output(["git", "-C", str(raw.path), "status", "--porcelain"]) == b""
     assert subprocess.check_output(["git", "-C", str(raw.path), "rev-parse", "HEAD"]) != subprocess.check_output(
         ["git", "-C", str(bare), "rev-parse", "main"])
+
+
+def test_git_hook_output_is_redacted_from_worker_streams(brain, monkeypatch):
+    monkeypatch.setenv("IG_BRAIN_MODE", "git")
+    raw = Brain(str(brain.path), mode="git")
+    raw.init()
+    raw.write_node(Node("private evidence", id="event", ntype="episodic", recall_count=2,
+                        created="2020-01-01T00:00:00Z"))
+    raw.commit_and_push("event")
+    hook = raw.path / ".git" / "hooks" / "pre-commit"
+    hook.write_text("#!/bin/sh\nprintf 'private stdout token\\n'\n"
+                    "printf 'private stderr token\\n' >&2\nexit 1\n")
+    hook.chmod(0o700)
+    result = subprocess.run([sys.executable, "-m", "graph_engine", "maintenance", "--once",
+                             "--actions", "consolidate"], capture_output=True, text=True, timeout=10)
+    assert result.returncode == 1
+    assert result.stderr == ""
+    rows = [json.loads(line) for line in result.stdout.splitlines()]
+    assert rows[2]["error"] == "storage_failure"
+    assert rows[2]["retryable"] is False
+    assert "private" not in result.stdout
+    # Failure remains inspectable on disk rather than in unredacted logs.
+    assert len(raw.read_nodes()) == 2
+
+
+@pytest.mark.parametrize("action", ["refresh", "lifecycle", "consolidate"])
+def test_remote_updates_cannot_bypass_input_check(brain, monkeypatch, tmp_path, action):
+    def git(*args):
+        return subprocess.run(["git", *map(str, args)], check=True, capture_output=True, text=True)
+
+    bare, publisher = tmp_path / "remote.git", tmp_path / "publisher"
+    git("init", "--bare", "-b", "main", bare)
+    monkeypatch.setenv("IG_BRAIN_MODE", "git")
+    raw = Brain(str(brain.path), mode="git")
+    raw.init(remote=str(bare))
+    raw.write_node(Node("old a", id="a", created="2020-01-01T00:00:00Z"))
+    raw.commit_and_push("event")
+    git("clone", bare, publisher)
+    (publisher / "nodes" / "b.md").write_text(
+        Node("old b", id="b", created="2020-01-01T00:00:00Z").to_markdown())
+    git("-C", publisher, "add", "-A")
+    git("-C", publisher, "-c", "user.name=test", "-c", "user.email=test@example.com",
+        "commit", "-m", "concurrent event")
+    original_pull, pulls = Brain.pull, []
+
+    def publish_after_pull(self):
+        original_pull(self)
+        pulls.append(self.path)
+        if len(pulls) == 1:
+            git("-C", publisher, "push", "origin", "main")
+
+    monkeypatch.setattr(Brain, "pull", publish_after_pull)
+    config = MaintenanceConfig(actions=(action,), max_records=1)
+    if action == "consolidate":
+        perform_pass(config, action)  # No eligible events, so no commit/push.
+    else:
+        # Writes use the checked snapshot. Since origin advanced, the push must
+        # fail rather than importing unchecked data to make it succeed.
+        with pytest.raises(PassFailure, match="storage_failure") as caught:
+            perform_pass(config, action)
+        assert not caught.value.retryable
+    assert len(pulls) == 1
+    assert raw.read_node("b") is None
+    # The next pass pulls the new corpus, then rejects it before processing.
+    with pytest.raises(PassFailure, match="input_limit") as caught:
+        perform_pass(config, action)
+    assert caught.value.retryable
+    assert raw.read_node("b").status == "probation"
+    assert raw.read_node("b").storage_tier == "recall"
+
+
+def test_pass_deadline_during_model_is_retryable_and_recovers(brain, monkeypatch):
+    import graph_engine.maintenance as maintenance
+    brain.write_node(Node("private evidence", id="event", ntype="episodic", recall_count=2,
+                          created="2020-01-01T00:00:00Z"))
+    before = {p.relative_to(brain.path): p.read_bytes() for p in brain.path.rglob("*") if p.is_file()}
+    original_check = maintenance._check_input
+
+    def slow_check(*args):
+        original_check(*args)
+        time.sleep(0.5)  # Less pass budget remains than the model's own timeout.
+
+    monkeypatch.setattr(maintenance, "_check_input", slow_check)
+    monkeypatch.setenv("IG_CONSOLIDATE_STRUCTURED_CMD", _command("import time; time.sleep(10)"))
+    config = MaintenanceConfig(actions=("consolidate",), extract_model=True,
+                               pass_timeout=1, model_timeout=0.8)
+    events = []
+    worker = MaintenanceWorker(config, emit=events.append)
+    assert worker.run(once=True) == 1
+    assert events[2]["error"] == "pass_timeout"
+    assert events[2]["retryable"] is True
+    assert not worker.stop.is_set()
+    assert before == {p.relative_to(brain.path): p.read_bytes() for p in brain.path.rglob("*") if p.is_file()}
+    with brain.write_guard(timeout=0):
+        pass
+    monkeypatch.setattr(maintenance, "_check_input", original_check)
+    monkeypatch.setenv("IG_CONSOLIDATE_STRUCTURED_CMD", _command(
+        'print(\'{"version":1,"abstain":true,"facts":[]}\')'))
+    assert worker.cycle()
+    assert events[-1]["event"] == "pass_completed"

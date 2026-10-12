@@ -179,7 +179,7 @@ def lifecycle_plan(brain: Brain, *, min_recall: int = PROMOTE_MIN_RECALL,
 def lifecycle(brain: Brain, *, min_recall: int = PROMOTE_MIN_RECALL,
               min_degree: int = PROMOTE_MIN_DEGREE, stale_days: int = DECAY_DAYS,
               max_degree: int = DECAY_MAX_DEGREE, dry_run: bool = False,
-              commit: bool = True, limit: int | None = None) -> dict:
+              commit: bool = True, limit: int | None = None, sync: bool = True) -> dict:
     """Promotion and decay: the status lifecycle, one commit, never destructive.
 
     ROADMAP_CASE `roadmap-dream-lifecycle`.
@@ -188,11 +188,13 @@ def lifecycle(brain: Brain, *, min_recall: int = PROMOTE_MIN_RECALL,
     weakly connected, old), stale → active again (used once more). Nothing is
     deleted and nothing leaves the file: `stale` is a demotion, not a removal —
     it takes the node out of the promotion pool and marks it for the report.
+    With sync=False the caller holds the guard over an already pulled corpus;
+    committing still happens normally.
     """
     brain.authorize("admin")
     if limit is not None and (type(limit) is not int or limit < 1):
         raise ValueError("lifecycle limit must be a positive integer")
-    if not dry_run and commit:
+    if not dry_run and commit and sync:
         brain.ensure_ready()
         brain.pull()
     plan_ = lifecycle_plan(brain, min_recall=min_recall, min_degree=min_degree,
@@ -277,7 +279,7 @@ def _expected_kind(confidence: float) -> str:
 
 @write_operation
 def refresh(brain: Brain, *, dry_run: bool = False, commit: bool = True,
-            strict_report: bool = False) -> dict:
+            strict_report: bool = False, sync: bool = True) -> dict:
     """Deterministic maintenance. Never destructive, never touches manual edges.
 
     1. Re-derive the kind of SUGGESTER similarity edges from the stored cosine
@@ -286,9 +288,10 @@ def refresh(brain: Brain, *, dry_run: bool = False, commit: bool = True,
     2. Fold the recall ledger into the node counters (`recall.aggregate`).
     3. Rebuild INDEX.md and regenerate the tracked BRAIN_REPORT.md.
     One commit for the whole pass.
+    With sync=False the caller holds the guard over an already pulled corpus.
     """
     brain.authorize("admin")
-    if not dry_run and commit:
+    if not dry_run and commit and sync:
         brain.ensure_ready()
         brain.pull()
     from .recall import aggregate as aggregate_recalls

@@ -123,6 +123,10 @@ def _model(config: MaintenanceConfig) -> Callable[[list[dict]], dict]:
             data = adapter(events)
             validate_consolidation(data, events)
             return data
+        except PassDeadline:
+            # The adapter has cleaned up its process group, and consolidation
+            # has not written any files while extracting/validating this batch.
+            raise PassFailure("pass_timeout") from None
         except RuntimeError as exc:
             code = "model_timeout" if "timed out" in str(exc) else "model_failed"
             raise PassFailure(code) from None
@@ -153,12 +157,12 @@ def perform_pass(config: MaintenanceConfig, action: str) -> dict[str, int]:
                 extractor = _model(config) if config.extract_model and action == "consolidate" else None
                 mutating = True
                 if action == "refresh":
-                    result = refresh(brain, strict_report=True)
+                    result = refresh(brain, strict_report=True, sync=False)
                 elif action == "lifecycle":
-                    result = lifecycle(brain, limit=config.limit)
+                    result = lifecycle(brain, limit=config.limit, sync=False)
                 else:
                     result = consolidate(brain, config=replace(config.consolidation, limit=config.limit),
-                                         structured_extractor=extractor, pending_evidence=True)
+                                         structured_extractor=extractor, pending_evidence=True, sync=False)
                 # Never export the rich maintenance result: it contains node
                 # IDs, quotes, proposals and potentially private diagnostics.
                 return {key: result[key] for key in COUNTS if type(result.get(key)) is int}
