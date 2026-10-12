@@ -218,7 +218,9 @@ class BrainEngine:
                relations: list[tuple[str, str]] | None = None,
                edge_origin: str = "manual",
                env: dict[str, str] | None = None,
-               _capture_input: str | None = None) -> tuple[Node, list[Edge], bool]:
+               _capture_input: str | None = None,
+               _document: dict | None = None,
+               _node_id: str | None = None) -> tuple[Node, list[Edge], bool]:
         """Ingest with dedupe. Returns: (node, edges, is_duplicate).
 
         On a near-duplicate (cosine >= threshold against the normalized text)
@@ -251,6 +253,11 @@ class BrainEngine:
         with self.brain.write_guard():
             self.brain.ensure_ready()  # onboarding: creates a missing brain repo
             self.brain.pull()
+            if _node_id is not None:
+                self.brain.authorize("write", _node_id)
+                capture_path = self.brain.node_path(_node_id)
+                if capture_path.exists() or capture_path.is_symlink():
+                    raise ValueError("Capture ID already exists; refusing to overwrite")
             if relations:
                 for ref, _kind in relations:
                     target = next((n for n in self.brain.read_nodes()
@@ -266,6 +273,7 @@ class BrainEngine:
                         # Cosine equivalence is not evidence equivalence. Store
                         # a separate exact receipt in the capture commit.
                         self.brain.write_node(Node(text=text, source=source, ntype=ntype,
+                            id=_node_id, document=_document,
                             capture=dict(input=_capture_input, node_id=dup.id,
                                          duplicate=True, source=source)))
                     self.brain.rebuild_index()
@@ -278,7 +286,8 @@ class BrainEngine:
                         self._heal_after_failed_commit()
                         raise
                     return dup, [], True
-            node = Node(text=text, source=source, tags=tags, ntype=ntype)
+            node = Node(text=text, source=source, tags=tags, ntype=ntype,
+                        id=_node_id, document=_document)
             if _capture_input is not None:
                 node.capture = dict(input=_capture_input, node_id=node.id,
                                     duplicate=False, source=source)

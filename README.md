@@ -40,7 +40,8 @@ On Windows, activate with `.venv\Scripts\Activate.ps1` and set environment
 variables using PowerShell's `$env:NAME="value"` syntax.
 
 For a released package, use `python -m pip install graph-engine-memory` in a virtual
-environment. Optional extras: `[st]` for semantic embeddings, `[mcp]` for MCP.
+environment. Optional extras: `[st]` for semantic embeddings, `[mcp]` for MCP,
+`[pdf]` for local PDF import.
 
 Version 0.6.1 is the first PyPI release under the `graph-engine-memory` package name
 (previously `ideagraph-live`). Install it in a fresh virtual environment and
@@ -55,6 +56,8 @@ ig ingest "User prefers short answers" --source agent
 ig search "answer preferences"
 ig entities "Alice works at Acme." --dry-run --json
 ig ingest "Alice works at Acme." --extract-entities --json
+ig import ./notes --recursive --extensions .md .txt --dry-run --json
+ig import ./notes --recursive --extensions .md .txt --source-prefix my-library
 ig pending
 ig accept <edge_id>
 ig explain <node_id> --query "answer preferences"
@@ -81,6 +84,12 @@ HTTP ingest and MCP remember accept `extraction: "rules"` or `"model"`.
 Facts stay pending by default. Capture and extraction use two commits; exact
 input receipts make retries safe even when ingestion merges a similar note.
 See [capture options and retry behavior](docs/guide.md#extract-during-ingestion).
+Local document import captures bounded chunks with source IDs, hashes and text
+locations (or PDF pages). Basic import needs no embedder; `--ingest`,
+`--extract-entities` and `--extract-model` opt into the existing pipeline.
+Retries preserve manual edits and earlier versions. Stored provenance includes
+absolute filenames/paths by default; use `--source-id` or `--source-prefix` to
+control it. See [document import](docs/guide.md#local-document-import).
 Explicit fact replacements create separate pending proposals; review both
 claims, evidence and event dates before accepting, rejecting or undoing them.
 See [replacement review](docs/guide.md#review-fact-replacements).
