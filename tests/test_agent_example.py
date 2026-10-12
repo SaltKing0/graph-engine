@@ -1,5 +1,6 @@
 """The copyable example uses disk memory and never needs a provider by default."""
 import httpx
+import pytest
 
 from examples import agent_memory as example
 
@@ -15,8 +16,37 @@ def test_two_sessions_and_prompt(tmp_path, monkeypatch):
     assert example.PREFERENCE in context["context"]
     assert context["context"] in messages[0]["content"]
     assert messages[1] == {"role": "user", "content": example.QUESTION}
-    assert "[memory:" + nid + "]" in example.offline_answer(context)
+    assert "[memory:" + nid + "]" in example.offline_answer(context, nid)
     assert before == {p.relative_to(path): p.read_bytes() for p in path.rglob("*") if p.is_file()}
+
+
+def test_existing_main_memory_does_not_change_preference_citation(tmp_path):
+    from graph_engine.brain import Brain, Node
+    path = tmp_path / "brain"
+    brain = Brain(str(path), mode="local")
+    brain.ensure_ready()
+    brain.write_node(Node(id="existing-main", text="User prefers astronomy examples.",
+                          storage_tier="main", tier_locked=True))
+    nid = example.capture_session(path)
+    context, _ = example.next_session(path)
+    assert context["nodes"] == ["existing-main", nid]
+    answer = example.offline_answer(context, nid)
+    assert f"[memory:{nid}]" in answer
+    assert "[memory:existing-main]" not in answer
+
+
+@pytest.mark.parametrize("budget", [0, 25])
+def test_omitted_or_truncated_preference_is_not_cited(tmp_path, budget):
+    from graph_engine.brain import Brain
+    from graph_engine.brain_engine import BrainEngine
+    from graph_engine.context import build_context
+    from graph_engine.embedder import HashEmbedder
+    path = tmp_path / "brain"
+    nid = example.capture_session(path)
+    engine = BrainEngine(Brain(str(path), mode="local"), HashEmbedder())
+    context = build_context(engine, example.QUESTION, budget=budget)
+    assert example.PREFERENCE not in context["context"]
+    assert "[memory:" not in example.offline_answer(context, nid)
 
 
 def test_optional_model_receives_same_prompt(tmp_path, monkeypatch):

@@ -502,10 +502,12 @@ recall and archival sections, in that order. Up to `k` visible important main
 memories are selected even without query overlap: manually pinned main nodes
 first, then main nodes with at least three recalls, ordered by descending
 recall count and stable ID. Remaining slots in each tier are filled from
-hybrid retrieval order, using a `3*k` candidate pool. This is a bounded
-selection, so it may not include every stored main memory. Node types and
-lifecycle status do not determine section membership. Tombstones and nodes
-hidden by the caller's graph/node permissions are excluded throughout.
+hybrid retrieval order, using a `3*k` candidate pool **per tier** before
+optional reranking. Both candidate and result limits apply independently to
+each tier, so a populated main tier cannot crowd recall/archival out. This is
+a bounded selection, so it may not include every stored main memory. Node
+types and lifecycle status do not determine section membership. Tombstones
+and nodes hidden by the caller's graph/node permissions are excluded throughout.
 
 The assembler packs individual entries, prefix-truncating oversized bodies
 with `… [truncated]` and trying later entries if one cannot fit. Main bodies

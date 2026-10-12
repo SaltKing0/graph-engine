@@ -64,8 +64,8 @@ def build_context(engine: BrainEngine, query: str, budget: int = 4000,
     Select up to k important main memories even without query overlap:
     manually pinned first, then recall_count >= MAIN_MIN_RECALLS, sorted by
     descending recall count and stable ID. Fill remaining slots with hybrid
-    hits in retrieval order (candidate pool: 3*k). All selection uses the
-    caller's visible live nodes. Retrieval never persists vectors or recalls.
+    hits in retrieval order (candidate pool: 3*k per tier). All selection uses
+    the caller's visible live nodes. Retrieval never persists vectors or recalls.
 
     `nodes` identifies exactly the non-empty memory bodies included in
     `context`. `memories` records their tiers, selection, evidence references
@@ -88,8 +88,8 @@ def build_context(engine: BrainEngine, query: str, budget: int = 4000,
         (n for n in live.values() if n.storage_tier == "main"
          and (n.tier_locked or n.recall_count >= MAIN_MIN_RECALLS)),
         key=lambda n: (not n.tier_locked, -n.recall_count, n.id))[:k]
-    hits = retrieve(engine, query, k=k * 3, rerank_k=max(30, k * 3),
-                    persist=False, track=False)
+    hits = retrieve(engine, query, k=k, rerank_k=k * 3,
+                    persist=False, track=False, per_tier=True)
     tiers: dict[str, list[tuple[Node, str]]] = {t: [] for t in STORAGE_TIERS}
     selected = set()
     for node in important:

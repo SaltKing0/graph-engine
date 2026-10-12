@@ -47,11 +47,16 @@ def next_session(path: Path, question: str = QUESTION) -> tuple[dict, list[dict]
     return context, messages
 
 
-def offline_answer(context: dict) -> str:
+def offline_answer(context: dict, preference_id: str) -> str:
     """A deterministic stand-in demonstrates prompt wiring, not model quality."""
-    if PREFERENCE in context["context"]:
+    # Cite the preference captured in session one, even when other memories
+    # precede it. Check its rendered entry so an omitted/truncated preference
+    # cannot be justified by the same words appearing in another memory.
+    citation = f"[memory:{preference_id}]"
+    entry = context["context"].partition(citation)[2].split("\n\n", 1)[0]
+    if preference_id in context["nodes"] and PREFERENCE in entry:
         return ("Agent Memory bewahrt Wissen zwischen Sitzungen und passt Antworten "
-                f"an deine Vorlieben an. [memory:{context['nodes'][0]}]")
+                f"an deine Vorlieben an. {citation}")
     return "Agent memory keeps useful information across sessions."
 
 
@@ -78,7 +83,7 @@ def run(path: Path, model: str | None = None) -> None:
     print("Model prompt:")
     print(json.dumps(messages, ensure_ascii=False, indent=2))
     print("Answer (" + ("real model" if model else "deterministic stand-in") + "):")
-    print(model_answer(messages, model) if model else offline_answer(context))
+    print(model_answer(messages, model) if model else offline_answer(context, nid))
 
 
 def main() -> None:

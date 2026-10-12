@@ -211,6 +211,39 @@ def test_important_main_selected_without_overlap_bounded(engine, monkeypatch):
     assert "unused" not in result["context"]
 
 
+@pytest.mark.parametrize("crowded_tier", ["main", "recall", "archival"])
+@pytest.mark.parametrize("rerank", [False, True])
+def test_candidate_and_result_limits_are_per_tier(engine, crowded_tier, rerank):
+    from collections import Counter
+    from graph_engine.context import build_context
+    from graph_engine.embedder import HashEmbedder
+    engine.embedder = HashEmbedder()
+    for i in range(36):
+        _write(engine, f"crowded-{i:02}", f"Project memory note {i}", crowded_tier)
+    for tier in ("main", "recall", "archival"):
+        if tier != crowded_tier:
+            _write(engine, tier, f"Project memory answer in {tier}", tier)
+
+    seen = []
+
+    class ReverseReranker:
+        def rerank(self, query, candidates, k):
+            seen.extend(nid for nid, _, _ in candidates)
+            return list(reversed(candidates))[:k]
+
+    if rerank:
+        engine.reranker = ReverseReranker()
+    result = build_context(engine, "Project memory", budget=4000, k=2)
+    for tier in ("main", "recall", "archival"):
+        assert len(result["tiers"][tier]["nodes"]) == (2 if tier == crowded_tier else 1)
+    assert result["tokens"] < 4000 and not result["truncated"]
+    if rerank:
+        tiers = {node.id: node.storage_tier for node in engine.brain.read_nodes()}
+        counts = Counter(tiers[nid] for nid in seen)
+        assert counts[crowded_tier] == 6  # 3*k candidates per tier, before reranking
+        assert set(counts) == {"main", "recall", "archival"}
+
+
 def test_skip_large_citation_and_try_following_memory(engine, monkeypatch):
     from graph_engine.context import build_context
     _write(engine, "too-big", "memory", source="x" * 1000)
