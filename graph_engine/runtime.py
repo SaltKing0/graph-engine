@@ -27,8 +27,7 @@ from .embedder import get_embedder
 # Audit #16: building a fresh engine per request re-instantiates the
 # sentence-transformers model per request (seconds of CPU, memory churn).
 # A process-wide cache shares the model + vector cache; write consistency
-# is provided by the Brain instance lock (all RMW mutations run under
-# brain._lock / BRAIN_LOCK). The cache is keyed on (brain path, embedder):
+# is provided by brain.write_guard() across threads and local processes. The cache is keyed on (brain path, embedder):
 # a changed env (tests, multi-brain setups) correctly gets a fresh engine
 # instead of the foreign instance.
 _ENGINES: dict[tuple[str, str], BrainEngine] = {}

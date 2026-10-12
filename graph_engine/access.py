@@ -5,6 +5,8 @@ sandbox Python or encrypt a brain against someone who can read its files.
 """
 from __future__ import annotations
 
+from .write_guard import write_operation
+
 from contextvars import ContextVar
 from datetime import datetime, timezone
 import hashlib
@@ -134,6 +136,7 @@ class SecuredBrain(Brain):
         self.authorize("read", node_id)
         return self._raw.read_node(node_id)
 
+    @write_operation
     def write_node(self, node: Node) -> None:
         self.authorize("write", node.id)
         if node.capture and node.capture["duplicate"]:
@@ -176,6 +179,7 @@ class SecuredBrain(Brain):
         self.authorize("read")
         return [e for e in self._raw.read_edges(include_rejected) if self._edge_allowed(e, "read")]
 
+    @write_operation
     def write_edges(self, edges: list[Edge]) -> None:
         self.authorize("write")
         with self._lock:
@@ -202,6 +206,7 @@ class SecuredBrain(Brain):
         self.authorize("read")
         return {nid: v for nid, v in self._raw.read_vectors().items() if self.can_access("read", nid)}
 
+    @write_operation
     def write_vectors(self, vectors: dict[str, list[float]]) -> None:
         self.authorize("write")
         old = self._raw.read_vectors()
@@ -224,26 +229,32 @@ class SecuredBrain(Brain):
         cached.update(zip(missing, values))
         return {nid: cached[nid] for nid in nodes if nid in cached}
 
+    @write_operation
     def ensure_ready(self) -> None:
         self.authorize("write")
         self._raw.ensure_ready()
 
+    @write_operation
     def init(self, remote: str | None = None, commit: bool = True) -> None:
         self.authorize("admin")
         self._raw.init(remote, commit)
 
+    @write_operation
     def clone_if_missing(self) -> None:
         self.authorize("admin")
         self._raw.clone_if_missing()
 
+    @write_operation
     def pull(self) -> None:
         self.authorize("write")
         self._raw.pull()
 
+    @write_operation
     def commit_and_push(self, message: str, push: bool = True, *, sync_pending: bool = False) -> None:
         self.authorize("write")
         self._raw.commit_and_push(message, push, sync_pending=sync_pending)
 
+    @write_operation
     def rebuild_index(self) -> None:
         self.authorize("write")
         # Generate complete internal derived state, not a filtered INDEX that

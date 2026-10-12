@@ -19,6 +19,7 @@ Idempotent: edges that already carry an origin are left untouched.
 """
 from __future__ import annotations
 
+from contextlib import nullcontext
 import argparse
 import collections
 import pathlib
@@ -46,39 +47,43 @@ def main() -> int:
     args = ap.parse_args()
 
     brain = Brain(args.brain, mode=args.mode)
-    edges = brain.read_edges(include_rejected=True)
-    counts: collections.Counter = collections.Counter()
-    todo = []
-    for edge in edges:
-        if getattr(edge, "origin", None):
-            counts["already"] += 1
-            continue
-        origin = infer(edge)
-        counts[origin] += 1
-        todo.append((edge, origin))
+    with brain.write_guard() if args.apply else nullcontext():
+        if args.apply:
+            brain.ensure_ready()
+            brain.pull()
+        edges = brain.read_edges(include_rejected=True)
+        counts: collections.Counter = collections.Counter()
+        todo = []
+        for edge in edges:
+            if getattr(edge, "origin", None):
+                counts["already"] += 1
+                continue
+            origin = infer(edge)
+            counts[origin] += 1
+            todo.append((edge, origin))
 
-    print(f"brain: {args.brain} (mode={args.mode})")
-    print(f"edges: {len(edges)} · already tagged: {counts['already']}")
-    print(f"to backfill: {len(todo)}  "
-          f"(intent {counts['intent']} · suggester {counts['suggester']} · "
-          f"manual {counts['manual']})")
-    if not args.apply:
-        print("DRY RUN — nothing written.")
-        return 0
-    if not todo:
-        print("nothing to do.")
-        return 0
+        print(f"brain: {args.brain} (mode={args.mode})")
+        print(f"edges: {len(edges)} · already tagged: {counts['already']}")
+        print(f"to backfill: {len(todo)}  "
+              f"(intent {counts['intent']} · suggester {counts['suggester']} · "
+              f"manual {counts['manual']})")
+        if not args.apply:
+            print("DRY RUN — nothing written.")
+            return 0
+        if not todo:
+            print("nothing to do.")
+            return 0
 
-    for edge, origin in todo:
-        edge.origin = origin
-    brain.write_edges(edges)
-    brain.commit_and_push(
-        f"migrate: backfill edge origin on {len(todo)} edges "
-        f"(intent {counts['intent']} · suggester {counts['suggester']} · "
-        f"manual {counts['manual']})")
-    after = collections.Counter(e.origin for e in brain.read_edges(include_rejected=True))
-    print("after:", dict(after))
-    return 0
+        for edge, origin in todo:
+            edge.origin = origin
+        brain.write_edges(edges)
+        brain.commit_and_push(
+            f"migrate: backfill edge origin on {len(todo)} edges "
+            f"(intent {counts['intent']} · suggester {counts['suggester']} · "
+            f"manual {counts['manual']})")
+        after = collections.Counter(e.origin for e in brain.read_edges(include_rejected=True))
+        print("after:", dict(after))
+        return 0
 
 
 if __name__ == "__main__":

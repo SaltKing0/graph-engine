@@ -33,6 +33,9 @@ IDEAGRAPH_EMBEDDER (st|hash), IDEAGRAPH_EMBEDDER_MODEL.
 
 from __future__ import annotations
 
+from contextlib import nullcontext
+from .write_guard import write_operation
+
 import os
 import sys
 from typing import Callable, TYPE_CHECKING
@@ -461,6 +464,7 @@ def cmd_link(engine: BrainEngine, args: list[str]) -> None:
     print(f"verlinkt: {edge.source} --[{edge.kind}]--> {edge.target}")
 
 
+@write_operation
 def cmd_init(engine: BrainEngine, args: list[str]) -> None:
     remote = None
     demo = "--demo" in args
@@ -692,17 +696,21 @@ def cmd_report(engine: BrainEngine, args: list[str]) -> None:
             sys.exit(1)
         print(out)
     if write:
-        from .report import write_report
-        try:
-            write_report(engine.brain, **opts)
-        except RuntimeError as exc:
-            print(f"Error: {exc}")
-            sys.exit(1)
-        if engine.brain.mode == "git":
-            engine.brain.commit_and_push("report: regenerate BRAIN_REPORT.md")
-            print("written: BRAIN_REPORT.md (committed)")
-        else:
-            print("written: BRAIN_REPORT.md (local mode, no commit)")
+        with engine.brain.write_guard():
+            engine.brain.authorize("admin")
+            engine.brain.ensure_ready()
+            engine.brain.pull()
+            from .report import write_report
+            try:
+                write_report(engine.brain, **opts)
+            except RuntimeError as exc:
+                print(f"Error: {exc}")
+                sys.exit(1)
+            if engine.brain.mode == "git":
+                engine.brain.commit_and_push("report: regenerate BRAIN_REPORT.md")
+                print("written: BRAIN_REPORT.md (committed)")
+            else:
+                print("written: BRAIN_REPORT.md (local mode, no commit)")
 
 
 def cmd_merge(engine: BrainEngine, args: list[str]) -> None:
@@ -1248,24 +1256,25 @@ def cmd_dream(engine: BrainEngine, args: list[str]) -> None:
         print("\nNothing written. Use --refresh / --consolidate / --distill / --lifecycle to run a pass.")
         return
 
-    out = {}
-    if do_refresh:
-        out["refresh"] = refresh(engine.brain, dry_run=dry_run)
-    if do_consolidate:
-        try:
-            out["consolidation"] = consolidate(engine.brain, config=config,
-                                               extractor=extractor, structured_extractor=structured,
-                                               dry_run=dry_run)
-        except (ValueError, RuntimeError) as exc:
-            print(f"consolidate: {exc}", file=sys.stderr)
-            sys.exit(1)
-    if do_distill:
-        out["distill"] = distill(engine.brain, min_size=min_size, limit=limit,
-                                 summarizer=summarizer, dry_run=dry_run)
-    if do_life:
-        out["lifecycle"] = lifecycle(engine.brain, min_recall=min_recall,
-                                     min_degree=min_degree, stale_days=stale_days,
-                                     max_degree=max_degree, dry_run=dry_run)
+    with nullcontext() if dry_run else engine.brain.write_guard():
+        out = {}
+        if do_refresh:
+            out["refresh"] = refresh(engine.brain, dry_run=dry_run)
+        if do_consolidate:
+            try:
+                out["consolidation"] = consolidate(engine.brain, config=config,
+                                                   extractor=extractor, structured_extractor=structured,
+                                                   dry_run=dry_run)
+            except (ValueError, RuntimeError) as exc:
+                print(f"consolidate: {exc}", file=sys.stderr)
+                sys.exit(1)
+        if do_distill:
+            out["distill"] = distill(engine.brain, min_size=min_size, limit=limit,
+                                     summarizer=summarizer, dry_run=dry_run)
+        if do_life:
+            out["lifecycle"] = lifecycle(engine.brain, min_recall=min_recall,
+                                         min_degree=min_degree, stale_days=stale_days,
+                                         max_degree=max_degree, dry_run=dry_run)
     if as_json:
         import json as _json
         print(_json.dumps(out, ensure_ascii=False, indent=2))

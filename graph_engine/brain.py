@@ -20,7 +20,8 @@ import json
 import os
 import re
 import subprocess
-import threading
+from contextlib import AbstractContextManager, nullcontext
+from .write_guard import THREAD_LOCK, canonical_path, run_git, write_guard, write_operation
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -344,15 +345,16 @@ class Brain:
     """The private repo as storage. mode="git" syncs, mode="local" is FS-only."""
 
     def __init__(self, path: str, remote: str | None = None, mode: str = "local"):
-        self.path = Path(path)
+        self.path = canonical_path(path)
         self.remote = remote
         self.mode = mode
-        # Instance lock: serializes RMW mutations even when MULTIPLE
-        # BrainEngine instances share the same brain (the server builds a new
-        # engine per request). Multi-step chains (ingest) must stay consistent
-        # across several calls — the engine-wide BRAIN_LOCK and this instance
-        # lock combine cleanly for that (RLock).
-        self._lock = threading.RLock()
+        # Compatibility alias. Mutations acquire write_guard(), which takes
+        # this thread lock first and then the shared per-brain OS lock.
+        self._lock = THREAD_LOCK
+
+    def write_guard(self, timeout: float | None = None) -> AbstractContextManager[None]:
+        """Hold from the first read through the last write/commit/push."""
+        return write_guard(self.path, timeout)
 
     def authorize(self, action: str, node_id: str | None = None) -> None:
         """Unprotected local brain; SecuredBrain enforces this shared hook."""
@@ -365,10 +367,11 @@ class Brain:
     @staticmethod
     def _remote_has_main(remote: str) -> bool:
         """True when the remote already carries a brain (a `main` branch)."""
-        r = subprocess.run(["git", "ls-remote", "--heads", remote, "main"],
+        r = run_git(["git", "ls-remote", "--heads", remote, "main"],
                            capture_output=True, text=True)
         return r.returncode == 0 and bool(r.stdout.strip())
 
+    @write_operation
     def clone_if_missing(self) -> None:
         # Audit #20: crashed-clone detection — a half-cloned directory
         # (without .git) blocked every further clone attempt forever.
@@ -381,8 +384,9 @@ class Brain:
                 f"{self.path} exists but is not a brain repo (no .git) and "
                 "not empty — please inspect/remove it manually instead of overwriting it.")
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        subprocess.run(["git", "clone", "--quiet", self.remote, str(self.path)], check=True)
+        run_git(["git", "clone", "--quiet", self.remote, str(self.path)], check=True)
 
+    @write_operation
     def init(self, remote: str | None = None, commit: bool = True) -> None:
         """Creates a fresh brain repo at the path (onboarding: `ig init`).
 
@@ -408,17 +412,18 @@ class Brain:
             self.write_vectors({})
         self.rebuild_index()
         if self.mode == "git" and not (self.path / ".git").exists():
-            subprocess.run(["git", "-C", str(self.path), "init", "--quiet"], check=True)
-            subprocess.run(["git", "-C", str(self.path), "symbolic-ref",
+            run_git(["git", "-C", str(self.path), "init", "--quiet"], check=True)
+            run_git(["git", "-C", str(self.path), "symbolic-ref",
                             "HEAD", "refs/heads/main"], check=True)
             if remote:
                 self.remote = remote
-                subprocess.run(["git", "-C", str(self.path), "remote", "add",
+                run_git(["git", "-C", str(self.path), "remote", "add",
                                 "origin", remote], check=True)
         if commit:
             # With remote → push the initial commit; without → commit locally only.
             self.commit_and_push("init: brain repo created", push=bool(remote))
 
+    @write_operation
     def ensure_ready(self) -> None:
         """Make sure the brain repo exists (init or clone).
 
@@ -435,11 +440,12 @@ class Brain:
         else:
             self.init(remote=None, commit=False)
 
+    @write_operation
     def pull(self) -> None:
         if self.mode != "git":
             return
         # Without origin (freshly `ig init`-ed, local) pull is a no-op.
-        has_origin = subprocess.run(
+        has_origin = run_git(
             ["git", "-C", str(self.path), "remote", "get-url", "origin"],
             capture_output=True).returncode == 0
         if not has_origin:
@@ -449,7 +455,7 @@ class Brain:
         # until manual repair. `--rebase --autostash` stashes local changes,
         # rebases onto origin/main and restores them; only real conflicts
         # remain visible as errors.
-        r = subprocess.run(
+        r = run_git(
             ["git", "-C", str(self.path), "pull", "--quiet", "--rebase",
              "--autostash", "origin", "main"],
             capture_output=True, text=True)
@@ -459,6 +465,7 @@ class Brain:
                 "local changes were stashed via autostash):\n"
                 + (r.stderr or r.stdout)[-500:])
 
+    @write_operation
     def commit_and_push(self, message: str, push: bool = True, *, sync_pending: bool = False) -> None:
         if self.mode != "git":
             return
@@ -467,26 +474,26 @@ class Brain:
         bot_name = os.environ.get("IG_BOT_NAME", "graph-engine-bot")
         bot_email = os.environ.get("IG_BOT_EMAIL", "bot@graph-engine.local")
         env_user = ["-c", f"user.name={bot_name}", "-c", f"user.email={bot_email}"]
-        subprocess.run(["git", "-C", str(self.path), *env_user, "add", "-A"], check=True)
-        diff = subprocess.run(["git", "-C", str(self.path), *env_user,
+        run_git(["git", "-C", str(self.path), *env_user, "add", "-A"], check=True)
+        diff = run_git(["git", "-C", str(self.path), *env_user,
                                "diff", "--cached", "--quiet"], capture_output=True)
         if diff.returncode == 0 and not sync_pending:
             return  # nothing to commit
         if diff.returncode != 0:
-            subprocess.run(["git", "-C", str(self.path), *env_user,
+            run_git(["git", "-C", str(self.path), *env_user,
                             "commit", "--quiet", "-m", message], check=True)
         if not push:
             return
         # Only push when an origin exists (freshly `ig init`-ed without a
         # remote has none — then the first commit stays local).
-        has_origin = subprocess.run(
+        has_origin = run_git(
             ["git", "-C", str(self.path), "remote", "get-url", "origin"],
             capture_output=True).returncode == 0
         if has_origin:
             # Audit #31: a failed push must not look like a failed ingest — the
             # commit is already local and consistent; the next pull --rebase
             # --autostash replays cleanly. Raise a precise, actionable error.
-            r = subprocess.run(["git", "-C", str(self.path), "push", "--quiet",
+            r = run_git(["git", "-C", str(self.path), "push", "--quiet",
                                 "origin", "main"], capture_output=True, text=True)
             if r.returncode != 0:
                 raise RuntimeError(
@@ -507,6 +514,7 @@ class Brain:
             raise ValueError(f"Invalid node ID: {node_id!r} (path-unsafe)")
         return self.path / "nodes" / f"{node_id}.md"
 
+    @write_operation
     def merge_node(self, node: Node, source: str | None = None) -> None:
         """Duplicate ingest: keep the existing node, log the source.
 
@@ -520,11 +528,13 @@ class Brain:
         node.sources = sources
         self.write_node(node)
 
+    @write_operation
     def write_node(self, node: Node) -> None:
         nodes_dir = self.path / "nodes"
         nodes_dir.mkdir(parents=True, exist_ok=True)
         _atomic_write(self.node_path(node.id), node.to_markdown())
 
+    @write_operation
     def promote_node(self, node_id: str) -> Node | None:
         """Dual buffer (V2#2): probation -> active after successful dedup check."""
         node = next((n for n in self.read_nodes() if n.id == node_id), None)
@@ -534,6 +544,7 @@ class Brain:
         self.write_node(node)
         return node
 
+    @write_operation
     def tombstone_node(self, node_id: str) -> Node | None:
         """Graceful degradation (V2#2): mark the node as forgotten (never hard-delete)."""
         node = next((n for n in self.read_nodes() if n.id == node_id), None)
@@ -608,6 +619,7 @@ class Brain:
                 continue
         return out
 
+    @write_operation
     def write_vectors(self, vectors: dict[str, list[float]]) -> None:
         content = "".join(
             _jsonl_dumps({"id": nid, "vec": vec}) + "\n"
@@ -634,36 +646,37 @@ class Brain:
         server: nothing is written to vectors.jsonl (a cold-cache write into
         the private repo would dirty it and churn the cron rebase); results
         are memoized in-process instead so the NEXT search is warm."""
-        vec_file = self.path / "vectors.jsonl"
-        memo_key = (str(self.path), vec_file.stat().st_mtime_ns if vec_file.exists() else None)
-        memo = Brain._VECTOR_MEMO.get(memo_key)
-        if memo is not None:
-            return {nid: v for nid, v in memo.items() if nid in node_ids}
-        nodes = {n.id: n for n in self.read_nodes()}
-        cached = self.read_vectors()
-        missing = [nid for nid in node_ids if nid not in cached and nid in nodes]
-        if missing and batch_fn is not None:
-            vecs = batch_fn([nodes[nid].text for nid in missing])
-            for nid, vec in zip(missing, vecs):
-                cached[nid] = vec
-            dirty = True
-        else:
-            dirty = False
-            for nid in node_ids:
-                if nid not in cached:
-                    node = nodes.get(nid)
-                    if node is None:
-                        continue
-                    cached[nid] = embed_fn(node.text)
-                    dirty = True
-        if dirty and persist:
-            self.write_vectors(cached)
-            # after a write the mtime changed — memoize under the NEW key so
-            # the next persist=False call hits it
-            Brain._VECTOR_MEMO[(str(self.path), vec_file.stat().st_mtime_ns)] = dict(cached)
-        elif not persist:
-            Brain._VECTOR_MEMO[memo_key] = dict(cached)
-        return {nid: v for nid, v in cached.items() if nid in node_ids}
+        with self.write_guard() if persist else nullcontext():
+            vec_file = self.path / "vectors.jsonl"
+            memo_key = (str(self.path), vec_file.stat().st_mtime_ns if vec_file.exists() else None)
+            memo = Brain._VECTOR_MEMO.get(memo_key)
+            if memo is not None:
+                return {nid: v for nid, v in memo.items() if nid in node_ids}
+            nodes = {n.id: n for n in self.read_nodes()}
+            cached = self.read_vectors()
+            missing = [nid for nid in node_ids if nid not in cached and nid in nodes]
+            if missing and batch_fn is not None:
+                vecs = batch_fn([nodes[nid].text for nid in missing])
+                for nid, vec in zip(missing, vecs):
+                    cached[nid] = vec
+                dirty = True
+            else:
+                dirty = False
+                for nid in node_ids:
+                    if nid not in cached:
+                        node = nodes.get(nid)
+                        if node is None:
+                            continue
+                        cached[nid] = embed_fn(node.text)
+                        dirty = True
+            if dirty and persist:
+                self.write_vectors(cached)
+                # after a write the mtime changed — memoize under the NEW key so
+                # the next persist=False call hits it
+                Brain._VECTOR_MEMO[(str(self.path), vec_file.stat().st_mtime_ns)] = dict(cached)
+            elif not persist:
+                Brain._VECTOR_MEMO[memo_key] = dict(cached)
+            return {nid: v for nid, v in cached.items() if nid in node_ids}
 
     # ---------- Edges ----------
 
@@ -704,15 +717,18 @@ class Brain:
             edges.append(edge)
         return edges
 
+    @write_operation
     def write_edges(self, edges: list[Edge]) -> None:
         content = "".join(_jsonl_dumps(e.to_dict()) + "\n" for e in edges)
         _atomic_write(self.edges_file, content)
 
+    @write_operation
     def add_edge(self, edge: Edge) -> None:
         edges = self.read_edges(include_rejected=True)
         edges.append(edge)
         self.write_edges(edges)
 
+    @write_operation
     def invalidate_edge(self, edge_id: str, reason: str | None = None,
                         by_edge_id: str | None = None) -> Edge | None:
         """Invalidate without changing an extracted fact's original validity.
@@ -729,6 +745,7 @@ class Brain:
             self.write_edges(edges)
             return edge
 
+    @write_operation
     def resolve_edge(self, edge_id: str, accept: bool) -> Edge | None:
         with self._lock:
             edges = self.read_edges(include_rejected=True)
@@ -749,6 +766,7 @@ class Brain:
             self.write_edges(edges)
             return edge
 
+    @write_operation
     def restore_edge(self, edge_id: str) -> Edge | None:
         """Return a saved decision to the inbox without reviving invalidated facts."""
         with self._lock:
@@ -786,6 +804,7 @@ class Brain:
 
     # ---------- Generated table of contents ----------
 
+    @write_operation
     def rebuild_index(self) -> None:
         with self._lock:
             lines = ["# Index", "", "| Idea | Source | Created |", "|---|---|---|"]

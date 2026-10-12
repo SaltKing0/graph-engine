@@ -34,6 +34,8 @@ auto-merge: the top pairs are demonstrably related-but-distinct.
 
 from __future__ import annotations
 
+from .write_guard import write_operation
+
 import collections
 import datetime
 import hashlib
@@ -173,6 +175,7 @@ def lifecycle_plan(brain: Brain, *, min_recall: int = PROMOTE_MIN_RECALL,
                       "stale_days": stale_days, "max_degree": max_degree}}
 
 
+@write_operation
 def lifecycle(brain: Brain, *, min_recall: int = PROMOTE_MIN_RECALL,
               min_degree: int = PROMOTE_MIN_DEGREE, stale_days: int = DECAY_DAYS,
               max_degree: int = DECAY_MAX_DEGREE, dry_run: bool = False,
@@ -187,6 +190,9 @@ def lifecycle(brain: Brain, *, min_recall: int = PROMOTE_MIN_RECALL,
     it takes the node out of the promotion pool and marks it for the report.
     """
     brain.authorize("admin")
+    if not dry_run and commit:
+        brain.ensure_ready()
+        brain.pull()
     plan_ = lifecycle_plan(brain, min_recall=min_recall, min_degree=min_degree,
                            stale_days=stale_days, max_degree=max_degree)
     promote, revive, decay = plan_["promote"], plan_["revive"], plan_["decay"]
@@ -263,6 +269,7 @@ def _expected_kind(confidence: float) -> str:
     return "similar" if confidence >= SIMILAR_BAND else "extends"
 
 
+@write_operation
 def refresh(brain: Brain, *, dry_run: bool = False, commit: bool = True) -> dict:
     """Deterministic maintenance. Never destructive, never touches manual edges.
 
@@ -274,6 +281,9 @@ def refresh(brain: Brain, *, dry_run: bool = False, commit: bool = True) -> dict
     One commit for the whole pass.
     """
     brain.authorize("admin")
+    if not dry_run and commit:
+        brain.ensure_ready()
+        brain.pull()
     from .recall import aggregate as aggregate_recalls
     from .report import write_report
 
@@ -316,6 +326,7 @@ def _summary_ids(brain: Brain) -> set[str]:
             if SUMMARY_TAG in n.tags or PROPOSAL_TAG in n.tags}
 
 
+@write_operation
 def distill(brain: Brain, *, min_size: int = DREAM_MIN_COMMUNITY,
             limit: int = DREAM_MAX_DISTILL, members_per_summary: int = DREAM_MEMBERS_PER_SUMMARY,
             summarizer: Callable[[str], str] | None = None,
@@ -334,6 +345,9 @@ def distill(brain: Brain, *, min_size: int = DREAM_MIN_COMMUNITY,
     carry the `community-summary` tag; their edges are `origin="consolidator"`.
     """
     brain.authorize("admin")
+    if not dry_run and commit:
+        brain.ensure_ready()
+        brain.pull()
     nodes = {n.id: n for n in brain.read_nodes() if n.status != "tombstone"}
     edges = [e for e in brain.read_edges(include_rejected=True)
              if not e.pending and not e.rejected and e.is_current]

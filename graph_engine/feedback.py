@@ -114,10 +114,9 @@ def record_feedback(engine: BrainEngine, query: str, node_id: str, label: str, *
         raise ValueError("query must be non-empty")
     if label not in ("relevant", "irrelevant"):
         raise ValueError("label must be relevant or irrelevant")
-    from .brain_engine import BRAIN_LOCK
     from .retrieval import _retrieve_trace
     brain = engine.brain
-    with BRAIN_LOCK:
+    with brain.write_guard():
         getattr(brain, "authorize", lambda **_: None)(action="write", node_id=node_id)
         brain.ensure_ready()
         brain.pull()

@@ -7,6 +7,8 @@ nodes or edges are written; facts are suggestions until reviewed.
 """
 from __future__ import annotations
 
+from contextlib import nullcontext
+
 import json
 import math
 import os
@@ -303,12 +305,11 @@ def extract_entities(brain: Brain, text: str | None = None, *, node_id: str | No
     normalized name/explicit alias AND type; conflicting identities abort the
     whole batch. No cosine matching, surname matching or tombstone revival.
     """
-    from .brain_engine import BRAIN_LOCK
     from .replacements import plan_replacement
 
     if (text is None) == (node_id is None):
         raise ValueError("provide either text or node_id")
-    with BRAIN_LOCK:
+    with nullcontext() if dry_run else brain.write_guard():
         if not dry_run:
             brain.ensure_ready()
             brain.pull()

@@ -9,6 +9,8 @@ protocol produces labelled, searchable proposals with pending evidence links.
 
 from __future__ import annotations
 
+from contextlib import nullcontext
+
 import datetime
 import json
 import math
@@ -197,9 +199,9 @@ def consolidate(brain: Brain, *, config: ConsolidationConfig | None = None,
     brain.authorize("admin")
     if extractor is not None and structured_extractor is not None:
         raise ValueError("legacy and structured consolidation are mutually exclusive")
-    from .brain_engine import BRAIN_LOCK, consolidation_config_from_env
+    from .brain_engine import consolidation_config_from_env
     config = config or consolidation_config_from_env()
-    with BRAIN_LOCK:
+    with nullcontext() if dry_run else brain.write_guard():
         if not dry_run:
             brain.ensure_ready()
             brain.pull()

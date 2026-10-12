@@ -31,6 +31,8 @@ a dry run on a brain copy.
 """
 from __future__ import annotations
 
+from .write_guard import write_operation
+
 import json
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -122,6 +124,7 @@ def _drop_vector(brain: Brain, deletee: str) -> None:
     brain.write_vectors({json.loads(l)["id"]: json.loads(l)["vec"] for l in keep})
 
 
+@write_operation
 def merge_nodes(
     brain: Brain,
     survivor_id: str,
@@ -197,17 +200,17 @@ def merge_nodes(
             brain.commit_and_push(
                 f"merge: {deletee_id} consolidated into {survivor_id} "
                 f"({redirected} redirected, {invalidated} invalidated, {removed} removed)")
-        except Exception:
-            # Audit #31: the merge mutations are on disk but uncommitted —
+        except Exception as exc:
+            # Audit #31: preserve local writes/commits on sync failure,
             # heal the derived index and raise an actionable error.
             try:
                 brain.rebuild_index()
             except Exception:
                 pass
             raise RuntimeError(
-                "merge applied but commit/push failed — changes are on disk "
-                "UNCOMMITTED. Recovery: `git -C <brain> add -A && git commit` "
-                "or retry the merge (it is idempotent against the merged state).") from None
+                "merge applied but commit/push failed — changes remain local and may "
+                "already be committed. Inspect git status/log before retrying sync. "
+                f"{exc}") from exc
 
     return MergeResult(
         survivor=survivor_id,
