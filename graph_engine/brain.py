@@ -61,7 +61,11 @@ class Node:
                  entity_name: str | None = None, entity_type: str | None = None,
                  aliases: list[str] | None = None,
                  storage_tier: str = "recall", tier_locked: bool = False,
-                 capture: dict | None = None):
+                 capture: dict | None = None, document: dict | None = None):
+        if document is not None:
+            from .document_import import validate_provenance
+            validate_provenance(document)
+        self.document = document
         if capture is not None and (not isinstance(capture, dict)
                 or set(capture) != {"input", "node_id", "duplicate", "source"}
                 or not all(isinstance(capture[k], str) for k in ("input", "node_id", "source"))
@@ -137,6 +141,10 @@ class Node:
         lines.append(f"tags: {tags}")
         if self.capture is not None:
             lines.append("capture: " + json.dumps(self.capture, ensure_ascii=True))
+        if self.document is not None:
+            from .document_import import validate_provenance
+            validate_provenance(self.document)
+            lines.append("document: " + json.dumps(self.document, ensure_ascii=True))
         if self.ntype == "entity":
             # JSON values are also valid YAML and safely preserve commas,
             # quotes, colons and Unicode in names/aliases.
@@ -203,7 +211,8 @@ class Node:
                    aliases=json.loads(meta.get("aliases", "[]")),
                    storage_tier=meta.get("storage_tier", "recall"),
                    tier_locked=meta.get("tier_locked", "false").lower() == "true",
-                   capture=json.loads(meta.get("capture", "null")))
+                   capture=json.loads(meta.get("capture", "null")),
+                   document=json.loads(meta.get("document", "null")))
 
     def to_dict(self) -> dict:
         result = {"id": self.id, "text": self.text, "created": self.created,
@@ -219,6 +228,8 @@ class Node:
                           aliases=self.aliases)
         if self.capture is not None:
             result["capture"] = self.capture
+        if self.document is not None:
+            result["document"] = self.document
         return result
 
 

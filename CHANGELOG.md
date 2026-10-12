@@ -7,6 +7,10 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- Local `ig import` for Markdown, UTF-8 text and optional `[pdf]` parsing:
+  bounded deterministic chunks, read-only previews, configurable source IDs,
+  file hashes and page/text locations, append-only retries and exact evidence
+  through opt-in ingestion/dedup/entity extraction (issue #24).
 - Packaged, explicitly started `ig maintenance` / `ig-maintenance` local worker
   with fixed graph/action selection, bounded inputs/passes/model calls, shared
   admin-authorized writer coordination, pending evidence, graceful shutdown and

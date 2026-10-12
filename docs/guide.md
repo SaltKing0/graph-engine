@@ -46,6 +46,7 @@ python -m pip install graph-engine-memory
 # Optional extras (can be combined, for example graph-engine-memory[st,mcp]):
 python -m pip install "graph-engine-memory[st]"   # semantic embeddings
 python -m pip install "graph-engine-memory[mcp]"  # MCP server
+python -m pip install "graph-engine-memory[pdf]"  # optional local PDF parsing
 ```
 
 To install current `main` without a checkout:
@@ -157,6 +158,8 @@ ig graph create <name>             # create a graph
 ig graph switch <name>             # persist the selected graph
 ig init [--remote <url>] [--demo]  # create a brain (empty / connected / demo)
 ig ingest "New idea ..."           # ingest (duplicates are merged)
+ig import ./notes --recursive --extensions .md .txt --dry-run --json
+                                  # preview local document chunks without brain writes
 ig entities "Alice works at Acme. She uses Python." [--dry-run] [--json]
                                   # typed entities + pending fact triples
 ig entities --node <node_id>       # extract from an existing note/event
@@ -215,6 +218,98 @@ ig merge <survivor> <deletee>      # consolidate a near-duplicate pair
 ig mcp                             # read-only MCP server over stdio (AI assistants)
 ig mcp --write                     # + remember/recall/forget (agent memory, opt-in)
 ```
+
+### Local document import
+
+Import selected local files or directories with `ig import`. Markdown (`.md`)
+and UTF-8 text (`.txt`) are selected by default. Directories are shallow unless
+`--recursive` is supplied. Extension selection is case-insensitive; use
+`--extensions .md .txt .pdf` to include PDF, or `.pdf` alone for a PDF collection.
+Symlink files/directories and non-regular files are reported and never followed.
+No URL fetching, OCR or background watching is performed.
+
+```bash
+ig import ./notes --recursive --extensions .md .txt --dry-run --json
+ig import ./notes --recursive --extensions .md .txt --source-prefix research --json
+python -m pip install "graph-engine-memory[pdf]"   # source checkout: pip install -e ".[pdf]"
+ig import ./paper.pdf --extensions .pdf --source-id paper-2026 --json
+ig import ./meeting.md --source-id meeting-2026 --extract-entities --json
+```
+
+Basic import stores semantic notes without loading an embedder, generating
+edges, invoking a model or generating vectors. Search can build their vectors
+later under its normal cache rules. `--ingest` enables existing embedding,
+semantic deduplication and edge suggestions for **new** chunks.
+`--extract-entities` additionally extracts rule-based entities/facts;
+`--extract-model` uses the configured `IG_ENTITIES_LLM_CMD` adapter with its
+existing timeout. These three options are mutually exclusive. Facts remain
+pending and follow existing review/rejection rules. Repeating an import with
+extraction enabled can extract from previously captured chunks; it does not
+rerun embedding/edge suggestions for existing receipts. Extraction uses the
+receipt's original input, including when its note body was manually edited.
+
+The default per-file limit is 10 MiB. `--max-bytes N` accepts 1–104857600 bytes;
+the actual read is bounded even if a file grows while importing. Selection is
+bounded to 1000 file/error entries and 1000 visited directories, including
+excluded files and traversal errors. Each
+document is bounded to 10000 chunks. `--chunk-chars N` accepts 1–20000 Unicode
+characters (default 2000), with deterministic paragraph/heading boundaries,
+then line/word boundaries, then hard splits for oversized words. Boundary
+whitespace is omitted, with every non-whitespace character preserved. Markdown
+syntax is retained as text. Chunk size counts characters, not tokens.
+
+PDF support uses the optional lightweight `pypdf` extra. It extracts each page
+independently, limits PDFs to 1000 pages and 10000000 extracted characters, and
+reports malformed/encrypted documents explicitly. PDFs with no extractable
+text are reported as empty and create no nodes. Scanned/image-only pages need
+external OCR. Page text order and whitespace depend on the PDF and parser;
+these limits bound input/output sizes, not all internal parser memory usage.
+
+Each chunk node has a JSON `document` frontmatter object (also available in
+node API/MCP output) recording the source identifier, SHA-256 of the exact
+file bytes, parser/version, chunk size/index/count, PDF page (one-based, or
+null for text), text offsets and line range. Character offsets are zero-based,
+end-exclusive into the UTF-8 decoded text or the extracted PDF page text;
+lines are one-based. An exact-input `capture` receipt links to the survivor
+when semantic deduplication reuses a similar note. Each source retains its
+own receipt and original chunk, so deduplication cannot substitute another
+source's claim. Duplicate receipts inherit their survivor's current access
+policy; forgetting a survivor also tombstones its receipts.
+
+**Privacy:** the stored source identifier defaults to the canonical absolute
+`file:` URI, which includes directories and filenames and travels with brain
+Git history. `--source-id LABEL` replaces it for exactly one selected file.
+`--source-prefix LABEL` accepts one directory/file selection and stores only
+`LABEL/relative-name`, still exposing relative names. Use a unique opaque
+`--source-id` for each file if filenames must stay private. Provenance stores
+no other original path, but the terminal/JSON summary includes local paths.
+Changing the source identifier intentionally creates an independent source.
+
+Receipts have deterministic IDs based on source ID, file hash, parser version,
+chunk settings and location. An identical retry reuses existing nodes and
+preserves manual text/tag edits; it never revives tombstones. A changed file,
+chunk size or PDF parser version creates a new set of receipts and keeps all
+prior knowledge. No automatic replacement/deletion is implied. Restoring an
+earlier file version reuses its original receipts. Use review/forget tools to
+manage superseded information explicitly.
+
+`--dry-run` parses files and reports planned/reused/tombstoned chunk IDs and
+provenance without initializing a brain, locking, syncing, committing,
+embedding, extracting or writing caches/recall records. Protected dry runs
+still enforce reads (and may append the separate security audit). Each real
+file holds the shared writer guard across its chunks; capture commits each
+chunk, and extraction commits separately. There is no all-or-nothing batch
+transaction. Already written chunks survive failures; identical retries reuse
+them, finish pending commits and retry idempotent extraction. Commit/push
+failures retain local data and are reported; resolve Git conflicts before retry.
+
+`--json` returns per-file `status`, source ID/hash, chunk count and chunk
+results with node/survivor IDs, provenance, reused/manual-edit/tombstone state
+and optional extraction counts. `failed`/`partial` files include error codes
+and make the command exit 1; processing continues for other files. Unsupported
+or unselected extensions are `skipped`. Missing/unreadable files and parsing
+errors are reported individually. An invalid option or oversized selection
+fails before capture. An empty document creates no records.
 
 ## Relationship inference and explanations
 

@@ -8,6 +8,8 @@ Examples:
   python -m graph_engine entities "Alice works at Acme. She uses Python." [--dry-run] [--json] [--llm]
   python -m graph_engine entities --node <node_id> [--accept-facts]
   cat note.md | python -m graph_engine ingest -
+  python -m graph_engine import ./notes --recursive --extensions .md .txt --dry-run --json
+  python -m graph_engine import paper.pdf --extensions .pdf --source-id paper-2026
   python -m graph_engine pending
   python -m graph_engine accept <edge_id>
   python -m graph_engine reject <edge_id>
@@ -1377,12 +1379,61 @@ COMMANDS = {
 }
 
 
+def cmd_import(args: list[str]) -> None:
+    """Parse before constructing an engine: basic import/dry-run need no model."""
+    import argparse
+    import json
+    from .document_import import DEFAULT_MAX_BYTES, import_documents
+
+    parser = argparse.ArgumentParser(prog="ig import")
+    parser.add_argument("paths", nargs="+", help="local files or directories")
+    parser.add_argument("--recursive", action="store_true")
+    parser.add_argument("--extensions", nargs="+", default=[".md", ".txt"],
+                        help="explicit selection from .md .txt .pdf (PDF requires [pdf])")
+    parser.add_argument("--max-bytes", type=int, default=DEFAULT_MAX_BYTES)
+    parser.add_argument("--chunk-chars", type=int, default=2000)
+    source = parser.add_mutually_exclusive_group()
+    source.add_argument("--source-id", help="replace stored path for one selected file")
+    source.add_argument("--source-prefix", help="replace absolute paths with prefix/relative-name")
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--json", action="store_true")
+    pipeline = parser.add_mutually_exclusive_group()
+    pipeline.add_argument("--ingest", action="store_true", help="opt into embedding/dedup/edge suggestions")
+    pipeline.add_argument("--extract-entities", action="store_true", help="ingest and extract pending rule-based facts")
+    pipeline.add_argument("--extract-model", action="store_true", help="ingest and extract with configured command adapter")
+    opts = parser.parse_args(args)
+    extraction = "rules" if opts.extract_entities else "model" if opts.extract_model else None
+    try:
+        engine = runtime.make_engine() if not opts.dry_run and (opts.ingest or extraction) else None
+        brain = engine.brain if engine is not None else runtime.make_brain()
+        result = import_documents(brain, opts.paths, extensions=opts.extensions,
+            recursive=opts.recursive, max_bytes=opts.max_bytes, chunk_chars=opts.chunk_chars,
+            source_id=opts.source_id, source_prefix=opts.source_prefix,
+            dry_run=opts.dry_run, engine=engine, extraction=extraction)
+    except (ValueError, RuntimeError, OSError) as exc:
+        print(f"import: {exc}", file=sys.stderr)
+        sys.exit(1)
+    if opts.json:
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+    else:
+        for file in result["files"]:
+            print(f"{file['status']}: {file['path']} ({len(file['chunks'])} chunks)"
+                  + (f" — {file['error']}" if "error" in file else ""))
+        print(f"Created {result['created_chunks']}, reused {result['reused_chunks']}, "
+              f"failed files {result['failed_files']}" + (" (dry run)" if opts.dry_run else ""))
+    if result["failed_files"]:
+        sys.exit(1)
+
+
 def main() -> None:
     args = sys.argv[1:]
     if not args or args[0] in ("-h", "--help"):
         print(__doc__)
         sys.exit(0)
     cmd, rest = args[0], args[1:]
+    if cmd == "import":
+        cmd_import(rest)
+        return
     if cmd == "maintenance":
         from .maintenance import main as maintenance_main
         maintenance_main(rest)

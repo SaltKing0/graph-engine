@@ -38,6 +38,15 @@ To run the browser suite locally:
 .venv/bin/python -m pytest tests/test_frontend_xss.py --fail-on-skip -q
 ```
 
+Document import has a separate PDF-extra gate on Python 3.11–3.13:
+
+```bash
+.venv/bin/python -m pip install -e ".[pdf]"
+.venv/bin/python -m pytest tests/test_document_import.py --fail-on-skip -q
+```
+
+Core text/Markdown import needs no parser extra or model download.
+
 Playwright's downloaded Chromium is used automatically; `PLAYWRIGHT_CHROMIUM`
 can override its executable. CI downloads D3 before testing and passes its
 path through `GRAPH_ENGINE_TEST_D3`; the tests check it against the shipped

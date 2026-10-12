@@ -271,6 +271,9 @@ def get_node(id: str, max_chars: int = fmt.DEFAULT_NODE_CHARS) -> dict:
                      "created": node.created, "source": node.source,
                      "sources": node.sources, "type": node.ntype,
                      "status": node.status, "tags": node.tags,
+                     **({"document": node.document,
+                         "document_survivor_id": node.capture["node_id"] if node.capture else node.id}
+                        if node.document is not None else {}),
                      **({"entity_name": fmt.snippet(node.entity_name or "", 200),
                          "entity_type": node.entity_type,
                          "aliases": [fmt.snippet(a, 200) for a in node.aliases[:20]]}

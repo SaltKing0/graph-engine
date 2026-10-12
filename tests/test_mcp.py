@@ -469,3 +469,24 @@ def test_context_tool_missing_brain_and_embedder_error(mcp_env, monkeypatch):
     assert server.build_context("memory")["error"]["code"] == "embedder_unavailable"
     monkeypatch.setenv("IG_BRAIN_PATH", str(mcp_env / "missing"))
     assert server.build_context("memory")["error"]["code"] == "brain_missing"
+
+
+@pytest.mark.skipif(not MCP_AVAILABLE, reason="MCP extra not installed")
+def test_document_import_provenance_visible_without_writes(tmp_path, monkeypatch):
+    from graph_engine.brain import Brain
+    from graph_engine.document_import import import_documents
+    from graph_engine.mcp.server import get_node
+    brain = Brain(str(tmp_path / "brain"), mode="local")
+    source = tmp_path / "note.md"
+    source.write_text("A source document with provenance.", encoding="utf-8")
+    result = import_documents(brain, [source], source_id="public-paper")
+    nid = result["files"][0]["chunks"][0]["node_id"]
+    monkeypatch.delenv("IG_ACCESS_POLICY", raising=False)
+    monkeypatch.delenv("IG_GRAPH_HOME", raising=False)
+    monkeypatch.setenv("IG_BRAIN_PATH", str(brain.path))
+    monkeypatch.setenv("IG_BRAIN_MODE", "local")
+    before = {p: p.read_bytes() for p in brain.path.rglob("*") if p.is_file()}
+    response = get_node(nid)
+    assert response["ok"] and response["node"]["document"]["source_id"] == "public-paper"
+    assert response["node"]["document_survivor_id"] == nid
+    assert {p: p.read_bytes() for p in brain.path.rglob("*") if p.is_file()} == before
