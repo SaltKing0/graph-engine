@@ -213,6 +213,31 @@ def test_search_json_emits_machine_readable_shape(tmp_path):
     assert {"id", "score", "snippet", "status", "type", "tags", "created"} <= set(top)
     assert 0.0 <= top["score"]
 
+@pytest.mark.parametrize("args,graph_hops,focal_id", [
+    (["launch", "--json", "schedule"], 0, None),
+    (["launch", "--graph-hops", "2", "schedule", "--json"], 2, None),
+    (["launch", "--focal-id", "anchor", "schedule", "--graph-hops", "2", "--json"], 2, "anchor"),
+])
+def test_search_flags_between_query_words(tmp_path, args, graph_hops, focal_id):
+    import json
+    from graph_engine.brain import Brain, Edge, Node
+
+    brain = Brain(tmp_path / "brain", mode="local")
+    brain.write_node(Node("launch schedule", id="anchor"))
+    brain.write_node(Node("Project Cedar", id="other"))
+    brain.write_edges([Edge("anchor", "other", "linked", pending=False)])
+    result = run_cli(["search", *args], tmp_path)
+    assert result.returncode == 0, result.stderr
+    data = json.loads(result.stdout)
+    assert data["query"] == "launch schedule"
+    assert data["results"][0]["id"] == "anchor"
+    if graph_hops:
+        assert data["graph"]["options"]["hops"] == graph_hops
+        assert data["graph"]["options"]["focal_id"] == focal_id
+    else:
+        assert "graph" not in data
+
+
 def test_search_json_empty_result_is_valid_json(tmp_path):
     run_cli(["ingest", "Completely unrelated anchovy pizza history"], tmp_path)
     r = run_cli(["search", "zzzqqqxxx nonexistent term", "--json"], tmp_path)

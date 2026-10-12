@@ -759,7 +759,7 @@ def cmd_search(engine: BrainEngine, args: list[str]) -> None:
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--graph-hops", type=int, default=0, choices=range(4))
     parser.add_argument("--focal-id")
-    options = parser.parse_args(args)
+    options = parser.parse_intermixed_args(args)
     as_json = options.json
     q = " ".join(options.terms)
     try:
