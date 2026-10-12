@@ -1202,7 +1202,7 @@ The current source includes entity/fact extraction, episodic consolidation,
 relationship inference, graph and search explanations, storage tiers, retrieval
 feedback, isolated graphs and opt-in access control, alongside the CLI, web UI,
 MCP server and dream maintenance. The package version in `pyproject.toml` is
-`0.6.1`; do not use that version alone to infer which `main` features are in a
+`0.7.0`; do not use that version alone to infer which `main` features are in a
 published package. See [CHANGELOG.md](../CHANGELOG.md) for release notes and
 unreleased changes.
 
