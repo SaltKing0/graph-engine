@@ -42,6 +42,12 @@ variables using PowerShell's `$env:NAME="value"` syntax.
 For a released package, use `python -m pip install graph-engine` in a virtual
 environment. Optional extras: `[st]` for semantic embeddings, `[mcp]` for MCP.
 
+Version 0.6.0 is the first release under the `graph-engine` package name
+(previously `ideagraph-live`). Install it in a fresh virtual environment and
+point `IG_BRAIN_PATH` at your existing brain. The `ig` commands remain;
+Python imports and the uvicorn module now use `graph_engine` instead of
+`ideagraph`.
+
 ## Everyday use
 
 ```bash
