@@ -191,6 +191,8 @@ class IngestBody(BaseModel):
     source: str = "human"
     tags: list[str] = []
     allow_duplicates: bool = False
+    extraction: str | None = None
+    accept_facts: bool = False
 
 
 @app.exception_handler(ValueError)
@@ -207,17 +209,22 @@ async def ingest(body: IngestBody):
     # run in the threadpool, not on the event loop (otherwise a slow ingest
     # stalls all requests and WS broadcasts).
     engine = runtime.make_engine()
-    node, edges, is_dup = await run_in_threadpool(
-        engine.ingest, body.text, body.source, body.tags,
-        body.allow_duplicates)
+    node, edges, is_dup, extracted = await run_in_threadpool(
+        engine.capture, body.text, body.source, body.tags,
+        body.allow_duplicates, extraction=body.extraction, accept_facts=body.accept_facts)
     await manager.broadcast({
         "type": "ingested",
         "node": node.to_dict(),
         "edges": [e.to_dict() for e in edges],
         "duplicate": is_dup,
     })
-    return {"node": node.to_dict(), "suggested": [e.to_dict() for e in edges],
-            "duplicate": is_dup}
+    result = {"node": node.to_dict(), "suggested": [e.to_dict() for e in edges],
+              "duplicate": is_dup}
+    if extracted is not None:
+        result["extraction"] = extracted
+        if extracted["status"] == "failed":
+            return JSONResponse(result, status_code=502)
+    return result
 
 
 @app.post("/api/edge/{edge_id}/accept")

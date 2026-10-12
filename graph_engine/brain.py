@@ -59,7 +59,14 @@ class Node:
                  observed_at: str | None = None, context: str | None = None,
                  entity_name: str | None = None, entity_type: str | None = None,
                  aliases: list[str] | None = None,
-                 storage_tier: str = "recall", tier_locked: bool = False):
+                 storage_tier: str = "recall", tier_locked: bool = False,
+                 capture: dict | None = None):
+        if capture is not None and (not isinstance(capture, dict)
+                or set(capture) != {"input", "node_id", "duplicate", "source"}
+                or not all(isinstance(capture[k], str) for k in ("input", "node_id", "source"))
+                or not isinstance(capture["duplicate"], bool)):
+            raise ValueError("Invalid capture receipt")
+        self.capture = capture
         if storage_tier not in STORAGE_TIERS:
             raise ValueError(f"Unknown storage tier: {storage_tier!r}")
         self.storage_tier = storage_tier
@@ -127,6 +134,8 @@ class Node:
         # the rewrite "changes" the file without any content gain.
         lines.append("sources: [" + ", ".join(self.sources) + "]")
         lines.append(f"tags: {tags}")
+        if self.capture is not None:
+            lines.append("capture: " + json.dumps(self.capture, ensure_ascii=True))
         if self.ntype == "entity":
             # JSON values are also valid YAML and safely preserve commas,
             # quotes, colons and Unicode in names/aliases.
@@ -192,7 +201,8 @@ class Node:
                    entity_type=json.loads(meta.get("entity_type", "null")),
                    aliases=json.loads(meta.get("aliases", "[]")),
                    storage_tier=meta.get("storage_tier", "recall"),
-                   tier_locked=meta.get("tier_locked", "false").lower() == "true")
+                   tier_locked=meta.get("tier_locked", "false").lower() == "true",
+                   capture=json.loads(meta.get("capture", "null")))
 
     def to_dict(self) -> dict:
         result = {"id": self.id, "text": self.text, "created": self.created,
@@ -206,6 +216,8 @@ class Node:
         if self.ntype == "entity":
             result.update(entity_name=self.entity_name, entity_type=self.entity_type,
                           aliases=self.aliases)
+        if self.capture is not None:
+            result["capture"] = self.capture
         return result
 
 
@@ -430,7 +442,7 @@ class Brain:
                 "local changes were stashed via autostash):\n"
                 + (r.stderr or r.stdout)[-500:])
 
-    def commit_and_push(self, message: str, push: bool = True) -> None:
+    def commit_and_push(self, message: str, push: bool = True, *, sync_pending: bool = False) -> None:
         if self.mode != "git":
             return
         # Bot identity is configurable (IG_BOT_NAME/IG_BOT_EMAIL); no longer
@@ -441,10 +453,11 @@ class Brain:
         subprocess.run(["git", "-C", str(self.path), *env_user, "add", "-A"], check=True)
         diff = subprocess.run(["git", "-C", str(self.path), *env_user,
                                "diff", "--cached", "--quiet"], capture_output=True)
-        if diff.returncode == 0:
+        if diff.returncode == 0 and not sync_pending:
             return  # nothing to commit
-        subprocess.run(["git", "-C", str(self.path), *env_user,
-                        "commit", "--quiet", "-m", message], check=True)
+        if diff.returncode != 0:
+            subprocess.run(["git", "-C", str(self.path), *env_user,
+                            "commit", "--quiet", "-m", message], check=True)
         if not push:
             return
         # Only push when an origin exists (freshly `ig init`-ed without a
@@ -539,6 +552,22 @@ class Brain:
             return node if node.id == node_id else None
         except (ValueError, KeyError, OSError):
             return None
+
+    def capture_receipts(self, node_id: str) -> list[Node]:
+        """Live evidence copies owned by a survivor, including legacy chains."""
+        remaining = {n.id: n for n in self.read_nodes()
+                     if n.capture and n.capture["duplicate"] and n.id != node_id}
+        family = {node_id}
+        receipts = []
+        while True:
+            attached = [n for n in remaining.values() if n.capture["node_id"] in family]
+            if not attached:
+                return receipts
+            for node in attached:
+                family.add(node.id)
+                del remaining[node.id]
+                if node.status != "tombstone":
+                    receipts.append(node)
 
     # ---------- Embedding-Cache ----------
 

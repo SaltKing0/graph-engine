@@ -4,6 +4,7 @@ Examples:
   python -m graph_engine graph list | create <name> | switch <name>
   python -m graph_engine init [--remote <brain-repo-url>] [--demo]
   python -m graph_engine ingest "New idea ..." [--source agent/bot] [--allow-dup]
+  python -m graph_engine ingest "Alice works at Acme." [--extract-entities | --extract-model] [--accept-facts] [--json]
   python -m graph_engine entities "Alice works at Acme. She uses Python." [--dry-run] [--json] [--llm]
   python -m graph_engine entities --node <node_id> [--accept-facts]
   cat note.md | python -m graph_engine ingest -
@@ -300,6 +301,9 @@ def cmd_context(engine: BrainEngine, args: list[str]) -> None:
 def cmd_ingest(engine: BrainEngine, args: list[str]) -> None:
     source = "human"
     allow_dup = False
+    extraction = None
+    accept_facts = False
+    as_json = False
     rest: list[str] = []
     i = 0
     while i < len(args):
@@ -313,6 +317,18 @@ def cmd_ingest(engine: BrainEngine, args: list[str]) -> None:
             i += 2
         elif args[i] == "--allow-dup":
             allow_dup = True
+            i += 1
+        elif args[i] in ("--extract-entities", "--extract-model"):
+            if extraction is not None:
+                print("Choose only one of --extract-entities or --extract-model")
+                sys.exit(1)
+            extraction = "model" if args[i] == "--extract-model" else "rules"
+            i += 1
+        elif args[i] == "--accept-facts":
+            accept_facts = True
+            i += 1
+        elif args[i] == "--json":
+            as_json = True
             i += 1
         else:
             rest.append(args[i])
@@ -331,13 +347,28 @@ def cmd_ingest(engine: BrainEngine, args: list[str]) -> None:
     if not text.strip():
         print("Nothing to ingest. Usage: ig ingest \"text\" | ig ingest - < file")
         sys.exit(1)
-    node, edges, dup = engine.ingest(text, source=source, allow_duplicates=allow_dup)
+    node, edges, dup, extracted = engine.capture(text, source=source,
+        allow_duplicates=allow_dup, extraction=extraction, accept_facts=accept_facts)
+    if as_json:
+        import json
+        result = dict(node=node.to_dict(), suggested=[e.to_dict() for e in edges], duplicate=dup)
+        if extracted is not None:
+            result["extraction"] = extracted
+        print(json.dumps(result, ensure_ascii=False))
+        if extracted and extracted["status"] == "failed":
+            sys.exit(1)
+        return
     if dup:
         print(f"Duplicate → merged into {node.id}: {_short(node.text)}")
     else:
         print(f"Node {node.id}: {_short(node.text)}")
         for e in edges:
             print(f"  Suggestion: --[{e.kind}]--> {e.target} ({e.id})")
+    if extracted is not None:
+        import json
+        print("Extraction: " + json.dumps(extracted, ensure_ascii=False))
+        if extracted["status"] == "failed":
+            sys.exit(1)
 
 
 def cmd_pending(engine: BrainEngine, args: list[str]) -> None:

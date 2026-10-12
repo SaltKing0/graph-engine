@@ -278,7 +278,8 @@ types; `uses` assigns an otherwise unknown subject type and a concept object,
 preserving a known object's explicit type (for example, `product`).
 These are heuristic labels, not a general named-entity recognition model.
 Unsupported prose can yield no extraction; it does not create an empty graph
-or an evidence node. Ordinary `ig ingest` does not extract automatically.
+or an evidence node. Ordinary `ig ingest` does not extract automatically;
+the explicit capture options below retain the input even with no entities.
 
 `International Business Machines (IBM)` declares an acronym alias. Later
 `Alice works at IBM` reuses that organization. Names/explicit aliases are
@@ -301,6 +302,90 @@ and a forgotten matching entity causes an error instead of being recreated.
 `--accept-facts` accepts **new** fact edges immediately; the default is pending
 review, including for model output. The web review card shows the predicate
 and quoted evidence. Existing decisions are preserved.
+
+### Extract during ingestion
+
+CLI ingest, HTTP ingest and MCP remember share `engine.capture()`. With no
+extraction option, their existing deduplication and response behavior remains
+unchanged. Rules and the configured model are separate opt-ins:
+
+```bash
+ig ingest "Alice works at Acme." --extract-entities --json
+cat observation.txt | ig ingest - --source agent --extract-entities --json
+export IG_ENTITIES_LLM_CMD='your-json-extraction-command'
+ig ingest "Alice works at Acme." --extract-model --json
+# Optional existing policy: accept NEW extracted facts immediately.
+ig ingest "Alice founded Acme." --extract-entities --accept-facts --json
+```
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/ingest \
+  -H 'Content-Type: application/json' \
+  -d '{"text":"Alice works at Acme.","extraction":"rules","accept_facts":false}'
+# Add your Authorization: Bearer header in protected mode.
+```
+
+In an MCP client, enable write mode and call
+`remember({"text":"Alice works at Acme.","extraction":"rules"})`.
+Use `"model"` to invoke the command configured by the operator; requests
+cannot supply shell commands. `accept_facts: true` is optional on both APIs
+and requires an extraction mode. `IDEAGRAPH_AUTO_ACCEPT` does not accept
+extracted facts. Rejected/invalidated decisions, validity windows, aliases,
+exact typed identities and forgotten entities follow `ig entities` rules.
+The model receives only entities readable by the current principal; writes
+require permission on linked entities and evidence.
+
+Python: `node, edges, duplicate, extraction = engine.capture(text,
+extraction="rules")`; `agent_memory.remember(engine, text, extraction="rules")`
+returns its usual dictionary plus `extraction`. `engine.ingest()` remains the
+compatible three-value API without extraction.
+
+Capture and extraction use **two commits**, under the existing process lock:
+
+1. Capture performs ordinary ingestion and stores an exact input receipt.
+   Its `capture.input` JSON field preserves all original whitespace and text.
+   If cosine deduplication returns an existing survivor, a separate
+   evidence note holds the receipt in this same commit. Fact quotes and
+   mentions reference this evidence note, never the survivor's older wording.
+2. Extraction validates and authorizes its complete plan, then stores the
+   subgraph in a second commit. New facts remain pending by default.
+
+In protected mode, a duplicate evidence note inherits its survivor's current
+read/write permissions, together with any additional restrictions on the
+evidence note itself. Changes to the survivor's ACL also apply to existing
+copies, their vectors and quoted fact supports.
+
+`forget` on the returned note ID also tombstones its capture receipts and
+invalidates facts that reference their evidence. The complete plan requires
+write permission before any tombstone is stored. Cosine consolidation preserves
+receipts and their survivors; they can still be promoted, but their IDs are not
+merged away. Later ingests deduplicate against ordinary notes, not evidence
+copies.
+
+The `extraction` response includes `status` (`complete` or `failed`), `mode`,
+`source_node_id`, `captured`, `retried`, `created_entities`, `reused_entities`,
+`created_facts`, `reused_facts`, and `pending_facts` (distinct undecided,
+non-invalidated facts returned by this pass, including reused pending facts).
+A successful pass can have all zero counts for unsupported prose.
+
+If extraction fails, the input remains captured. CLI exits 1, HTTP returns
+502 with the captured node and extraction status, and MCP returns `ok: false`
+with the same capture/extraction information. Failure counts are null because
+a storage/sync failure may leave some writes on disk. Safe error codes avoid
+returning model stderr or hidden entity names. Missing model configuration or
+invalid options fail before capture. The command's existing 300-second timeout
+applies on every surface.
+
+Retry the **identical original text, source and memory type** with extraction
+enabled. The receipt skips repeat ingest and evidence creation, even with
+`allow_duplicates: true`; changed tags/relations on such a retry are not
+reapplied. A corrected model command or a switch to rules can resume extraction.
+Existing facts/supports are reused, and existing decisions are preserved.
+Unchanged retries add no Git commit. A failed commit/push can leave local
+writes or commits intact; retries commit outstanding writes and retry sync.
+Capture errors themselves retain the existing ingest error behavior. There is
+no rollback across the two phases. Receipts are scoped to accessible live
+notes and do not revive tombstones. Use one writer process per brain.
 
 ### Optional model extraction
 
@@ -479,7 +564,8 @@ ig mcp --write   # or IG_MCP_WRITE=1 — adds three write tools
 
 Write mode keeps the same discipline as the rest of the engine: **provenance**
 (so "what did a model write?" stays a query), **never destructive**, **one commit
-per write**. The write tools are registered only in write mode and carry
+per ordinary write**; opt-in entity extraction uses the two-phase capture
+workflow described above. The write tools are registered only in write mode and carry
 `readOnlyHint: false`. Client approval behavior depends on the MCP client;
 the annotation itself does not enforce a confirmation. In read-only mode,
 write handlers also reject direct calls with a `write_disabled` envelope.
@@ -692,7 +778,7 @@ distillation also requires its separate `IG_DREAM_LLM_CMD`.
 | `IG_CONSOLIDATE_MIN_COUNT` | `1` | minimum eligible, unprocessed events before a pass (integer >= 1) |
 | `IG_CONSOLIDATE_LIMIT` | `50` | maximum events per pass (integer >= 1) |
 | `IG_CONSOLIDATE_LLM_CMD` | *(none)* | optional stdin/stdout fact extractor, invoked only with `--llm` |
-| `IG_ENTITIES_LLM_CMD` | *(none)* | optional JSON stdin/stdout entity and triple extractor for `ig entities --llm` |
+| `IG_ENTITIES_LLM_CMD` | *(none)* | optional JSON stdin/stdout entity and triple extractor for `ig entities --llm`, `ig ingest --extract-model`, and HTTP/MCP `extraction: "model"`; 300-second timeout; never enabled automatically |
 
 Dedupe: near-duplicate ingests (cosine ≥ 0.92) merge into the existing node
 (`sources:` provenance); opt out with `ig ingest --allow-dup` or the

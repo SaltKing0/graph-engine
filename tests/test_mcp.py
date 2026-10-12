@@ -405,6 +405,14 @@ def test_stdio_cli_roundtrip(mcp_env, write):
                     if write:
                         text = "Astronomy telescope Jupiter rings observation"
                         saved = await call("remember", {"text": text})
+                        extracted = await call("remember", {
+                            "text": "Alice works at Acme.", "extraction": "rules"})
+                        assert extracted["extraction"]["status"] == "complete"
+                        assert extracted["extraction"]["pending_facts"] == 1
+                        retried = await call("remember", {
+                            "text": "Alice works at Acme.", "extraction": "rules"})
+                        assert retried["node_id"] == extracted["node_id"]
+                        assert retried["extraction"]["created_facts"] == 0
                         recalled = await call("recall", {"query": text})
                         assert saved["node_id"] in {n["id"] for n in recalled["results"]}
                         assert recalled["tracked"] is True
