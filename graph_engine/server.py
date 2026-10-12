@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
@@ -110,6 +110,56 @@ def review_js():
 @app.get("/api/graph")
 def graph():
     return JSONResponse(runtime.make_brain().graph_state())
+
+
+def _search_query(query: str) -> str:
+    query = query.strip()
+    if not query:
+        raise ValueError("query must be non-empty")
+    return query
+
+
+@app.get("/api/search")
+def search(query: str = Query(min_length=1, max_length=500),
+           k: int = Query(default=12, ge=1, le=20)):
+    """Rank accessible live nodes; RRF scores are not factual confidence.
+
+    Sync handlers run model construction and retrieval in FastAPI's threadpool.
+    The secured brain enforces node ACLs and forbids vector-cache writes;
+    recall.record additionally filters out nodes the caller cannot write.
+    """
+    from .retrieval import retrieve
+    query = _search_query(query)
+    engine = runtime.make_engine()
+    hits = retrieve(engine, query, k=k, persist=not bool(access.policy_path()), track=True)
+    live = {node.id: node for node in engine.brain.read_nodes() if node.status != "tombstone"}
+    results = []
+    for nid, score in hits:
+        node = live.get(nid)
+        if node is None:
+            continue
+        # Plain text, never HTML; the browser must render/escape it as text.
+        snippet = " ".join(node.text.split())
+        if len(snippet) > 200:
+            snippet = snippet[:199] + "…"
+        results.append({"id": nid, "snippet": snippet, "rank": len(results) + 1,
+                        "score": float(score), "score_kind": "rrf"})
+    return JSONResponse({"query": query, "k": k, "results": results,
+                         "score_note": "RRF scores rank relevance, not factual confidence."},
+                        headers=NO_CACHE)
+
+
+@app.get("/api/search/{node_id}/explain")
+def search_explanation(node_id: str, query: str = Query(min_length=1, max_length=500),
+                       k: int = Query(default=12, ge=1, le=20)):
+    """Recompute one explanation on demand, without cache or recall writes."""
+    from .retrieval import explain
+    query = _search_query(query)
+    engine = runtime.make_engine()
+    node = engine.brain.read_node(node_id)  # checks the node ACL, including direct requests
+    if node is None or node.status == "tombstone":
+        return JSONResponse({"error": "Idea unavailable"}, status_code=404, headers=NO_CACHE)
+    return JSONResponse(explain(engine, node_id, query, k=k), headers=NO_CACHE)
 
 
 @app.get("/report")

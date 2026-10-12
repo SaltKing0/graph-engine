@@ -350,3 +350,38 @@ def test_feedback_tiers_and_inference_respect_node_access(protected, monkeypatch
     assert raw.read_node("public").tier_locked
     monkeypatch.setenv("IG_PRINCIPAL", "owner")
     assert {r["node_id"] for r in read_feedback(runtime.make_brain())} == {"public", "private"}
+
+
+def test_http_search_acl_viewer_read_only_and_revocation(protected, monkeypatch):
+    from graph_engine.server import app
+    raw, policy_path, policy = protected
+    raw.write_node(Node(id="deleted", text="knowledge", status="tombstone"))
+    # Missing vectors must be computed without filling the protected disk cache.
+    raw.vectors_file.unlink()
+    client = TestClient(app)
+    query = {"query": "knowledge", "k": 20}
+    headers = {"Authorization": "Bearer viewer-token"}
+    for path in ("/api/search", "/api/search/public/explain"):
+        assert client.get(path, params=query).status_code == 401
+        assert client.get(path, params=query, headers={"Authorization": "Bearer invalid"}).status_code == 401
+    before = {str(p.relative_to(raw.path)): p.read_bytes() for p in raw.path.rglob("*") if p.is_file()}
+    response = client.get("/api/search", params=query, headers=headers)
+    assert response.status_code == 200
+    assert {r["id"] for r in response.json()["results"]} == {"public", "readonly"}
+    assert "private" not in response.text and "deleted" not in response.text
+    explained = client.get("/api/search/public/explain", params=query, headers=headers)
+    assert explained.status_code == 200
+    assert "private" not in explained.text and "secret evidence" not in explained.text
+    assert client.get("/api/search/private/explain", params=query, headers=headers).status_code == 403
+    after = {str(p.relative_to(raw.path)): p.read_bytes() for p in raw.path.rglob("*") if p.is_file()}
+    assert after == before
+    # Editors may record only writable hits, and still cannot persist vectors.
+    response = client.get("/api/search", params=query, headers={"Authorization": "Bearer editor-token"})
+    assert response.status_code == 200
+    ledger = [json.loads(line) for line in (raw.path / "recalls.jsonl").read_text().splitlines()]
+    assert ledger[-1]["ids"] == ["public"]
+    assert not raw.vectors_file.exists()
+    policy["graphs"]["default"]["roles"].pop("bob")
+    policy_path.write_text(json.dumps(policy))
+    assert client.get("/api/search", params=query, headers=headers).status_code == 403
+    assert client.get("/api/search/public/explain", params=query, headers=headers).status_code == 403
