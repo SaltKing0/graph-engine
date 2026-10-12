@@ -435,6 +435,10 @@ def test_git_hook_output_is_redacted_from_worker_streams(brain, monkeypatch):
 
 @pytest.mark.parametrize("action", ["refresh", "lifecycle", "consolidate"])
 def test_remote_updates_cannot_bypass_input_check(brain, monkeypatch, tmp_path, action):
+    # A fresh installation/CI runner may have no global committer identity.
+    monkeypatch.setenv("GIT_CONFIG_GLOBAL", os.devnull)
+    monkeypatch.setenv("GIT_CONFIG_NOSYSTEM", "1")
+
     def git(*args):
         return subprocess.run(["git", *map(str, args)], check=True, capture_output=True, text=True)
 
@@ -443,6 +447,8 @@ def test_remote_updates_cannot_bypass_input_check(brain, monkeypatch, tmp_path, 
     monkeypatch.setenv("IG_BRAIN_MODE", "git")
     raw = Brain(str(brain.path), mode="git")
     raw.init(remote=str(bare))
+    git("-C", raw.path, "config", "user.name", "test")
+    git("-C", raw.path, "config", "user.email", "test@example.com")
     raw.write_node(Node("old a", id="a", created="2020-01-01T00:00:00Z"))
     raw.commit_and_push("event")
     git("clone", bare, publisher)
