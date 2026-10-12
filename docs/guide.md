@@ -360,6 +360,38 @@ Python callers can use `engine.entities(text, ...)` or
 An extractor callable receives `(text, known_entities)` and returns the same
 JSON-compatible structure.
 
+## Search in the web UI
+
+The search field uses the engine's hybrid dense + BM25 retrieval with RRF
+fusion and optional reranking, so paraphrased questions can find ideas without
+literal word matches. Results arrive after a short typing pause; older
+responses are ignored. Arrow keys move between results, Enter opens an idea,
+and Escape clears the search. Both ranked hits and literal text matches stay
+highlighted in the graph.
+
+Use **Why this result?** to load a read-only explanation for that idea. It
+shows the dense/BM25 scores, ranks, RRF contributions, fused score and any
+reranker prediction. Explanations are computed only on demand and reused
+while the query stays open. They describe the current corpus, not a saved
+historical search. RRF scores rank relevance, **not factual confidence**;
+they are not comparable across queries. Optional reranking changes result
+order while the search score remains labelled `rrf`.
+
+HTTP clients can call `GET /api/search?query=...&k=12` and
+`GET /api/search/<node_id>/explain?query=...&k=12`. Queries must contain
+non-whitespace text and are limited to 500 characters; `k` defaults to 12
+and must be 1–20. The candidate limit is 30. Search returns `id`, a plain-text
+snippet capped at 200 characters, one-based `rank`, `score`, and `score_kind`.
+Both endpoints send `Cache-Control: no-store`.
+
+With access control enabled, both endpoints require the existing Bearer
+header and return only accessible, non-tombstoned nodes. Use the existing
+authenticated proxy setup for the browser; no browser token-login flow is
+provided. Missing/invalid authentication returns 401; access denial returns
+403. Search records recall only for writable hits and may fill vector caches
+in unprotected mode. Protected searches never persist vectors, viewer
+searches never record recall, and explanations never write either.
+
 ## Explain a search result
 
 `ig explain <node_id> --query "your search"` recomputes the search against the

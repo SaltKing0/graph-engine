@@ -48,6 +48,9 @@
     #search { width:100%; font-size:.875rem; padding:10px 12px; }
     #search-results { position:absolute; top:calc(100% + 8px); right:0; width:min(360px,80vw); max-height:320px; overflow:auto; z-index:3; margin:0; padding:6px; list-style:none; background:var(--panel); border:1px solid var(--border); border-radius:10px; box-shadow:0 12px 35px #0008; }
     #search-results button { text-align:left; width:100%; background:transparent; border:0; line-height:1.5; overflow-wrap:anywhere; }
+    #search-results small { display:block; color:var(--dim); }
+    #search-results .explain-search { font-size:.75rem; color:var(--dim); }
+    .search-explanation { white-space:pre-wrap; overflow-wrap:anywhere; font-size:.75rem; padding:8px; margin:0; }
     #search-results button:hover { background:var(--raised); }
     #search-results .no-results { padding:12px; color:var(--dim); font-size:.875rem; }
     #canvas { flex:1; min-height:0; position:relative; overflow:hidden; background-image:radial-gradient(#263241 1px,transparent 1px); background-size:24px 24px; }
@@ -144,7 +147,7 @@
   <nav id="mobile-tabs" aria-label="View"><button type="button" data-view="graph" aria-pressed="true">Graph</button><button type="button" data-view="inbox" aria-pressed="false">Suggestions <span id="mobile-count"></span></button></nav>
   <main id="main">
     <section id="graphwrap" aria-label="Idea graph">
-      <div class="graph-toolbar"><h1>Your idea network</h1><div class="search"><label for="search" class="sr-only">Search ideas</label><input id="search" type="search" placeholder="Search ideas …" autocomplete="off" aria-controls="search-results" aria-expanded="false"><ul id="search-results" aria-label="Search results" hidden></ul></div></div>
+      <div class="graph-toolbar"><h1>Your idea network</h1><div class="search"><label for="search" class="sr-only">Search ideas</label><input id="search" type="search" placeholder="Search ideas …" maxlength="1000" autocomplete="off" aria-controls="search-results" aria-expanded="false"><ul id="search-results" aria-label="Search results" aria-busy="false" hidden></ul><p id="search-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p></div></div>
       <div id="canvas">
         <div id="graph3d" hidden></div>
         <svg id="graph" aria-label="Connections between your ideas"></svg>

@@ -18,6 +18,8 @@ const short = (text, length = 36) => {
   let loaded = false, saving = false, resolving = false, refreshVersion = 0;
   let noticeTimer, reconnectTimer, socket, width = 1, height = 1;
   let initialFit = true, graph3D = null, use3D = false;
+  let searchTimer, searchVersion = 0, searchResults = [];
+  const searchExplanations = new Map();
   const sprites = new Map();
   const nodeById = id => nodes.find(node => node.id === id);
   const textOf = id => nodeById(id)?.text || "Idea unavailable";
@@ -110,17 +112,19 @@ const short = (text, length = 36) => {
     const selected = pending.find(edge => edge.id === selectedEdge) || edges.find(edge => edge.id === selectedEdge);
     const ids = new Set(selected ? [selected.source, selected.target] : selectedNode ? [selectedNode] : []);
     const searching = $("#search").value.trim().toLowerCase();
+    const matches = new Set(searchResults.map(result => result.id));
+    const searchMatch = node => matches.has(node.id) || node.text.toLowerCase().includes(searching);
     if (graph3D) {
-      graph3D.nodeColor(node => (ids.size ? !ids.has(node.id) : searching && !node.text.toLowerCase().includes(searching)) ? "#303b49" : ids.has(node.id) ? "#83b9ff" : "#eaf0f7");
+      graph3D.nodeColor(node => (ids.size ? !ids.has(node.id) : searching && !searchMatch(node)) ? "#303b49" : ids.has(node.id) ? "#83b9ff" : "#eaf0f7");
       for (const [id, sprite] of sprites) {
-        sprite.material.opacity = (ids.size ? !ids.has(id) : searching && !sprite.text.toLowerCase().includes(searching)) ? .2 : 1;
+        sprite.material.opacity = (ids.size ? !ids.has(id) : searching && !(matches.has(id) || sprite.text.toLowerCase().includes(searching))) ? .2 : 1;
       }
       graph3D.linkColor(edge => ids.size && !(selected ? edge.id === selectedEdge : ids.has(idOf(edge.source)) || ids.has(idOf(edge.target))) ? "#202a36" : colors[edge.kind] || "#a0afc1");
       graph3D.linkWidth(edge => edge.id === selectedEdge ? 2.5 : edge.pending ? .4 : 1);
     }
     nodeLayer.selectAll(".node")
       .classed("selected", node => ids.has(node.id))
-      .classed("dimmed", node => ids.size ? !ids.has(node.id) : searching ? !node.text.toLowerCase().includes(searching) : false);
+      .classed("dimmed", node => ids.size ? !ids.has(node.id) : searching ? !searchMatch(node) : false);
     linkLayer.selectAll("line")
       .attr("stroke-width", edge => edge.id === selectedEdge ? 3 : 1.5)
       .attr("opacity", edge => ids.size ? (selected ? edge.id === selectedEdge : ids.has(idOf(edge.source)) || ids.has(idOf(edge.target))) ? 1 : .08 : edge.pending ? .5 : .75);
@@ -271,7 +275,7 @@ const short = (text, length = 36) => {
     refreshTimer = setTimeout(refresh, delay);
   }
 
-  async function refresh() {
+  async function refresh({ updateSearch = true } = {}) {
     clearTimeout(refreshTimer);
     const version = ++refreshVersion;
     try {
@@ -305,7 +309,7 @@ const short = (text, length = 36) => {
       simulation.alpha(.6).restart();
       if (initialFit && nodes.length) { simulation.tick(80); tick(); fitNodes(nodes); initialFit = false; }
       if (detailId) renderDetail(detailId);
-      if (document.activeElement === $("#search")) renderSearch();
+      if (updateSearch && document.activeElement === $("#search")) renderSearch();
     } catch (error) {
       if (version !== refreshVersion) return;
       if (!loaded) {
@@ -465,34 +469,142 @@ const short = (text, length = 36) => {
     if (event.target === $("#detail") && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) $("#detail").close();
   });
 
-  function closeSearch() { $("#search-results").hidden = true; $("#search").setAttribute("aria-expanded", "false"); }
+  function closeSearch() {
+    clearTimeout(searchTimer);
+    searchVersion++;
+    // Hiding the dropdown keeps ranked highlights for the active query.
+    if (!$("#search").value.trim()) searchResults = [];
+    searchExplanations.clear();
+    $("#search-results").hidden = true;
+    $("#search-results").setAttribute("aria-busy", "false");
+    $("#search").setAttribute("aria-expanded", "false");
+    $("#search-status").textContent = "";
+    highlight();
+  }
+
+  function searchMessage(message, busy = false) {
+    const item = document.createElement("li");
+    item.className = "no-results";
+    item.textContent = message;
+    $("#search-results").replaceChildren(item);
+    $("#search-results").hidden = false;
+    $("#search-results").setAttribute("aria-busy", String(busy));
+    $("#search").setAttribute("aria-expanded", "true");
+    $("#search-status").textContent = message;
+  }
+
+  function searchError(error) {
+    if (error.status === 401) return "Authentication required. Open this page through your authenticated proxy.";
+    if (error.status === 403) return "Access denied. You do not have permission to search these ideas.";
+    if (error.status === 404) return "This idea is no longer available.";
+    return "Search failed. Check the connection and try again.";
+  }
+
+  function renderSearchResults() {
+    $("#search-results").innerHTML = searchResults.map((result, index) => `
+      <li data-result="${esc(result.id)}">
+        <button data-node="${esc(result.id)}"><span>${esc(result.rank)}. ${esc(result.snippet)}</span><small>RRF ${esc(Number(result.score).toPrecision(3))}</small></button>
+        <button class="quiet explain-search" data-explain="${esc(result.id)}" aria-expanded="false" aria-controls="search-explanation-${index}">Why this result?</button>
+        <pre id="search-explanation-${index}" class="search-explanation" hidden></pre>
+      </li>`).join("");
+    $("#search-results").setAttribute("aria-busy", "false");
+    $("#search-status").textContent = `${searchResults.length} results. RRF scores rank relevance, not factual confidence.`;
+    const note = document.createElement("li");
+    note.className = "no-results";
+    note.textContent = "RRF scores rank relevance, not factual confidence.";
+    $("#search-results").append(note);
+  }
+
   function renderSearch() {
-    const query = $("#search").value.trim().toLowerCase();
+    clearTimeout(searchTimer);
+    const version = ++searchVersion;
+    searchResults = [];
+    searchExplanations.clear();
+    const query = $("#search").value.trim();
     highlight();
     if (!query) { closeSearch(); return; }
-    const matches = nodes.filter(node => node.text.toLowerCase().includes(query)).slice(0, 12);
-    $("#search-results").innerHTML = matches.map(node => `<li><button data-node="${esc(node.id)}">${esc(short(node.text, 100))}</button></li>`).join("") || '<li class="no-results">No matching idea found.</li>';
-    $("#search-results").hidden = false;
-    $("#search").setAttribute("aria-expanded", "true");
+    if (Array.from(query).length > 500) { searchMessage("Use at most 500 characters."); return; }
+    searchMessage("Searching …", true);
+    searchTimer = setTimeout(async () => {
+      try {
+        const data = await request(`/api/search?${new URLSearchParams({ query, k:12 })}`);
+        if (version !== searchVersion) return;
+        searchResults = data.results;
+        if (searchResults.length) renderSearchResults();
+        else searchMessage("No matching idea found. Try different terms.");
+        highlight();
+      } catch (error) {
+        if (version !== searchVersion) return;
+        searchMessage(searchError(error));
+      }
+    }, 250);
   }
+
   $("#search").addEventListener("input", () => { clearSelection(); renderSearch(); });
-  $("#search").addEventListener("focus", renderSearch);
+  $("#search").addEventListener("focus", () => { if ($("#search-results").hidden) renderSearch(); });
   $("#search").addEventListener("keydown", event => {
-    if (event.key === "ArrowDown") { event.preventDefault(); $("#search-results button")?.focus(); }
-    if (event.key === "Enter") { event.preventDefault(); $("#search-results button")?.click(); }
+    if (event.isComposing) return;
+    if (event.key === "ArrowDown") { event.preventDefault(); $("#search-results button[data-node]")?.focus(); }
+    if (event.key === "Enter") { event.preventDefault(); $("#search-results button[data-node]")?.click(); }
   });
   $("#search-results").addEventListener("keydown", event => {
-    const buttons = [...document.querySelectorAll("#search-results button")];
-    const index = buttons.indexOf(document.activeElement);
+    const buttons = [...document.querySelectorAll("#search-results button[data-node]")];
+    const nodeButton = event.target.closest("li[data-result]")?.querySelector("button[data-node]");
+    const index = buttons.indexOf(nodeButton);
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
-      buttons[Math.max(0, Math.min(buttons.length - 1, index + (event.key === "ArrowDown" ? 1 : -1)))]?.focus();
+      if (event.key === "ArrowUp" && index === 0) $("#search").focus();
+      else buttons[Math.max(0, Math.min(buttons.length - 1, index + (event.key === "ArrowDown" ? 1 : -1)))]?.focus();
     }
   });
-  $("#search-results").addEventListener("click", event => {
+
+  $("#search-results").addEventListener("click", async event => {
+    const explainButton = event.target.closest("button[data-explain]");
+    if (explainButton) {
+      const panel = explainButton.parentElement.querySelector(".search-explanation");
+      const expanded = explainButton.getAttribute("aria-expanded") === "true";
+      explainButton.setAttribute("aria-expanded", String(!expanded));
+      panel.hidden = expanded;
+      if (expanded) return;
+      const version = searchVersion;
+      const id = explainButton.dataset.explain;
+      panel.textContent = "Loading explanation …";
+      try {
+        if (!searchExplanations.has(id)) {
+          const query = $("#search").value.trim();
+          const pending = request(`/api/search/${encodeURIComponent(id)}/explain?${new URLSearchParams({ query, k:12 })}`);
+          searchExplanations.set(id, pending);
+        }
+        const data = await searchExplanations.get(id);
+        if (version !== searchVersion) return;
+        const scoreText = value => value == null ? "unavailable" : Number(value).toPrecision(4);
+        const channelText = (name, channel) => `${name}: ${scoreText(channel?.score)} · rank ${channel?.rank ?? "—"} · RRF contribution ${scoreText(channel?.rrf_contribution)}`;
+        const reasons = { returned:"Returned", outside_top_k:"Outside the result limit", outside_candidate_limit:"Outside the candidate limit", no_overlap:"No matching terms or meaning" };
+        panel.textContent = [
+          "Fresh explanation; scores describe relevance, not factual confidence.",
+          `Result: ${reasons[data.reason] || data.reason} · rank ${data.rank ?? "—"}`,
+          channelText("Dense cosine", data.dense), channelText("BM25", data.bm25),
+          `Fused RRF: ${scoreText(data.rrf?.score)} · rank ${data.rrf?.rank ?? "—"}`,
+          ...(data.reranker_score == null ? [] : [`Reranker: ${scoreText(data.reranker_score)}`]),
+          `Matched terms: ${(data.matched_terms || []).join(", ") || "none"}`,
+          "Graph connections do not affect this ranking."
+        ].join("\n");
+      } catch (error) {
+        if (version !== searchVersion) return;
+        searchExplanations.delete(id);
+        panel.textContent = searchError(error);
+      }
+      return;
+    }
     const button = event.target.closest("button[data-node]");
     if (!button) return;
-    selectedEdge = null; selectedNode = button.dataset.node; initialFit = false;
+    const id = button.dataset.node;
+    const version = searchVersion;
+    // Loading a missing hit must not restart the search that selected it.
+    if (!nodeById(id)) await refresh({ updateSearch:false });
+    if (version !== searchVersion) return;
+    if (!nodeById(id)) { notify("This idea is no longer available.", true); return; }
+    selectedEdge = null; selectedNode = id; initialFit = false;
     $("#search").value = ""; closeSearch(); highlight();
     fitNodes(nodes.filter(node => node.id === selectedNode));
     $("#search").focus(); showDetail(selectedNode);
@@ -503,7 +615,7 @@ const short = (text, length = 36) => {
   window.addEventListener("keydown", event => {
     if (event.isComposing || event.ctrlKey || event.metaKey || event.altKey || $("#detail").open) return;
     if (event.key === "Escape") {
-      closeSearch(); $("#search").value = ""; clearSelection();
+      $("#search").value = ""; closeSearch(); clearSelection();
       if (document.activeElement.matches("input,textarea")) document.activeElement.blur();
       return;
     }
