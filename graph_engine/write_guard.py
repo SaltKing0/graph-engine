@@ -7,12 +7,14 @@ The file is permanent: unlinking it would let two writers lock different inodes.
 from __future__ import annotations
 
 from contextlib import contextmanager
+from contextvars import ContextVar
 from functools import wraps
 import errno
 import hashlib
 import inspect
 import math
 import os
+import signal
 from pathlib import Path
 import sys
 import subprocess
@@ -22,6 +24,7 @@ from typing import Callable, Iterator, ParamSpec, TypeVar
 
 THREAD_LOCK = threading.RLock()
 _HELD: dict[str, int] = {}
+_GIT_DEADLINE: ContextVar[float | None] = ContextVar("ig_git_deadline", default=None)
 P = ParamSpec("P")
 T = TypeVar("T")
 
@@ -141,6 +144,16 @@ def write_operation(function: Callable[P, T]) -> Callable[P, T]:
     return guarded
 
 
+@contextmanager
+def git_deadline(deadline: float) -> Iterator[None]:
+    """Bound worker Git subprocesses, including their descendants, to a pass."""
+    token = _GIT_DEADLINE.set(deadline)
+    try:
+        yield
+    finally:
+        _GIT_DEADLINE.reset(token)
+
+
 def run_git(args: list[str], **kwargs) -> subprocess.CompletedProcess:
     """Keep POSIX Git children inside the guard even if their parent dies.
 
@@ -149,6 +162,33 @@ def run_git(args: list[str], **kwargs) -> subprocess.CompletedProcess:
     """
     if os.name == "posix" and _HELD:
         kwargs["pass_fds"] = tuple(_HELD.values())
+    deadline = _GIT_DEADLINE.get()
+    if deadline is not None:
+        timeout = min(kwargs.pop("timeout", float("inf")), max(0, deadline - time.monotonic()))
+        check = kwargs.pop("check", False)
+        if kwargs.pop("capture_output", False):
+            kwargs["stdout"], kwargs["stderr"] = subprocess.PIPE, subprocess.PIPE
+        # Worker logs expose only redacted summaries. Commands such as add and
+        # commit do not request capture; their diagnostics/hooks must not inherit
+        # the worker's streams (and discarding avoids unbounded hook capture).
+        for stream in ("stdout", "stderr"):
+            if kwargs.get(stream) is None:
+                kwargs[stream] = subprocess.DEVNULL
+        kwargs["start_new_session"] = True
+        with subprocess.Popen(args, **kwargs) as proc:
+            try:
+                stdout, stderr = proc.communicate(timeout=timeout)
+            except BaseException:
+                # Clean up Git/SSH/hooks before releasing their inherited lock.
+                try:
+                    os.killpg(proc.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                proc.communicate()
+                raise
+        if check and proc.returncode:
+            raise subprocess.CalledProcessError(proc.returncode, args, stdout, stderr)
+        return subprocess.CompletedProcess(args, proc.returncode, stdout, stderr)
     return subprocess.run(args, **kwargs)
 
 

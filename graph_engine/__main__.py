@@ -18,6 +18,7 @@ Examples:
   python -m graph_engine recall [--top 10] [--aggregate] [--dry-run] [--json]
   python -m graph_engine consolidate [--threshold 1] [--min-age-days 1] [--min-count 1] [--limit 50] [--dry-run] [--json] [--llm | --structured]
   python -m graph_engine dream [--refresh] [--consolidate] [--distill] [--lifecycle] [--dry-run] [--json]
+  python -m graph_engine maintenance [--once] [--actions refresh lifecycle consolidate] [--interval 900]
   python -m graph_engine link <node_a> <node_b> [--kind same_as]
   python -m graph_engine search "attention" [--json]
   python -m graph_engine explain <node_id> [--query "attention"] [--json]
@@ -1382,6 +1383,10 @@ def main() -> None:
         print(__doc__)
         sys.exit(0)
     cmd, rest = args[0], args[1:]
+    if cmd == "maintenance":
+        from .maintenance import main as maintenance_main
+        maintenance_main(rest)
+        return
     if cmd == "graph":
         try:
             cmd_graph(rest)

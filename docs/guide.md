@@ -788,8 +788,9 @@ events, use `ig consolidate --threshold 0 --min-age-days 0`.
 Fact IDs are independent of text. Editing or merging a fact keeps its identity;
 a later extraction reuses an exact current-text match or creates a new fact.
 
-The command does not start a daemon: run `ig dream --refresh --consolidate` from
-your scheduler for time-based checks, or invoke it manually. Completed ingest
+The command does not start a daemon. For a packaged, explicitly started service,
+use [the maintenance worker](#background-maintenance-worker), or run
+`ig dream --refresh --consolidate` manually/from your own scheduler. Completed ingest
 cycles in `tools/ig_cycle.py` now include `--consolidate`; cycles that abort before
 the dream step still perform no extraction. `ig dream` without action flags
 remains read-only. Dream accepts the same gate flags, using `--consolidate-limit`
@@ -903,6 +904,147 @@ Dream's dry-run report distinguishes selection eligibility, extraction not run,
 and stored evidence review counts. JSON returns `protocol`, `extraction_ran`,
 `proposals`, `pending_proposals` (new pending evidence-edge count), and the
 publication policy; `review` is the stored edge-state count before the pass.
+
+## Background maintenance worker
+
+`ig maintenance` (also `ig-maintenance` and `python -m graph_engine.maintenance`)
+ships in the package. Only explicitly running this command starts a worker;
+package imports, ingest, the web server and MCP never start it. Initialize the
+brain with `ig init` first. The worker requires no embedder or model download.
+Current support is **Linux/macOS on local filesystems**; Windows users can run
+individual maintenance commands manually. The shared guard's network filesystem,
+multi-host and read-snapshot limitations still apply.
+
+```bash
+export IG_BRAIN_PATH="$HOME/graph-engine-brain"
+ig maintenance --once --actions refresh lifecycle consolidate
+ig maintenance --interval 900 --actions refresh lifecycle consolidate --limit 50
+```
+
+Default actions are `refresh lifecycle`, in that order. `--actions` selects and
+orders passes. Refresh folds recall usage, rebalances unpinned tiers, repairs
+similarity kinds and regenerates the index/report. Lifecycle promotes/revives or
+marks old unused nodes stale; it never removes them. Consolidation reuses the
+existing age/recall/count gates and preserves exact observation text by default.
+Worker-created evidence links stay **pending** (including copy mode); existing
+accept/reject/forget decisions survive retries. The worker never accepts pending
+assertions, merges or deletes knowledge. Community distillation and legacy
+free-text model commands are intentionally absent from its action list.
+
+| Flag | Default | Bound/behavior |
+|---|---|---|
+| `--interval` | `900` seconds | 0.01–604800; fixed delay after the previous cycle finishes, first cycle immediately |
+| `--graph` | startup graph selection | named graph under `IG_GRAPH_HOME`; selection remains fixed even if another CLI switches graphs |
+| `--pass-timeout` | `120` seconds | 0.01–3600; whole individual pass including lock wait, planning, model, writes and Git sync |
+| `--lock-timeout` | `30` seconds | 0–3600; shared writer wait; the pass deadline can expire first |
+| `--limit` | `50` | 1–1000 lifecycle transitions or selected consolidation source events per pass |
+| `--max-records` | `10000` | 1–1000000; input ceiling separately for node files, edges, vectors and recall-ledger lines |
+| `--max-input-bytes` | `67108864` | 1–1073741824; combined node/edge/vector/recall input bytes |
+| `--threshold`, `--min-age-days`, `--min-count` | `1`, `1`, `1` | consolidation eligibility, explicit worker settings |
+| `--extract-model` | off | requires the consolidate action and configured `IG_CONSOLIDATE_STRUCTURED_CMD` |
+| `--model-timeout` | `30` seconds | positive, shorter than the pass deadline when enabled; one structured batch call |
+| `--once` | off | one cycle; exit status 1 if any pass fails |
+
+Refresh reads and can update a whole bounded corpus; `--limit` does not truncate
+recall aggregation or an index/report. Oversized inputs fail before maintenance
+writes, so raise the input ceilings deliberately after inspecting workload.
+Structured model output retains its existing 32-fact/16-evidence-per-fact and
+128 KiB limits; `--limit` bounds input events rather than output facts. Git pull
+runs under the same guard before input checks; pulled files can exceed the
+ceiling, in which case maintenance stops before processing them.
+Each pass pulls once, then checks and processes that same corpus under the guard.
+Remote updates arriving afterward are checked by the next pass.
+
+In protected mode, configure `IG_ACCESS_POLICY` and `IG_PRINCIPAL` for an admin
+of the selected graph. Each pass constructs a fresh secured brain and checks
+admin authorization again; policy revocation takes effect on subsequent access.
+The worker uses CLI identity, never bearer tokens or an authorization bypass.
+
+For model-backed extraction, startup **and** the model flag are explicit:
+
+```bash
+export IG_CONSOLIDATE_STRUCTURED_CMD='your-json-consolidation-command'
+ig maintenance --actions consolidate --extract-model --model-timeout 30 --pass-timeout 120
+```
+
+Setting a model command alone does not enable it. The existing structured
+protocol validates the whole batch before writes; failed, malformed, oversized
+or timed-out model output leaves that consolidation batch unwritten.
+
+### Logs, retries and shutdown
+
+Stdout is newline-delimited JSON: `worker_started`, `pass_started`,
+`pass_completed`, `pass_failed`, `worker_stopped` (and `cycle_skipped` for a
+concurrent invocation of the same worker object). Pass summaries identify the
+graph/action and duration, and completed summaries include only numeric counts.
+Failed summaries use safe error codes and an empty count map: partial counts
+are unknown. They exclude node text, evidence, IDs, model stdout/stderr, command
+strings, tokens and raw exception messages. Git diagnostics and hook output are
+captured for internal handling or discarded; they never inherit worker stdout
+or stderr. Save logs **outside the brain**:
+
+```bash
+ig maintenance --actions refresh lifecycle consolidate >> "$HOME/graph-engine-maintenance.jsonl"
+python -c 'import json,sys; [print(r) for line in sys.stdin if (r:=json.loads(line)).get("event")=="pass_failed"]' < "$HOME/graph-engine-maintenance.jsonl"
+```
+
+One worker runs passes sequentially without catch-up queues; additional worker,
+CLI, HTTP and MCP processes serialize through the same brain guard. A failed
+pass skips remaining actions that cycle. `writer_busy`, pre-write access/input
+failures and model failures have `retryable: true` and retry at the next interval
+without a tight retry loop. A completed no-op consolidation or lifecycle pass
+creates no duplicate records. Fix missing initialization, permissions, oversized
+inputs or the configured model before expecting a successful retry.
+
+SIGINT/SIGTERM interrupt the idle wait immediately and request shutdown after the
+current bounded pass; later actions do not start. A pass deadline interrupts
+processing and cleans up active Git/model process groups. The writer guard is
+released during unwinding. Like the underlying storage, a pass is **not a
+multi-file transaction**. POSIX deadlines interrupt Python processing and
+subprocess waits; they cannot preempt an uninterruptible filesystem/native call.
+Interruption or storage/sync failure during mutation
+may leave partial files, an interrupted Git operation or a local commit whose
+push failed. These failures have `retryable: false`; the worker exits 1 and
+requires inspection before restart. This avoids replaying a possibly partially
+folded recall ledger. Do not delete lock files, reset the brain or blindly enable
+automatic restart. Inspect `git status`, the affected files/ledger and local
+commits; resolve any Git operation and reconcile partial work first. Safe model
+failures can retry automatically because validation precedes file writes. This
+includes pass deadlines that expire during model extraction or its validation.
+
+### Local Linux deployment
+
+For a user systemd service, save this as
+`~/.config/systemd/user/graph-engine-maintenance.service`, replacing `USER` and
+the virtual-environment path. It runs the installed command, not checkout tools:
+
+```ini
+[Unit]
+Description=GraphEngine local memory maintenance
+
+[Service]
+Type=simple
+Environment=IG_BRAIN_PATH=/home/USER/graph-engine-brain
+# Protected brains also need IG_ACCESS_POLICY and IG_PRINCIPAL=an-admin.
+ExecStart=/home/USER/.venvs/graph-engine/bin/ig-maintenance --actions refresh lifecycle consolidate --interval 900 --limit 50 --pass-timeout 120
+Restart=no
+TimeoutStopSec=130
+
+[Install]
+WantedBy=default.target
+```
+
+```bash
+systemctl --user daemon-reload
+systemctl --user enable --now graph-engine-maintenance
+journalctl --user -u graph-engine-maintenance -f
+systemctl --user stop graph-engine-maintenance
+```
+
+The journal retains JSON failures for inspection. This example deliberately
+leaves fatal failures stopped; safe failures already retry inside the worker.
+On macOS, run the same command in a terminal or configure launchd with equivalent
+environment, log paths and a shutdown grace longer than `--pass-timeout`.
 
 ## Configuration
 

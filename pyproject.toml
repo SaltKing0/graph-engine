@@ -37,6 +37,7 @@ dev = ["pytest==8.4.0"]
 [project.scripts]
 ig = "graph_engine.__main__:main"
 ig-mcp = "graph_engine.mcp.server:main"
+ig-maintenance = "graph_engine.maintenance:main"
 
 [project.urls]
 Homepage = "https://github.com/SaltKing0/graph-engine"

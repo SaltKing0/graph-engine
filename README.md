@@ -97,6 +97,19 @@ not factual entailment. Copy mode and legacy `--llm` remain available.
 
 See the [structured protocol and publication policy](docs/guide.md#structured-consolidation-proposals).
 
+Background maintenance requires explicit startup (Linux/macOS):
+
+```bash
+ig maintenance --once --actions refresh lifecycle consolidate
+ig maintenance --interval 900 --actions refresh lifecycle consolidate --limit 50
+```
+
+The packaged worker needs no embedder or model download. It shares the local
+writer guard, requires an admin principal in protected mode, keeps new evidence
+pending and prints JSON summaries without node text or tokens. Model extraction
+requires its own `--extract-model` flag. See [worker limits, failures and local
+deployment](docs/guide.md#background-maintenance-worker).
+
 ## Documentation
 
 - [CLI reference](docs/guide.md#cli) and [configuration](docs/guide.md#configuration)

@@ -7,6 +7,11 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- Packaged, explicitly started `ig maintenance` / `ig-maintenance` local worker
+  with fixed graph/action selection, bounded inputs/passes/model calls, shared
+  admin-authorized writer coordination, pending evidence, graceful shutdown and
+  redacted JSON summaries. Safe failures retry at the next interval; uncertain
+  partial-write failures stop for inspection (issue #28).
 - Shared per-brain local writer guard for CLI, HTTP, MCP and maintenance,
   with canonical path identities, reentrant operations, bounded waits and
   crash-released locks outside tracked brain files. POSIX Git children retain

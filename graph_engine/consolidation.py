@@ -188,13 +188,18 @@ def consolidate(brain: Brain, *, config: ConsolidationConfig | None = None,
                 extractor: Callable[[str], str | None] | None = None,
                 structured_extractor: Callable[[list[dict]], dict] | None = None,
                 dry_run: bool = False, commit: bool = True,
-                now: datetime.datetime | None = None) -> dict:
+                now: datetime.datetime | None = None, pending_evidence: bool = False,
+                sync: bool = True) -> dict:
     """One bounded pass, one commit. Validate all extraction before writing.
 
     Copy/legacy modes reuse exact normalized semantic matches. Structured mode
     reuses labelled proposals with the same validity window. New facts enter
     probation; tombstoned matches are never revived.
     Dry runs report source candidates, not model-dependent output counts.
+    Background workers use pending_evidence=True for copy provenance; the
+    interactive command keeps its existing publication policy by default.
+    With sync=False the caller must hold the guard over an already ready and
+    pulled corpus. The pass still commits and pushes its changes.
     """
     brain.authorize("admin")
     if extractor is not None and structured_extractor is not None:
@@ -202,7 +207,7 @@ def consolidate(brain: Brain, *, config: ConsolidationConfig | None = None,
     from .brain_engine import consolidation_config_from_env
     config = config or consolidation_config_from_env()
     with nullcontext() if dry_run else brain.write_guard():
-        if not dry_run:
+        if not dry_run and sync:
             brain.ensure_ready()
             brain.pull()
         plan = consolidation_plan(brain, config=config, now=now)
@@ -226,7 +231,8 @@ def consolidate(brain: Brain, *, config: ConsolidationConfig | None = None,
             result["abstained"] = not facts
             result["extraction_ran"] = True
         else:
-            changed, links = _copy_batch(nodes, edges, plan, extractor, result)
+            changed, links = _copy_batch(nodes, edges, plan, extractor, result,
+                                         pending_evidence=pending_evidence)
             result["extraction_ran"] = True
 
         # No file writes until the complete extraction batch has been validated.
@@ -252,7 +258,7 @@ def consolidate(brain: Brain, *, config: ConsolidationConfig | None = None,
 
 
 def _copy_batch(nodes: dict[str, Node], edges: list[Edge], plan: dict, extractor: Callable | None,
-                result: dict) -> tuple[dict[str, Node], list[Edge]]:
+                result: dict, *, pending_evidence: bool = False) -> tuple[dict[str, Node], list[Edge]]:
     """Compatible deterministic and legacy extraction planning."""
     semantic: dict[str, Node] = {}
     suppressed = _suppressed_claims(nodes, edges)
@@ -289,6 +295,8 @@ def _copy_batch(nodes: dict[str, Node], edges: list[Edge], plan: dict, extractor
                 fact.sources.append("consolidator")
                 changed[fact.id] = fact
         links.append(Edge(source=fact.id, target=nid, kind="extends",
-                          pending=False, origin="consolidator"))
+                          pending=pending_evidence, origin="consolidator"))
+
+    result["pending_proposals"] = sum(e.pending for e in links)
 
     return changed, links

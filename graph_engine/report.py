@@ -18,7 +18,7 @@ inbox (always empty — the cycle auto-accepts), and a coverage section
 """
 from __future__ import annotations
 
-from .write_guard import write_operation
+from .write_guard import run_git, write_operation
 
 import json
 import os
@@ -59,7 +59,7 @@ def _short(text: str, limit: int = 72) -> str:
 
 def _git(brain: Brain, *args: str) -> str | None:
     try:
-        r = subprocess.run(["git", "-C", brain.path, *args],
+        r = run_git(["git", "-C", brain.path, *args],
                            capture_output=True, text=True, timeout=10)
         if r.returncode != 0:
             return None
