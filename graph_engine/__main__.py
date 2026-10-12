@@ -839,7 +839,7 @@ def cmd_mcp(engine: BrainEngine, args: list[str]) -> None:
     try:
         from .mcp.server import main as mcp_main
     except ImportError:
-        print("MCP support is not installed — pip install 'graph-engine[mcp]'")
+        print("MCP support is not installed — pip install 'graph-engine-memory[mcp]'")
         sys.exit(1)
     if write:
         from .mcp.server import register_write_tools

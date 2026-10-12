@@ -6,6 +6,16 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-10-12
+
+### Fixed
+- Publish as `graph-engine-memory`: PyPI rejected the planned `graph-engine`
+  name as too similar to an existing project. Version 0.6.0 remains a GitHub
+  release only; 0.6.1 includes all of its features under the accepted PyPI name.
+- Update package metadata, PyPI links, installation instructions and missing-
+  dependency messages. Python imports remain `graph_engine`; CLI commands
+  remain `ig` and `ig-mcp`; the repository remains `SaltKing0/graph-engine`.
+
 ## [0.6.0] - 2026-10-12
 
 ### Added
@@ -531,7 +541,9 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
   license. Similarity edges (`ähnlich`, `erweitert` — renamed to
   `similar`/`extends` in 0.5.0).
 
-[Unreleased]: https://github.com/SaltKing0/graph-engine/compare/v0.5.4...HEAD
+[Unreleased]: https://github.com/SaltKing0/graph-engine/compare/v0.6.1...HEAD
+[0.6.1]: https://github.com/SaltKing0/graph-engine/compare/v0.6.0...v0.6.1
+[0.6.0]: https://github.com/SaltKing0/graph-engine/compare/v0.5.4...v0.6.0
 [0.5.4]: https://github.com/SaltKing0/graph-engine/compare/v0.5.3...v0.5.4
 [0.5.3]: https://github.com/SaltKing0/graph-engine/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/SaltKing0/graph-engine/compare/v0.5.1...v0.5.2

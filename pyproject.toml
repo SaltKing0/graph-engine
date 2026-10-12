@@ -3,8 +3,8 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "graph-engine"
-version = "0.6.0"
+name = "graph-engine-memory"
+version = "0.6.1"
 description = "Self-growing idea graph: Ingest → Embed → Suggest → Visualize. A generic engine for a persistent knowledge graph backed by your own private git repo (the 'brain')."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -43,7 +43,7 @@ Homepage = "https://github.com/SaltKing0/graph-engine"
 Repository = "https://github.com/SaltKing0/graph-engine"
 Issues = "https://github.com/SaltKing0/graph-engine/issues"
 Changelog = "https://github.com/SaltKing0/graph-engine/blob/main/CHANGELOG.md"
-PyPI = "https://pypi.org/project/graph-engine/"
+PyPI = "https://pypi.org/project/graph-engine-memory/"
 
 [tool.setuptools]
 packages = ["graph_engine", "graph_engine.web", "graph_engine.mcp"]
