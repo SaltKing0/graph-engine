@@ -17,6 +17,7 @@ file, never a half-written one.
 from __future__ import annotations
 
 import json
+import math
 import os
 import re
 import subprocess
@@ -625,7 +626,12 @@ class Brain:
             # store read (read_nodes skips broken files the same way).
             try:
                 d = json.loads(line)
-                out[d["id"]] = d["vec"]
+                nid, vector = d["id"], d["vec"]
+                if (not isinstance(nid, str) or not isinstance(vector, list)
+                        or any(not isinstance(value, (int, float)) or isinstance(value, bool)
+                               or not math.isfinite(value) for value in vector)):
+                    continue
+                out[nid] = vector
             except (json.JSONDecodeError, KeyError, TypeError):
                 continue
         return out
@@ -637,17 +643,15 @@ class Brain:
             for nid, vec in sorted(vectors.items()))
         _atomic_write(self.vectors_file, content)
 
-    # Process-wide memo for persist=False reads (report #1): the MCP server is
-    # long-lived, but Brain instances are rebuilt per call via runtime.make_brain,
-    # so without a memo every search on a cold clone re-embeds ALL nodes
-    # (measured 275 s for 1821 nodes on the 2-core VPS — per search). Keyed by
-    # (path, vectors.jsonl mtime) so an external cache fill (cron, CLI) or a
-    # different brain invalidates it naturally. Bounded to one brain's worth of
-    # vectors per path; entries are replaced, never appended unboundedly.
+    # Read-only computed vectors remain in memory across Brain instances.
+    # Fingerprint node files as well as vectors so new/missing/edited nodes
+    # cannot be hidden by a previous partial memo. Retrieval supplies the
+    # model identity; persist modes are separate to preserve writer opt-in.
+    # At most eight corpora/model combinations are retained.
     _VECTOR_MEMO: dict = {}
 
     def vectors_for(self, node_ids: set[str], embed_fn, batch_fn=None,
-                    persist: bool = True) -> dict[str, list[float]]:
+                    persist: bool = True, *, embedder_key: tuple | None = None) -> dict[str, list[float]]:
         """Vectors from cache; missing ones are computed and — unless
         `persist=False` — stored. Audit #4: reads nodes/vectors ONCE up front
         instead of per missing ID. Audit #60: when batch_fn is provided, all
@@ -658,10 +662,10 @@ class Brain:
         the private repo would dirty it and churn the cron rebase); results
         are memoized in-process instead so the NEXT search is warm."""
         with self.write_guard() if persist else nullcontext():
-            vec_file = self.path / "vectors.jsonl"
-            memo_key = (str(self.path), vec_file.stat().st_mtime_ns if vec_file.exists() else None)
+            from .search_index import corpus_stamp
+            memo_key = (str(self.path), corpus_stamp(self.path), embedder_key, persist)
             memo = Brain._VECTOR_MEMO.get(memo_key)
-            if memo is not None:
+            if memo is not None and node_ids <= memo.keys():
                 return {nid: v for nid, v in memo.items() if nid in node_ids}
             nodes = {n.id: n for n in self.read_nodes()}
             cached = self.read_vectors()
@@ -682,11 +686,13 @@ class Brain:
                         dirty = True
             if dirty and persist:
                 self.write_vectors(cached)
-                # after a write the mtime changed — memoize under the NEW key so
-                # the next persist=False call hits it
-                Brain._VECTOR_MEMO[(str(self.path), vec_file.stat().st_mtime_ns)] = dict(cached)
+                # The vector stamp changed; memoize under the new writer key.
+                Brain._VECTOR_MEMO[(str(self.path), corpus_stamp(self.path), embedder_key, persist)] = dict(cached)
             elif not persist:
                 Brain._VECTOR_MEMO[memo_key] = dict(cached)
+            # Bound retained corpora in a process serving many brains/models.
+            while len(Brain._VECTOR_MEMO) > 8:
+                Brain._VECTOR_MEMO.pop(next(iter(Brain._VECTOR_MEMO), None), None)
             return {nid: v for nid, v in cached.items() if nid in node_ids}
 
     # ---------- Edges ----------

@@ -1,0 +1,371 @@
+{
+  "schema_version": 1,
+  "environment": {
+    "source_commit": "88c7a4e84674842eb7940ea4e5a064df552bb75c",
+    "python": "3.12.14",
+    "platform": "macOS-26.7.1-arm64-arm-64bit",
+    "cpu_count": 8,
+    "mode": "local",
+    "seed": 0,
+    "numpy_version": "2.3.1",
+    "blas_threads": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": null
+    },
+    "reranker": null,
+    "remote": null,
+    "cold_definition": "application indexes/memo cleared; OS page cache not flushed",
+    "rss_definition": "process high-water mark, cumulative across sizes"
+  },
+  "results": [
+    {
+      "nodes": 1000,
+      "fixture_setup_ms": 423.439749982208,
+      "model_load_ms": 0.00895801349543035,
+      "embedder": {
+        "name": "HashEmbedder",
+        "dimension": 64,
+        "semantic_model": false,
+        "projection": "sha256-bag-of-words-v1"
+      },
+      "search": {
+        "uncached": {
+          "n": 3,
+          "p50_ms": 85.67341699381359,
+          "p95_ms": 93.15641701687127
+        },
+        "cold": {
+          "n": 3,
+          "p50_ms": 83.56250001816079,
+          "p95_ms": 87.8987500036601
+        },
+        "warm": {
+          "n": 3,
+          "p50_ms": 45.33883300609887,
+          "p95_ms": 45.517416001530364
+        }
+      },
+      "search_stages": {
+        "uncached": {
+          "filesystem_parsing": {
+            "n": 3,
+            "p50_ms": 36.48675000295043,
+            "p95_ms": 44.12962499191053
+          },
+          "query_embedding": {
+            "n": 3,
+            "p50_ms": 0.021334009943529963,
+            "p95_ms": 0.022792024537920952
+          },
+          "vector_loading_embedding": {
+            "n": 3,
+            "p50_ms": 41.11274998285808,
+            "p95_ms": 41.12966699176468
+          },
+          "dense_index_construction": {
+            "n": 3,
+            "p50_ms": 1.5357499942183495,
+            "p95_ms": 1.5746660064905882
+          },
+          "dense_scoring": {
+            "n": 3,
+            "p50_ms": 0.08345901733264327,
+            "p95_ms": 0.1076660118997097
+          },
+          "lexical_index_construction": {
+            "n": 3,
+            "p50_ms": 3.269375010859221,
+            "p95_ms": 3.2709999941289425
+          },
+          "lexical_scoring": {
+            "n": 3,
+            "p50_ms": 0.7767920033074915,
+            "p95_ms": 0.8350000134669244
+          }
+        },
+        "cold": {
+          "filesystem_parsing": {
+            "n": 3,
+            "p50_ms": 33.84562500286847,
+            "p95_ms": 33.91687502153218
+          },
+          "query_embedding": {
+            "n": 3,
+            "p50_ms": 0.022541993530467153,
+            "p95_ms": 0.022958993213251233
+          },
+          "vector_loading_embedding": {
+            "n": 3,
+            "p50_ms": 41.35345897520892,
+            "p95_ms": 45.21433298941702
+          },
+          "dense_index_construction": {
+            "n": 3,
+            "p50_ms": 1.5426249883603305,
+            "p95_ms": 1.5938330034259707
+          },
+          "dense_scoring": {
+            "n": 3,
+            "p50_ms": 0.09741602116264403,
+            "p95_ms": 0.15949999215081334
+          },
+          "lexical_index_construction": {
+            "n": 3,
+            "p50_ms": 3.1856250134296715,
+            "p95_ms": 3.2241250155493617
+          },
+          "lexical_scoring": {
+            "n": 3,
+            "p50_ms": 0.7634159992448986,
+            "p95_ms": 0.8478329982608557
+          }
+        },
+        "warm": {
+          "filesystem_parsing": {
+            "n": 3,
+            "p50_ms": 34.187583019956946,
+            "p95_ms": 36.39625001233071
+          },
+          "query_embedding": {
+            "n": 3,
+            "p50_ms": 0.02125001628883183,
+            "p95_ms": 0.03429202479310334
+          },
+          "vector_loading_embedding": {
+            "n": 3,
+            "p50_ms": 0.11312501737847924,
+            "p95_ms": 0.12141698971390724
+          },
+          "dense_index_construction": {
+            "n": 3,
+            "p50_ms": 1.5381250123027712,
+            "p95_ms": 1.9471249834168702
+          },
+          "dense_scoring": {
+            "n": 3,
+            "p50_ms": 0.08687502122484148,
+            "p95_ms": 0.13308299821801484
+          },
+          "lexical_index_construction": {
+            "n": 3,
+            "p50_ms": 3.35370801622048,
+            "p95_ms": 6.498291011666879
+          },
+          "lexical_scoring": {
+            "n": 3,
+            "p50_ms": 0.7437089807353914,
+            "p95_ms": 0.802791997557506
+          }
+        }
+      },
+      "ingest": {
+        "cold": {
+          "n": 1,
+          "p50_ms": 487.66700000851415,
+          "p95_ms": 487.66700000851415
+        },
+        "warm": {
+          "n": 2,
+          "p50_ms": 500.1001455093501,
+          "p95_ms": 501.11462501809
+        }
+      },
+      "ingest_git_calls": {
+        "pull": {
+          "n": 3,
+          "p50_ms": 0.043459003791213036,
+          "p95_ms": 0.04374998388811946
+        },
+        "commit_and_push": {
+          "n": 3,
+          "p50_ms": 0.09225000394508243,
+          "p95_ms": 0.09279101504944265
+        }
+      },
+      "memory": {
+        "python_and_numpy_traced_retained_bytes": 2335143,
+        "python_and_numpy_traced_peak_bytes": 5995403,
+        "process_peak_rss_bytes": 59326464
+      },
+      "correctness_mismatches": []
+    },
+    {
+      "nodes": 10000,
+      "fixture_setup_ms": 4080.1776250009425,
+      "model_load_ms": 0.004083005478605628,
+      "embedder": {
+        "name": "HashEmbedder",
+        "dimension": 64,
+        "semantic_model": false,
+        "projection": "sha256-bag-of-words-v1"
+      },
+      "search": {
+        "uncached": {
+          "n": 3,
+          "p50_ms": 955.6832919770386,
+          "p95_ms": 1134.8357500100974
+        },
+        "cold": {
+          "n": 3,
+          "p50_ms": 940.6735829834361,
+          "p95_ms": 942.9938750108704
+        },
+        "warm": {
+          "n": 3,
+          "p50_ms": 482.79179199016653,
+          "p95_ms": 489.8954580130521
+        }
+      },
+      "search_stages": {
+        "uncached": {
+          "filesystem_parsing": {
+            "n": 3,
+            "p50_ms": 377.7455000090413,
+            "p95_ms": 561.2191659747623
+          },
+          "query_embedding": {
+            "n": 3,
+            "p50_ms": 0.024333014152944088,
+            "p95_ms": 0.024375010980293155
+          },
+          "vector_loading_embedding": {
+            "n": 3,
+            "p50_ms": 474.83158300747164,
+            "p95_ms": 482.06366700469516
+          },
+          "dense_index_construction": {
+            "n": 3,
+            "p50_ms": 16.12770900828764,
+            "p95_ms": 16.163624997716397
+          },
+          "dense_scoring": {
+            "n": 3,
+            "p50_ms": 3.016834001755342,
+            "p95_ms": 3.8067499990575016
+          },
+          "lexical_index_construction": {
+            "n": 3,
+            "p50_ms": 32.85650000907481,
+            "p95_ms": 33.39324999251403
+          },
+          "lexical_scoring": {
+            "n": 3,
+            "p50_ms": 7.735582999885082,
+            "p95_ms": 7.898000010754913
+          }
+        },
+        "cold": {
+          "filesystem_parsing": {
+            "n": 3,
+            "p50_ms": 376.48525001714006,
+            "p95_ms": 381.3137499964796
+          },
+          "query_embedding": {
+            "n": 3,
+            "p50_ms": 0.027667003450915217,
+            "p95_ms": 0.027875008527189493
+          },
+          "vector_loading_embedding": {
+            "n": 3,
+            "p50_ms": 464.34175001922995,
+            "p95_ms": 470.75070801656693
+          },
+          "dense_index_construction": {
+            "n": 3,
+            "p50_ms": 16.095583996502683,
+            "p95_ms": 16.19262501480989
+          },
+          "dense_scoring": {
+            "n": 3,
+            "p50_ms": 16.61816702107899,
+            "p95_ms": 17.27854201453738
+          },
+          "lexical_index_construction": {
+            "n": 3,
+            "p50_ms": 32.373416994232684,
+            "p95_ms": 32.84629201516509
+          },
+          "lexical_scoring": {
+            "n": 3,
+            "p50_ms": 7.761583983665332,
+            "p95_ms": 7.782000000588596
+          }
+        },
+        "warm": {
+          "filesystem_parsing": {
+            "n": 3,
+            "p50_ms": 380.78287499956787,
+            "p95_ms": 387.1654159738682
+          },
+          "query_embedding": {
+            "n": 3,
+            "p50_ms": 0.026833004085347056,
+            "p95_ms": 0.026833004085347056
+          },
+          "vector_loading_embedding": {
+            "n": 3,
+            "p50_ms": 0.9502920147497207,
+            "p95_ms": 1.0433749994263053
+          },
+          "dense_index_construction": {
+            "n": 3,
+            "p50_ms": 15.636249998351559,
+            "p95_ms": 15.73995899525471
+          },
+          "dense_scoring": {
+            "n": 3,
+            "p50_ms": 1.736750011332333,
+            "p95_ms": 2.114792005158961
+          },
+          "lexical_index_construction": {
+            "n": 3,
+            "p50_ms": 32.11233398178592,
+            "p95_ms": 32.3211669747252
+          },
+          "lexical_scoring": {
+            "n": 3,
+            "p50_ms": 7.807958987541497,
+            "p95_ms": 8.52841601590626
+          }
+        }
+      },
+      "ingest": {
+        "cold": {
+          "n": 1,
+          "p50_ms": 5205.041542008985,
+          "p95_ms": 5205.041542008985
+        },
+        "warm": {
+          "n": 2,
+          "p50_ms": 5163.596541518928,
+          "p95_ms": 5183.7376250186935
+        }
+      },
+      "ingest_git_calls": {
+        "pull": {
+          "n": 3,
+          "p50_ms": 0.043832988012582064,
+          "p95_ms": 0.04395801806822419
+        },
+        "commit_and_push": {
+          "n": 3,
+          "p50_ms": 0.10241600102744997,
+          "p95_ms": 0.11320799239911139
+        }
+      },
+      "memory": {
+        "python_and_numpy_traced_retained_bytes": 21952013,
+        "python_and_numpy_traced_peak_bytes": 60565927,
+        "process_peak_rss_bytes": 235945984
+      },
+      "correctness_mismatches": []
+    }
+  ],
+  "quality": {
+    "dataset_version": "de-en-memory-v1.0.0",
+    "dataset_sha256": "ecd55eef857eee0975f334b2e31ef6b658e245111c9712b0b9af19b43a37c6e3",
+    "questions": 12,
+    "mismatches": [],
+    "comparison": "exact ordered (ID, score) pairs; same embedding and reranking settings"
+  }
+}

@@ -139,3 +139,23 @@ def test_crash_between_node_and_edge_write_leaves_readable_brain(tmp_path):
     edges = brain.read_edges()
     assert len(nodes) == 1
     assert len(edges) == 1  # the good edge survives, the partial line is skipped
+
+
+def test_search_snapshot_invalidates_after_git_pull(remote, tmp_path):
+    from graph_engine.retrieval import retrieve
+    bare, writer = remote
+    writer.write_node(Node(id="alpha", text="alpha knowledge", status="active"))
+    writer.commit_and_push("Initial node")
+    reader = Brain(str(tmp_path / "reader"), mode="git", remote=str(bare))
+    reader.init(remote=str(bare))
+    engine = BrainEngine(reader, HashEmbedder(), reranker=False)
+    engine.reranker = None
+    retrieve(engine, "alpha", persist=False)
+    old = engine._search_index
+    writer.pull()  # reader.init may have committed its rebuilt INDEX.md
+    writer.write_node(Node(id="new", text="new alpha knowledge", status="active"))
+    writer.commit_and_push("External new node")
+    reader.pull()
+    assert "new" in dict(retrieve(engine, "alpha", k=10, persist=False))
+    assert engine._search_index is not old
+    assert _git("status", "--porcelain", cwd=str(reader.path)).stdout == ""

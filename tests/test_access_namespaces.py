@@ -539,3 +539,23 @@ def test_orphan_and_cyclic_capture_receipts_fail_closed(protected, parent):
     assert "copy" not in {n.id for n in brain.read_nodes()}
     with pytest.raises(PermissionError):
         brain.read_node("copy")
+
+
+def test_search_index_never_reuses_unprotected_or_other_principal_cache(protected):
+    from graph_engine.retrieval import retrieve
+    raw, path, policy = protected
+    unprotected = BrainEngine(raw, HashEmbedder(), reranker=False)
+    unprotected.reranker = None
+    retrieve(unprotected, "private knowledge", persist=False)
+    original = unprotected._search_index
+    secured = runtime.make_engine()
+    secured._search_index = original  # even an accidentally copied snapshot is ignored
+    assert "private" not in dict(retrieve(secured, "private knowledge", persist=False))
+    # Current policy applies on every call to the same engine.
+    policy["graphs"]["default"]["nodes"]["public"] = {"read": ["owner"]}
+    path.write_text(json.dumps(policy))
+    assert "public" not in dict(retrieve(secured, "public knowledge", persist=False))
+    policy["graphs"]["default"]["roles"].pop("alice")
+    path.write_text(json.dumps(policy))
+    with pytest.raises(PermissionError):
+        retrieve(secured, "knowledge", persist=False)
