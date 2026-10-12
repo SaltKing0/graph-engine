@@ -1,0 +1,396 @@
+{
+  "schema_version": 1,
+  "version": "de-en-memory-v1.0.0",
+  "provenance": {
+    "benchmark": "custom synthetic smoke and diagnostic dataset",
+    "license": "MIT",
+    "equivalent_to_locomo_or_longmemeval": false
+  },
+  "conversations": [
+    {
+      "id": "en-ada",
+      "turns": [
+        {
+          "id": "en-t00",
+          "date": "2026-01-03",
+          "role": "user",
+          "text": "My name is Ada and I prefer green tea without sugar."
+        },
+        {
+          "id": "en-t01",
+          "date": "2026-01-03",
+          "role": "assistant",
+          "text": "I will keep your drink preference in mind."
+        },
+        {
+          "id": "en-t02",
+          "date": "2026-01-07",
+          "role": "user",
+          "text": "My office is in Hamburg. I work there on Tuesdays."
+        },
+        {
+          "id": "en-t03",
+          "date": "2026-02-01",
+          "role": "user",
+          "text": "My office moved from Hamburg to Berlin. Berlin is now my work location."
+        },
+        {
+          "id": "en-t04",
+          "date": "2026-02-03",
+          "role": "user",
+          "text": "Alex Kim is our engineer. Alex Kim writes Rust for the Atlas project."
+        },
+        {
+          "id": "en-t05",
+          "date": "2026-02-04",
+          "role": "user",
+          "text": "Alex Roth is our designer. Alex Roth uses Python for sketches."
+        },
+        {
+          "id": "en-t06",
+          "date": "2026-02-05",
+          "role": "user",
+          "text": "Mira leads the Orion team. Mira is the Orion team manager."
+        },
+        {
+          "id": "en-t07",
+          "date": "2026-02-06",
+          "role": "user",
+          "text": "Mira lives in Porto near the river."
+        },
+        {
+          "id": "en-t08",
+          "date": "2026-02-07",
+          "role": "user",
+          "text": "The Orion team releases updates on Mondays."
+        },
+        {
+          "id": "en-t09",
+          "date": "2026-02-08",
+          "role": "user",
+          "text": "My favourite weekend hobby is cycling along the river."
+        },
+        {
+          "id": "en-t10",
+          "date": "2026-02-09",
+          "role": "user",
+          "text": "Leo likes coffee and trains for a marathon every weekend."
+        },
+        {
+          "id": "en-t11",
+          "date": "2026-02-10",
+          "role": "user",
+          "text": "There are yellow chairs in the kitchen. The printer uses blue ink."
+        },
+        {
+          "id": "en-t12",
+          "date": "2026-02-11",
+          "role": "assistant",
+          "text": "We have discussed work, colleagues, and hobbies."
+        }
+      ]
+    },
+    {
+      "id": "de-ada",
+      "turns": [
+        {
+          "id": "de-t00",
+          "date": "2026-01-03",
+          "role": "user",
+          "text": "Ich heiße Ada und bevorzuge grünen Tee ohne Zucker."
+        },
+        {
+          "id": "de-t01",
+          "date": "2026-01-03",
+          "role": "assistant",
+          "text": "Ich merke mir deine Getränkevorliebe."
+        },
+        {
+          "id": "de-t02",
+          "date": "2026-01-07",
+          "role": "user",
+          "text": "Mein Büro ist in Hamburg. Ich arbeite dort dienstags."
+        },
+        {
+          "id": "de-t03",
+          "date": "2026-02-01",
+          "role": "user",
+          "text": "Mein Büro ist von Hamburg nach Berlin umgezogen. Berlin ist jetzt mein Arbeitsort."
+        },
+        {
+          "id": "de-t04",
+          "date": "2026-02-03",
+          "role": "user",
+          "text": "Alex Kim ist unser Ingenieur. Alex Kim schreibt Rust für das Projekt Atlas."
+        },
+        {
+          "id": "de-t05",
+          "date": "2026-02-04",
+          "role": "user",
+          "text": "Alex Roth ist unser Designer. Alex Roth verwendet Python für Skizzen."
+        },
+        {
+          "id": "de-t06",
+          "date": "2026-02-05",
+          "role": "user",
+          "text": "Mira leitet das Team Orion. Mira ist die Leiterin des Teams Orion."
+        },
+        {
+          "id": "de-t07",
+          "date": "2026-02-06",
+          "role": "user",
+          "text": "Mira wohnt in Porto nahe am Fluss."
+        },
+        {
+          "id": "de-t08",
+          "date": "2026-02-07",
+          "role": "user",
+          "text": "Das Team Orion veröffentlicht montags Updates."
+        },
+        {
+          "id": "de-t09",
+          "date": "2026-02-08",
+          "role": "user",
+          "text": "Meine liebste Freizeitbeschäftigung am Wochenende ist Radfahren am Fluss."
+        },
+        {
+          "id": "de-t10",
+          "date": "2026-02-09",
+          "role": "user",
+          "text": "Leo mag Kaffee und trainiert jedes Wochenende für einen Marathon."
+        },
+        {
+          "id": "de-t11",
+          "date": "2026-02-10",
+          "role": "user",
+          "text": "In der Küche stehen gelbe Stühle. Der Drucker verwendet blaue Tinte."
+        },
+        {
+          "id": "de-t12",
+          "date": "2026-02-11",
+          "role": "assistant",
+          "text": "Wir haben über Arbeit, Kollegen und Hobbys gesprochen."
+        }
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": "en-preference",
+      "conversation_id": "en-ada",
+      "language": "en",
+      "category": "preference",
+      "question": "What drink does Ada prefer, and with how much sugar?",
+      "question_date": "2026-02-12",
+      "answers": [
+        "green tea without sugar",
+        "unsweetened green tea"
+      ],
+      "evidence_ids": [
+        "en-t00"
+      ],
+      "unanswerable": false,
+      "forbidden_answers": [
+        "coffee with sugar"
+      ]
+    },
+    {
+      "id": "en-temporal",
+      "conversation_id": "en-ada",
+      "language": "en",
+      "category": "temporal",
+      "question": "Where is my office now, after the move?",
+      "question_date": "2026-02-12",
+      "answers": [
+        "Berlin"
+      ],
+      "evidence_ids": [
+        "en-t02",
+        "en-t03"
+      ],
+      "unanswerable": false,
+      "forbidden_answers": [
+        "Hamburg"
+      ]
+    },
+    {
+      "id": "en-ambiguity",
+      "conversation_id": "en-ada",
+      "language": "en",
+      "category": "ambiguity",
+      "question": "Which programming language does Alex Kim use for Atlas?",
+      "question_date": "2026-02-12",
+      "answers": [
+        "Rust"
+      ],
+      "evidence_ids": [
+        "en-t04"
+      ],
+      "unanswerable": false,
+      "forbidden_answers": [
+        "Python"
+      ]
+    },
+    {
+      "id": "en-multi-hop",
+      "conversation_id": "en-ada",
+      "language": "en",
+      "category": "multi-hop",
+      "question": "In which city does the manager of the Orion team live?",
+      "question_date": "2026-02-12",
+      "answers": [
+        "Porto"
+      ],
+      "evidence_ids": [
+        "en-t06",
+        "en-t07"
+      ],
+      "unanswerable": false,
+      "forbidden_answers": [
+        "Berlin",
+        "Hamburg"
+      ]
+    },
+    {
+      "id": "en-irrelevant",
+      "conversation_id": "en-ada",
+      "language": "en",
+      "category": "irrelevant",
+      "question": "What is my favourite weekend hobby?",
+      "question_date": "2026-02-12",
+      "answers": [
+        "cycling",
+        "cycling along the river"
+      ],
+      "evidence_ids": [
+        "en-t09"
+      ],
+      "unanswerable": false,
+      "forbidden_answers": [
+        "marathon running",
+        "training for a marathon"
+      ]
+    },
+    {
+      "id": "en-unanswerable",
+      "conversation_id": "en-ada",
+      "language": "en",
+      "category": "unanswerable",
+      "question": "What is Ada's passport number?",
+      "question_date": "2026-02-12",
+      "answers": [],
+      "evidence_ids": [],
+      "unanswerable": true,
+      "forbidden_answers": []
+    },
+    {
+      "id": "de-preference",
+      "conversation_id": "de-ada",
+      "language": "de",
+      "category": "preference",
+      "question": "Welches Getränk bevorzugt Ada und mit wie viel Zucker?",
+      "question_date": "2026-02-12",
+      "answers": [
+        "grüner Tee ohne Zucker",
+        "grünen Tee ohne Zucker",
+        "ungesüßter grüner Tee"
+      ],
+      "evidence_ids": [
+        "de-t00"
+      ],
+      "unanswerable": false,
+      "forbidden_answers": [
+        "Kaffee mit Zucker"
+      ]
+    },
+    {
+      "id": "de-temporal",
+      "conversation_id": "de-ada",
+      "language": "de",
+      "category": "temporal",
+      "question": "Wo ist mein Büro jetzt nach dem Umzug?",
+      "question_date": "2026-02-12",
+      "answers": [
+        "Berlin"
+      ],
+      "evidence_ids": [
+        "de-t02",
+        "de-t03"
+      ],
+      "unanswerable": false,
+      "forbidden_answers": [
+        "Hamburg"
+      ]
+    },
+    {
+      "id": "de-ambiguity",
+      "conversation_id": "de-ada",
+      "language": "de",
+      "category": "ambiguity",
+      "question": "Welche Programmiersprache verwendet Alex Kim für Atlas?",
+      "question_date": "2026-02-12",
+      "answers": [
+        "Rust"
+      ],
+      "evidence_ids": [
+        "de-t04"
+      ],
+      "unanswerable": false,
+      "forbidden_answers": [
+        "Python"
+      ]
+    },
+    {
+      "id": "de-multi-hop",
+      "conversation_id": "de-ada",
+      "language": "de",
+      "category": "multi-hop",
+      "question": "In welcher Stadt wohnt die Leiterin des Teams Orion?",
+      "question_date": "2026-02-12",
+      "answers": [
+        "Porto"
+      ],
+      "evidence_ids": [
+        "de-t06",
+        "de-t07"
+      ],
+      "unanswerable": false,
+      "forbidden_answers": [
+        "Berlin",
+        "Hamburg"
+      ]
+    },
+    {
+      "id": "de-irrelevant",
+      "conversation_id": "de-ada",
+      "language": "de",
+      "category": "irrelevant",
+      "question": "Was ist meine liebste Freizeitbeschäftigung am Wochenende?",
+      "question_date": "2026-02-12",
+      "answers": [
+        "Radfahren",
+        "Radfahren am Fluss"
+      ],
+      "evidence_ids": [
+        "de-t09"
+      ],
+      "unanswerable": false,
+      "forbidden_answers": [
+        "Marathontraining",
+        "Marathon laufen"
+      ]
+    },
+    {
+      "id": "de-unanswerable",
+      "conversation_id": "de-ada",
+      "language": "de",
+      "category": "unanswerable",
+      "question": "Welche Reisepassnummer hat Ada?",
+      "question_date": "2026-02-12",
+      "answers": [],
+      "evidence_ids": [],
+      "unanswerable": true,
+      "forbidden_answers": []
+    }
+  ]
+}

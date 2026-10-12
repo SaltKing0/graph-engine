@@ -43,6 +43,16 @@ can override its executable. CI downloads D3 before testing and passes its
 path through `GRAPH_ENGINE_TEST_D3`; the tests check it against the shipped
 HTML's SRI digest and serve it locally to avoid browser CDN requests.
 
+The separate memory answer-quality benchmark has an offline CI smoke gate:
+
+```bash
+.venv/bin/python -m tools.memory_benchmark --smoke --check --output /tmp/memory-smoke.json
+```
+
+See [memory benchmarks](docs/memory-benchmarks.md) for full DE/EN comparisons.
+Keep model calls and downloads opt-in; do not replace the engine golden-set
+gates with this small diagnostic fixture.
+
 ## Code style
 
 - **Python 3.11+** (uses `str | None` type hints). Type hints are required.
