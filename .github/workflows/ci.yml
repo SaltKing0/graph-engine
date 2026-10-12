@@ -73,8 +73,8 @@ jobs:
     name: test (3.12, Chromium)
     runs-on: ubuntu-latest
     env:
-      PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/playwright
-      GRAPH_ENGINE_TEST_D3: ${{ runner.temp }}/d3.v7.min.js
+      PLAYWRIGHT_BROWSERS_PATH: /tmp/graph-engine-playwright
+      GRAPH_ENGINE_TEST_D3: /tmp/graph-engine-d3.v7.min.js
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
