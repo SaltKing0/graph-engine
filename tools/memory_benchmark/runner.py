@@ -90,7 +90,8 @@ def summarize(results: list[dict[str, Any]]) -> dict[str, Any]:
 def checkpoint(path: Path, report: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")
-    temporary.write_text(json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False) + "\n")
+    temporary.write_text(json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
+                         encoding="utf-8")
     temporary.replace(path)
 
 

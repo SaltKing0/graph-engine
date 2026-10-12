@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import copy
 import json
+import os
 import socket
 import subprocess
 import sys
@@ -18,6 +19,25 @@ from tools.memory_benchmark.answers import HTTPAnswers, ReplayAnswers, build_pro
 from tools.memory_benchmark.dataset import DEFAULT_DATASET, import_longmemeval, load_dataset, validate_dataset
 from tools.memory_benchmark.runner import assemble_context, run
 from tools.memory_benchmark.scoring import answer_metrics, retrieval_metrics, validate_answer
+
+
+def test_checkpoint_is_utf8_with_ascii_locale(tmp_path):
+    script = r'''
+import json
+import sys
+from pathlib import Path
+from tools.memory_benchmark.runner import checkpoint
+
+output = Path(sys.argv[1])
+report = {"text": "gr\u00fcner Tee \U0001f375"}
+checkpoint(output, report)
+assert json.loads(output.read_bytes()) == report
+'''
+    env = {**os.environ, "LC_ALL": "C", "LANG": "C",
+           "PYTHONUTF8": "0", "PYTHONCOERCECLOCALE": "0"}
+    result = subprocess.run([sys.executable, "-c", script, str(tmp_path / "report.json")],
+                            env=env, capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
 
 
 def test_smoke_is_offline_and_ignores_ambient_models(tmp_path, monkeypatch):
