@@ -87,9 +87,13 @@ def test_retry_is_noop_preserves_manual_edits_and_changed_versions(brain, tmp_pa
     node.text = "My manually corrected note."
     node.tags = ["curated"]
     brain.write_node(node)
-    before = snapshot(brain)
+    edited = brain.node_path(nid).read_bytes()
     retry = import_documents(brain, [path], source_id="paper")
     assert retry["files"][0]["chunks"][0]["edited"]
+    assert brain.node_path(nid).read_bytes() == edited
+    assert "My manually corrected note." in (brain.path / "INDEX.md").read_text()
+    before = snapshot(brain)
+    assert import_documents(brain, [path], source_id="paper")["reused_chunks"] == 1
     assert snapshot(brain) == before
     path.write_text("Alice works at Other.")
     changed = import_documents(brain, [path], source_id="paper")
@@ -239,6 +243,39 @@ def test_partial_commit_failure_is_retryable_without_duplicate_or_edit_loss(brai
     result = import_documents(brain, [path])
     assert result["failed_files"] == 0 and result["reused_chunks"] == 1
     assert len(brain.read_nodes()) == 1
+
+
+def test_failed_index_write_is_repaired_before_retry_commit(tmp_path, monkeypatch):
+    brain = Brain(str(tmp_path / "brain"), mode="git")
+    brain.init()
+    path = write(tmp_path, "Alice works at Acme.\n\nBob works at OtherCo.")
+    original_rebuild = brain.rebuild_index
+    def fail():
+        raise OSError("transient index write failure")
+    monkeypatch.setattr(brain, "rebuild_index", fail)
+    first = import_documents(brain, [path], chunk_chars=25)
+    assert first["failed_files"] == 1 and first["created_chunks"] == 1
+    nid = first["files"][0]["chunks"][0]["node_id"]
+    assert nid not in (brain.path / "INDEX.md").read_text()
+    node = brain.read_node(nid)
+    node.text = "My manual correction."
+    node.tags = ["curated"]
+    brain.write_node(node)
+    edited = brain.node_path(nid).read_bytes()
+    monkeypatch.setattr(brain, "rebuild_index", original_rebuild)
+    original_commit = brain.commit_and_push
+    def verify_commit(*args, **kwargs):
+        assert nid in (brain.path / "INDEX.md").read_text()
+        return original_commit(*args, **kwargs)
+    monkeypatch.setattr(brain, "commit_and_push", verify_commit)
+    retry = import_documents(brain, [path], chunk_chars=25)
+    assert retry["failed_files"] == 0 and retry["reused_chunks"] == 1
+    assert retry["created_chunks"] == 1
+    assert brain.node_path(nid).read_bytes() == edited
+    assert "My manual correction." in (brain.path / "INDEX.md").read_text()
+    status = subprocess.run(["git", "-C", str(brain.path), "status", "--porcelain"],
+                            capture_output=True, text=True, check=True)
+    assert not status.stdout
 
 
 def test_failed_model_extraction_can_retry_without_recapture(brain, tmp_path, monkeypatch):
@@ -392,6 +429,40 @@ def test_edited_receipt_metadata_or_broken_record_never_overwritten(brain, tmp_p
     repeated = import_documents(brain, [path])
     assert repeated["failed_files"] == 1
     assert repeated["files"][0]["error"] == ("receipt_unreadable" if invalid else "receipt_conflict")
+    assert snapshot(brain) == before
+
+
+@pytest.mark.parametrize("damage", ["missing", "input", "source", "node_id", "duplicate"])
+@pytest.mark.parametrize("duplicate", [False, True])
+@pytest.mark.parametrize("dry_run", [False, True])
+def test_damaged_capture_is_refused_before_extraction(brain, tmp_path, damage, duplicate, dry_run):
+    path = write(tmp_path)
+    engine = BrainEngine(brain, SameVector())
+    if duplicate:
+        engine.ingest("Original note")
+    first = import_documents(brain, [path], engine=engine if duplicate else None)
+    nid = first["files"][0]["chunks"][0]["node_id"]
+    node = brain.read_node(nid)
+    node.text = "Alice works at OtherCo."
+    if damage == "missing":
+        node.capture = None
+    elif damage == "input":
+        node.capture["input"] = node.text
+    elif damage == "source":
+        node.capture["source"] = "human"
+    elif damage == "node_id":
+        node.capture["node_id"] = nid if duplicate else "another-node"
+    else:
+        node.capture["duplicate"] = not duplicate
+    brain.write_node(node)
+    before = snapshot(brain)
+    def forbidden(*args, **kwargs):
+        raise AssertionError("damaged receipt must not reach extraction")
+    engine.entities = forbidden
+    retry = import_documents(brain, [path], engine=engine, extraction="rules", dry_run=dry_run)
+    assert retry["failed_files"] == 1
+    assert retry["files"][0]["error"] == "receipt_conflict"
+    assert retry["created_chunks"] == retry["reused_chunks"] == 0
     assert snapshot(brain) == before
 
 
