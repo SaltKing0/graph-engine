@@ -3,9 +3,11 @@
 The engine has bi-temporal edges (valid_from/valid_to) since the Zep/Graphiti
 lesson, but no way to QUERY them. This module adds the read side:
 
-  valid_at(brain, timestamp)  — the graph as it was at a point in time
+  valid_at(brain, timestamp)  — current records filtered by fact validity
   history(brain, node_id)     — how a node's edges evolved over time
-  when(engine, query, at)     — retrieval restricted to what was known then
+  when(engine, query, at)     — current text filtered by creation time
+
+For historical text and decisions use snapshots.snapshot / snapshot_query.
 
 All functions are read-only. They never modify the brain.
 """
@@ -37,7 +39,7 @@ def _is_valid_at(edge: "Edge", ts: datetime.datetime) -> bool:
 
 
 def valid_at(brain: "Brain", timestamp: str) -> dict:
-    """The graph as it was at a point in time.
+    """Current graph records filtered by creation and fact-validity time.
 
     Returns {nodes: [...], edges: [...]} — only nodes and edges that were
     live at the given timestamp. Nodes are included if they existed (created
@@ -114,12 +116,11 @@ def history(brain: "Brain", node_id: str) -> list[dict]:
 
 
 def when(engine: "BrainEngine", query: str, at: str, k: int = 5) -> list[tuple[str, float]]:
-    """Retrieval restricted to what was known at a point in time (Phase 2).
+    """Retrieval of current text restricted by creation time (Phase 2).
 
     Runs the normal hybrid retrieval, then filters the results to only
     include nodes that existed at the given timestamp. This is the
-    "what did I know then?" query — useful for understanding how the
-    brain's knowledge has evolved.
+    temporal filter; it does not restore old text or review decisions.
     """
     from .retrieval import retrieve
 

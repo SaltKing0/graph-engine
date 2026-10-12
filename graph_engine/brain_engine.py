@@ -588,7 +588,7 @@ class BrainEngine:
         return nodes[:limit]
 
     def valid_at(self, timestamp: str) -> dict:
-        """The graph as it was at a point in time (Phase 2: temporal reasoning).
+        """Current records filtered by creation and fact-validity time.
 
         Returns {nodes: [...], edges: [...]} — only nodes and edges that were
         live at the given timestamp. Read-only.
@@ -606,13 +606,24 @@ class BrainEngine:
         return history(self.brain, node_id)
 
     def when(self, query: str, at: str, k: int = 5) -> list[tuple[str, float]]:
-        """Retrieval restricted to what was known at a point in time (Phase 2).
+        """Retrieve current text, restricted by node creation time.
 
         Runs the normal hybrid retrieval, then filters the results to only
         include nodes that existed at the given timestamp. Read-only.
         """
         from .temporal import when
         return when(self, query, at, k=k)
+
+    def snapshot(self, revision: str, *, fact_valid_at: str | None = None) -> dict:
+        """Read Git snapshot state with current authorization, without sync."""
+        from .snapshots import snapshot
+        return snapshot(self.brain, revision, fact_valid_at=fact_valid_at)
+
+    def snapshot_query(self, revision: str, query: str, *, k: int = 5,
+                       fact_valid_at: str | None = None) -> dict:
+        """Search historical committed text without recall/cache writes."""
+        from .snapshots import snapshot_query
+        return snapshot_query(self, revision, query, k=k, fact_valid_at=fact_valid_at)
 
     def build_context(self, query: str, budget: int = 4000, **kwargs) -> dict:
         """Assemble a context window for a query (Phase 3: context management).
