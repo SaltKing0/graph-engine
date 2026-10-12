@@ -179,7 +179,7 @@ def lifecycle_plan(brain: Brain, *, min_recall: int = PROMOTE_MIN_RECALL,
 def lifecycle(brain: Brain, *, min_recall: int = PROMOTE_MIN_RECALL,
               min_degree: int = PROMOTE_MIN_DEGREE, stale_days: int = DECAY_DAYS,
               max_degree: int = DECAY_MAX_DEGREE, dry_run: bool = False,
-              commit: bool = True) -> dict:
+              commit: bool = True, limit: int | None = None) -> dict:
     """Promotion and decay: the status lifecycle, one commit, never destructive.
 
     ROADMAP_CASE `roadmap-dream-lifecycle`.
@@ -190,12 +190,19 @@ def lifecycle(brain: Brain, *, min_recall: int = PROMOTE_MIN_RECALL,
     it takes the node out of the promotion pool and marks it for the report.
     """
     brain.authorize("admin")
+    if limit is not None and (type(limit) is not int or limit < 1):
+        raise ValueError("lifecycle limit must be a positive integer")
     if not dry_run and commit:
         brain.ensure_ready()
         brain.pull()
     plan_ = lifecycle_plan(brain, min_recall=min_recall, min_degree=min_degree,
                            stale_days=stale_days, max_degree=max_degree)
     promote, revive, decay = plan_["promote"], plan_["revive"], plan_["decay"]
+    candidates = {"promote": len(promote), "revive": len(revive), "decay": len(decay)}
+    if limit is not None:
+        promote = sorted(promote)[:limit]
+        revive = sorted(revive)[:limit - len(promote)]
+        decay = sorted(decay)[:limit - len(promote) - len(revive)]
 
     if not dry_run and (promote or revive or decay):
         nodes = {n.id: n for n in brain.read_nodes()}
@@ -213,8 +220,7 @@ def lifecycle(brain: Brain, *, min_recall: int = PROMOTE_MIN_RECALL,
                 f"{min_degree}; unused, degree <= {max_degree}, age >= {stale_days}d)")
 
     return {"promoted": len(promote), "revived": len(revive), "staled": len(decay),
-            "candidates": {"promote": len(promote), "revive": len(revive),
-                           "decay": len(decay)},
+            "candidates": candidates,
             "dry_run": dry_run}
 
 
@@ -270,7 +276,8 @@ def _expected_kind(confidence: float) -> str:
 
 
 @write_operation
-def refresh(brain: Brain, *, dry_run: bool = False, commit: bool = True) -> dict:
+def refresh(brain: Brain, *, dry_run: bool = False, commit: bool = True,
+            strict_report: bool = False) -> dict:
     """Deterministic maintenance. Never destructive, never touches manual edges.
 
     1. Re-derive the kind of SUGGESTER similarity edges from the stored cosine
@@ -308,6 +315,8 @@ def refresh(brain: Brain, *, dry_run: bool = False, commit: bool = True) -> dict
         try:
             write_report(brain, write=True)
         except Exception:
+            if strict_report:
+                raise
             # A report failure must never fail the pass (same rule as the cycle).
             pass
         if commit:
