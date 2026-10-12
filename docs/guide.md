@@ -792,6 +792,16 @@ derived summary, git history or external export. Policy updates and brain
 mutations are not a multi-file transaction. Use one writer process per brain,
 as with the existing storage model.
 
+## Memory answer-quality benchmarks
+
+The source checkout includes a separate DE/EN experiment runner with GraphEngine,
+BM25 and vector adapters. Run `.venv/bin/python -m tools.memory_benchmark --smoke
+--check --output /tmp/memory-smoke.json` for deterministic retrieval/evidence
+checks without network or model downloads. Answer scores require opt-in model
+calls or replayed predictions. See [memory benchmarks](memory-benchmarks.md) for
+full comparisons, metric definitions, local semantic embeddings, cost limits,
+and the LongMemEval import path. Existing engine regression oracles stay separate.
+
 ## Open source / privacy
 
 The **engine is generic** (this public repo) — the **brain is your private
