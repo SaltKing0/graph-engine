@@ -49,6 +49,9 @@ The separate memory answer-quality benchmark has an offline CI smoke gate:
 .venv/bin/python -m tools.memory_benchmark --smoke --check --output /tmp/memory-smoke.json
 ```
 
+Graph retrieval tests: `.venv/bin/python -m pytest tests/test_graph_retrieval.py -q`.
+For an opt-in graph on/off diagnostic, see [graph comparison](docs/memory-benchmarks.md#graph-expansion-comparison).
+
 See [memory benchmarks](docs/memory-benchmarks.md) for full DE/EN comparisons.
 Keep model calls and downloads opt-in; do not replace the engine golden-set
 gates with this small diagnostic fixture.

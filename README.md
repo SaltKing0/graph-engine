@@ -84,6 +84,7 @@ See [capture options and retry behavior](docs/guide.md#extract-during-ingestion)
 - [Memory lifecycle](docs/guide.md#memory-lifecycle-promotion-and-decay),
   [storage tiers and feedback](docs/guide.md#storage-tiers-and-retrieval-feedback)
 - [Isolated graphs and access control](docs/guide.md#isolated-graphs-and-access-control)
+- [Opt-in graph retrieval and scoring](docs/graph-retrieval.md)
 - [Memory answer-quality benchmarks](docs/memory-benchmarks.md)
 - [Budgeted agent context and two-session example](docs/guide.md#budgeted-context-and-a-complete-agent-turn)
 - [Known limitations](docs/guide.md#known-limitations)

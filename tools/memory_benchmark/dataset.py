@@ -49,6 +49,22 @@ def validate_dataset(dataset: dict[str, Any]) -> None:
                     or not isinstance(turn["text"], str) or not turn["text"].strip()
                     or not isinstance(turn["date"], str) or not turn["date"].strip()):
                 raise ValueError("turn requires role, date and nonempty text")
+        relationships = conversation.get("relationships", [])
+        if not isinstance(relationships, list):
+            raise ValueError("relationships must be a list of source annotations")
+        edge_ids: set[str] = set()
+        for edge in relationships:
+            if (not isinstance(edge, dict) or set(edge) - {"id", "source", "target", "kind", "predicate", "evidence_ids"}
+                    or not isinstance(edge.get("id"), str) or not edge["id"] or edge["id"] in edge_ids
+                    or edge.get("source") not in ids[cid] or edge.get("target") not in ids[cid]
+                    or not isinstance(edge.get("kind"), str) or not edge["kind"]
+                    or ("predicate" in edge and not isinstance(edge["predicate"], str))):
+                raise ValueError("relationships require unique IDs, known endpoints and a kind")
+            evidence = edge.get("evidence_ids", [])
+            if (not isinstance(evidence, list) or not all(isinstance(nid, str) for nid in evidence)
+                    or not set(evidence) <= ids[cid]):
+                raise ValueError("relationship evidence must reference source turns")
+            edge_ids.add(edge["id"])
     qids: set[str] = set()
     for question in questions:
         qid = question["id"]

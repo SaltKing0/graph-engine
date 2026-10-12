@@ -5,7 +5,7 @@ the brain proactively:
 
 ```markdown
 ## Knowledge brain
-A GraphEngine MCP server (tools: search_brain, build_context, get_node, neighbors,
+A GraphEngine MCP server (tools: search_brain, explain_search, build_context, get_node, neighbors,
 brain_status) is available. Consult it BEFORE starting non-trivial design,
 architecture or research work — it may already hold prior decisions,
 constraints and related ideas. Skip it for routine edits, typo fixes and
@@ -34,3 +34,9 @@ The GraphEngine MCP server also has `remember`, `recall` and `forget`.
 
 There is deliberately NO per-command hook: noisy PreToolUse nudges are the
 known anti-pattern that gets MCP tools abandoned.
+
+Graph expansion is explicit: `search_brain(graph_hops=2)` can recover related
+memories through accepted current paths; use `explain_search` with the same
+options to inspect seeds, edges and contributions. `focal_id` must be an exact
+known node/entity ID. Paths supply retrieval context, never transitive facts.
+Graph exploration never records recall or fills the vector cache.

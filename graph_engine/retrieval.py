@@ -10,12 +10,14 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 
 import numpy as np
 
 from .brain_engine import BrainEngine
 from .feedback import LearningProfile, learning_profile
 from .tiers import order_by_tier
+from .graph_retrieval import GraphOptions, GraphTrace, eligible_edges, expand
 
 
 def tokenize(text: str) -> list[str]:
@@ -98,6 +100,7 @@ class _RetrievalTrace:
     tiers: dict[str, str] = field(default_factory=dict)
     learning: LearningProfile | None = None
     feedback_adjustments: dict[str, float] = field(default_factory=dict)
+    graph: GraphTrace = field(default_factory=GraphTrace)
 
 
 def _limit_hits(hits: list[tuple[str, float]], k: int,
@@ -117,7 +120,7 @@ def _limit_hits(hits: list[tuple[str, float]], k: int,
 
 def _retrieve_trace(engine: BrainEngine, query: str, rerank_k: int,
                     persist: bool, *, learn: bool = True,
-                    per_tier: bool = False) -> _RetrievalTrace:
+                    per_tier: bool = False, graph: GraphOptions | None = None) -> _RetrievalTrace:
     """One scoring path for normal retrieval and its explanation."""
     nodes = engine.brain.read_nodes()
     # Audit #7: tombstones are "forgotten" — they must not come back as
@@ -129,6 +132,7 @@ def _retrieve_trace(engine: BrainEngine, query: str, rerank_k: int,
     trace.learning = learning_profile(engine.brain, query, nodes) if learn else LearningProfile(query)
     query = trace.learning.expanded_query
     if not nodes:
+        trace.graph = expand(engine.brain, set(), [], graph)
         return trace
     node_ids = [n.id for n in nodes]
     qvec = engine.embedder.embed(query)
@@ -170,8 +174,6 @@ def _retrieve_trace(engine: BrainEngine, query: str, rerank_k: int,
     overlap = dense_ids | bm_ids
     dense = [(nid, s) for nid, s in dense if nid in overlap]
     bm_rank = [(nid, s) for nid, s in bm_rank if nid in overlap]
-    if not dense and not bm_rank:
-        return trace
 
     trace.dense_ranks = {nid: rank for rank, (nid, _) in enumerate(
         sorted(dense, key=lambda hit: hit[1], reverse=True), start=1)}
@@ -179,6 +181,16 @@ def _retrieve_trace(engine: BrainEngine, query: str, rerank_k: int,
         sorted(bm_rank, key=lambda hit: hit[1], reverse=True), start=1)}
     trace.fused = rrf_fuse([dense, bm_rank], k=60,
                            weights=[trace.learning.dense_weight, trace.learning.bm25_weight])
+    # Graph relevance is added to base RRF before feedback and tier ordering.
+    # Seed selection honors feedback, before persisted tier priority. Apply
+    # feedback to the combined candidate score only once below.
+    seeds = sorted([(nid, max(0.0, score + trace.learning.adjustments.get(nid, 0.0)))
+                    for nid, score in trace.fused], key=lambda hit: hit[1], reverse=True)
+    trace.graph = expand(engine.brain, set(node_ids), seeds, graph)
+    combined = dict(trace.fused)
+    for nid, contribution in trace.graph.contributions.items():
+        combined[nid] = combined.get(nid, 0.0) + contribution
+    trace.fused = list(combined.items())
     trace.feedback_adjustments = {
         nid: max(-score, trace.learning.adjustments.get(nid, 0.0))
         for nid, score in trace.fused}
@@ -191,18 +203,18 @@ def _retrieve_trace(engine: BrainEngine, query: str, rerank_k: int,
 
 
 def retrieve_candidates(engine: BrainEngine, query: str, rerank_k: int = 30,
-                        persist: bool = True) -> tuple[list[str], dict[str, str], list[tuple[str, float]]]:
+                        persist: bool = True, *, graph: GraphOptions | None = None) -> tuple[list[str], dict[str, str], list[tuple[str, float]]]:
     """Shared candidate retrieval for the retrieve()/rerank path."""
-    trace = _retrieve_trace(engine, query, rerank_k, persist)
+    trace = _retrieve_trace(engine, query, rerank_k, persist, graph=graph)
     return trace.node_ids, trace.text_by_id, trace.candidates
 
 
 def explain(engine: BrainEngine, node_id: str, query: str, *, k: int = 5,
-            rerank_k: int = 30) -> dict:
+            rerank_k: int = 30, graph: GraphOptions | None = None) -> dict:
     """Explain a fresh query against the current brain, without writing anything.
 
-    Graph edges are contextual evidence only: hybrid retrieval does not use
-    graph traversal. This is a recomputation, not a historical search log.
+    Graph expansion is explicit and bounded; paths never assert entailment.
+    This is a recomputation, not a historical search log.
     """
     if not query.strip():
         raise ValueError("query must be non-empty")
@@ -214,7 +226,7 @@ def explain(engine: BrainEngine, node_id: str, query: str, *, k: int = 5,
     if node.status == "tombstone":
         raise ValueError(f"Node {node_id!r} is tombstoned and excluded from retrieval.")
 
-    trace = _retrieve_trace(engine, query, rerank_k, persist=False)
+    trace = _retrieve_trace(engine, query, rerank_k, persist=False, graph=graph)
     reranked = getattr(engine, "reranker", None) is not None
     hits = (_rerank(engine, query, k, trace.text_by_id, trace.candidates,
                     reranker_scores=trace.reranker_scores, tiers=trace.tiers)
@@ -238,9 +250,9 @@ def explain(engine: BrainEngine, node_id: str, query: str, *, k: int = 5,
               "outside_candidate_limit" if node_id in fused_ranks else "no_overlap")
     # Only accepted, live connections to other returned hits are evidence.
     hit_ids = set(final_ranks) - {node_id}
-    edges = [edge for edge in engine.brain.read_edges()
-             if not edge.pending and not edge.rejected and edge.is_current
-             and ((edge.source == node_id and edge.target in hit_ids)
+    edges = [edge for edge in eligible_edges(engine.brain, set(trace.node_ids),
+                                            datetime.now(timezone.utc))
+             if ((edge.source == node_id and edge.target in hit_ids)
                   or (edge.target == node_id and edge.source in hit_ids))]
     return {
         "query": query, "node_id": node_id, "retrieved": retrieved,
@@ -260,20 +272,25 @@ def explain(engine: BrainEngine, node_id: str, query: str, *, k: int = 5,
         "reranker_score": reranker_score,
         "final_score": (reranker_score if has_model_scores else retrieval_score)
                        if retrieved else None,
-        "final_score_kind": "reranker" if has_model_scores else "rrf",
+        "final_score_kind": ("reranker" if has_model_scores else
+                             "rrf_graph" if trace.graph.contributions else "rrf"),
         "matched_terms": sorted(set(tokenize(query)) & set(tokenize(node.text))),
-        "graph_used_for_ranking": False,
+        "graph_used_for_ranking": bool(trace.graph.contributions),
+        "graph": {**trace.graph.summary(),
+                  "contribution": trace.graph.contributions.get(node_id, 0.0),
+                  "paths": trace.graph.paths.get(node_id, [])},
         "graph_context": [edge.to_dict() for edge in sorted(edges, key=lambda e: e.id)],
     }
 
 
 def retrieve(engine: BrainEngine, query: str, k: int = 5, rerank_k: int = 30,
              persist: bool = True, track: bool = False, *,
-             per_tier: bool = False) -> list[tuple[str, float]]:
+             per_tier: bool = False, graph: GraphOptions | None = None) -> list[tuple[str, float]]:
     """Hybrid retrieval over the brain. Returns top-k (node_id, rrf_score).
 
     Dense: cosine of the query embedding against the cached node vectors.
     BM25: lexical overlap against the node texts.
+    GraphOptions explicitly adds bounded graph relevance before candidate limits.
     Fusion: RRF over the two rankings with optional learned weights and
     explicit feedback adjustments. Matching tiers precede relevance: main,
     recall, archival, including after reranking.
@@ -288,7 +305,22 @@ def retrieve(engine: BrainEngine, query: str, k: int = 5, rerank_k: int = 30,
     read-only; CLI/HTTP pass True. The ledger write is an append to a
     gitignored file — it never dirties the brain repo.
     """
-    trace = _retrieve_trace(engine, query, rerank_k, persist, per_tier=per_tier)
+    trace = _retrieve_trace(engine, query, rerank_k, persist, per_tier=per_tier, graph=graph)
+    return _finish_retrieval(engine, query, k, trace, track=track, per_tier=per_tier)
+
+
+def retrieve_with_evidence(engine: BrainEngine, query: str, k: int = 5,
+                           rerank_k: int = 30, *, persist: bool = False,
+                           track: bool = False, graph: GraphOptions | None = None) -> dict:
+    """One scoring pass with paths/evidence for returned candidates, read-only by default."""
+    trace = _retrieve_trace(engine, query, rerank_k, persist, graph=graph)
+    hits = _finish_retrieval(engine, query, k, trace, track=track)
+    return {"hits": hits, "graph": trace.graph.summary(),
+            "evidence": {nid: trace.graph.paths.get(nid, []) for nid, _ in hits}}
+
+
+def _finish_retrieval(engine: BrainEngine, query: str, k: int, trace: _RetrievalTrace,
+                      *, track: bool = False, per_tier: bool = False) -> list[tuple[str, float]]:
     text_by_id, candidates = trace.text_by_id, trace.candidates
     if not candidates:
         return []

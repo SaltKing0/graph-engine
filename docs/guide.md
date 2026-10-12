@@ -239,7 +239,9 @@ edges are excluded. Inference needs no LLM and never writes inferred edges.
 `ig explain <node_id>` shows one shortest current graph path per reachable
 node (default depth 2, limit 20) and supporting edges. It reports truncation
 when the result limit is reached. These paths are contextual: hybrid retrieval
-does not traverse graph edges. Add `--query "..."` to recompute the existing
+does not traverse graph edges by default. Explicit `--graph-hops 1..3` enables
+bounded accepted graph relevance; see [graph retrieval](graph-retrieval.md).
+Add `--query "..."` to recompute the existing
 BM25/dense/RRF/reranker score explanation for a fresh query; that mode retains
 its `--top` and `--rerank-k` options. Both modes and `infer` are read-only and
 do not update recall statistics or vector files.
@@ -544,7 +546,8 @@ Five tools, all annotated `readOnlyHint`:
 
 | Tool | Purpose |
 |---|---|
-| `search_brain` | hybrid search (dense + BM25, RRF-fused); `score` is a rank-fusion score, **not** a similarity |
+| `search_brain` | hybrid search; optional `graph_hops=1..3` / exact `focal_id` adds accepted graph context and evidence; scores are relevance, **not** confidence |
+| `explain_search` | read-only score/path recomputation with the same query, k and graph options |
 | `build_context` | citation-bearing prompt context by persisted tier; `query` 1–500 chars, `budget` 0–8000 estimated tokens, `k` 1–20 memories per tier, optional `include_metadata` (default true) |
 | `get_node` | one node: full text (capped at 2000 chars) + its live edges |
 | `neighbors` | undirected graph neighborhood, 1–2 hops — the question vector search cannot answer |

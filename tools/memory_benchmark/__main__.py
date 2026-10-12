@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from .adapters import ADAPTERS
+from .adapters import ADAPTERS, EXPERIMENT_ADAPTERS
 from .answers import HTTPAnswers
 from .dataset import DEFAULT_DATASET, import_longmemeval
 from .runner import checkpoint, run
@@ -23,7 +23,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dataset", type=Path, default=DEFAULT_DATASET)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--adapter", action="append", choices=ADAPTERS)
+    parser.add_argument("--adapter", action="append", choices=EXPERIMENT_ADAPTERS)
     parser.add_argument("--k", type=positive, default=5)
     parser.add_argument("--context-budget", type=positive, default=256)
     parser.add_argument("--seed", type=int, default=0)
