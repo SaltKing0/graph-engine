@@ -6,7 +6,18 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-13
+
 ### Added
+- Read-only `ig snapshot` queries for committed Git revisions, including
+  historical node text, review state and optional fact-validity filtering;
+  current permissions apply without changing the active brain (issue #26).
+- Opt-in graph-expanded retrieval using accepted, live edges, bounded
+  traversal and reconstructible score/path explanations (issue #22).
+- Authenticated hybrid search in the web UI and HTTP API, with semantic
+  results, highlights and refreshed selection (issue #18).
+- Reproducible DE/EN memory retrieval, evidence and answer-quality benchmark
+  tools, with an offline CI smoke and documented opt-in model runs (issue #21).
 - Local `ig import` for Markdown, UTF-8 text and optional `[pdf]` parsing:
   bounded deterministic chunks, read-only previews, configurable source IDs,
   file hashes and page/text locations, append-only retries and exact evidence
@@ -34,6 +45,9 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
   agent example with an optional real-model path (issue #20).
 
 ### Fixed
+- Profiled retrieval and added disposable search snapshots that cache node
+  text, BM25 statistics and normalized vector matrices. Changes invalidate
+  caches; malformed/overflowing vectors are ignored safely (issue #29).
 - Duplicate capture evidence now follows its survivor's current access
   restrictions. Forget also tombstones associated receipts and invalidates
   their fact supports; cosine consolidation preserves receipts and retry IDs.
@@ -577,7 +591,8 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
   license. Similarity edges (`ähnlich`, `erweitert` — renamed to
   `similar`/`extends` in 0.5.0).
 
-[Unreleased]: https://github.com/SaltKing0/graph-engine/compare/v0.6.1...HEAD
+[Unreleased]: https://github.com/SaltKing0/graph-engine/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/SaltKing0/graph-engine/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/SaltKing0/graph-engine/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/SaltKing0/graph-engine/compare/v0.5.4...v0.6.0
 [0.5.4]: https://github.com/SaltKing0/graph-engine/compare/v0.5.3...v0.5.4
