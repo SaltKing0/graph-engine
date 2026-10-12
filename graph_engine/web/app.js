@@ -362,6 +362,10 @@ const short = (text, length = 36) => {
         <button class="idea-preview" data-action="source" aria-label="Read first idea in full"><span class="excerpt">${esc(textOf(edge.source))}</span><span class="read">Read idea ↗</span></button>
         <button class="idea-preview" data-action="target" aria-label="Read second idea in full"><span class="excerpt">${esc(textOf(edge.target))}</span><span class="read">Read idea ↗</span></button>
         ${edge.kind === "fact" ? (edge.evidence || []).slice(0, 3).map(item => `<p class="fact-evidence">${esc(short(item.text, 240))}</p>`).join("") : ""}
+        ${edge.origin === "consolidator" && (edge.evidence || []).length ?
+          `<p>Consolidation proposal. Quotes establish provenance, not factual entailment. This node remains searchable before review.</p>
+           <p>Extracted validity: ${esc(edge.extracted_validity?.valid_from || "unknown")} to ${esc(edge.extracted_validity?.valid_to || "unknown")}</p>` +
+          edge.evidence.map(item => `<p class="fact-evidence">Evidence ${esc(item.node_id)}: ${esc(item.quote)}</p>`).join("") : ""}
         ${edge.kind === "fact_replacement" ? replacementDetails(edge) : ""}
         <div class="actions"><button class="ok" data-action="accept" ${resolving ? "disabled" : ""}>&#10003; Accept</button><button class="quiet" data-action="reject" ${resolving ? "disabled" : ""}>Dismiss</button></div>
       </article>`).join("");

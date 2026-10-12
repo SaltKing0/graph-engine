@@ -794,7 +794,7 @@ the dream step still perform no extraction. `ig dream` without action flags
 remains read-only. Dream accepts the same gate flags, using `--consolidate-limit`
 for extraction because its existing `--limit` controls community distillation.
 
-For optional refinement, set `IG_CONSOLIDATE_LLM_CMD` to a command that reads an
+For **legacy free-text** refinement, set `IG_CONSOLIDATE_LLM_CMD` to a command that reads an
 evidence prompt on stdin and prints **one grounded fact** on stdout, then run
 `ig consolidate --llm` or `ig dream --consolidate --llm`. Blank stdout declines
 extraction and leaves the event eligible for a later run. Nonzero exit status or
@@ -803,6 +803,103 @@ The model's output still requires review; no automatic grounding check is made.
 Dry runs never invoke the command and report candidate events rather than
 model-dependent output counts. When dream combines `--distill --consolidate --llm`,
 distillation also requires its separate `IG_DREAM_LLM_CMD`.
+
+### Structured consolidation proposals
+
+For machine-checked provenance, configure a separate JSON command and explicitly
+select the structured protocol:
+
+```bash
+export IG_CONSOLIDATE_STRUCTURED_CMD='your-json-consolidation-command'
+ig consolidate --structured --dry-run --json  # selection only; never runs the command
+ig consolidate --structured --json          # one bounded batch, one commit
+ig dream --consolidate --structured         # same protocol in dream
+ig pending                                 # inspect claim, exact quotes and dates
+ig accept <edge_id>                         # individual evidence-link decision
+ig reject <edge_id>
+ig undo <edge_id>                           # restore the decision to pending
+```
+
+`--structured` and `--llm` are mutually exclusive. There is no fallback between
+protocols. Dream requires `--consolidate` with `--structured`; it does not change
+community distillation into a structured extractor.
+
+The command receives a JSON object containing `version: 1`, `instruction`,
+`schema`, `limits`, and an `events` array of `{node_id, text, observed_at}`.
+Each event is a selected live episodic node; `text` is its current stored text,
+not another event's similar text. `observed_at` falls back to `created`.
+Return exactly this versioned envelope with one or more concise facts:
+
+```json
+{
+  "version": 1,
+  "abstain": false,
+  "facts": [
+    {
+      "text": "Alice works at Acme.",
+      "evidence": [{"node_id": "event-id-from-request", "quote": "Alice works at Acme."}],
+      "valid_from": null,
+      "valid_to": null
+    }
+  ]
+}
+```
+
+Explicit abstention is `{"version":1,"abstain":true,"facts":[]}`. Empty stdout
+is an error in this protocol. Each fact requires nonempty `text` and `evidence`;
+only `valid_from` and `valid_to` are optional. Every evidence object has exactly
+`node_id` and `quote`. IDs must reference selected events, and quotes must match
+their text exactly, including whitespace. Dates use the entity extractor's
+ISO-8601 validation, normalize to UTC (naive dates mean UTC), and describe a
+half-open fact-validity window. An end requires an earlier start. Unknown dates
+stay null; they are not filled from event or publication time.
+
+Limits are 256 KiB of JSON input, 128 KiB of stdout/stderr and validated serialized
+output, 32 facts, 4,000 characters per fact, 1–16 quotes per fact, and 8,000
+characters per quote. Lower the selection `--limit` if input is too large.
+Nonzero exit, a 300-second timeout, duplicate JSON keys, invalid schema/dates,
+or unsupported quotes abort the entire extraction batch before node, edge or
+cursor writes. On POSIX a failed/timed-out command's process group is terminated;
+on Windows the directly launched process is terminated. No provider SDK is added.
+
+**Publication policy:** new nodes are probationary semantic nodes with an
+`episodic-extraction` and `consolidation-proposal` tag and a visible
+`Consolidation proposal (not reviewed truth):` text prefix. They are immediately
+searchable and may appear in agent context. Pending or rejected evidence links
+do **not** hide a semantic node. Treat the labelled text as a proposal and consult
+its evidence/review state before relying on it. Rejection preserves the labelled
+node for inspection; explicitly forget it to remove it from live retrieval.
+Validity windows are stored on evidence links; ordinary semantic search does
+not apply those windows to the proposal's node text.
+The prefix remains after acceptance: an edge review is not an entailment proof.
+Automatic dedup, lifecycle promotion and community distillation exclude these
+proposal nodes so maintenance cannot silently remove the label or publish them
+as ordinary truth. `ig accept-pending` holds their evidence links for individual
+review, regardless of similarity confidence.
+
+Each fact has a stable node ID and a pending `extends` link to each cited event,
+with exact quote objects in `edge.evidence` and the normalized dates in
+`edge.extracted_validity`. CLI JSON and the web review inbox expose the proposals
+and their evidence. Existing review/undo and Git history preserve decisions;
+review timestamps and the configured principal (or `local`) are recorded on
+structured links. Original events remain unchanged.
+Exact structured claim text (case/whitespace normalized) and validity windows
+reuse a proposal; different windows remain separate. Rejected/invalidated
+structured claims and forgotten matching semantic text are not recreated from
+later events. Existing provenance, including pending/rejected/tombstoned links,
+marks cited events processed. Explicit undo makes review possible again without
+duplicating extraction. Abstained or uncited events remain retryable using the
+existing round-robin cursor.
+
+**Validation proves provenance, not factual entailment.** A real quote can still
+be misinterpreted or accompanied by unsupported added claims. Ambiguous pronoun
+resolution is a model/human judgment, not a claim made by the validator. The
+command instruction asks the model to abstain when evidence is ambiguous;
+structurally valid interpretations remain pending proposals for review.
+Dream's dry-run report distinguishes selection eligibility, extraction not run,
+and stored evidence review counts. JSON returns `protocol`, `extraction_ran`,
+`proposals`, `pending_proposals` (new pending evidence-edge count), and the
+publication policy; `review` is the stored edge-state count before the pass.
 
 ## Configuration
 
@@ -837,6 +934,7 @@ distillation also requires its separate `IG_DREAM_LLM_CMD`.
 | `IG_CONSOLIDATE_MIN_COUNT` | `1` | minimum eligible, unprocessed events before a pass (integer >= 1) |
 | `IG_CONSOLIDATE_LIMIT` | `50` | maximum events per pass (integer >= 1) |
 | `IG_CONSOLIDATE_LLM_CMD` | *(none)* | optional stdin/stdout fact extractor, invoked only with `--llm` |
+| `IG_CONSOLIDATE_STRUCTURED_CMD` | *(none)* | separate JSON proposal command, invoked only with `--structured`; 300-second timeout; exact quotes/IDs/dates checked; 128 KiB output bound |
 | `IG_ENTITIES_LLM_CMD` | *(none)* | optional JSON stdin/stdout entity and triple extractor for `ig entities --llm`, `ig ingest --extract-model`, and HTTP/MCP `extraction: "model"`; 300-second timeout; never enabled automatically |
 
 Dedupe: near-duplicate ingests (cosine ≥ 0.92) merge into the existing node

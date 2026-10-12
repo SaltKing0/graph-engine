@@ -45,6 +45,7 @@ from typing import Callable
 from .brain import Brain, Edge, Node
 from .communities import analyze_communities
 from .consolidation import ConsolidationConfig, consolidation_plan
+from .consolidation_protocol import PROPOSAL_TAG
 from .hygiene import connectivity, near_dup_pairs
 from .intent import INTENT_KINDS
 from .similarity import cosine
@@ -96,6 +97,9 @@ class DreamPlan:
         lines.append(f"## Decay candidates: {len(self.decay_candidates)}")
         lines.append(f"## Episodic extraction candidates: {len(self.consolidation.get('candidates', []))}")
         lines.append(f"  gates: {self.consolidation.get('gates', {})}")
+        lines.append("  Selection eligibility only; extraction not run, no truth verified.")
+        lines.append(f"  Structured evidence review: {self.consolidation.get('review', {})}")
+        lines.append(f"  Publication: {self.consolidation.get('publication_policy', '')}")
         lines.append(f"## Merge candidates (review, never auto): {len(self.merge_candidates)}")
         for a, b, score in self.merge_candidates[:5]:
             lines.append(f"  {score:.3f}  {a!r}")
@@ -308,7 +312,8 @@ def refresh(brain: Brain, *, dry_run: bool = False, commit: bool = True) -> dict
 
 def _summary_ids(brain: Brain) -> set[str]:
     """Ids of nodes a previous pass wrote — excluded from the next partition."""
-    return {n.id for n in brain.read_nodes() if SUMMARY_TAG in (n.tags or [])}
+    return {n.id for n in brain.read_nodes()
+            if SUMMARY_TAG in n.tags or PROPOSAL_TAG in n.tags}
 
 
 def distill(brain: Brain, *, min_size: int = DREAM_MIN_COMMUNITY,

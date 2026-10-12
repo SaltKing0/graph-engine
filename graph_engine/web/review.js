@@ -104,6 +104,10 @@ function renderCards() {
       <div class="nodebox pickable" data-pick="${esc(e.target)}">
         <span class="id">${esc(e.target)}</span><br>${esc(short(e.target))}</div>
       ${e.kind === "fact" ? (e.evidence || []).slice(0, 3).map(item => `<p>${esc(item.text.slice(0, 240))}</p>`).join("") : ""}
+      ${e.origin === "consolidator" && (e.evidence || []).length ?
+        `<p>Consolidation proposal. Quotes establish provenance, not factual entailment. This node remains searchable before review.</p>
+         <p>Extracted validity: ${esc(e.extracted_validity?.valid_from || "unknown")} to ${esc(e.extracted_validity?.valid_to || "unknown")}</p>` +
+        e.evidence.map(item => `<p>Evidence ${esc(item.node_id)}: ${esc(item.quote)}</p>`).join("") : ""}
       ${e.kind === "fact_replacement" ? replacementDetails(e) : ""}
       <div class="actions">
         <button class="ok" data-resolve="${esc(e.id)}" data-accept="1">✓ accept ⏎</button>

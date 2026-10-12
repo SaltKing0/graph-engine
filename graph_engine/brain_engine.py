@@ -47,6 +47,12 @@ CONSOLIDATE_MIN_AGE_DAYS_ENV = "IG_CONSOLIDATE_MIN_AGE_DAYS"
 CONSOLIDATE_MIN_COUNT_ENV = "IG_CONSOLIDATE_MIN_COUNT"
 CONSOLIDATE_LIMIT_ENV = "IG_CONSOLIDATE_LIMIT"
 CONSOLIDATE_LLM_CMD_ENV = "IG_CONSOLIDATE_LLM_CMD"
+CONSOLIDATE_STRUCTURED_CMD_ENV = "IG_CONSOLIDATE_STRUCTURED_CMD"
+
+
+def consolidation_structured_command_from_env() -> str:
+    """Separate opt-in JSON adapter; never fall back to the legacy command."""
+    return os.environ.get(CONSOLIDATE_STRUCTURED_CMD_ENV, "").strip()
 
 
 GRAPH_HOME_ENV = "IG_GRAPH_HOME"
@@ -108,6 +114,7 @@ class BrainEngine:
         """Closest node above the dedupe threshold — or None. Uses the vector cache."""
         node_ids = {n.id for n in self.brain.read_nodes()
                     if n.id != exclude_id and n.ntype != "entity" and n.status != "tombstone"
+                    and "consolidation-proposal" not in n.tags
                     and not (n.capture and n.capture["duplicate"])
                     and self.brain.can_access("write", n.id)}
         vectors = self.brain.vectors_for(
@@ -148,7 +155,8 @@ class BrainEngine:
             protected = {nid for n in nodes if n.capture and n.status != "tombstone"
                          for nid in (n.id, n.capture["node_id"])}
             for pn in nodes:
-                if pn.status != "probation" or pn.ntype == "entity":
+                if (pn.status != "probation" or pn.ntype == "entity"
+                        or "consolidation-proposal" in pn.tags):
                     continue
                 pvec = self.brain.vectors_for(
                     {pn.id}, lambda t: self.embedder.embed(_normalize(t))

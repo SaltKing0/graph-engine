@@ -387,3 +387,30 @@ def test_fact_replacement_review_accept_reject_and_undo(server, page, view):
     undo.click()
     expect(card).to_have_count(1)
     assert_inert(page)
+
+
+@pytest.mark.parametrize("view", ["main", "review"])
+def test_structured_consolidation_evidence_is_visible_and_inert(server, page, tmp_path, view):
+    from graph_engine.consolidation import ConsolidationConfig, consolidate
+    from graph_engine.consolidation_protocol import PROPOSAL_PREFIX
+    brain = Brain(tmp_path / "brain", mode="local")
+    brain.write_node(Node(id="event", text=HOSTILE, ntype="episodic",
+                          created="2020-01-01T00:00:00Z"))
+    result = consolidate(brain, config=ConsolidationConfig(threshold=0, min_age_days=0),
+                         structured_extractor=lambda events: dict(version=1, abstain=False,
+                             facts=[dict(text="A proposed claim", evidence=[dict(
+                                 node_id="event", quote=HOSTILE)])]))
+    edge = next(e for e in brain.read_edges() if e.origin == "consolidator")
+    page.goto(server if view == "main" else server + "/review")
+    card = (page.locator(f'.card[data-id="{edge.id}"]') if view == "main" else
+            page.locator(".card").filter(has=page.locator(f'[data-resolve="{edge.id}"]')))
+    expect(card).to_contain_text(PROPOSAL_PREFIX.strip())
+    expect(card).to_contain_text("Evidence event: " + HOSTILE)
+    expect(card).to_contain_text("not factual entailment")
+    expect(card).to_contain_text("remains searchable before review")
+    assert_inert(page)
+    card.locator("button.ok").click()
+    expect(card).to_have_count(0)
+    page.locator("#undo" if view == "main" else "#undoBtn").click()
+    expect(card).to_have_count(1)
+    assert result["created"] == 1

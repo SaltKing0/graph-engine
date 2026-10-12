@@ -16,7 +16,7 @@ Examples:
   python -m graph_engine tier --rebalance [--dry-run] [--json]
   python -m graph_engine feedback "query" <node_id> <relevant|irrelevant> [--json]
   python -m graph_engine recall [--top 10] [--aggregate] [--dry-run] [--json]
-  python -m graph_engine consolidate [--threshold 1] [--min-age-days 1] [--min-count 1] [--limit 50] [--dry-run] [--json] [--llm]
+  python -m graph_engine consolidate [--threshold 1] [--min-age-days 1] [--min-count 1] [--limit 50] [--dry-run] [--json] [--llm | --structured]
   python -m graph_engine dream [--refresh] [--consolidate] [--distill] [--lifecycle] [--dry-run] [--json]
   python -m graph_engine link <node_a> <node_b> [--kind same_as]
   python -m graph_engine search "attention" [--json]
@@ -406,6 +406,11 @@ def cmd_pending(engine: BrainEngine, args: list[str]) -> None:
         if e.kind == "fact":
             for evidence in e.evidence[:3]:
                 print(f"  evidence {evidence['node_id']}: {_short(evidence['text'], 160)}")
+        if e.origin == "consolidator" and e.evidence:
+            print(f"  Consolidation proposal; extracted validity: {e.extracted_validity}")
+            print("  Quote matching proves provenance, not factual entailment.")
+            for evidence in e.evidence:
+                print(f"  evidence {evidence['node_id']}: {evidence['quote']!r}")
     print(f"\n{len(edges)} pending · akzeptieren: ig accept {edges[0].id}")
 
 
@@ -1089,12 +1094,21 @@ def _consolidation_extractor() -> Callable[[str], str | None]:
 
 def _print_consolidation(result: dict) -> None:
     if result["dry_run"]:
-        print(f"consolidate: would extract from {len(result['candidates'])} episodic node(s) "
+        print(f"consolidate: selection eligible: {len(result['candidates'])} episodic node(s) "
               f"({result['eligible']} eligible; dry run, nothing written)")
+        print("Extraction not run; eligibility does not establish reviewed truth.")
     else:
         print(f"consolidate: {result['created']} fact(s) created, "
               f"{result['reused']} reused, {result['edges']} provenance edge(s), "
               f"{result['skipped']} skipped")
+    if result["protocol"] == "structured-v1":
+        print(f"structured proposals: {result['pending_proposals']} pending evidence edge(s). "
+              + result["publication_policy"])
+        for proposal in result["proposals"]:
+            print(f"  proposal {proposal['node_id']}: {proposal['text']}")
+            for ref in proposal["evidence"]:
+                print(f"    source {ref['node_id']}: {ref['quote']!r}")
+        print("Exact quotes establish provenance, not factual entailment.")
 
 
 def cmd_consolidate(engine: BrainEngine, args: list[str]) -> None:
@@ -1109,13 +1123,17 @@ def cmd_consolidate(engine: BrainEngine, args: list[str]) -> None:
     parser.add_argument("--limit", type=int)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--json", action="store_true")
-    parser.add_argument("--llm", action="store_true")
+    protocol = parser.add_mutually_exclusive_group()
+    protocol.add_argument("--llm", action="store_true", help="legacy free-text command")
+    protocol.add_argument("--structured", action="store_true", help="structured JSON proposal command")
     opts = parser.parse_args(args)
     config = _consolidation_config(vars(opts))
     extractor = _consolidation_extractor() if opts.llm else None
     try:
+        from .consolidation_protocol import command_extractor
+        structured = command_extractor() if opts.structured else None
         result = consolidate(engine.brain, config=config, extractor=extractor,
-                             dry_run=opts.dry_run)
+                             structured_extractor=structured, dry_run=opts.dry_run)
     except (ValueError, RuntimeError) as exc:
         print(f"consolidate: {exc}", file=sys.stderr)
         sys.exit(1)
@@ -1140,6 +1158,7 @@ def cmd_dream(engine: BrainEngine, args: list[str]) -> None:
     from .consolidation import consolidate
     do_refresh, do_distill, dry_run, as_json = False, False, False, False
     do_life, use_llm, do_consolidate = False, False, False
+    use_structured = False
     consolidation_overrides = {}
     min_size, limit = DREAM_MIN_COMMUNITY, DREAM_MAX_DISTILL
     min_recall, min_degree = PROMOTE_MIN_RECALL, PROMOTE_MIN_DEGREE
@@ -1161,6 +1180,8 @@ def cmd_dream(engine: BrainEngine, args: list[str]) -> None:
             as_json, i = True, i + 1
         elif a == "--llm":
             use_llm, i = True, i + 1
+        elif a == "--structured":
+            use_structured, i = True, i + 1
         elif a in ("--threshold", "--min-age-days", "--min-count", "--consolidate-limit"):
             if i + 1 >= len(args):
                 print(f"Usage: {a} expects a number")
@@ -1193,10 +1214,19 @@ def cmd_dream(engine: BrainEngine, args: list[str]) -> None:
             print(f"Unknown option for dream: {a!r}")
             sys.exit(1)
 
+    if use_structured and (use_llm or not do_consolidate):
+        print("--structured requires --consolidate and cannot combine with --llm", file=sys.stderr)
+        sys.exit(1)
     no_actions = not (do_refresh or do_distill or do_life or do_consolidate)
     config = _consolidation_config(consolidation_overrides) if do_consolidate or no_actions else None
     summarizer = _dream_summarizer() if use_llm and do_distill else None
     extractor = _consolidation_extractor() if use_llm and do_consolidate else None
+    try:
+        from .consolidation_protocol import command_extractor
+        structured = command_extractor() if use_structured else None
+    except ValueError as exc:
+        print(f"consolidate: {exc}", file=sys.stderr)
+        sys.exit(1)
 
     if no_actions:
         result = plan(engine.brain, min_recall=min_recall, min_degree=min_degree,
@@ -1224,7 +1254,8 @@ def cmd_dream(engine: BrainEngine, args: list[str]) -> None:
     if do_consolidate:
         try:
             out["consolidation"] = consolidate(engine.brain, config=config,
-                                               extractor=extractor, dry_run=dry_run)
+                                               extractor=extractor, structured_extractor=structured,
+                                               dry_run=dry_run)
         except (ValueError, RuntimeError) as exc:
             print(f"consolidate: {exc}", file=sys.stderr)
             sys.exit(1)
