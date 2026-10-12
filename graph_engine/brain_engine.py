@@ -362,7 +362,11 @@ class BrainEngine:
                 if not e.pending and e.kind == "similar":
                         target_node = next((n for n in self.brain.read_nodes()
                                             if n.id == e.target), None)
-                        if target_node is None or target_node.status == "tombstone" or target_node.ntype == "entity":
+                        if (target_node is None or target_node.status == "tombstone"
+                                or target_node.ntype == "entity"
+                                or "consolidation-proposal" in target_node.tags):
+                            # Proposal text is the claim's reuse/decision key.
+                            # Keep automatic cross-references in edges only.
                             continue
                         existing = target_node.text.count("[evolved ")
                         if existing >= EVOLVED_ANNOTATION_CAP:

@@ -872,9 +872,10 @@ node for inspection; explicitly forget it to remove it from live retrieval.
 Validity windows are stored on evidence links; ordinary semantic search does
 not apply those windows to the proposal's node text.
 The prefix remains after acceptance: an edge review is not an entailment proof.
-Automatic dedup, lifecycle promotion and community distillation exclude these
-proposal nodes so maintenance cannot silently remove the label or publish them
-as ordinary truth. `ig accept-pending` holds their evidence links for individual
+Automatic dedup, text evolution, lifecycle promotion and community distillation
+exclude these proposal nodes so maintenance preserves their claim identity and
+cannot silently remove the label or publish them as ordinary truth.
+`ig accept-pending` holds their evidence links for individual
 review, regardless of similarity confidence.
 
 Each fact has a stable node ID and a pending `extends` link to each cited event,
@@ -886,7 +887,8 @@ structured links. Original events remain unchanged.
 Exact structured claim text (case/whitespace normalized) and validity windows
 reuse a proposal; different windows remain separate. Rejected/invalidated
 structured claims and forgotten matching semantic text are not recreated from
-later events. Existing provenance, including pending/rejected/tombstoned links,
+later events, including by deterministic copy and legacy free-text passes.
+Existing provenance, including pending/rejected/tombstoned links,
 marks cited events processed. Explicit undo makes review possible again without
 duplicating extraction. Abstained or uncited events remain retryable using the
 existing round-robin cursor.

@@ -199,6 +199,72 @@ def test_proposals_do_not_get_promoted_merged_or_reused_as_ingest_survivors(tmp_
     assert engine._find_duplicate(engine.embedder.embed(node.text)).id != nid
 
 
+@pytest.mark.parametrize("decision", ["pending", "reject", "invalidate", "forget"])
+def test_ingest_evolution_preserves_proposal_identity_and_decisions(tmp_path, decision):
+    brain = Brain(tmp_path / "brain", mode="local")
+    claim = ("Alice manages the engineering team at Acme and works with Bob on Python services. "
+             "Their project is a search engine that uses a graph database to store user "
+             "preferences, customer requests, deployment settings, team permissions, and "
+             "incident reports.")
+    seed(brain, text=claim)
+    first = run(brain, batch(fact(claim)))
+    nid = first["proposals"][0]["node_id"]
+    before = brain.node_path(nid).read_bytes()
+    engine = BrainEngine(brain, embedder=HashEmbedder())
+    _, edges, _ = engine.ingest(claim, allow_duplicates=True, auto_accept=True)
+    # Exercise a real accepted similarity suggestion, which normally evolves text.
+    assert any(e.target == nid and e.kind == "similar" and not e.pending for e in edges)
+    assert brain.node_path(nid).read_bytes() == before
+    assert "[evolved " in brain.read_node("event").text
+    edge = next(e for e in brain.read_edges() if e.origin == "consolidator")
+    if decision == "reject":
+        brain.resolve_edge(edge.id, False)
+    elif decision == "invalidate":
+        brain.invalidate_edge(edge.id)
+    elif decision == "forget":
+        brain.tombstone_node(nid)
+    decision_before = next(e.to_dict() for e in brain.read_edges(include_rejected=True)
+                           if e.id == edge.id)
+    seed(brain, "later", claim)
+    result = run(brain, batch(fact(claim, nid="later")))
+    assert result["created"] == 0
+    if decision == "pending":
+        assert result["reused"] == result["edges"] == 1
+        assert result["proposals"][0]["node_id"] == nid
+    else:
+        assert result["skipped"] == 1 and result["edges"] == 0
+    assert next(e.to_dict() for e in brain.read_edges(include_rejected=True)
+                if e.id == edge.id) == decision_before
+
+
+@pytest.mark.parametrize("mode", ["copy", "legacy"])
+@pytest.mark.parametrize("decision", ["reject", "invalidate", "forget"])
+def test_copy_and_legacy_respect_structured_decisions(tmp_path, mode, decision):
+    brain = Brain(tmp_path / "brain", mode="local")
+    seed(brain)
+    first = run(brain, batch(fact()))
+    nid = first["proposals"][0]["node_id"]
+    edge = brain.read_edges()[0]
+    if decision == "reject":
+        brain.resolve_edge(edge.id, False)
+    elif decision == "invalidate":
+        brain.invalidate_edge(edge.id)
+    else:
+        brain.tombstone_node(nid)
+    decision_before = next(e.to_dict() for e in brain.read_edges(include_rejected=True)
+                           if e.id == edge.id)
+    seed(brain, "later", "  ALICE works at   Acme.  ")
+    seed(brain, "unrelated", "Bob uses Python.")
+    options = {"extractor": lambda text: text} if mode == "legacy" else {}
+    result = consolidate(brain, config=OPEN, now=NOW, **options)
+    assert result["skipped"] == result["created"] == result["edges"] == 1
+    edges = brain.read_edges(include_rejected=True)
+    assert not any(e.target == "later" for e in edges)
+    assert any(e.target == "unrelated" and not e.pending for e in edges)
+    assert next(e.to_dict() for e in edges if e.id == edge.id) == decision_before
+    assert brain.read_node(nid).status == ("tombstone" if decision == "forget" else "probation")
+
+
 def test_git_batch_one_commit_failure_and_repeat_do_not_commit(tmp_path):
     brain = Brain(tmp_path / "brain", mode="git")
     brain.ensure_ready()

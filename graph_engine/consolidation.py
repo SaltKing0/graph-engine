@@ -28,14 +28,19 @@ def _claim(node: Node) -> str:
     return node.text
 
 
-def _structured_batch(nodes: dict[str, Node], edges: list[Edge], facts: list[dict],
-                      result: dict) -> tuple[dict[str, Node], list[Edge]]:
-    """Plan proposals without changing existing records or review decisions."""
+def _suppressed_claims(nodes: dict[str, Node], edges: list[Edge]) -> set[str]:
+    """Respect forgetting and structured review decisions in every protocol."""
     forgotten = {_key(_claim(n)) for n in nodes.values()
                  if n.ntype == "semantic" and n.status == "tombstone"}
     blocked_ids = {e.source for e in edges if e.origin == "consolidator" and e.evidence
                    and (e.rejected or e.is_invalidated)}
-    blocked = {_key(_claim(nodes[nid])) for nid in blocked_ids if nid in nodes}
+    return forgotten | {_key(_claim(nodes[nid])) for nid in blocked_ids if nid in nodes}
+
+
+def _structured_batch(nodes: dict[str, Node], edges: list[Edge], facts: list[dict],
+                      result: dict) -> tuple[dict[str, Node], list[Edge]]:
+    """Plan proposals without changing existing records or review decisions."""
+    suppressed = _suppressed_claims(nodes, edges)
     matches = {}
     for edge in edges:
         node = nodes.get(edge.source)
@@ -47,7 +52,7 @@ def _structured_batch(nodes: dict[str, Node], edges: list[Edge], facts: list[dic
     linked = {(e.source, e.target) for e in edges if e.origin == "consolidator"}
     for item in facts:
         key = _key(item["text"])
-        if key in forgotten or key in blocked:
+        if key in suppressed:
             result["skipped"] += 1
             continue
         identity = (key, item["valid_from"], item["valid_to"])
@@ -209,17 +214,17 @@ def consolidate(brain: Brain, *, config: ConsolidationConfig | None = None,
             return result
 
         nodes = {n.id: n for n in brain.read_nodes()}
+        edges = brain.read_edges(include_rejected=True)
         if structured_extractor is not None:
             events = [{"node_id": nid, "text": nodes[nid].text,
                        "observed_at": nodes[nid].observed_at or nodes[nid].created}
                       for nid in plan["candidates"]]
             facts = validate_consolidation(structured_extractor(events), events)
-            changed, links = _structured_batch(nodes, brain.read_edges(include_rejected=True),
-                                                facts, result)
+            changed, links = _structured_batch(nodes, edges, facts, result)
             result["abstained"] = not facts
             result["extraction_ran"] = True
         else:
-            changed, links = _copy_batch(nodes, plan, extractor, result)
+            changed, links = _copy_batch(nodes, edges, plan, extractor, result)
             result["extraction_ran"] = True
 
         # No file writes until the complete extraction batch has been validated.
@@ -244,12 +249,11 @@ def consolidate(brain: Brain, *, config: ConsolidationConfig | None = None,
         return result
 
 
-def _copy_batch(nodes: dict[str, Node], plan: dict, extractor: Callable | None,
+def _copy_batch(nodes: dict[str, Node], edges: list[Edge], plan: dict, extractor: Callable | None,
                 result: dict) -> tuple[dict[str, Node], list[Edge]]:
     """Compatible deterministic and legacy extraction planning."""
     semantic: dict[str, Node] = {}
-    forgotten = {_key(_claim(n)) for n in nodes.values()
-                 if n.ntype == "semantic" and n.status == "tombstone"}
+    suppressed = _suppressed_claims(nodes, edges)
     for node in sorted(nodes.values(), key=lambda n: n.id):
         if (node.ntype == "semantic" and node.status != "tombstone"
                 and "community-summary" not in node.tags and PROPOSAL_TAG not in node.tags):
@@ -261,7 +265,7 @@ def _copy_batch(nodes: dict[str, Node], plan: dict, extractor: Callable | None,
         text = extractor(event.text) if extractor is not None else event.text
         if text is not None and not isinstance(text, str):
             raise ValueError("consolidation extractor must return text or None")
-        if text is None or not text.strip() or _key(text) in forgotten:
+        if text is None or not text.strip() or _key(text) in suppressed:
             result["skipped"] += 1
             continue
         text = text.strip()
