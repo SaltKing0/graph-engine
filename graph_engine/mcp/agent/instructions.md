@@ -5,12 +5,14 @@ the brain proactively:
 
 ```markdown
 ## Knowledge brain
-An GraphEngine MCP server (tools: search_brain, get_node, neighbors,
+A GraphEngine MCP server (tools: search_brain, build_context, get_node, neighbors,
 brain_status) is available. Consult it BEFORE starting non-trivial design,
 architecture or research work — it may already hold prior decisions,
 constraints and related ideas. Skip it for routine edits, typo fixes and
 mechanical refactors. `search_brain` scores are rank-fusion scores, not
-similarities. The brain is read-only from here; changes go through the
+similarities. Use `build_context` for budgeted, citation-bearing memory in a
+model prompt; its token budget is approximate and excludes the rest of the
+prompt. The brain is read-only from here; changes go through the
 owner (`ig ingest`, `ig pending`).
 ```
 

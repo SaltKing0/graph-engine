@@ -455,11 +455,12 @@ activated shell's `PATH`:
 }
 ```
 
-Four tools, all annotated `readOnlyHint`:
+Five tools, all annotated `readOnlyHint`:
 
 | Tool | Purpose |
 |---|---|
 | `search_brain` | hybrid search (dense + BM25, RRF-fused); `score` is a rank-fusion score, **not** a similarity |
+| `build_context` | citation-bearing prompt context by persisted tier; `query` 1–500 chars, `budget` 0–8000 estimated tokens, `k` 1–20 memories per tier, optional `include_metadata` (default true) |
 | `get_node` | one node: full text (capped at 2000 chars) + its live edges |
 | `neighbors` | undirected graph neighborhood, 1–2 hops — the question vector search cannot answer |
 | `brain_status` | cheap orientation: size, connectivity, pending-review load |
@@ -492,6 +493,89 @@ a cold clone does not dirty the private repo (`IG_MCP_CACHE_VECTORS=1` opts
 back in; measured cold-search cost: see CHANGELOG). `brain_status` returns the
 brain path basename only. Optional opt-in prompt snippet for your
 `CLAUDE.md`/`AGENTS.md`: `graph_engine/mcp/agent/instructions.md`.
+
+### Budgeted context and a complete agent turn
+
+`ig context "answer preferences" --budget 500 --json` and Python
+`build_context(engine, query, budget=500, k=5)` assemble **persisted** main,
+recall and archival sections, in that order. Up to `k` visible important main
+memories are selected even without query overlap: manually pinned main nodes
+first, then main nodes with at least three recalls, ordered by descending
+recall count and stable ID. Remaining slots in each tier are filled from
+hybrid retrieval order, using a `3*k` candidate pool **per tier** before
+optional reranking. Both candidate and result limits apply independently to
+each tier, so a populated main tier cannot crowd recall/archival out. This is
+a bounded selection, so it may not include every stored main memory. Node
+types and lifecycle status do not determine section membership. Tombstones
+and nodes hidden by the caller's graph/node permissions are excluded throughout.
+
+The assembler packs individual entries, prefix-truncating oversized bodies
+with `… [truncated]` and trying later entries if one cannot fit. Main bodies
+start with full text; recall/archival bodies start with 200/300-character
+snippets. `nodes` lists exactly the memory bodies present in `context`;
+`memories` records their tiers, selection reason and per-body truncation.
+`omitted` counts selected entries that cannot fit a citation plus non-empty
+body. `truncated` is true when any selected body is shortened or omitted.
+
+Each entry has a stable `[memory:ID]` citation and available provenance labels,
+even with `include_metadata=False` (which only hides type/status). Accepted,
+current edges add `edge_id@evidence_node_id` references when their endpoints
+and evidence sources are visible and live. Evidence references identify
+supporting nodes; fetch those nodes for full evidence text. Labels and
+evidence lists are capped at five per entry, labels at 200 characters.
+
+`tokens` counts the **complete rendered context**, including section headers,
+citation metadata, escaped characters, truncation markers and separators. The
+estimate is CJK characters plus `ceil(other characters / 4)`. It is an
+approximation, **not an exact tokenizer limit**: leave headroom and use your
+model's tokenizer for a hard limit. The JSON envelope, system instructions,
+user question and answer reserve are outside this budget. The result's
+`token_estimate` and `truncation` explain these rules. A zero or too-small
+budget returns empty context and no IDs. `context_stats` uses the same packing
+path; tier estimates cover each section, while the total also counts separators.
+
+All context interfaces are read-only: no tier changes, recall ledger updates,
+or vector cache writes. MCP `build_context` remains strictly read-only even
+with `IG_MCP_CACHE_VECTORS=1`; protected reads retain the existing authorization
+audit beside the policy file. It uses the same `ok`/error envelope and access
+guard as other read tools. Example MCP arguments:
+
+```json
+{"query": "answer preferences", "budget": 500, "k": 5}
+```
+
+Run the [framework-neutral two-session example](../examples/agent_memory.py)
+from a source checkout after installing `.[dev]`:
+
+```bash
+python -m examples.agent_memory
+# Keep the demo brain instead of using a temporary directory:
+python -m examples.agent_memory --brain /tmp/agent-memory-demo
+```
+
+Session one calls `remember` for an explicit user preference: concise answers
+in German. Session two constructs a fresh brain and engine, retrieves the
+persisted preference, and inserts the returned context into a system message
+alongside the new user question. The script prints the complete messages and
+a deterministic German answer with a memory citation. It uses HashEmbedder,
+no model download, no API key and no provider call. The answer is a stand-in
+to demonstrate wiring, not a model-quality evaluation. This demo uses a local
+brain; production callers should construct the engine through
+`graph_engine.runtime.make_engine()` to honor configured graphs and permissions,
+and only capture memories the user authorized storing.
+
+For an optional real-model path, choose a chat-completions-compatible model
+and set `OPENAI_API_KEY`, then run:
+
+```bash
+python -m examples.agent_memory --model YOUR_MODEL_ID
+```
+
+That explicit flag sends the same printed messages to the provider. The
+default base URL is `https://api.openai.com/v1`; set `OPENAI_BASE_URL` for
+another compatible endpoint. No additional SDK is required. Only synthetic
+demo memory is sent. Real responses can vary; reserve output tokens and
+account for the entire prompt with the provider's tokenizer in your own agent.
 
 ## Memory lifecycle (promotion and decay)
 

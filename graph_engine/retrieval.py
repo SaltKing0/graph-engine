@@ -100,13 +100,30 @@ class _RetrievalTrace:
     feedback_adjustments: dict[str, float] = field(default_factory=dict)
 
 
+def _limit_hits(hits: list[tuple[str, float]], k: int,
+                tiers: dict[str, str] | None = None) -> list[tuple[str, float]]:
+    """Preserve ranking while applying either a global or per-tier quota."""
+    if tiers is None:
+        return hits[:k]
+    counts: dict[str, int] = {}
+    result = []
+    for hit in hits:
+        tier = tiers[hit[0]]
+        if counts.get(tier, 0) < k:
+            result.append(hit)
+            counts[tier] = counts.get(tier, 0) + 1
+    return result
+
+
 def _retrieve_trace(engine: BrainEngine, query: str, rerank_k: int,
-                    persist: bool, *, learn: bool = True) -> _RetrievalTrace:
+                    persist: bool, *, learn: bool = True,
+                    per_tier: bool = False) -> _RetrievalTrace:
     """One scoring path for normal retrieval and its explanation."""
     nodes = engine.brain.read_nodes()
     # Audit #7: tombstones are "forgotten" — they must not come back as
     # search answers (consolidate/_find_duplicate already exclude them).
-    nodes = [n for n in nodes if n.status != "tombstone"]
+    nodes = [n for n in nodes if n.status != "tombstone"
+             and (not per_tier or n.text.strip())]
     trace = _RetrievalTrace([n.id for n in nodes], {n.id: n.text for n in nodes})
     trace.tiers = {n.id: n.storage_tier for n in nodes}
     trace.learning = learning_profile(engine.brain, query, nodes) if learn else LearningProfile(query)
@@ -168,7 +185,8 @@ def _retrieve_trace(engine: BrainEngine, query: str, rerank_k: int,
     trace.fused = sorted([(nid, score + trace.feedback_adjustments[nid])
                           for nid, score in trace.fused], key=lambda hit: hit[1], reverse=True)
     trace.fused = order_by_tier(trace.fused, trace.tiers)
-    trace.candidates = trace.fused[:rerank_k]
+    trace.candidates = _limit_hits(trace.fused, rerank_k,
+                                   trace.tiers if per_tier else None)
     return trace
 
 
@@ -250,7 +268,8 @@ def explain(engine: BrainEngine, node_id: str, query: str, *, k: int = 5,
 
 
 def retrieve(engine: BrainEngine, query: str, k: int = 5, rerank_k: int = 30,
-             persist: bool = True, track: bool = False) -> list[tuple[str, float]]:
+             persist: bool = True, track: bool = False, *,
+             per_tier: bool = False) -> list[tuple[str, float]]:
     """Hybrid retrieval over the brain. Returns top-k (node_id, rrf_score).
 
     Dense: cosine of the query embedding against the cached node vectors.
@@ -261,19 +280,25 @@ def retrieve(engine: BrainEngine, query: str, k: int = 5, rerank_k: int = 30,
     Rerank (V2#1, optional): hybrid yields top-`rerank_k` candidates; a
     `reranker` set on the engine (cross-encoder or stub) re-sorts them to
     top-`k`. Without a reranker (default) the behavior is identical.
+    With per_tier=True, both limits apply independently to each persisted
+    tier, and empty bodies are excluded. This bounds context candidates
+    without letting a populated higher tier crowd out the lower tiers.
     track (recall tracking): append the returned ids to the local recall ledger
     (`recall.record`). Off by default so read-only surfaces (MCP) stay
     read-only; CLI/HTTP pass True. The ledger write is an append to a
     gitignored file — it never dirties the brain repo.
     """
-    trace = _retrieve_trace(engine, query, rerank_k, persist)
+    trace = _retrieve_trace(engine, query, rerank_k, persist, per_tier=per_tier)
     text_by_id, candidates = trace.text_by_id, trace.candidates
     if not candidates:
         return []
 
     reranker = getattr(engine, "reranker", None)
-    result = candidates[:k] if reranker is None else _rerank(engine, query, k,
-                                                             text_by_id, candidates, tiers=trace.tiers)
+    if reranker is None:
+        result = _limit_hits(candidates, k, trace.tiers if per_tier else None)
+    else:
+        result = _rerank(engine, query, k, text_by_id, candidates,
+                         tiers=trace.tiers, per_tier=per_tier)
     if track:
         from .recall import record, tracking_enabled
         if tracking_enabled():
@@ -284,7 +309,8 @@ def retrieve(engine: BrainEngine, query: str, k: int = 5, rerank_k: int = 30,
 def _rerank(engine: BrainEngine, query: str, k: int, text_by_id: dict[str, str],
             candidates: list[tuple[str, float]], *,
             reranker_scores: dict[str, float] | None = None,
-            tiers: dict[str, str] | None = None) -> list[tuple[str, float]]:
+            tiers: dict[str, str] | None = None,
+            per_tier: bool = False) -> list[tuple[str, float]]:
     with_text = [(nid, text_by_id[nid], score) for nid, score in candidates]
     with_scores = getattr(engine.reranker, "rerank_with_scores", None)
     if with_scores is None:
@@ -293,4 +319,5 @@ def _rerank(engine: BrainEngine, query: str, k: int, text_by_id: dict[str, str],
         reranked, scores = with_scores(query, with_text, len(with_text))
         if reranker_scores is not None:
             reranker_scores.update(scores)
-    return order_by_tier([(nid, score) for nid, _, score in reranked], tiers or {})[:k]
+    hits = order_by_tier([(nid, score) for nid, _, score in reranked], tiers or {})
+    return _limit_hits(hits, k, tiers if per_tier else None)

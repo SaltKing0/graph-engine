@@ -355,9 +355,9 @@ def test_write_mode_registers_exactly_the_write_tools(mcp_env, tmp_path):
     for name in WRITE_TOOLS:
         assert name in flags, f"{name} not registered in write mode"
         assert flags[name] is False, f"{name} must not claim readOnlyHint"
-    for name in ("search_brain", "get_node", "neighbors", "brain_status"):
+    for name in ("search_brain", "build_context", "get_node", "neighbors", "brain_status"):
         assert flags.get(name) is True, f"{name} must stay read-only"
-    assert len(flags) == 7
+    assert len(flags) == 8
 
 
 @pytest.mark.skipif(not MCP_AVAILABLE, reason="mcp extra not installed")
@@ -384,7 +384,7 @@ def test_stdio_cli_roundtrip(mcp_env, write):
                 async with ClientSession(reader, writer) as client:
                     await client.initialize()
                     tools = {tool.name: tool for tool in (await client.list_tools()).tools}
-                    readonly = {"search_brain", "get_node", "neighbors", "brain_status"}
+                    readonly = {"search_brain", "build_context", "get_node", "neighbors", "brain_status"}
                     assert set(tools) == readonly | (set(WRITE_TOOLS) if write else set())
                     for name, tool in tools.items():
                         assert tool.annotations.readOnlyHint is (name in readonly)
@@ -400,6 +400,8 @@ def test_stdio_cli_roundtrip(mcp_env, write):
                     assert found["count"] == 2
                     node = await call("get_node", {"id": "aaaaaaaaaaaa"})
                     assert "agent memory" in node["node"]["text"]
+                    context = await call("build_context", {"query": "agent memory", "budget": 100})
+                    assert context["nodes"] and context["tokens"] <= 100
                     if write:
                         text = "Astronomy telescope Jupiter rings observation"
                         saved = await call("remember", {"text": text})
@@ -422,3 +424,40 @@ def test_stdio_cli_roundtrip(mcp_env, write):
         brain = Brain(str(mcp_env), mode="local")
         assert any(n.status == "tombstone" and n.source == "agent" for n in brain.read_nodes())
         assert (mcp_env / "recalls.jsonl").exists()
+
+
+@pytest.mark.skipif(not MCP_AVAILABLE, reason="mcp extra not installed")
+@pytest.mark.parametrize("args", [
+    {"query": " "}, {"query": "x" * 501},
+    {"query": "memory", "budget": -1}, {"query": "memory", "budget": 8001},
+    {"query": "memory", "k": 0}, {"query": "memory", "k": 21},
+])
+def test_context_tool_bounds(mcp_env, args):
+    payload, err = _call("build_context", args)
+    assert not err and payload["error"]["code"] == "invalid_params"
+
+
+@pytest.mark.skipif(not MCP_AVAILABLE, reason="mcp extra not installed")
+def test_context_tool_strict_readonly_even_with_cache_enabled(mcp_env, monkeypatch):
+    from graph_engine.runtime import reset_engine_cache
+    reset_engine_cache()
+    monkeypatch.setenv("IG_MCP_CACHE_VECTORS", "1")
+    before = {p.relative_to(mcp_env): p.read_bytes() for p in mcp_env.rglob("*") if p.is_file()}
+    payload, err = _call("build_context", {"query": "agent memory", "budget": 100})
+    assert not err and payload["ok"] and payload["nodes"]
+    assert payload["tokens"] <= payload["budget"]
+    assert "Approximate" in payload["token_estimate"]
+    assert "source: test" in payload["context"]
+    after = {p.relative_to(mcp_env): p.read_bytes() for p in mcp_env.rglob("*") if p.is_file()}
+    assert before == after
+    zero, _ = _call("build_context", {"query": "agent memory", "budget": 0})
+    assert zero["nodes"] == [] and zero["context"] == "" and zero["tokens"] == 0
+
+
+@pytest.mark.skipif(not MCP_AVAILABLE, reason="mcp extra not installed")
+def test_context_tool_missing_brain_and_embedder_error(mcp_env, monkeypatch):
+    from graph_engine.mcp import server
+    monkeypatch.setattr(server, "make_engine", lambda: (_ for _ in ()).throw(RuntimeError("unavailable")))
+    assert server.build_context("memory")["error"]["code"] == "embedder_unavailable"
+    monkeypatch.setenv("IG_BRAIN_PATH", str(mcp_env / "missing"))
+    assert server.build_context("memory")["error"]["code"] == "brain_missing"
