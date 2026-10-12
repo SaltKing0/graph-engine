@@ -23,8 +23,25 @@ with the `[st]` extra and Playwright installed everything runs, the embedder-
 and browser-dependent tests skip without them). New features need tests — in particular the golden-set evals
 (`graph_engine/evals.py`) and the intent/hygiene integrations.
 
-CI runs two jobs: `test` (Python 3.11/3.12, default install) and `test-st`
-(3.12 with the real embedder), so the skipped tests are covered too.
+CI covers the default install on Python 3.11–3.13 and the real embedder on
+3.12. Dedicated MCP jobs on 3.11 and 3.14 test stdio transport, read/write
+tools and access boundaries. A Chromium job on 3.12 tests rendering, XSS
+protection, capture, review and undo against a real server. The MCP and
+browser jobs use `--fail-on-skip`: missing optional dependencies cannot
+silently turn those jobs green.
+
+To run the browser suite locally:
+
+```bash
+.venv/bin/python -m pip install "playwright==1.58.0"
+.venv/bin/python -m playwright install chromium
+.venv/bin/python -m pytest tests/test_frontend_xss.py --fail-on-skip -q
+```
+
+Playwright's downloaded Chromium is used automatically; `PLAYWRIGHT_CHROMIUM`
+can override its executable. CI downloads D3 before testing and passes its
+path through `GRAPH_ENGINE_TEST_D3`; the tests check it against the shipped
+HTML's SRI digest and serve it locally to avoid browser CDN requests.
 
 ## Code style
 

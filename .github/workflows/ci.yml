@@ -26,7 +26,7 @@ jobs:
           pip install --upgrade pip
           pip install -e ".[dev]"
       - name: Test
-        run: pytest tests/ -q
+        run: python -m pytest tests/ -q
 
   # The [st] extra path: real sentence-transformers embedder. Keeps the
   # embedder-dependent tests (model override, demo near-dup measurement)
@@ -46,4 +46,46 @@ jobs:
           pip install torch --index-url https://download.pytorch.org/whl/cpu
           pip install -e ".[dev,st]"
       - name: Test
-        run: pytest tests/ -q
+        run: python -m pytest tests/ -q
+
+  test-mcp:
+    name: test (${{ matrix.python-version }}, MCP)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install MCP extra
+        run: python -m pip install -e ".[dev,mcp]"
+      - name: Test MCP transport, tools and access boundaries
+        run: >-
+          python -m pytest tests/test_mcp.py tests/test_access_namespaces.py
+          tests/test_entities.py tests/test_fact_validity.py
+          --fail-on-skip -q
+
+  test-browser:
+    name: test (3.12, Chromium)
+    runs-on: ubuntu-latest
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: /tmp/graph-engine-playwright
+      GRAPH_ENGINE_TEST_D3: /tmp/graph-engine-d3.v7.min.js
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install browser dependencies
+        run: |
+          python -m pip install -e ".[dev]" "playwright==1.58.0"
+          python -m playwright install --with-deps chromium
+      - name: Fetch integrity-checked graph library
+        run: curl --fail --location --retry 3 https://d3js.org/d3.v7.min.js --output "$GRAPH_ENGINE_TEST_D3"
+      - name: Test browser workflows and XSS protection
+        run: python -m pytest tests/test_frontend_xss.py --fail-on-skip -q

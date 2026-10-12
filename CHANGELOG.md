@@ -7,6 +7,11 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- Dedicated MCP CI on Python 3.11/3.14 and Chromium CI on Python 3.12,
+  with strict failure on skipped integration tests. MCP tests exercise the
+  real stdio CLI in read-only and write modes. Browser tests verify rendered
+  hostile content, fact evidence, capture persistence, review and undo;
+  an unloaded graph can no longer pass the XSS checks.
 - `ig entities <text>` / `ig entities --node <id>` extracts typed entity nodes,
   directed fact triples with quoted source evidence, and semantic/episodic
   mention links (issue #3). Includes a dependency-free English/German sentence
