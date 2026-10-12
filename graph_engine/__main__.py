@@ -23,6 +23,7 @@ Examples:
   python -m graph_engine maintenance [--once] [--actions refresh lifecycle consolidate] [--interval 900]
   python -m graph_engine link <node_a> <node_b> [--kind same_as]
   python -m graph_engine search "attention" [--json]
+  python -m graph_engine snapshot HEAD~1 ["attention"] [--valid-at ISO-8601] [--json]
   python -m graph_engine explain <node_id> [--query "attention"] [--json]
   python -m graph_engine infer "How does A relate to B?" [--json]
   python -m graph_engine gaps [--taxonomy tax.json] [--min 10] [--json]
@@ -228,7 +229,7 @@ def cmd_timeline(engine: BrainEngine, args: list[str]) -> None:
 
 
 def cmd_valid_at(engine: BrainEngine, args: list[str]) -> None:
-    """Show the graph as it was at a point in time (Phase 2: temporal reasoning)."""
+    """Filter current graph records by creation and fact-validity time."""
     if not args:
         print("Usage: ig valid-at <ISO-8601>")
         sys.exit(1)
@@ -269,8 +270,46 @@ def cmd_history(engine: BrainEngine, args: list[str]) -> None:
         print(f"  {ev['timestamp']}  {ev['event']:12s}  --[{ev['kind']}]-->  {other[:8]}{origin}{rejected}")
 
 
+def cmd_snapshot(engine: BrainEngine, args: list[str]) -> None:
+    """Read or search an explicit Git revision without touching the checkout."""
+    import argparse
+    import json
+    from .snapshots import SnapshotError
+    parser = argparse.ArgumentParser(prog="ig snapshot")
+    parser.add_argument("revision", help="commit/ref, optionally followed by ~N or ^N")
+    parser.add_argument("query", nargs="*", help="optional hybrid search of historical text")
+    parser.add_argument("--valid-at", dest="fact_valid_at", help="optional fact-validity ISO-8601 time")
+    parser.add_argument("--k", type=int, default=5)
+    parser.add_argument("--json", action="store_true")
+    opts = parser.parse_args(args)
+    try:
+        if opts.query:
+            result = engine.snapshot_query(opts.revision, " ".join(opts.query), k=opts.k,
+                                           fact_valid_at=opts.fact_valid_at)
+        else:
+            result = engine.snapshot(opts.revision, fact_valid_at=opts.fact_valid_at)
+    except SnapshotError as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        sys.exit(1)
+    if opts.json:
+        print(json.dumps({**result, "nodes": [n.to_dict() for n in result["nodes"]],
+                          "edges": [e.to_dict() for e in result["edges"]]}, indent=2, ensure_ascii=False))
+        return
+    print(f"Git snapshot {result['revision']} (commit time {result['commit_time']})")
+    if opts.fact_valid_at:
+        print(f"Fact validity at {opts.fact_valid_at}")
+    scores = dict(result.get("hits", []))
+    for node in result["nodes"]:
+        score = f"{scores[node.id]:.4f}  " if node.id in scores else ""
+        print(f"  {score}{node.id}  [{node.status}]  {_short(node.text)}")
+    for edge in result["edges"]:
+        decision = "rejected" if edge.rejected else "pending" if edge.pending else "accepted"
+        print(f"  {edge.id}  {edge.source} --[{edge.kind}]--> {edge.target}  [{decision}]")
+    print(f"{len(result['nodes'])} nodes, {len(result['edges'])} edges")
+
+
 def cmd_when(engine: BrainEngine, args: list[str]) -> None:
-    """Retrieval restricted to what was known at a point in time (Phase 2)."""
+    """Search current text, filtered by creation time."""
     if len(args) < 2:
         print("Usage: ig when <ISO-8601> <query>")
         sys.exit(1)
@@ -1353,6 +1392,7 @@ COMMANDS = {
     "consolidate": cmd_consolidate,
     "timeline": cmd_timeline,
     "valid-at": cmd_valid_at,
+    "snapshot": cmd_snapshot,
     "history": cmd_history,
     "when": cmd_when,
     "context": cmd_context,

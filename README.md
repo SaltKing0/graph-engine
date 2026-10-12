@@ -94,6 +94,12 @@ Explicit fact replacements create separate pending proposals; review both
 claims, evidence and event dates before accepting, rejecting or undoing them.
 See [replacement review](docs/guide.md#review-fact-replacements).
 
+Use `ig snapshot HEAD~1 "attention" --json` to search historical committed text,
+or `ig snapshot <commit-or-ref> --json` to inspect historical records and review
+state. Optional `--valid-at <ISO-8601>` filters that snapshot by fact validity.
+Snapshot queries apply current permissions and leave the active brain unchanged.
+See [Git snapshots](docs/guide.md#git-revision-snapshots) for semantics and limits.
+
 For structured episodic consolidation, explicitly run `ig consolidate --structured`
 or `ig dream --consolidate --structured`. Exact quotes and event IDs are validated
 before one batch commit. Proposed semantic nodes are labelled and searchable;

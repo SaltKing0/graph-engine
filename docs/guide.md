@@ -170,6 +170,8 @@ ig timeline [--since X] [--until Y] # query episodic nodes by time range
 ig valid-at <ISO-8601>             # filter current records by validity at a time
 ig history <node_id>               # how a node's edges evolved over time
 ig when <ISO-8601> <query>         # search current text, filter by creation time
+ig snapshot <commit-or-ref> [query] [--valid-at ISO-8601] [--json]
+                                  # read/search committed historical records
 ig context <query> [--budget N]     # build a context window for a prompt
 ig search "attention"              # hybrid search (dense + BM25 via RRF)
 ig infer "How does Alice relate to Acme?" [--json]
@@ -1221,8 +1223,84 @@ unreleased changes.
 - **Temporal queries filter current records.** `ig valid-at` applies stored
   creation/validity timestamps and current review/tombstone state; `ig when`
   filters a bounded search of current text by creation time. Neither restores
-  old node text or past review decisions from Git. Use Git history when an
-  exact historical snapshot is needed.
+  old node text or past review decisions from Git. Use `ig snapshot` for
+  historical committed records; see [Git snapshots](#git-revision-snapshots).
+
+## Git revision snapshots
+
+`ig snapshot` reads an explicit commit from the selected Git-mode brain without
+changing its checkout. This restores historical note text, edges, review
+decisions and tombstone state, even after those records have changed today:
+
+```bash
+ig snapshot HEAD~1 --json
+ig snapshot main "Alice uses Python" --k 5 --json
+ig snapshot <sha> --valid-at 2021-06-01T00:00:00Z --json
+```
+
+Every result contains `revision` (the resolved full SHA), `commit_time` (Git's
+committer timestamp) and `fact_valid_at` (the optional fact-validity filter).
+These are separate clocks: an accepted fact in a 2026 commit can describe a
+relation valid during 2021. `commit_time` is repository metadata, not proof of
+when something happened or an exact wall-clock knowledge snapshot.
+
+Without `--valid-at`, inspection returns all readable committed node records,
+including tombstones, and edges including pending/rejected review state. With
+`--valid-at`, it returns nodes created by that time and live in the chosen
+commit, plus accepted, non-rejected edges valid at that time. Validity intervals
+are half-open (`valid_from <= T < valid_to`), with stored invalidation times
+also respected. This never reconstructs review decisions inside a commit:
+the chosen commit supplies the decision state. Naive timestamps mean UTC.
+
+An optional query ranks live historical text using the configured embedder,
+BM25/RRF, persisted tier ordering and optional reranker. JSON adds `hits` as
+`[node_id, score]` pairs in ranking order, `query`, and `score_kind: "rrf"`.
+RRF scores are ranking signals, not factual confidence; a reranker can change
+their order. Query responses include only matching nodes and snapshot edges
+whose endpoints both match. Inspection is the way to obtain the complete
+authorized snapshot graph. Current retrieval feedback and graph expansion are
+not used. Python callers can use `engine.snapshot(revision,
+fact_valid_at=...)` and `engine.snapshot_query(revision, query, k=5,
+fact_valid_at=...)`; nodes/edges are `Node`/`Edge` objects, as in `valid_at`.
+
+Accepted revision syntax is a SHA, ASCII branch/tag/ref or `HEAD`, optionally
+followed by up to four `~N`/`^N` ancestry selectors (each number up to four
+digits). Revisions are limited to 200 characters; reflog/date expressions,
+path expressions and command options are rejected. Resolution uses only
+objects already present locally and never fetches history. For date selection,
+choose a branch and resolve one candidate explicitly, then pass its SHA:
+
+```bash
+git -C "$IG_BRAIN_PATH" rev-list --first-parent --max-count=1 \
+  --before='2026-10-01T00:00:00Z' main
+ig snapshot <returned-sha> --json
+```
+
+This selects a reachable commit using Git's timestamp/ancestry rules. It cannot
+recover uncommitted knowledge, unseen remote commits or a precise wall-clock
+state, and timestamps can be backdated. Pin the returned SHA for repeatability.
+
+The brain must be the Git repository root. Local mode, missing history/objects,
+non-commit objects, missing `edges.jsonl`, unsupported record paths, symlinks,
+malformed records and incompatible metadata produce explicit errors. Legacy
+optional fields supported by today's node/edge schema remain readable; unknown
+metadata is rejected rather than silently coerced or dropped. Reads are capped
+at 50,000 records / 64 MiB of node and edge content, with 30 seconds per Git
+read. Queries are limited to 1–4,000 characters and `--k` to 1–100.
+
+Snapshot queries use the **current** selected graph's policy, principal and
+node ACLs, including present and historical capture-parent chains, edge evidence
+and replacement/undo evidence. Historical grants never override present
+revocation. ACL entries for removed IDs still apply. ACLs cannot retract
+information already copied, exported or read earlier, and they do not encrypt
+Git history against an OS user who can read the repository.
+
+No checkout/reset/stash, temporary brain, historical vector writes, recall
+updates, initialization, pull or push occurs. Vectors are computed in memory
+from historical text; current stored vectors are not reused. HEAD, index,
+working files (including dirty/untracked files) and the recall ledger remain
+unchanged. Protected reads retain the normal audit log beside the policy.
+Existing `valid-at`, `when` and `history` continue to operate on current records.
 
 ## Storage tiers and retrieval feedback
 
