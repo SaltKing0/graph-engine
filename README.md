@@ -76,6 +76,9 @@ HTTP ingest and MCP remember accept `extraction: "rules"` or `"model"`.
 Facts stay pending by default. Capture and extraction use two commits; exact
 input receipts make retries safe even when ingestion merges a similar note.
 See [capture options and retry behavior](docs/guide.md#extract-during-ingestion).
+Explicit fact replacements create separate pending proposals; review both
+claims, evidence and event dates before accepting, rejecting or undoing them.
+See [replacement review](docs/guide.md#review-fact-replacements).
 
 ## Documentation
 

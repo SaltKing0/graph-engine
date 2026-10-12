@@ -92,9 +92,16 @@ def forget(brain: Brain, node_id: str, *, reason: str,
             brain.authorize("write", nid)
         now = _now_iso()
         edges = brain.read_edges(include_rejected=True)
+        by_id = {e.id: e for e in edges}
         invalidated = 0
         for e in edges:
             affected = [e.source, e.target, *(item.get("node_id") for item in e.evidence)]
+            if e.kind == "fact_replacement":
+                for key in ("old_fact_id", "new_fact_id"):
+                    fact = by_id.get((e.replacement or {}).get(key))
+                    if fact is not None:
+                        affected.extend([fact.source, fact.target,
+                                         *(item.get("node_id") for item in fact.evidence)])
             if not e.is_invalidated and not e.rejected and forgotten.intersection(affected):
                 # Authorize the whole family and affected edges before any
                 # tombstone, including facts supported by an evidence copy.

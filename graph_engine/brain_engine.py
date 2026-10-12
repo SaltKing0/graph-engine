@@ -451,7 +451,8 @@ class BrainEngine:
                     created_facts=result["created_facts"],
                     reused_facts=len(facts) - result["created_facts"],
                     pending_facts=sum(f["pending"] and not f.get("rejected") and not f.get("invalidated_at")
-                                      for f in facts))
+                                      for f in facts),
+                    proposals=result["proposals"])
             return node, edges, duplicate, summary
 
     def entities(self, text: str | None = None, **kwargs) -> dict:

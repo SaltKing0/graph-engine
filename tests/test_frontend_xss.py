@@ -351,3 +351,39 @@ def test_search_empty_state_and_retry(server, page):
     expect(page.locator("#search-results button")).to_have_count(0)
     page.locator("#search").fill("")
     expect(page.locator("#search-results")).to_be_hidden()
+
+
+@pytest.mark.parametrize("view", ["main", "review"])
+def test_fact_replacement_review_accept_reject_and_undo(server, page, view):
+    def capture(text, accept=False):
+        response = page.request.post(server + "/api/ingest", data={
+            "text": text, "extraction": "rules", "accept_facts": accept})
+        assert response.status == 200
+        assert response.json()["extraction"]["status"] == "complete"
+        return response.json()
+    capture("Alice works at Acme.", True)
+    changed = capture("Alice now works at Globex instead of Acme.")
+    proposal = changed["extraction"]["proposals"][0]
+    pid = proposal["id"]
+    if view == "main":
+        page.goto(server)
+        card = page.locator(f'.card[data-id="{pid}"]')
+    else:
+        page.goto(server + "/review")
+        card = page.locator(".card").filter(has=page.locator(f'[data-resolve="{pid}"]'))
+    undo = page.locator("#undo" if view == "main" else "#undoBtn")
+    expect(card).to_contain_text("Old claim")
+    expect(card).to_contain_text("New claim")
+    expect(card).to_contain_text("Acme")
+    expect(card).to_contain_text("Globex")
+    expect(card).to_contain_text("Proposed effective date: unknown")
+    expect(card).to_contain_text("Alice now works at Globex instead of Acme")
+    card.locator("button.ok").click()
+    expect(card).to_have_count(0)
+    undo.click()
+    expect(card).to_have_count(1)
+    card.locator('[data-action="reject"]' if view == "main" else "button.no").click()
+    expect(card).to_have_count(0)
+    undo.click()
+    expect(card).to_have_count(1)
+    assert_inert(page)

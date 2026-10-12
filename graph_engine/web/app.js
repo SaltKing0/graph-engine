@@ -13,7 +13,7 @@ const short = (text, length = 36) => {
 };
   const idOf = value => typeof value === "object" ? value.id : value;
   const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  let nodes = [], edges = [], links = [], pending = [];
+  let nodes = [], edges = [], links = [], pending = [], reviewEdgesById = {};
   let selectedEdge = null, selectedNode = null, detailId = null, undoId = null;
   let loaded = false, saving = false, resolving = false, refreshVersion = 0;
   let noticeTimer, reconnectTimer, socket, width = 1, height = 1;
@@ -285,10 +285,13 @@ const short = (text, length = 36) => {
       nodes = graph.nodes.map(node => Object.assign(existing.get(node.id) || {}, node));
       const ids = new Set(nodes.map(node => node.id));
       const eligible = graph.edges.filter(edge => ids.has(edge.source) && ids.has(edge.target) && !edge.rejected);
+      reviewEdgesById = Object.fromEntries(eligible.map(edge => [edge.id, edge]));
       edges = eligible.filter(edge => edge.current ?? !edge.valid_to);
       links = edges.map(edge => ({ ...edge }));
       // Historical and scheduled facts still need review, even off the live graph.
       pending = eligible.filter(edge => edge.pending && !(edge.invalidated ?? Boolean(edge.valid_to)));
+      const replacementFacts = new Set(pending.filter(edge => edge.kind === "fact_replacement").map(edge => edge.replacement.new_fact_id));
+      pending = pending.filter(edge => !replacementFacts.has(edge.id));
       if (!pending.some(edge => edge.id === selectedEdge)) selectedEdge = null;
       if (!ids.has(selectedNode)) selectedNode = null;
       // Clear old links before replacing nodes, so deleted endpoints cannot leak into the simulation.
@@ -331,6 +334,19 @@ const short = (text, length = 36) => {
     }
   }
 
+  function replacementDetails(edge) {
+    const meta = edge.replacement;
+    return [["Old", meta.old_fact_id], ["New", meta.new_fact_id]].map(([label, id]) => {
+      const fact = reviewEdgesById[id];
+      if (!fact) return "";
+      const dates = fact.extracted_validity || {};
+      return `<p><strong>${esc(label)} claim ${esc(id)}</strong>: ${esc(textOf(fact.source))} — ${esc(fact.predicate)} → ${esc(textOf(fact.target))}</p>` +
+        `<p>Extracted validity: ${esc(dates.valid_from || "unknown")} to ${esc(dates.valid_to || "unknown")}</p>` +
+        (fact.evidence || []).map(item => `<p class="fact-evidence">Evidence ${esc(item.node_id)}: ${esc(item.text)}</p>`).join("");
+    }).join("") + `<p>Proposed effective date: ${esc(meta.effective_at || "unknown")}</p>` +
+      `<p>Reason: ${esc(meta.reason)} (${esc(meta.basis)})</p>`;
+  }
+
   function renderCards() {
     const cards = $("#cards");
     const active = document.activeElement;
@@ -346,6 +362,7 @@ const short = (text, length = 36) => {
         <button class="idea-preview" data-action="source" aria-label="Read first idea in full"><span class="excerpt">${esc(textOf(edge.source))}</span><span class="read">Read idea ↗</span></button>
         <button class="idea-preview" data-action="target" aria-label="Read second idea in full"><span class="excerpt">${esc(textOf(edge.target))}</span><span class="read">Read idea ↗</span></button>
         ${edge.kind === "fact" ? (edge.evidence || []).slice(0, 3).map(item => `<p class="fact-evidence">${esc(short(item.text, 240))}</p>`).join("") : ""}
+        ${edge.kind === "fact_replacement" ? replacementDetails(edge) : ""}
         <div class="actions"><button class="ok" data-action="accept" ${resolving ? "disabled" : ""}>&#10003; Accept</button><button class="quiet" data-action="reject" ${resolving ? "disabled" : ""}>Dismiss</button></div>
       </article>`).join("");
     if (focusedId && focusedAction) {

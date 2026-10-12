@@ -75,10 +75,10 @@ def _redirect_edges(edges: list, survivor: str, deletee: str,
     redirected_ids: list[str] = []
     invalidated_ids: list[str] = []
     for e in edges:
-        if e.kind == "fact":
+        if e.kind in ("fact", "fact_replacement"):
             # Entity identities cannot be text-merged (guard below). Preserve
-            # all fact predicates, directions, validity windows and historical
-            # evidence references when unrelated semantic notes are merged.
+            # all fact windows/evidence and each replacement decision's unique
+            # identity when unrelated semantic notes are merged.
             new_edges.append(e)
             continue
         s, t = e.source, e.target

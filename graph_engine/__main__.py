@@ -73,6 +73,8 @@ def cmd_entities(engine: BrainEngine, args: list[str]) -> None:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--llm", action="store_true")
     parser.add_argument("--accept-facts", action="store_true", help="accept new facts immediately")
+    parser.add_argument("--exclusive-predicate", action="append", default=[],
+                        help="declare a predicate exclusive for this extraction (repeatable)")
     opts = parser.parse_args(args)
     if opts.node_id and opts.text:
         parser.error("--node cannot be combined with text")
@@ -85,7 +87,8 @@ def cmd_entities(engine: BrainEngine, args: list[str]) -> None:
         extractor = command_extractor() if opts.llm else None
         result = engine.entities(text, node_id=opts.node_id, source=opts.source,
                                  extractor=extractor, dry_run=opts.dry_run,
-                                 accept_facts=opts.accept_facts)
+                                 accept_facts=opts.accept_facts,
+                                 exclusive_predicates=tuple(opts.exclusive_predicate))
     except (ValueError, RuntimeError) as exc:
         print(f"entities: {exc}", file=sys.stderr)
         sys.exit(1)
@@ -102,6 +105,11 @@ def cmd_entities(engine: BrainEngine, args: list[str]) -> None:
         state = "rejected" if fact.get("rejected") else "invalidated" if invalidated else "pending" if fact["pending"] else "accepted"
         print(f"  {fact['id']}: {names[fact['source']]} --[{fact['predicate']}]--> "
               f"{names[fact['target']]} ({state})")
+    for proposal in result["proposals"]:
+        meta = proposal["replacement"]
+        state = "pending" if proposal["pending"] else "rejected" if proposal.get("rejected") else "accepted"
+        print(f"  {proposal['id']} [replacement]: {meta['old_fact_id']} → {meta['new_fact_id']} "
+              f"({state}, effective {meta['effective_at'] or 'unknown'}); review with ig pending")
 
 
 def cmd_observe(engine: BrainEngine, args: list[str]) -> None:
@@ -373,11 +381,24 @@ def cmd_ingest(engine: BrainEngine, args: list[str]) -> None:
 
 def cmd_pending(engine: BrainEngine, args: list[str]) -> None:
     edges = [e for e in engine.brain.read_edges() if e.pending and not e.is_invalidated]
+    facts = {e.id: e for e in engine.brain.read_edges(include_rejected=True)}
     texts = {n.id: n.text for n in engine.brain.read_nodes()}
     if not edges:
         print("No pending suggestions.")
         return
     for e in edges:
+        if e.kind == "fact_replacement":
+            meta = e.replacement
+            print(f"{e.id} [fact replacement]")
+            for label, key in (("old", "old_fact_id"), ("new", "new_fact_id")):
+                fact = facts[meta[key]]
+                print(f"  {label} {fact.id}: {texts.get(fact.source, fact.source)} "
+                      f"--[{fact.predicate}]--> {texts.get(fact.target, fact.target)}")
+                print(f"    extracted validity: {fact.extracted_validity}")
+                for evidence in fact.evidence:
+                    print(f"    evidence {evidence['node_id']}: {evidence['text']}")
+            print(f"  effective: {meta['effective_at'] or 'unknown'}; reason: {meta['reason']} ({meta['basis']})")
+            continue
         kind = e.predicate if e.kind == "fact" and e.predicate else e.kind
         direction = "→" if e.kind == "fact" else "↔"
         print(f"{e.id}  [{kind}]  {_short(texts.get(e.source, e.source), 40)}"
@@ -404,6 +425,14 @@ def _resolve_cmd(engine: BrainEngine, edge_id: str, accept: bool) -> None:
         sys.exit(1)
     kind = edge.predicate if edge.kind == "fact" and edge.predicate else edge.kind
     print(f"{'accepted' if accept else 'rejected'}: {edge_id} [{kind}]")
+
+
+def cmd_undo(engine: BrainEngine, args: list[str]) -> None:
+    edge_id = _first_or_usage(args, "undo")
+    if engine.undo(edge_id) is None:
+        print(f"Cannot undo {edge_id}: decision unavailable or facts changed.")
+        sys.exit(1)
+    print(f"Restored to pending: {edge_id}")
 
 
 def cmd_link(engine: BrainEngine, args: list[str]) -> None:
@@ -1287,6 +1316,7 @@ COMMANDS = {
     "pending": lambda e, a: cmd_pending(e, a),
     "accept": lambda e, a: _resolve_cmd(e, _first_or_usage(a, "accept"), True),
     "reject": lambda e, a: _resolve_cmd(e, _first_or_usage(a, "reject"), False),
+    "undo": cmd_undo,
     "link": cmd_link,
     "search": cmd_search,
     "explain": cmd_explain,

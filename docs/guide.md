@@ -305,6 +305,62 @@ and a forgotten matching entity causes an error instead of being recreated.
 review, including for model output. The web review card shows the predicate
 and quoted evidence. Existing decisions are preserved.
 
+### Review fact replacements
+
+Different objects alone do not imply a contradiction: Alice may work for both
+Acme and Globex. Explicit replacement language can instead create a separate
+pending `fact_replacement` record referencing the old and new fact IDs:
+
+```bash
+ig entities "Alice works at Acme." --accept-facts
+ig entities "Alice now works at Globex instead of Acme as of 2027-01-01."
+ig pending                         # both claims, all evidence, date and reason
+ig accept <replacement_id>         # one coherent decision/commit
+ig undo <replacement_id>           # restore the exact original facts
+```
+
+The dependency-free grammar supports `Alice [now] works at/for Globex instead
+of Acme [as of YYYY-MM-DD]`. The model adapter may return an optional `replaces`
+field naming the old object, which must be an extracted entity mentioned in the
+quoted evidence. That quote must contain explicit replacement/negation language
+(such as `instead of` or `no longer`); its interpretation still requires review.
+For predicates your application declares exclusive, use the repeatable
+`ig entities --exclusive-predicate works_at` flag, or the Python
+`exclusive_predicates=("works_at",)` argument. No predicates are exclusive by
+default; declarations apply to that extraction only.
+
+Creating a proposal leaves existing facts unchanged. `--accept-facts` keeps a
+new fact pending when it has a replacement proposal. `ig accept-pending` holds
+proposals and their new claims for individual review. CLI `ig pending`, the web
+inbox and `/review` show old/new claims, original extracted windows, every evidence quote
+and source ID, the proposed effective date and reason. CLI accept/reject and the
+existing HTTP `/api/edge/{replacement_id}/accept|reject|undo` routes review these
+records. The web review page provides an Undo last decision button.
+
+Acceptance accepts the new fact and marks the old fact's `superseded_by` with
+the proposal ID. A known effective date closes the old fact's real-world
+`valid_to`; `reviewed_at` separately records decision time, so a future change
+leaves the old fact live until its effective date. An unknown date stays null
+in the proposal and `extracted_validity`: acceptance retires the old assertion
+using `invalidated_at` at review time, without inventing an event date or an
+extracted end date. The legacy top-level `valid_from` fallback on undated facts
+is a storage timestamp, not an inferred event date. Original extraction windows
+remain unchanged as identity keys. Nonoverlapping or backwards windows do not
+produce proposals.
+
+Rejection changes neither fact. A competing proposal can still be dismissed
+after another replacement is accepted, provided its endpoints and evidence
+remain live and authorized. Repeated extraction reuses the proposal and
+preserves its decision. Git retains each decision; undo restores both saved
+before-states only when neither fact has changed since acceptance and all their
+endpoints/evidence are live. Forgetting, rejecting or adding later evidence can
+block undo; it never revives forgotten claims or discards later edits. An
+accepted replacement must be undone through its proposal ID rather than one
+fact. Review and undo require write access to both facts and every evidence
+node; a proposal is hidden when any referenced fact/evidence is unreadable,
+including evidence added after proposal creation. Proposal records do not
+participate in live relationships or temporal fact queries.
+
 ### Extract during ingestion
 
 CLI ingest, HTTP ingest and MCP remember share `engine.capture()`. With no
