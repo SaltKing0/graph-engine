@@ -348,7 +348,9 @@ is a storage timestamp, not an inferred event date. Original extraction windows
 remain unchanged as identity keys. Nonoverlapping or backwards windows do not
 produce proposals.
 
-Rejection changes neither fact. Repeated extraction reuses the proposal and
+Rejection changes neither fact. A competing proposal can still be dismissed
+after another replacement is accepted, provided its endpoints and evidence
+remain live and authorized. Repeated extraction reuses the proposal and
 preserves its decision. Git retains each decision; undo restores both saved
 before-states only when neither fact has changed since acceptance and all their
 endpoints/evidence are live. Forgetting, rejecting or adding later evidence can

@@ -152,16 +152,17 @@ class SecuredBrain(Brain):
             self.authorize("write", node.id)
         return receipts
 
-    def _edge_allowed(self, edge: Edge, action: str) -> bool:
+    def _edge_allowed(self, edge: Edge, action: str, *,
+                      edges_by_id: dict[str, Edge] | None = None) -> bool:
         # Evidence is embedded text: hiding only the endpoints would leak it.
         ids = [edge.source, edge.target] + [e.get("node_id") for e in edge.evidence]
         if edge.kind == "fact_replacement":
             meta = edge.replacement or {}
-            facts = {e.id: e for e in self._raw.read_edges(include_rejected=True)
-                     if e.kind == "fact"}
+            records = (edges_by_id if edges_by_id is not None else
+                       {e.id: e for e in self._raw.read_edges(include_rejected=True)})
             for key in ("old_fact_id", "new_fact_id"):
-                fact = facts.get(meta.get(key))
-                if fact is None or not self._edge_allowed(fact, action):
+                fact = records.get(meta.get(key))
+                if fact is None or fact.kind != "fact" or not self._edge_allowed(fact, action):
                     return False
             # Undo snapshots contain embedded quotes too; their permissions
             # remain mandatory even if the current fact later loses support.
@@ -180,15 +181,19 @@ class SecuredBrain(Brain):
         with self._lock:
             old = {e.id: e for e in self._raw.read_edges(include_rejected=True)}
             new = {e.id: e for e in edges}
+            # Complete the proposed view before checking references. Hidden
+            # records survive bulk rewrites regardless of validation order.
+            for eid in old.keys() - new.keys():
+                if not self._edge_allowed(old[eid], "read", edges_by_id=old):
+                    new[eid] = old[eid]
             for eid in old.keys() | new.keys():
                 before, after = old.get(eid), new.get(eid)
                 if before and after and before.to_dict() == after.to_dict():
                     continue
-                if before and after is None and not self._edge_allowed(before, "read"):
-                    new[eid] = before  # bulk rewrites must preserve hidden records
-                    continue
-                for edge in (before, after):
-                    if edge is not None and not self._edge_allowed(edge, "write"):
+                # Check the saved record against saved facts and the proposed
+                # record against facts in this same atomic write.
+                for edge, records in ((before, old), (after, new)):
+                    if edge is not None and not self._edge_allowed(edge, "write", edges_by_id=records):
                         audit(self.graph_name, self.identity, "write_edge", False)
                         raise PermissionError("Access denied")
             self._raw.write_edges(list(new.values()))

@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 
 from graph_engine.access import SecuredBrain
 from graph_engine.agent_memory import forget
-from graph_engine.brain import Brain, Node
+from graph_engine.brain import Brain, Edge, Node
 from graph_engine.brain_engine import BrainEngine
 from graph_engine.embedder import HashEmbedder
 from graph_engine.entities import extract_entities, rule_extract, validate_extraction
@@ -308,3 +308,94 @@ def test_dry_run_proposal_does_not_mutate_the_brain(brain):
     result = extract_entities(brain, "Alice works at Globex instead of Acme.", dry_run=True)
     assert result["proposals"][0]["pending"]
     assert {str(p): p.read_bytes() for p in brain.path.rglob("*") if p.is_file()} == before
+
+
+@pytest.mark.parametrize("role", ["editor", "admin"])
+def test_secured_extraction_can_create_and_review_replacement(tmp_path, monkeypatch, role):
+    policy = tmp_path / "policy.json"
+    policy.write_text(json.dumps({"graphs": {"default": {"roles": {"user": role}}}}))
+    monkeypatch.setenv("IG_ACCESS_POLICY", str(policy))
+    secured = SecuredBrain(tmp_path / "brain", mode="local", graph_name="default", identity="user")
+    old, change, text = setup_change(secured, accept_facts=True)
+    pid = change["proposals"][0]["id"]
+    assert facts(secured)[old["id"]].to_dict() == old
+    assert facts(secured)[change["facts"][0]["id"]].pending
+    assert not extract_entities(secured, text, accept_facts=True)["changed"]
+    engine = BrainEngine(secured, HashEmbedder())
+    assert engine.resolve(pid, True)
+    assert engine.undo(pid)
+    assert facts(secured)[old["id"]].to_dict() == old
+
+
+@pytest.mark.parametrize("which", ["old_evidence", "new_evidence", "missing_fact"])
+def test_secured_replacement_write_checks_planned_references(brain, tmp_path, monkeypatch, which):
+    from graph_engine.replacements import plan_replacement
+
+    initial = extract_entities(brain, "Alice works at Acme.", accept_facts=True)
+    rows = list(facts(brain).values())
+    old = next(e for e in rows if e.id == initial["facts"][0]["id"])
+    target, support = Node("Globex"), Node("Alice works at Globex instead of Acme")
+    brain.write_node(target)
+    brain.write_node(support)
+    new = Edge(old.source, target.id, "fact", predicate=old.predicate,
+               evidence=[dict(node_id=support.id, text=support.text)],
+               extracted_validity=dict(valid_from=None, valid_to=None))
+    rows.append(new)
+    proposal, _ = plan_replacement(rows, old, new, reason=support.text,
+                                   basis="explicit replacement evidence", effective_at=None)
+    assert proposal
+    nodes = {}
+    if which == "missing_fact":
+        rows.remove(new)
+    else:
+        nid = old.evidence[0]["node_id"] if which == "old_evidence" else support.id
+        nodes[nid] = {"write": []}
+    policy = tmp_path / "policy.json"
+    policy.write_text(json.dumps({"graphs": {"default": {
+        "roles": {"user": "editor"}, "nodes": nodes}}}))
+    monkeypatch.setenv("IG_ACCESS_POLICY", str(policy))
+    secured = SecuredBrain(brain.path, mode="local", graph_name="default", identity="user")
+    before = brain.edges_file.read_bytes()
+    with pytest.raises(PermissionError):
+        secured.write_edges(rows)
+    assert brain.edges_file.read_bytes() == before
+
+
+@pytest.mark.parametrize("accepted", [False, True])
+def test_unrelated_merge_preserves_all_replacement_records_and_undo(brain, accepted):
+    from graph_engine.merge import merge_nodes
+
+    extract_entities(brain, "Alice works at Acme. Alice works at Other.", accept_facts=True)
+    change = extract_entities(brain, "Alice works at Globex.", exclusive_predicates=("works_at",))
+    pids = [p["id"] for p in change["proposals"]]
+    assert len(pids) == 2
+    engine = BrainEngine(brain, HashEmbedder())
+    if accepted:
+        for pid in pids:
+            assert engine.resolve(pid, True)
+    before = {pid: facts(brain)[pid].to_dict() for pid in pids}
+    survivor, deletee = Node("unrelated note one"), Node("unrelated note two")
+    brain.write_node(survivor)
+    brain.write_node(deletee)
+    merge_nodes(brain, survivor.id, deletee.id, commit=False)
+    assert {pid: facts(brain)[pid].to_dict() for pid in pids} == before
+    if accepted:
+        for pid in reversed(pids):
+            assert engine.undo(pid)
+    else:
+        for pid in pids:
+            assert engine.resolve(pid, False)
+
+
+@pytest.mark.parametrize("date", [None, "2998-01-01"])
+def test_competing_replacement_can_be_rejected_after_acceptance(brain, date):
+    _, first, _ = setup_change(brain, date)
+    second = extract_entities(brain, "Alice works at Initech instead of Acme.")
+    pid = second["proposals"][0]["id"]
+    engine = BrainEngine(brain, HashEmbedder())
+    assert engine.resolve(first["proposals"][0]["id"], True)
+    before = {e.id: e.to_dict() for e in facts(brain).values() if e.kind == "fact"}
+    assert engine.resolve(pid, True) is None
+    assert engine.resolve(pid, False).rejected
+    assert {e.id: e.to_dict() for e in facts(brain).values() if e.kind == "fact"} == before
+    assert pid not in {e.id for e in brain.read_edges() if e.pending}

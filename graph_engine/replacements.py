@@ -82,9 +82,9 @@ def resolve_replacement(brain: Brain, edges: list[Edge], proposal: Edge, *,
         proposal.pending, proposal.rejected = True, False
         proposal.reviewed_at = None
     else:
-        if old.is_invalidated or new.is_invalidated or old.rejected or new.rejected or old.superseded_by or new.superseded_by:
-            return None
         if accept:
+            if old.is_invalidated or new.is_invalidated or old.rejected or new.rejected or old.superseded_by or new.superseded_by:
+                return None
             if old.pending:
                 return None
             effective_at = meta["effective_at"]
@@ -107,6 +107,8 @@ def resolve_replacement(brain: Brain, edges: list[Edge], proposal: Edge, *,
             old.reviewed_by = new.reviewed_by = proposal.id
             new.pending = False
             meta["decision"] = dict(before=before, after=[old.to_dict(), new.to_dict()])
+        # A competing decision can make acceptance stale. Dismissal still
+        # changes only this proposal, while live-node/permission checks apply.
         proposal.pending, proposal.rejected = False, not accept
         proposal.reviewed_at = _now_iso()
     brain.write_edges(edges)
