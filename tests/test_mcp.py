@@ -358,3 +358,67 @@ def test_write_mode_registers_exactly_the_write_tools(mcp_env, tmp_path):
     for name in ("search_brain", "get_node", "neighbors", "brain_status"):
         assert flags.get(name) is True, f"{name} must stay read-only"
     assert len(flags) == 7
+
+
+@pytest.mark.skipif(not MCP_AVAILABLE, reason="mcp extra not installed")
+@pytest.mark.parametrize("write", [False, True])
+def test_stdio_cli_roundtrip(mcp_env, write):
+    """Initialize and call tools through the real CLI JSON-RPC transport."""
+    import anyio
+    from mcp import ClientSession, StdioServerParameters
+    from mcp.client.stdio import stdio_client
+
+    before = {p.relative_to(mcp_env): p.read_bytes()
+              for p in mcp_env.rglob("*") if p.is_file()}
+    env = {k: v for k, v in os.environ.items()
+           if not k.startswith(("IG_", "IDEAGRAPH_"))}
+    env.update(IG_BRAIN_PATH=str(mcp_env), IG_BRAIN_MODE="local",
+               IDEAGRAPH_EMBEDDER="hash", IG_MCP_CACHE_VECTORS="0",
+               PYTHONPATH=str(Path(__file__).resolve().parent.parent))
+    args = ["-m", "graph_engine", "mcp"] + (["--write"] if write else [])
+
+    async def run():
+        with anyio.fail_after(30):
+            params = StdioServerParameters(command=sys.executable, args=args, env=env)
+            async with stdio_client(params) as (reader, writer):
+                async with ClientSession(reader, writer) as client:
+                    await client.initialize()
+                    tools = {tool.name: tool for tool in (await client.list_tools()).tools}
+                    readonly = {"search_brain", "get_node", "neighbors", "brain_status"}
+                    assert set(tools) == readonly | (set(WRITE_TOOLS) if write else set())
+                    for name, tool in tools.items():
+                        assert tool.annotations.readOnlyHint is (name in readonly)
+
+                    async def call(name, arguments):
+                        result = await client.call_tool(name, arguments)
+                        assert not result.isError
+                        payload = json.loads(result.content[0].text)
+                        assert payload["ok"] is True, payload
+                        return payload
+
+                    found = await call("search_brain", {"query": "agent memory"})
+                    assert found["count"] == 2
+                    node = await call("get_node", {"id": "aaaaaaaaaaaa"})
+                    assert "agent memory" in node["node"]["text"]
+                    if write:
+                        text = "Astronomy telescope Jupiter rings observation"
+                        saved = await call("remember", {"text": text})
+                        recalled = await call("recall", {"query": text})
+                        assert saved["node_id"] in {n["id"] for n in recalled["results"]}
+                        assert recalled["tracked"] is True
+                        forgotten = await call("forget", {"id": saved["node_id"],
+                                                          "reason": "stdio test cleanup"})
+                        assert forgotten["status"] == "tombstone"
+                        found = await call("search_brain", {"query": text})
+                        assert saved["node_id"] not in {n["id"] for n in found["results"]}
+
+    anyio.run(run)
+    if not write:
+        after = {p.relative_to(mcp_env): p.read_bytes()
+                 for p in mcp_env.rglob("*") if p.is_file()}
+        assert after == before, "read-only stdio calls changed the brain"
+    else:
+        from graph_engine.brain import Brain
+        brain = Brain(str(mcp_env), mode="local")
+        assert any(n.status == "tombstone" and n.source == "agent" for n in brain.read_nodes())
+        assert (mcp_env / "recalls.jsonl").exists()
