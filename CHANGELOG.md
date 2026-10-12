@@ -6,7 +6,17 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-12
+
 ### Added
+- Persisted main/recall/archival storage tiers with manual pinning and
+  automatic promotion/demotion; retrieval respects tier priority.
+- Explicit relevance feedback with bounded dense/BM25 fusion weights,
+  query-specific adjustments and learned query expansion.
+- Evidence-backed relationship inference, conservative typed transitivity,
+  contradiction reporting and graph-path explanations.
+- Isolated named graphs with separate Git histories, opt-in graph roles and
+  node ACLs, HTTP bearer authentication and authorization audit logs.
 - Dedicated MCP CI on Python 3.11/3.14 and Chromium CI on Python 3.12,
   with strict failure on skipped integration tests. MCP tests exercise the
   real stdio CLI in read-only and write modes. Browser tests verify rendered
@@ -163,6 +173,14 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
   edges added in a single cycle — none of them visible in `ig pending`. The cap
   is a bound, not a repair: marker heuristics cannot read descriptive negation,
   so the semantic fix stays a documented roadmap item.
+
+### Changed
+- Package name `ideagraph-live` → `graph-engine`; Python import namespace
+  `ideagraph` → `graph_engine`. CLI commands remain `ig` and `ig-mcp`.
+  Install into a fresh virtual environment and reuse `IG_BRAIN_PATH` for
+  existing brains. Update Python integrations and uvicorn module paths.
+- PyPI publishing requires a successful main-branch CI run for the exact
+  commit being released and a release tag matching the package version.
 
 ## [0.5.4] - 2026-09-18
 
