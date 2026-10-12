@@ -230,7 +230,11 @@ class Edge:
                  origin: str | None = None, predicate: str | None = None,
                  evidence: list[dict] | None = None,
                  extracted_validity: dict | None = None,
-                 invalidated_at: str | None = None):
+                 invalidated_at: str | None = None,
+                 replacement: dict | None = None,
+                 superseded_by: str | None = None,
+                 reviewed_at: str | None = None,
+                 reviewed_by: str | None = None):
         self.source = source
         self.target = target
         self.kind = kind
@@ -261,6 +265,10 @@ class Edge:
         self.extracted_validity = (dict(extracted_validity)
                                    if extracted_validity is not None else None)
         self.invalidated_at = invalidated_at
+        self.replacement = replacement
+        self.superseded_by = superseded_by
+        self.reviewed_at = reviewed_at
+        self.reviewed_by = reviewed_by
 
     @property
     def is_invalidated(self) -> bool:
@@ -269,6 +277,8 @@ class Edge:
 
     def is_valid_at(self, at: datetime) -> bool:
         """Half-open validity interval, additionally cut off by invalidation."""
+        if self.kind == "fact_replacement":
+            return False  # A review record is never a real-world relation.
         if at.tzinfo is None:
             at = at.replace(tzinfo=timezone.utc)
         for value, is_start in ((self.valid_from, True), (self.valid_to, False),
@@ -288,6 +298,8 @@ class Edge:
     @property
     def is_current(self) -> bool:
         """Validity only: callers choose whether to include pending/rejected edges."""
+        if self.kind == "fact_replacement":
+            return False
         if self.is_invalidated:
             return False
         return (self.extracted_validity is None
@@ -316,6 +328,10 @@ class Edge:
             result["extracted_validity"] = dict(self.extracted_validity)
         if self.invalidated_at is not None:
             result["invalidated_at"] = self.invalidated_at
+        for key in ("replacement", "superseded_by", "reviewed_at", "reviewed_by"):
+            value = getattr(self, key)
+            if value is not None:
+                result[key] = value
         return result
 
 
@@ -675,7 +691,11 @@ class Brain:
                             origin=d.get("origin"), predicate=d.get("predicate"),
                             evidence=d.get("evidence", []),
                             extracted_validity=d.get("extracted_validity"),
-                            invalidated_at=d.get("invalidated_at"))
+                            invalidated_at=d.get("invalidated_at"),
+                            replacement=d.get("replacement"),
+                            superseded_by=d.get("superseded_by"),
+                            reviewed_at=d.get("reviewed_at"),
+                            reviewed_by=d.get("reviewed_by"))
             except (ValueError, KeyError, TypeError):
                 continue
             if edge.rejected and not include_rejected:
@@ -711,8 +731,12 @@ class Brain:
     def resolve_edge(self, edge_id: str, accept: bool) -> Edge | None:
         with self._lock:
             edges = self.read_edges(include_rejected=True)
+            proposal = next((e for e in edges if e.id == edge_id and e.kind == "fact_replacement"), None)
+            if proposal is not None:
+                from .replacements import resolve_replacement
+                return resolve_replacement(self, edges, proposal, accept=accept)
             edge = next((e for e in edges if e.id == edge_id and e.pending and not e.rejected
-                         and not e.is_invalidated), None)
+                         and not e.is_invalidated and not e.superseded_by), None)
             if edge is None:
                 return None
             edge.pending = False
@@ -724,8 +748,16 @@ class Brain:
         """Return a saved decision to the inbox without reviving invalidated facts."""
         with self._lock:
             edges = self.read_edges(include_rejected=True)
+            proposal = next((e for e in edges if e.id == edge_id and e.kind == "fact_replacement"), None)
+            if proposal is not None:
+                from .replacements import resolve_replacement
+                return resolve_replacement(self, edges, proposal, undo=True)
+            if any(e.kind == "fact_replacement" and not e.pending and not e.rejected
+                   and edge_id in ((e.replacement or {}).get("old_fact_id"),
+                                   (e.replacement or {}).get("new_fact_id")) for e in edges):
+                return None  # Undo the coherent replacement decision, not one half.
             edge = next((e for e in edges if e.id == edge_id and not e.pending
-                         and not e.is_invalidated), None)
+                         and not e.is_invalidated and not e.superseded_by), None)
             if edge is None:
                 return None
             edge.pending = True
@@ -740,7 +772,7 @@ class Brain:
             "nodes": [n.to_dict() for n in self.read_nodes()],
             "edges": [{**e.to_dict(), **({"current": e.is_current,
                                          "invalidated": e.is_invalidated}
-                                        if e.extracted_validity is not None else {})}
+                                        if e.extracted_validity is not None or e.kind == "fact_replacement" else {})}
                       for e in self.read_edges()],
         }
 

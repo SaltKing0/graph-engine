@@ -7,6 +7,10 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- Evidence-backed fact replacement proposals with old/new claims, explicit
+  dates/reasons and full evidence in CLI/web review. Accept/reject/undo preserve
+  extraction windows, permissions and retry decisions; simultaneous objects do
+  not imply exclusivity (issue #23).
 - Opt-in rule/model entity and fact extraction on CLI ingest, HTTP ingest and
   MCP remember. Exact input receipts preserve evidence through cosine dedupe;
   structured partial-failure results and two-phase commits support safe retries

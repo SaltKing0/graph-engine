@@ -155,6 +155,20 @@ class SecuredBrain(Brain):
     def _edge_allowed(self, edge: Edge, action: str) -> bool:
         # Evidence is embedded text: hiding only the endpoints would leak it.
         ids = [edge.source, edge.target] + [e.get("node_id") for e in edge.evidence]
+        if edge.kind == "fact_replacement":
+            meta = edge.replacement or {}
+            facts = {e.id: e for e in self._raw.read_edges(include_rejected=True)
+                     if e.kind == "fact"}
+            for key in ("old_fact_id", "new_fact_id"):
+                fact = facts.get(meta.get(key))
+                if fact is None or not self._edge_allowed(fact, action):
+                    return False
+            # Undo snapshots contain embedded quotes too; their permissions
+            # remain mandatory even if the current fact later loses support.
+            for rows in meta.get("decision", {}).values():
+                for row in rows:
+                    ids.extend([row["source"], row["target"],
+                                *(e.get("node_id") for e in row.get("evidence", []))])
         return all(isinstance(nid, str) and self.can_access(action, nid) for nid in ids)
 
     def read_edges(self, include_rejected: bool = False) -> list[Edge]:

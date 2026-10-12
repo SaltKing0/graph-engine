@@ -7,7 +7,7 @@
 // kann keinen Code mehr in die Seite injizieren.
 const $ = id => document.getElementById(id);
 
-let nodes = {}, pending = [], selectedId = null;
+let nodes = {}, edgesById = {}, pending = [], selectedId = null, lastResolved = null;
 let pickA = null, pickB = null;
 
 // Audit #47: die Selection war positional (Index in pending) und sprang nach
@@ -57,7 +57,10 @@ async function refresh() {
   }
   nodes = {};
   g.nodes.forEach(n => nodes[n.id] = n);
+  edgesById = Object.fromEntries(g.edges.map(e => [e.id, e]));
   pending = g.edges.filter(e => e.pending && !(e.invalidated ?? Boolean(e.valid_to)));
+  const replacementFacts = new Set(pending.filter(e => e.kind === "fact_replacement").map(e => e.replacement.new_fact_id));
+  pending = pending.filter(e => !replacementFacts.has(e.id));
   if (selectedId == null && pending.length) selectedId = pending[0].id;
   if (selectedId != null && !pending.some(e => e.id === selectedId)) {
     selectedId = pending.length ? pending[0].id : null;
@@ -69,6 +72,19 @@ async function refresh() {
 // Audit #30: in-flight lock — key-repeat or double-click spammed resolve POSTs
 // (each POST commits; the spam created noisy history and raced the refresh).
 let resolving = false;
+
+function replacementDetails(e) {
+  const meta = e.replacement;
+  return [["Old", meta.old_fact_id], ["New", meta.new_fact_id]].map(([label, id]) => {
+    const fact = edgesById[id];
+    if (!fact) return "";
+    const dates = fact.extracted_validity || {};
+    return `<p><strong>${esc(label)} claim ${esc(id)}</strong>: ${esc(nodes[fact.source]?.text || fact.source)} — ${esc(fact.predicate)} → ${esc(nodes[fact.target]?.text || fact.target)}</p>` +
+      `<p>Extracted validity: ${esc(dates.valid_from || "unknown")} to ${esc(dates.valid_to || "unknown")}</p>` +
+      (fact.evidence || []).map(item => `<p>Evidence ${esc(item.node_id)}: ${esc(item.text)}</p>`).join("");
+  }).join("") + `<p>Proposed effective date: ${esc(meta.effective_at || "unknown")}</p>` +
+    `<p>Reason: ${esc(meta.reason)} (${esc(meta.basis)})</p>`;
+}
 
 // ---------- Inbox ----------
 function renderCards() {
@@ -88,6 +104,7 @@ function renderCards() {
       <div class="nodebox pickable" data-pick="${esc(e.target)}">
         <span class="id">${esc(e.target)}</span><br>${esc(short(e.target))}</div>
       ${e.kind === "fact" ? (e.evidence || []).slice(0, 3).map(item => `<p>${esc(item.text.slice(0, 240))}</p>`).join("") : ""}
+      ${e.kind === "fact_replacement" ? replacementDetails(e) : ""}
       <div class="actions">
         <button class="ok" data-resolve="${esc(e.id)}" data-accept="1">✓ accept ⏎</button>
         <button class="no" data-resolve="${esc(e.id)}" data-accept="0">✗ reject esc</button>
@@ -119,6 +136,8 @@ async function resolve(id, accept) {
   try {
     const r = await fetch(`/api/edge/${encodeURIComponent(id)}/${accept ? "accept" : "reject"}`, { method: "POST" });
     if (!r.ok) return flash("Failed to resolve", false);
+    lastResolved = id;
+    $("undoBtn").hidden = false;
     flash(accept ? "Edge accepted" : "Edge rejected");
     await refresh();
     // Audit #50: after accepting, focus landed on the next card's first button
@@ -131,6 +150,23 @@ async function resolve(id, accept) {
     resolving = false;
   }
 }
+
+$("undoBtn").addEventListener("click", async () => {
+  if (resolving || !lastResolved) return;
+  resolving = true;
+  try {
+    const r = await fetch(`/api/edge/${encodeURIComponent(lastResolved)}/undo`, { method: "POST" });
+    if (!r.ok) return flash("Cannot undo: decision unavailable or facts changed", false);
+    lastResolved = null;
+    $("undoBtn").hidden = true;
+    flash("Decision restored to pending");
+    await refresh();
+  } catch (err) {
+    flash("Network error: " + String(err.message || err), false);
+  } finally {
+    resolving = false;
+  }
+});
 
 // ---------- same_as-Picker ----------
 function pick(id) {
