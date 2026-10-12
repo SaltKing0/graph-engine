@@ -275,7 +275,7 @@ const short = (text, length = 36) => {
     refreshTimer = setTimeout(refresh, delay);
   }
 
-  async function refresh() {
+  async function refresh({ updateSearch = true } = {}) {
     clearTimeout(refreshTimer);
     const version = ++refreshVersion;
     try {
@@ -309,7 +309,7 @@ const short = (text, length = 36) => {
       simulation.alpha(.6).restart();
       if (initialFit && nodes.length) { simulation.tick(80); tick(); fitNodes(nodes); initialFit = false; }
       if (detailId) renderDetail(detailId);
-      if (document.activeElement === $("#search")) renderSearch();
+      if (updateSearch && document.activeElement === $("#search")) renderSearch();
     } catch (error) {
       if (version !== refreshVersion) return;
       if (!loaded) {
@@ -472,7 +472,8 @@ const short = (text, length = 36) => {
   function closeSearch() {
     clearTimeout(searchTimer);
     searchVersion++;
-    searchResults = [];
+    // Hiding the dropdown keeps ranked highlights for the active query.
+    if (!$("#search").value.trim()) searchResults = [];
     searchExplanations.clear();
     $("#search-results").hidden = true;
     $("#search-results").setAttribute("aria-busy", "false");
@@ -599,7 +600,8 @@ const short = (text, length = 36) => {
     if (!button) return;
     const id = button.dataset.node;
     const version = searchVersion;
-    if (!nodeById(id)) await refresh();
+    // Loading a missing hit must not restart the search that selected it.
+    if (!nodeById(id)) await refresh({ updateSearch:false });
     if (version !== searchVersion) return;
     if (!nodeById(id)) { notify("This idea is no longer available.", true); return; }
     selectedEdge = null; selectedNode = id; initialFit = false;
@@ -613,7 +615,7 @@ const short = (text, length = 36) => {
   window.addEventListener("keydown", event => {
     if (event.isComposing || event.ctrlKey || event.metaKey || event.altKey || $("#detail").open) return;
     if (event.key === "Escape") {
-      closeSearch(); $("#search").value = ""; clearSelection();
+      $("#search").value = ""; closeSearch(); clearSelection();
       if (document.activeElement.matches("input,textarea")) document.activeElement.blur();
       return;
     }

@@ -225,6 +225,67 @@ def test_search_uses_ranked_results_keyboard_and_lazy_safe_explanation(server, p
     assert_inert(page)
 
 
+@pytest.mark.parametrize("outside_action", ["zoom", "focus"])
+def test_ranked_highlights_survive_closing_search(server, page, outside_action):
+    payload = {"results": [
+        {"id": "safe", "snippet": "Semantic match", "rank": 1, "score": .02}]}
+    page.route("**/api/search?**", lambda route: route.fulfill(
+        json=payload if "query=Benign" in route.request.url else {"results": []}))
+    open_graph(page, server)
+    search = page.locator("#search")
+    search.fill("Benign")
+    expect(page.locator("#search-results button[data-node]")).to_have_count(1)
+    semantic = page.locator('#graph .node[aria-label="Open idea: A second idea about memory"]')
+    literal = page.locator("#graph .node").filter(has=page.locator("title", has_text="Benign"))
+    expect(semantic).not_to_have_class("node dimmed")
+    if outside_action == "zoom":
+        page.locator("#zoom-in").click()
+    else:
+        page.locator("#zoom-in").focus()
+    expect(page.locator("#search-results")).to_be_hidden()
+    expect(search).to_have_value("Benign")
+    expect(semantic).not_to_have_class("node dimmed")
+    expect(literal).not_to_have_class("node dimmed")
+    # A different query must discard highlights from the previous ranking.
+    search.fill("unmatched")
+    expect(page.locator("#search-status")).to_contain_text("No matching idea")
+    expect(semantic).to_have_class("node dimmed")
+    search.press("Escape")
+    expect(search).to_have_value("")
+    expect(semantic).not_to_have_class("node dimmed")
+    expect(literal).not_to_have_class("node dimmed")
+
+
+@pytest.mark.parametrize("change_query", [False, True])
+def test_enter_refreshes_missing_search_hit_without_losing_selection(server, page, change_query):
+    open_graph(page, server)
+    graph = page.request.get(f"{server}/api/graph").json()
+    graph["nodes"].append(dict(graph["nodes"][0], id="new", text="Newly added idea"))
+    refresh_requests = []
+    page.route("**/api/graph", lambda route: refresh_requests.append(route))
+    page.route("**/api/search?**", lambda route: route.fulfill(json={"results": [
+        {"id": "new", "snippet": "Newly added idea", "rank": 1, "score": .02}]}))
+    search = page.locator("#search")
+    search.fill("new idea")
+    expect(page.locator("#search-results button[data-node]")).to_have_count(1)
+    with page.expect_request(f"{server}/api/graph"):
+        search.press("Enter")
+    assert len(refresh_requests) == 1
+    if change_query:
+        search.fill("different query")
+    refresh_requests[0].fulfill(json=graph)
+    expect(page.locator("#graph .node")).to_have_count(3)
+    if change_query:
+        expect(page.locator("#detail")).not_to_be_visible()
+        expect(search).to_have_value("different query")
+        expect(page.locator("#search-results")).to_be_visible()
+    else:
+        expect(page.locator("#detail")).to_be_visible()
+        expect(page.locator("#detail-text")).to_have_text("Newly added idea")
+        expect(search).to_have_value("")
+        expect(page.locator("#search-results")).to_be_hidden()
+
+
 def test_real_http_search_and_explanation_render_hostile_text_safely(server, page):
     calls = []
     page.on("request", lambda request: calls.append(request.url))
