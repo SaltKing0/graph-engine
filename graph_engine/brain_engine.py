@@ -108,6 +108,7 @@ class BrainEngine:
         """Closest node above the dedupe threshold — or None. Uses the vector cache."""
         node_ids = {n.id for n in self.brain.read_nodes()
                     if n.id != exclude_id and n.ntype != "entity" and n.status != "tombstone"
+                    and not (n.capture and n.capture["duplicate"])
                     and self.brain.can_access("write", n.id)}
         vectors = self.brain.vectors_for(
             node_ids,
@@ -141,13 +142,18 @@ class BrainEngine:
         """
         with BRAIN_LOCK:
             promoted, merged = 0, 0
-            for pn in self.brain.read_nodes():
+            nodes = self.brain.read_nodes()
+            # Receipts and their survivors own exact evidence and retry state.
+            # Promote them normally, but never cosine-merge away their IDs.
+            protected = {nid for n in nodes if n.capture and n.status != "tombstone"
+                         for nid in (n.id, n.capture["node_id"])}
+            for pn in nodes:
                 if pn.status != "probation" or pn.ntype == "entity":
                     continue
                 pvec = self.brain.vectors_for(
                     {pn.id}, lambda t: self.embedder.embed(_normalize(t))
                 ).get(pn.id)
-                dup = self._find_duplicate(pvec, exclude_id=pn.id) if pvec else None
+                dup = self._find_duplicate(pvec, exclude_id=pn.id) if pvec and pn.id not in protected else None
                 if dup is not None and dup.status != "tombstone":
                     self.brain.merge_node(dup, source=pn.source)
                     self.brain.tombstone_node(pn.id)

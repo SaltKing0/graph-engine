@@ -457,3 +457,85 @@ def test_viewer_cannot_capture_or_call_model(protected, monkeypatch):
     with pytest.raises(PermissionError):
         runtime.make_engine().capture("Alice works at Acme.", extraction="model")
     assert not calls and len(raw.read_nodes()) == 3
+
+
+def test_duplicate_receipt_inherits_current_survivor_permissions(protected, monkeypatch):
+    from graph_engine.server import app
+
+    raw, path, policy = protected
+    raw.write_node(Node("Alice works at Acme.", id="private", status="active"))
+    raw.write_vectors({})
+    acl = policy["graphs"]["default"]["nodes"]["private"]
+    acl.update(read=["owner", "alice"], write=["owner", "alice"])
+    path.write_text(json.dumps(policy))
+    engine = runtime.make_engine()
+    captured = engine.capture("Alice works at Acme.", extraction="rules")
+    receipt_id = captured[3]["source_node_id"]
+    assert captured[2] and captured[0].id == "private" and receipt_id != "private"
+    raw.write_vectors({receipt_id: [1., 0.]})
+    fact_id = next(e.id for e in raw.read_edges() if e.kind == "fact" and e.origin == "entity-extractor")
+
+    monkeypatch.setenv("IG_PRINCIPAL", "bob")
+    viewer = runtime.make_brain()
+    assert receipt_id not in {n.id for n in viewer.read_nodes()}
+    assert not viewer.can_access("read", receipt_id)
+    with pytest.raises(PermissionError):
+        viewer.read_node(receipt_id)
+    assert receipt_id not in viewer.read_vectors()
+    assert fact_id not in {e.id for e in viewer.read_edges(True)}
+    client = TestClient(app)
+    response = client.get("/api/graph", headers={"Authorization": "Bearer viewer-token"})
+    assert response.status_code == 200
+    assert receipt_id not in response.text and "Alice works at Acme" not in response.text
+
+    # Existing secured instances must observe grants and revocations too.
+    acl["read"].append("bob")
+    path.write_text(json.dumps(policy))
+    assert viewer.read_node(receipt_id).capture["node_id"] == "private"
+    assert fact_id in {e.id for e in viewer.read_edges(True)}
+    acl["write"] = ["owner"]
+    path.write_text(json.dumps(policy))
+    assert not engine.brain.can_access("write", receipt_id)
+    with pytest.raises(PermissionError):
+        engine.brain.write_node(raw.read_node(receipt_id))
+    acl["read"].remove("bob")
+    path.write_text(json.dumps(policy))
+    assert not viewer.can_access("read", receipt_id)
+
+
+@pytest.mark.parametrize("restricted", ["receipt", "fact_endpoint"])
+def test_forget_preflights_capture_family_before_any_tombstones(protected, restricted):
+    from graph_engine.agent_memory import forget
+
+    raw, path, policy = protected
+    engine = runtime.make_engine()
+    node, _, _, extracted = engine.capture("Alice works at Acme.", extraction="rules")
+    duplicate = engine.capture(" Alice works at Acme. ", extraction="rules")[3]
+    receipt_id = duplicate["source_node_id"]
+    assert receipt_id != node.id
+    restricted_id = receipt_id if restricted == "receipt" else next(
+        n.id for n in raw.read_nodes() if n.entity_name == "Alice")
+    policy["graphs"]["default"]["nodes"][restricted_id] = {"read": ["owner"], "write": ["owner"]}
+    path.write_text(json.dumps(policy))
+    # Keep fact endpoints readable to test their write preflight. The receipt
+    # case must discover copies even when they are outside the caller's view.
+    if restricted == "fact_endpoint":
+        policy["graphs"]["default"]["nodes"][restricted_id]["read"].append("alice")
+        path.write_text(json.dumps(policy))
+    before = {p.relative_to(raw.path): p.read_bytes() for p in raw.path.rglob("*") if p.is_file()}
+    with pytest.raises(PermissionError):
+        forget(engine.brain, node.id, reason="remove all captures")
+    assert before == {p.relative_to(raw.path): p.read_bytes() for p in raw.path.rglob("*") if p.is_file()}
+    assert raw.read_node(extracted["source_node_id"]).status != "tombstone"
+
+
+@pytest.mark.parametrize("parent", ["missing", "copy"])
+def test_orphan_and_cyclic_capture_receipts_fail_closed(protected, parent):
+    raw, _, _ = protected
+    raw.write_node(Node("restricted copy", id="copy",
+        capture=dict(input="restricted copy", node_id=parent, duplicate=True, source="human")))
+    brain = runtime.make_brain()
+    assert not brain.can_access("read", "copy")
+    assert "copy" not in {n.id for n in brain.read_nodes()}
+    with pytest.raises(PermissionError):
+        brain.read_node("copy")

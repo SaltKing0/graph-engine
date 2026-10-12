@@ -105,10 +105,26 @@ class SecuredBrain(Brain):
         self.authorize("read")
 
     def authorize(self, action: str, node_id: str | None = None) -> None:
-        require(self.graph_name, self.identity, action, node_id)
+        allowed = self.can_access(action, node_id)
+        audit(self.graph_name, self.identity, action, allowed, node_id)
+        if not allowed:
+            raise PermissionError("Access denied")
 
     def can_access(self, action: str, node_id: str | None = None) -> bool:
-        return permitted(self.graph_name, self.identity, action, node_id)
+        # Evidence copies inherit their survivor's CURRENT permissions, in
+        # addition to any ACL of their own. Policy changes must also apply to
+        # copies already on disk, including their vectors and fact supports.
+        seen = set()
+        while True:
+            if node_id in seen or not permitted(self.graph_name, self.identity, action, node_id):
+                return False
+            seen.add(node_id)
+            node = self._raw.read_node(node_id) if node_id is not None else None
+            if node is None:
+                return len(seen) == 1  # new IDs are allowed; orphan copies fail closed
+            if not node.capture or not node.capture["duplicate"]:
+                return True
+            node_id = node.capture["node_id"]
 
     def read_nodes(self) -> list[Node]:
         self.authorize("read")
@@ -120,7 +136,21 @@ class SecuredBrain(Brain):
 
     def write_node(self, node: Node) -> None:
         self.authorize("write", node.id)
+        if node.capture and node.capture["duplicate"]:
+            parent_id = node.capture["node_id"]
+            if self._raw.read_node(parent_id) is None:
+                raise PermissionError("Capture survivor unavailable")
+            self.authorize("write", parent_id)
         self._raw.write_node(node)
+
+    def capture_receipts(self, node_id: str) -> list[Node]:
+        # Discover all copies before a forget, including copies with tighter
+        # ACLs than their survivor. Fail before returning or changing any data.
+        self.authorize("write", node_id)
+        receipts = self._raw.capture_receipts(node_id)
+        for node in receipts:
+            self.authorize("write", node.id)
+        return receipts
 
     def _edge_allowed(self, edge: Edge, action: str) -> bool:
         # Evidence is embedded text: hiding only the endpoints would leak it.

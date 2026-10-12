@@ -350,6 +350,18 @@ Capture and extraction use **two commits**, under the existing process lock:
 2. Extraction validates and authorizes its complete plan, then stores the
    subgraph in a second commit. New facts remain pending by default.
 
+In protected mode, a duplicate evidence note inherits its survivor's current
+read/write permissions, together with any additional restrictions on the
+evidence note itself. Changes to the survivor's ACL also apply to existing
+copies, their vectors and quoted fact supports.
+
+`forget` on the returned note ID also tombstones its capture receipts and
+invalidates facts that reference their evidence. The complete plan requires
+write permission before any tombstone is stored. Cosine consolidation preserves
+receipts and their survivors; they can still be promoted, but their IDs are not
+merged away. Later ingests deduplicate against ordinary notes, not evidence
+copies.
+
 The `extraction` response includes `status` (`complete` or `failed`), `mode`,
 `source_node_id`, `captured`, `retried`, `created_entities`, `reused_entities`,
 `created_facts`, `reused_facts`, and `pending_facts` (distinct undecided,

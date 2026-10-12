@@ -7,7 +7,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from graph_engine import runtime
-from graph_engine.agent_memory import remember
+from graph_engine.agent_memory import forget, remember
 from graph_engine.brain import Brain, Node
 from graph_engine.brain_engine import BrainEngine
 from graph_engine.embedder import HashEmbedder
@@ -88,6 +88,82 @@ def test_zero_entities_still_captures_source(engine):
     node, _, _, result = engine.capture("ambiguous prose", extraction="rules")
     assert result["status"] == "complete" and result["source_node_id"] == node.id
     assert result["created_entities"] == result["pending_facts"] == 0
+
+
+@pytest.mark.parametrize("duplicate", [False, True])
+def test_forget_remembered_capture_removes_receipts_and_fact_support(engine, duplicate, monkeypatch):
+    from graph_engine.retrieval import retrieve
+
+    text = "Alice works at Acme."
+    if duplicate:
+        engine.ingest(text)
+    result = remember(engine, text, extraction="rules", accept_facts=True)
+    assert result["duplicate"] is duplicate
+    receipt = result["extraction"]["source_node_id"]
+    commits = []
+    monkeypatch.setattr(engine.brain, "commit_and_push",
+                        lambda message, push=True: commits.append(message))
+    forgotten = forget(engine.brain, result["node_id"], reason="Remove this observation")
+    assert forgotten["forgotten"] and forgotten["edges_invalidated"] == 3
+    assert engine.brain.read_node(receipt).status == "tombstone"
+    assert engine.brain.read_node(result["node_id"]).status == "tombstone"
+    assert not {receipt, result["node_id"]} & {nid for nid, _ in retrieve(engine, text, k=20)}
+    assert all(e.is_invalidated for e in engine.brain.read_edges() if e.origin == "entity-extractor")
+    assert forget(engine.brain, result["node_id"], reason="retry")["already"]
+    assert len(commits) == 1
+
+
+def test_forget_cleans_legacy_receipt_chains_below_a_tombstone(engine):
+    brain = engine.brain
+    brain.write_node(Node("old note", id="survivor", status="tombstone"))
+    brain.write_node(Node("old copy", id="copy", status="tombstone",
+                         capture=dict(input="old copy", node_id="survivor", duplicate=True, source="human")))
+    brain.write_node(Node("live copy", id="child",
+                         capture=dict(input="live copy", node_id="copy", duplicate=True, source="human")))
+    assert forget(brain, "survivor", reason="finish previous forget")["forgotten"]
+    assert brain.read_node("child").status == "tombstone"
+
+
+@pytest.mark.parametrize("survivor_active", [False, True])
+def test_consolidation_preserves_duplicate_capture_and_retry(engine, survivor_active):
+    from graph_engine.context import _evidence
+
+    text = "Alice works at Acme."
+    survivor = engine.ingest(text)[0]
+    if survivor_active:
+        engine.brain.promote_node(survivor.id)
+    first = engine.capture(text, extraction="rules", accept_facts=True)[3]
+    receipt_id = first["source_node_id"]
+    live = lambda: {n.id: n for n in engine.brain.read_nodes() if n.status != "tombstone"}
+    refs = _evidence(engine, live())
+    assert any(refs.values())
+    assert engine.consolidate()["merged"] == 0
+    assert engine.brain.read_node(survivor.id).status == "active"
+    assert engine.brain.read_node(receipt_id).status == "active"
+    assert _evidence(engine, live()) == refs
+    before = snapshot(engine.brain)
+    retried = engine.capture(text, extraction="rules")[3]
+    assert retried["retried"] and retried["source_node_id"] == receipt_id
+    assert snapshot(engine.brain) == before
+
+
+def test_consolidation_preserves_independent_exact_input_receipts(engine):
+    text = "Alice works at Acme."
+    first = engine.capture(text, source="first", extraction="rules", allow_duplicates=True)[0]
+    second = engine.capture(text, source="second", extraction="rules", allow_duplicates=True)[0]
+    assert first.id != second.id
+    assert engine.consolidate() == {"promoted": 2, "merged": 0}
+    for source, node in (("first", first), ("second", second)):
+        retried = engine.capture(text, source=source, extraction="rules")[3]
+        assert retried["retried"] and retried["source_node_id"] == node.id
+
+
+def test_later_ingests_never_deduplicate_into_an_evidence_copy(engine):
+    text = "Alice works at Acme."
+    engine.brain.write_node(Node(text, id="z-survivor"))
+    engine.brain.write_node(Node(text, id="a-evidence",
+        capture=dict(input=text, node_id="z-survivor", duplicate=True, source="human")))
+    assert engine.ingest(text)[0].id == "z-survivor"
 
 
 def test_remember_retry_does_not_report_a_new_note_write(engine):

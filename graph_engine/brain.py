@@ -553,6 +553,22 @@ class Brain:
         except (ValueError, KeyError, OSError):
             return None
 
+    def capture_receipts(self, node_id: str) -> list[Node]:
+        """Live evidence copies owned by a survivor, including legacy chains."""
+        remaining = {n.id: n for n in self.read_nodes()
+                     if n.capture and n.capture["duplicate"] and n.id != node_id}
+        family = {node_id}
+        receipts = []
+        while True:
+            attached = [n for n in remaining.values() if n.capture["node_id"] in family]
+            if not attached:
+                return receipts
+            for node in attached:
+                family.add(node.id)
+                del remaining[node.id]
+                if node.status != "tombstone":
+                    receipts.append(node)
+
     # ---------- Embedding-Cache ----------
 
     @property

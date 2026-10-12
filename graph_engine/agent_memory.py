@@ -16,7 +16,7 @@ edges are invalidated instead of deleted, so the audit trail survives.
 from __future__ import annotations
 
 from .brain import Brain, Edge, Node, _now_iso
-from .brain_engine import BrainEngine
+from .brain_engine import BRAIN_LOCK, BrainEngine
 
 AGENT_SOURCE = "agent"          # node provenance: a model wrote this
 AGENT_ORIGIN = "agent"          # edge provenance: a model declared this
@@ -69,41 +69,49 @@ def forget(brain: Brain, node_id: str, *, reason: str,
     """Hide a node from every live view — without deleting it.
 
     Sets `status="tombstone"` (out of `retrieve`, `graph`, `hygiene` — the file
-    and its history stay) and invalidates every undecided/live edge touching it, in ONE
+    and its history stay), along with its live capture receipts, and invalidates
+    every undecided/live edge referencing those nodes or their evidence, in ONE
     commit. `reason` is mandatory and lands in the commit message: the record of
-    WHY must survive with the decision. Idempotent: forgetting a tombstone again
-    is a no-op, not an error.
+    WHY must survive with the decision. Repeating a completed forget is a no-op.
     """
     reason = (reason or "").strip()
     if not reason:
         raise ValueError("forget requires a reason — it lands in the commit message.")
-    brain.authorize("write", node_id)
-    node = brain.read_node(node_id)
-    if node is None:
-        raise ValueError(f"No node with id {node_id!r}.")
-    if node.status == FORGET_STATUS:
-        return {"node_id": node_id, "status": FORGET_STATUS, "edges_invalidated": 0,
-                "forgotten": False, "already": True, "reason": reason}
+    with BRAIN_LOCK:
+        brain.authorize("write", node_id)
+        node = brain.read_node(node_id)
+        if node is None:
+            raise ValueError(f"No node with id {node_id!r}.")
+        receipts = brain.capture_receipts(node_id)
+        if node.status == FORGET_STATUS and not receipts:
+            return {"node_id": node_id, "status": FORGET_STATUS, "edges_invalidated": 0,
+                    "forgotten": False, "already": True, "reason": reason}
 
-    now = _now_iso()
-    edges = brain.read_edges(include_rejected=True)
-    invalidated = 0
-    for e in edges:
-        if not e.is_invalidated and not e.rejected and node_id in (e.source, e.target):
-            # Check every affected record before writing the tombstone. A
-            # readable edge can connect to a node the caller cannot modify.
-            for affected in [e.source, e.target, *(item.get("node_id") for item in e.evidence)]:
-                brain.authorize("write", affected)
-            e.invalidate(now)        # Also invalidate scheduled/expired extracted facts.
-            invalidated += 1
-    node.status = FORGET_STATUS
-    brain.write_node(node)
-    brain.write_edges(edges)
-    brain.rebuild_index()
-    if commit:
-        brain.commit_and_push(
-            f"agent forget: {node_id} — {reason} "
-            f"({invalidated} edge(s) invalidated, node tombstoned)", push=push)
-    return {"node_id": node_id, "status": FORGET_STATUS,
-            "edges_invalidated": invalidated, "forgotten": True,
-            "already": False, "reason": reason, "text": (node.text or "")[:120]}
+        forgotten = {n.id for n in [node, *receipts]}
+        for nid in forgotten:
+            brain.authorize("write", nid)
+        now = _now_iso()
+        edges = brain.read_edges(include_rejected=True)
+        invalidated = 0
+        for e in edges:
+            affected = [e.source, e.target, *(item.get("node_id") for item in e.evidence)]
+            if not e.is_invalidated and not e.rejected and forgotten.intersection(affected):
+                # Authorize the whole family and affected edges before any
+                # tombstone, including facts supported by an evidence copy.
+                for nid in affected:
+                    brain.authorize("write", nid)
+                e.invalidate(now)    # Also invalidate scheduled/expired extracted facts.
+                invalidated += 1
+        for n in [node, *receipts]:
+            n.status = FORGET_STATUS
+            brain.write_node(n)
+        brain.write_edges(edges)
+        brain.rebuild_index()
+        if commit:
+            brain.commit_and_push(
+                f"agent forget: {node_id} — {reason} "
+                f"({invalidated} edge(s) invalidated, node and {len(receipts)} capture receipt(s) tombstoned)",
+                push=push)
+        return {"node_id": node_id, "status": FORGET_STATUS,
+                "edges_invalidated": invalidated, "forgotten": True,
+                "already": False, "reason": reason, "text": (node.text or "")[:120]}

@@ -16,6 +16,9 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
   agent example with an optional real-model path (issue #20).
 
 ### Fixed
+- Duplicate capture evidence now follows its survivor's current access
+  restrictions. Forget also tombstones associated receipts and invalidates
+  their fact supports; cosine consolidation preserves receipts and retry IDs.
 - Context assembly now groups persisted storage tiers, prioritizes a bounded
   selection of important main memories, and truncates individual bodies to
   an estimate counting headers, metadata and separators. Returned IDs now
