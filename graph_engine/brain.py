@@ -632,7 +632,7 @@ class Brain:
                                or not math.isfinite(value) for value in vector)):
                     continue
                 out[nid] = vector
-            except (json.JSONDecodeError, KeyError, TypeError):
+            except (json.JSONDecodeError, KeyError, TypeError, OverflowError):
                 continue
         return out
 

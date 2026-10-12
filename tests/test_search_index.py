@@ -207,3 +207,20 @@ def test_malformed_vector_cache_values_recover_without_writes(engine, bad):
     assert brain.read_vectors() == {}
     assert_matches(engine)
     assert brain.vectors_file.read_bytes() == before
+
+
+def test_oversized_orphan_vector_preserves_valid_records_and_search(engine):
+    import json
+    expected = hits(engine, cached=False)
+    brain = engine.brain
+    valid = engine.embedder.embed("alpha beta")
+    brain.vectors_file.write_text(
+        json.dumps({"id": "orphan", "vec": [10**400]}) + "\n"
+        + json.dumps({"id": "a", "vec": valid}) + "\n")
+    before = brain.vectors_file.read_bytes()
+
+    assert brain.read_vectors() == {"a": valid}
+    assert hits(engine) == expected
+    assert hits(engine) == expected  # Warm snapshot must also recover.
+    assert hits(engine, cached=False) == expected
+    assert brain.vectors_file.read_bytes() == before
