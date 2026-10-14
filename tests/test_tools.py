@@ -44,6 +44,187 @@ def brain(tmp_path):
 # ig_cycle
 # ---------------------------------------------------------------------------
 
+def _tree_snapshot(root: Path) -> dict:
+    """Record contents, links and modification times, including Git history."""
+    snapshot = {}
+    for path in [root, *sorted(root.rglob("*"))]:
+        stat = path.lstat()
+        content = (os.readlink(path) if path.is_symlink()
+                   else path.read_bytes() if path.is_file() else None)
+        snapshot[str(path.relative_to(root))] = (stat.st_mode, stat.st_mtime_ns, content)
+    return snapshot
+
+
+@pytest.fixture()
+def cycle_source(tmp_path, brain):
+    from graph_engine.brain import Brain, Node
+
+    Brain(brain, mode="local").write_node(Node("Synthetic source memory", id="source"))
+    (brain / "sentinel.txt").write_text("source must survive", encoding="utf-8")
+    for args in (["init"], ["add", "."],
+                 ["-c", "user.name=Test", "-c", "user.email=test@example.invalid",
+                  "commit", "-m", "Synthetic source history"]):
+        subprocess.run(["git", "-C", str(brain), *args], check=True,
+                       capture_output=True, text=True)
+    findings = tmp_path / "findings.txt"
+    findings.write_text("The scheduler assigns one worker per queued job.\n",
+                        encoding="utf-8")
+    return brain, findings
+
+
+@pytest.mark.parametrize("dry_run_only", [True, False])
+@pytest.mark.parametrize("destination", [
+    "same", "dotdot_alias", "ancestor", "descendant", "nested_descendant",
+    "source_symlink", "destination_symlink", "ancestor_symlink",
+    "source_parent_symlink", "unrelated_symlink", "unrelated_parent_symlink",
+    "dangling_symlink", "symlink_loop", "existing_directory", "empty_directory", "existing_file",
+    "missing_parent", "marker_existing_directory",
+])
+def test_cycle_rejects_unsafe_copy_without_mutation(tmp_path, cycle_source,
+                                                 destination, dry_run_only):
+    brain, findings = cycle_source
+    source = brain
+    copy = tmp_path / "copy"
+    if destination == "same":
+        copy = brain
+    elif destination == "dotdot_alias":
+        copy = brain / ".." / brain.name
+    elif destination == "ancestor":
+        copy = tmp_path
+    elif destination == "descendant":
+        copy = brain / "copy"
+    elif destination == "nested_descendant":
+        copy = brain / "new-parent" / "copy"
+    elif destination == "source_symlink":
+        source = tmp_path / "source-alias"
+        source.symlink_to(brain, target_is_directory=True)
+        copy = brain / "copy"
+    elif destination in {"destination_symlink", "ancestor_symlink"}:
+        copy.symlink_to(brain if destination == "destination_symlink" else tmp_path,
+                        target_is_directory=True)
+    elif destination == "source_parent_symlink":
+        alias = tmp_path / "source-alias"
+        alias.symlink_to(brain, target_is_directory=True)
+        copy = alias / "copy"
+    elif destination in {"unrelated_symlink", "unrelated_parent_symlink"}:
+        unrelated = tmp_path / "unrelated"
+        unrelated.mkdir()
+        (unrelated / "sentinel.txt").write_text("unrelated must survive", encoding="utf-8")
+        copy.symlink_to(unrelated, target_is_directory=True)
+        if destination == "unrelated_parent_symlink":
+            copy = copy / "new-copy"
+    elif destination == "dangling_symlink":
+        copy.symlink_to(tmp_path / "absent", target_is_directory=True)
+    elif destination == "symlink_loop":
+        copy.symlink_to(copy, target_is_directory=True)
+    elif destination in {"existing_directory", "empty_directory", "marker_existing_directory"}:
+        copy.mkdir()
+        if destination != "empty_directory":
+            (copy / "sentinel.txt").write_text("unrelated must survive", encoding="utf-8")
+        if destination == "marker_existing_directory":
+            findings.write_text("This is nicht safe.\n", encoding="utf-8")
+    elif destination == "existing_file":
+        copy.write_text("unrelated must survive", encoding="utf-8")
+    elif destination == "missing_parent":
+        copy = tmp_path / "missing-parent" / "copy"
+    before = _tree_snapshot(tmp_path)
+    cmd = [PY, str(REPO / "tools" / "ig_cycle.py"),
+           "--brain", str(source), "--engine", str(REPO),
+           "--glob", str(findings), "--copy", str(copy),
+           "--metrics", str(tmp_path / "metrics.jsonl")]
+    if dry_run_only:
+        cmd.append("--dry-run-only")
+    r = subprocess.run(cmd, capture_output=True, text=True,
+                       env=_env(tmp_path), timeout=120)
+    assert _tree_snapshot(tmp_path) == before
+    assert r.returncode != 0
+    assert "unsafe --copy" in r.stdout
+    assert "Traceback" not in r.stderr
+
+
+@pytest.mark.parametrize("explicit_copy", [True, False])
+def test_cycle_safe_copy_preserves_source(tmp_path, cycle_source, explicit_copy):
+    brain, findings = cycle_source
+    before = _tree_snapshot(brain)
+    temporary = tmp_path / "temporary"
+    temporary.mkdir()
+    copy = tmp_path / "copy"
+    cmd = [PY, str(REPO / "tools" / "ig_cycle.py"),
+           "--brain", str(brain), "--engine", str(REPO),
+           "--glob", str(findings), "--dry-run-only",
+           "--metrics", str(tmp_path / "metrics.jsonl")]
+    if explicit_copy:
+        cmd.extend(["--copy", str(copy)])
+    r = subprocess.run(cmd, capture_output=True, text=True,
+                       env=_env(tmp_path, TMPDIR=str(temporary)), timeout=120)
+    assert r.returncode == 0, r.stderr[-500:]
+    assert "dry-run: 1 findings on copy" in r.stdout
+    assert _tree_snapshot(brain) == before
+    assert not (tmp_path / "metrics.jsonl").exists()
+    assert list(temporary.glob("ig-brain-dryrun-*")) == []
+    if explicit_copy:
+        assert len(list((copy / "nodes").glob("*.md"))) == 2
+        assert not (copy / ".git").exists()
+        assert not (copy / "sentinel.txt").exists()
+
+
+def test_cycle_default_copy_cleanup_on_failure(tmp_path, cycle_source):
+    brain, findings = cycle_source
+    (brain / "INDEX.md").unlink()
+    before = _tree_snapshot(brain)
+    temporary = tmp_path / "temporary"
+    temporary.mkdir()
+    r = subprocess.run(
+        [PY, str(REPO / "tools" / "ig_cycle.py"),
+         "--brain", str(brain), "--engine", str(REPO),
+         "--glob", str(findings), "--dry-run-only"],
+        capture_output=True, text=True,
+        env=_env(tmp_path, TMPDIR=str(temporary)), timeout=120)
+    assert r.returncode != 0
+    assert "dry-run copy failed" in r.stdout
+    assert "Traceback" not in r.stderr
+    assert _tree_snapshot(brain) == before
+    assert list(temporary.glob("ig-brain-dryrun-*")) == []
+
+
+def test_cycle_rejects_temporary_directory_inside_source(tmp_path, cycle_source):
+    brain, findings = cycle_source
+    before = _tree_snapshot(tmp_path)
+    r = subprocess.run(
+        [PY, str(REPO / "tools" / "ig_cycle.py"),
+         "--brain", str(brain), "--engine", str(REPO),
+         "--glob", str(findings), "--dry-run-only"],
+        capture_output=True, text=True,
+        env=_env(tmp_path, TMPDIR=str(brain)), timeout=120)
+    assert r.returncode != 0
+    assert "set TMPDIR outside it" in r.stdout
+    assert "Traceback" not in r.stderr
+    assert _tree_snapshot(tmp_path) == before
+
+
+def test_cycle_copy_creation_race_preserves_destination(tmp_path, cycle_source, monkeypatch):
+    """Another process claims the destination between validation and mkdir."""
+    from tools import ig_cycle
+
+    brain, _ = cycle_source
+    copy = tmp_path / "copy"
+    validate = ig_cycle._validate_copy_path
+    before = {}
+
+    def claim_destination(source: Path, destination: str) -> Path:
+        path = validate(source, destination)
+        path.mkdir()
+        (path / "sentinel.txt").write_text("another process owns this", encoding="utf-8")
+        before.update(_tree_snapshot(tmp_path))
+        return path
+
+    monkeypatch.setattr(ig_cycle, "_validate_copy_path", claim_destination)
+    with pytest.raises(FileExistsError):
+        with ig_cycle._dry_run_copy(brain, str(copy)):
+            pytest.fail("must refuse the newly claimed destination")
+    assert _tree_snapshot(tmp_path) == before
+
+
 def test_cycle_missing_brain_aborts_cleanly(tmp_path):
     """#28: a missing brain is a friendly abort, not a traceback."""
     r = subprocess.run(
