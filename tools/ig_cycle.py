@@ -23,6 +23,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+from contextlib import contextmanager, ExitStack
 import glob
 import json
 import os
@@ -34,6 +35,7 @@ import sys
 import tempfile
 import time
 import unicodedata
+from typing import Iterator
 
 DEFAULT_METRICS = os.path.expanduser("~/.cache/graph_engine/ig_metrics.jsonl")
 
@@ -172,6 +174,64 @@ def write_metrics(entry: dict, path: str = DEFAULT_METRICS) -> None:
         print(f"metrics write failed (non-fatal): {e}")
 
 
+def _validate_copy_path(brain: Path, destination: str) -> Path:
+    """Require a fresh, disjoint destination with no symlink components."""
+    copy = Path(destination).expanduser().absolute()
+    for path in [copy, *copy.parents]:
+        if path.is_symlink():
+            raise ValueError(f"destination must not contain symlinks: {path}")
+    resolved = copy.resolve()
+    source = brain.resolve()
+    if (resolved == source or resolved.is_relative_to(source)
+            or source.is_relative_to(resolved)):
+        raise ValueError("destination must not overlap --brain (including ancestors and aliases)")
+    for path in [copy, *copy.parents]:
+        # samefile also catches case aliases on case-insensitive filesystems.
+        if source.exists() and path.exists() and os.path.samefile(source, path):
+            raise ValueError("destination must not overlap --brain (including aliases)")
+    if copy.exists():
+        raise ValueError("destination already exists; choose a new directory path")
+    if not copy.parent.is_dir():
+        raise ValueError("destination's parent must be an existing directory")
+    return copy
+
+
+def _temporary_copy_parent(brain: Path) -> Path:
+    source = brain.resolve()
+
+    def check(parent: Path) -> None:
+        if (parent.is_relative_to(source)
+                or any(path.exists() and os.path.samefile(source, path)
+                       for path in [parent, *parent.parents])):
+            raise ValueError("temporary directory is inside --brain; set TMPDIR outside it")
+
+    # gettempdir() probes candidates by creating a file. Check overrides first
+    # so even that probe cannot change a source brain selected as TMPDIR.
+    for name in ("TMPDIR", "TEMP", "TMP"):
+        if os.environ.get(name):
+            check(Path(os.environ[name]).resolve())
+    parent = Path(tempfile.gettempdir()).resolve()
+    check(parent)
+    return parent
+
+
+@contextmanager
+def _dry_run_copy(brain: Path, destination: str) -> Iterator[str]:
+    """Create only directories owned by this invocation; never replace a path."""
+    with ExitStack() as stack:
+        if destination:
+            copy = _validate_copy_path(brain, destination)
+            # Atomic exclusive creation also refuses a path created after validation.
+            copy.mkdir()
+        else:
+            copy = Path(stack.enter_context(tempfile.TemporaryDirectory(
+                prefix="ig-brain-dryrun-", dir=_temporary_copy_parent(brain))))
+        shutil.copytree(brain / "nodes", copy / "nodes")
+        for name in ("edges.jsonl", "vectors.jsonl", "INDEX.md"):
+            shutil.copy(brain / name, copy / name)
+        yield str(copy)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--glob", default="/tmp/dogfood_*.txt")
@@ -184,10 +244,19 @@ def main() -> int:
     ap.add_argument("--engine", default=os.environ.get("IG_ENGINE_PATH", str(_repo_root)))
     ap.add_argument("--dry-run-only", action="store_true")
     ap.add_argument("--copy", default="",
-                    help="dry-run copy dir (default: unique mkdtemp in /tmp)")
+                    help="new dry-run copy directory, retained for inspection; parent must "
+                    "exist, no symlinks or overlap with --brain (default: owned temporary "
+                    "directory, automatically removed)")
     ap.add_argument("--metrics", default=DEFAULT_METRICS,
                     help="metrics JSONL path (default: %s)" % DEFAULT_METRICS)
     args = ap.parse_args()
+
+    if args.copy:
+        try:
+            _validate_copy_path(Path(args.brain), args.copy)
+        except (ValueError, OSError, RuntimeError) as e:
+            print(f"unsafe --copy: {e}")
+            return 1
 
     t0 = time.time()
     try:
@@ -197,6 +266,12 @@ def main() -> int:
         # Audit #28: a missing brain crashed with a raw traceback — friendly abort.
         print(f"brain not found or has no nodes/ dir: {args.brain}")
         return 1
+    if not args.copy:
+        try:
+            _temporary_copy_parent(Path(args.brain))
+        except (ValueError, OSError, RuntimeError) as e:
+            print(f"unsafe temporary copy: {e}")
+            return 1
     # Engine venv python (has numpy/st embedder); fall back to current interpreter.
     eng_py = os.path.join(args.engine, ".venv", "bin", "python")
     if not os.path.exists(eng_py):
@@ -227,31 +302,27 @@ def main() -> int:
         return 1
     print("marker-scan: CLEAN")
 
-    # Dry-run on a copy (exclude .git, per skill). Audit #28: the copy path is a
-    # unique mkdtemp by default — a fixed /tmp/ig-brain-dryrun collided across
-    # concurrent cycles (one cycle rmtree'd the copy another was using).
-    copy_dir = args.copy or tempfile.mkdtemp(prefix="ig-brain-dryrun-")
-    if os.path.exists(copy_dir):
-        shutil.rmtree(copy_dir)
-    os.makedirs(copy_dir)
-    shutil.copytree(os.path.join(args.brain, "nodes"), os.path.join(copy_dir, "nodes"))
-    for f in ("edges.jsonl", "vectors.jsonl", "INDEX.md"):
-        shutil.copy(os.path.join(args.brain, f), os.path.join(copy_dir, f))
     # The cycle is a production pipeline, so the real embedder is the default —
     # but an explicit IDEAGRAPH_EMBEDDER from the caller wins. Otherwise a
     # caller that asked for the hash embedder (tests, light installs without
     # the [st] extra) still pulled a model download in here.
     cycle_embedder = os.environ.get("IDEAGRAPH_EMBEDDER", "st")
-    dry_env = dict(os.environ, IG_BRAIN_PATH=copy_dir, IG_BRAIN_MODE="local",
-                   IDEAGRAPH_INTENT_PENDING="1", IDEAGRAPH_EMBEDDER=cycle_embedder)
     dry_islands = []
-    for src, finding in findings:
-        out = run([eng_py, "-m", "graph_engine", "ingest", finding, "--source", src],
-                  dry_env, args.engine)
-        n = out.count("Suggestion:")
-        m = __import__("re").search(r"Node (\w{12}):", out)
-        if m and n == 0:
-            dry_islands.append(m.group(1))
+    try:
+        # Copy records only: Git history always stays with the source brain.
+        with _dry_run_copy(Path(args.brain), args.copy) as copy_dir:
+            dry_env = dict(os.environ, IG_BRAIN_PATH=copy_dir, IG_BRAIN_MODE="local",
+                           IDEAGRAPH_INTENT_PENDING="1", IDEAGRAPH_EMBEDDER=cycle_embedder)
+            for src, finding in findings:
+                out = run([eng_py, "-m", "graph_engine", "ingest", finding, "--source", src],
+                          dry_env, args.engine)
+                n = out.count("Suggestion:")
+                m = __import__("re").search(r"Node (\w{12}):", out)
+                if m and n == 0:
+                    dry_islands.append(m.group(1))
+    except (ValueError, OSError) as e:
+        print(f"dry-run copy failed: {e}")
+        return 1
     print(f"dry-run: {len(findings)} findings on copy, islands={dry_islands}")
     if args.dry_run_only:
         print("dry-run-only: stopping (brain untouched)")

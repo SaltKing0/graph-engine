@@ -150,6 +150,17 @@ run them with `python tools/<script>.py --help` for their options:
    red-spec eval cases in the roadmap harness, flipped to the golden set
    only after implementation (first self-extension: `IG_EDGE_CONF_FLOOR`).
 
+`ig_cycle --dry-run-only` ingests findings into an owned temporary copy and
+removes that copy when the dry run finishes or fails. The source brain and its
+Git history remain untouched. Use `--copy /absolute/path/to/new-copy` to retain
+the dry-run records for inspection (Git history is excluded). The path must not
+exist, even as an empty directory or dangling symlink, and its parent must
+already exist. Symlinks in the destination path and any overlap with `--brain`
+(the same directory, an ancestor, a descendant, or a path alias) are rejected
+before filesystem writes. Choose a fresh path for each invocation; the tool
+never replaces or recursively deletes an explicit destination. If the system
+temporary directory is inside the source brain, set `TMPDIR` outside it.
+
 ## CLI
 
 ```bash
