@@ -329,7 +329,11 @@ def extract_entities(brain: Brain, text: str | None = None, *, node_id: str | No
         entity_nodes = [n for n in nodes if n.ntype == "entity" and n.entity_name and n.entity_type]
         known = [dict(name=n.entity_name, type=n.entity_type, aliases=n.aliases)
                  for n in entity_nodes if n.status != "tombstone"]
-        data = validate_extraction((extractor or rule_extract)(text, known), text)
+        # Only the fixed rules may resolve corpus names before identity linking.
+        # A model could copy any supplied name into an unrelated output alias or
+        # predicate. Keep its entire text input scoped to this evidence node.
+        context = known if extractor is None or extractor is rule_extract else []
+        data = validate_extraction((extractor or rule_extract)(text, context), text)
         if not data["entities"]:
             return dict(source_node_id=evidence_node.id if evidence_node else None,
                         entities=[], facts=[], created_entities=0, created_facts=0,
@@ -339,6 +343,7 @@ def extract_entities(brain: Brain, text: str | None = None, *, node_id: str | No
             evidence_node = Node(text=text, source=source, ntype="semantic")
         writes = {} if evidence_node.id in {n.id for n in nodes} else {evidence_node.id: evidence_node}
         linked, created = {}, 0
+        edges = brain.read_edges(include_rejected=True)
         # Include planned nodes so two aliases within the same batch reuse one identity.
         for item in data["entities"]:
             keys = {_key(a) for a in [item["name"], *item["aliases"]]}
@@ -362,8 +367,13 @@ def extract_entities(brain: Brain, text: str | None = None, *, node_id: str | No
                 entity_nodes.append(node)
                 writes[node.id] = node
                 created += 1
+            # Names and aliases are source-derived text too, including on reuse.
+            dependencies = sorted(set(node.derived_from) | {evidence_node.id} |
+                {e.source for e in edges if e.kind == "mentions" and e.origin == ORIGIN and e.target == node.id})
+            if dependencies != node.derived_from:
+                node.derived_from = dependencies
+                writes[node.id] = node
             linked[_key(item["name"])] = node
-        edges = brain.read_edges(include_rejected=True)
         edges_changed = False
         for node in {n.id: n for n in linked.values()}.values():
             if not any(e.kind == "mentions" and e.source == evidence_node.id and e.target == node.id for e in edges):

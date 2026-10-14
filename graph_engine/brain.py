@@ -62,7 +62,12 @@ class Node:
                  entity_name: str | None = None, entity_type: str | None = None,
                  aliases: list[str] | None = None,
                  storage_tier: str = "recall", tier_locked: bool = False,
-                 capture: dict | None = None, document: dict | None = None):
+                 capture: dict | None = None, document: dict | None = None,
+                 derived_from: list[str] | None = None):
+        self.derived_from = [] if derived_from is None else (
+            list(derived_from) if isinstance(derived_from, list) else derived_from)
+        self._validate_derivation()
+        self.derived_from = sorted(set(self.derived_from or []))
         if document is not None:
             from .document_import import validate_provenance
             validate_provenance(document)
@@ -118,6 +123,7 @@ class Node:
         self.aliases = list(aliases or [])
 
     def to_markdown(self) -> str:
+        self._validate_derivation()
         # This frontmatter format stores scalars and simple lists on one line.
         # Untrusted source/tags must never introduce another metadata key (in
         # particular an id with different access permissions). Check at write
@@ -146,6 +152,8 @@ class Node:
             from .document_import import validate_provenance
             validate_provenance(self.document)
             lines.append("document: " + json.dumps(self.document, ensure_ascii=True))
+        if self.derived_from:
+            lines.append("derived_from: " + json.dumps(sorted(set(self.derived_from))))
         if self.ntype == "entity":
             # JSON values are also valid YAML and safely preserve commas,
             # quotes, colons and Unicode in names/aliases.
@@ -174,6 +182,15 @@ class Node:
                 char in value for char in "\r\n\v\f\x1c\x1d\x1e\x85\u2028\u2029")):
             raise ValueError(f"{name} must be a single-line string")
 
+    def _validate_derivation(self) -> None:
+        if (not isinstance(self.derived_from, list)
+                or any(not isinstance(nid, str) or not nid or len(nid) > 200
+                       or nid.startswith(".") or any(c in nid for c in "/\\\x00")
+                       for nid in self.derived_from)):
+            raise ValueError("derived_from must be a list of node IDs")
+        for nid in self.derived_from:
+            self._validate_metadata("derived_from", nid)
+
     @classmethod
     def from_markdown(cls, raw: str) -> "Node":
         m = re.match(r"^---\n(.*?)\n---\n\n?(.*)$", raw, re.DOTALL)
@@ -200,6 +217,9 @@ class Node:
             recall_count = 0
         recall_queries = [q.strip() for q in
                           meta.get("recall_queries", "").strip("[]").split(",") if q.strip()]
+        derived_from = json.loads(meta.get("derived_from", "[]"))
+        if not isinstance(derived_from, list):
+            raise ValueError("derived_from must be a list of node IDs")
         return cls(text=text.strip(), id=meta["id"], created=meta.get("created"),
                    source=meta.get("source", "human"), tags=tags, sources=sources,
                    ntype=meta.get("type", "semantic"), status=meta.get("status", "probation"),
@@ -213,7 +233,8 @@ class Node:
                    storage_tier=meta.get("storage_tier", "recall"),
                    tier_locked=meta.get("tier_locked", "false").lower() == "true",
                    capture=json.loads(meta.get("capture", "null")),
-                   document=json.loads(meta.get("document", "null")))
+                   document=json.loads(meta.get("document", "null")),
+                   derived_from=derived_from)
 
     def to_dict(self) -> dict:
         result = {"id": self.id, "text": self.text, "created": self.created,
@@ -231,6 +252,8 @@ class Node:
             result["capture"] = self.capture
         if self.document is not None:
             result["document"] = self.document
+        if self.derived_from:
+            result["derived_from"] = list(self.derived_from)
         return result
 
 

@@ -138,6 +138,37 @@ def test_current_revocation_hides_ids_and_evidence(saved, tmp_path, monkeypatch)
         snapshot(secured, accepted)
 
 
+def test_derived_snapshot_text_respects_historical_and_current_lineage(saved, tmp_path, monkeypatch):
+    brain, _, _, _ = saved
+    brain.write_node(Node('historically private text', id='derived', derived_from=['evidence']))
+    historical = commit(brain)
+    # A trusted local rewrite cannot publish the older committed text.
+    brain.write_node(Node('now public text', id='derived'))
+    secured, path, policy = secure(brain, tmp_path, monkeypatch)
+    policy['graphs']['default']['nodes']['evidence'] = {'read': ['owner']}
+    path.write_text(json.dumps(policy))
+    assert 'derived' not in {n.id for n in snapshot(secured, historical)['nodes']}
+    assert BrainEngine(secured, HashEmbedder()).snapshot_query(historical, 'historically private')['hits'] == []
+    policy['graphs']['default']['nodes'].clear()
+    path.write_text(json.dumps(policy))
+    assert 'derived' in {n.id for n in snapshot(secured, historical)['nodes']}
+    # Present lineage remains mandatory even when the old record had no sources.
+    public_revision = commit(brain)
+    brain.write_node(Node('now derived text', id='derived', derived_from=['evidence']))
+    policy['graphs']['default']['nodes']['evidence'] = {'read': ['owner']}
+    path.write_text(json.dumps(policy))
+    assert 'derived' not in {n.id for n in snapshot(secured, public_revision)['nodes']}
+
+
+def test_snapshot_missing_or_cyclic_derivation_is_hidden(saved, tmp_path, monkeypatch):
+    brain, _, _, _ = saved
+    brain.write_node(Node('orphan text', id='orphan', derived_from=['absent']))
+    brain.write_node(Node('cycle text', id='cycle', derived_from=['cycle']))
+    revision = commit(brain)
+    secured, _, _ = secure(brain, tmp_path, monkeypatch)
+    assert {'orphan', 'cycle'}.isdisjoint(n.id for n in snapshot(secured, revision)['nodes'])
+
+
 def test_historical_copy_cannot_bypass_current_parent_revocation(saved, tmp_path, monkeypatch):
     brain, _, _, _ = saved
     copy = Node('secret copy', id='copy', capture={
