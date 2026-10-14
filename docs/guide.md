@@ -1326,7 +1326,7 @@ at 50,000 records / 64 MiB of node and edge content, with 30 seconds per Git
 read. Queries are limited to 1–4,000 characters and `--k` to 1–100.
 
 Snapshot queries use the **current** selected graph's policy, principal and
-node ACLs, including present and historical capture-parent chains, edge evidence
+node ACLs, including present and historical derivation/capture-parent chains, edge evidence
 and replacement/undo evidence. Historical grants never override present
 revocation. ACL entries for removed IDs still apply. ACLs cannot retract
 information already copied, exported or read earlier, and they do not encrypt
@@ -1457,6 +1457,33 @@ consolidation, recall aggregation and saved reports) requires admin access.
 External precomputed structural-report files are not exposed in protected
 mode because they lack namespace/permission provenance.
 
+Derived memories persist `derived_from` source-node IDs in frontmatter. Direct
+episodic extraction, copy/legacy consolidation, structured proposals, entity
+names/aliases and merged text inherit all their sources' **current** ACLs.
+Structured proposals inherit every event supplied to the extractor, including
+uncited inputs; community summaries inherit every member, even when only a
+few members have evidence edges. Reusing a fact or entity accumulates sources.
+Both the derived node's ACL and every transitive source ACL must permit the
+operation. Revocation therefore also hides already saved or computed vectors,
+search results, context, HTTP and MCP output. Tombstoned sources retain their
+ACLs; missing, corrupt or cyclic source chains fail closed, including for
+admins. Shared ancestors are allowed.
+
+Ordinary node rewrites preserve existing dependencies. Accepting evidence,
+changing tags, deleting an evidence edge or adding a permissive ACL to a
+derived ID does not publish its text. There is no application publication or
+declassification action; grant access by deliberately editing the trusted
+source policies. A derived write requires write permission on its sources.
+
+For older records without `derived_from`, protected reads follow recorded
+consolidator extraction edges, entity mention edges, capture parents and merge
+receipts in text, including rejected evidence. Old community summaries and
+structured proposals do not record their complete model inputs, so protected
+reads hide them until the trusted operator regenerates them with complete
+provenance. Old identifiable derived records without a source are also hidden.
+Protected node rewrites and evidence-edge removal persist recovered legacy
+dependencies before changing them. Provenance is local to one brain.
+
 Allow/deny decisions append JSON lines to `<policy-stem>.audit.jsonl` beside
 the policy, including timestamp, principal, graph, action and optional node ID;
 node text and bearer tokens are not logged. New audit files use mode `0600`.
@@ -1470,8 +1497,8 @@ access or arbitrary Python execution. Protect the policy, logs, brain files,
 git remotes and process environment with OS permissions. Direct `Brain(...)`
 construction and maintenance scripts are trusted local APIs; untrusted clients
 must use the protected runtime/HTTP/MCP entry points. A node ACL governs that
-stored node; it cannot retract information already copied into another node,
-derived summary, git history or external export. Policy updates and brain
+stored node and recorded derivatives; it cannot retract untracked manual copies,
+git history or external exports. Policy updates and brain
 mutations are not a multi-file transaction. Policy changes and namespace selection
 are outside the per-brain guard; coordinate those separately with the service
 operator.

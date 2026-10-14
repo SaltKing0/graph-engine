@@ -55,6 +55,196 @@ def test_nodes_edges_vectors_and_shared_memo_do_not_leak(protected):
     assert raw.read_node("readonly").text == "readonly knowledge"
 
 
+@pytest.mark.parametrize("mode", ["extract", "copy", "legacy", "structured", "distill", "entities", "merge"])
+def test_derived_memories_inherit_source_acl_on_every_read_surface(protected, monkeypatch, mode):
+    from graph_engine.consolidation import consolidate, ConsolidationConfig
+    from graph_engine.dream import distill
+    from graph_engine.entities import extract_entities
+    from graph_engine.merge import merge_nodes
+    from graph_engine.retrieval import retrieve
+    from graph_engine.context import build_context
+    raw, _, _ = protected
+    secret = "Alice works at PrivateExampleCo."
+    raw.write_node(Node(id="private", text=secret, ntype="episodic",
+                        created="2020-01-01T00:00:00Z", status="active"))
+    admin = access.SecuredBrain(str(raw.path), graph_name="default", identity="owner")
+    engine = BrainEngine(admin, HashEmbedder(), reranker=False)
+    before = {n.id for n in raw.read_nodes()}
+    if mode == "extract":
+        engine.extract("private")
+    elif mode in ("copy", "legacy", "structured"):
+        options = {}
+        if mode == "legacy":
+            options["extractor"] = lambda text: text
+        elif mode == "structured":
+            options["structured_extractor"] = lambda events: dict(version=1, abstain=False,
+                facts=[dict(text=secret, evidence=[dict(node_id="private", quote=secret)])])
+        consolidate(admin, config=ConsolidationConfig(threshold=0, min_age_days=0),
+                    commit=False, **options)
+    elif mode == "distill":
+        raw.write_edges([Edge("private", "public", "extends", pending=False)])
+        distill(admin, min_size=2, members_per_summary=1, commit=False,
+                summarizer=lambda digest: secret)
+    elif mode == "entities":
+        extract_entities(admin, node_id="private", commit=False)
+    else:
+        merge_nodes(admin, "public", "private", commit=False)
+    derived = {n.id for n in raw.read_nodes()} - before if mode != "merge" else {"public"}
+    assert derived
+    # Both persisted and computed vectors must respect the same source boundary.
+    raw.vectors_for(derived, lambda text: [1., 0.])
+    viewer = access.SecuredBrain(str(raw.path), graph_name="default", identity="bob")
+    assert derived <= {n.id for n in admin.read_nodes()}
+    assert derived.isdisjoint(n.id for n in viewer.read_nodes())
+    assert derived.isdisjoint(viewer.read_vectors())
+    assert viewer.vectors_for(derived, lambda text: pytest.fail("embedded hidden text")) == {}
+    for nid in derived:
+        with pytest.raises(PermissionError):
+            viewer.read_node(nid)
+    viewer_engine = BrainEngine(viewer, HashEmbedder(), reranker=False)
+    assert derived.isdisjoint(nid for nid, _ in retrieve(viewer_engine, secret, k=20))
+    assert "PrivateExampleCo" not in str(build_context(viewer_engine, secret, k=20))
+    from graph_engine.server import app
+    client = TestClient(app)
+    headers = {"Authorization": "Bearer viewer-token"}
+    for route in ("/api/graph", "/api/report"):
+        response = client.get(route, headers=headers)
+        assert response.status_code == 200
+        assert "PrivateExampleCo" not in response.text
+    pytest.importorskip("mcp")
+    monkeypatch.setenv("IG_PRINCIPAL", "bob")
+    from graph_engine.mcp.server import get_node, search_brain, build_context as mcp_context
+    for nid in derived:
+        assert get_node(nid)["ok"] is False
+    assert "PrivateExampleCo" not in str(search_brain("Alice", k=20))
+    assert "PrivateExampleCo" not in str(mcp_context("Alice", k=20))
+
+
+def test_current_acl_revocation_transitive_multi_source_and_no_silent_publication(protected):
+    raw, path, policy = protected
+    raw.write_node(Node("first source", id="s1"))
+    raw.write_node(Node("second source", id="s2"))
+    raw.write_node(Node("combined secret", id="combined", derived_from=["s1", "s2"]))
+    raw.write_node(Node("nested secret", id="nested", derived_from=["combined", "s1"]))
+    raw.write_vectors({"combined": [1.], "nested": [2.]})
+    viewer = access.SecuredBrain(str(raw.path), graph_name="default", identity="bob")
+    assert {"combined", "nested"} <= {n.id for n in viewer.read_nodes()}
+    policy["graphs"]["default"]["nodes"]["s2"] = {"read": ["owner"]}
+    path.write_text(json.dumps(policy))
+    assert {"combined", "nested"}.isdisjoint(n.id for n in viewer.read_nodes())
+    assert viewer.read_vectors() == {}
+    # An explicit ACL on the derived ID cannot override a source restriction.
+    policy["graphs"]["default"]["nodes"]["combined"] = {"read": ["*"]}
+    path.write_text(json.dumps(policy))
+    assert not viewer.can_access("read", "combined")
+    admin = access.SecuredBrain(str(raw.path), graph_name="default", identity="owner")
+    admin.write_node(Node("rewritten secret", id="combined"))
+    assert raw.read_node("combined").derived_from == ["s1", "s2"]
+    assert not viewer.can_access("read", "combined")
+    editor = access.SecuredBrain(str(raw.path), graph_name="default", identity="alice")
+    with pytest.raises(PermissionError):
+        editor.write_node(Node("new derived secret", id="forged", derived_from=["s2"]))
+    assert raw.read_node("forged") is None
+    policy["graphs"]["default"]["nodes"].pop("s2")
+    path.write_text(json.dumps(policy))
+    assert viewer.read_node("nested").text == "nested secret"
+    assert viewer.read_vectors() == {"combined": [1.], "nested": [2.]}
+
+
+def test_missing_cyclic_and_malformed_provenance_fail_closed(protected):
+    raw, _, _ = protected
+    raw.write_node(Node("orphan", id="orphan", derived_from=["absent"]))
+    raw.write_node(Node("cycle a", id="cycle-a", derived_from=["cycle-b"]))
+    raw.write_node(Node("cycle b", id="cycle-b", derived_from=["cycle-a"]))
+    raw.write_node(Node("self cycle", id="self", derived_from=["self"]))
+    raw.write_node(Node("bad metadata", id="malformed"))
+    node_path = raw.node_path("malformed")
+    node_path.write_text(node_path.read_text().replace("type: semantic", 'derived_from: "private"\ntype: semantic'))
+    raw.write_vectors({nid: [1.] for nid in ("orphan", "cycle-a", "cycle-b", "self", "malformed", "absent")})
+    for identity in ("owner", "bob"):
+        secured = access.SecuredBrain(str(raw.path), graph_name="default", identity=identity)
+        assert secured.read_vectors() == {}
+        for nid in ("orphan", "cycle-a", "cycle-b", "self"):
+            assert not secured.can_access("read", nid)
+            with pytest.raises(PermissionError):
+                secured.read_node(nid)
+        assert secured.read_node("malformed") is None
+    with pytest.raises(PermissionError):
+        secured = access.SecuredBrain(str(raw.path), graph_name="default", identity="owner")
+        secured.write_node(Node("self", id="new-cycle", derived_from=["new-cycle"]))
+
+
+def test_legacy_extractions_and_incomplete_model_lineage(protected):
+    raw, _, _ = protected
+    raw.write_node(Node("legacy secret", id="legacy", source="human"))
+    raw.add_edge(Edge("legacy", "private", "extends", origin="consolidator",
+                      rejected=True))
+    raw.write_node(Node("legacy name", id="entity", ntype="entity", source="entity-extractor"))
+    raw.add_edge(Edge("private", "entity", "mentions", origin="entity-extractor"))
+    raw.write_node(Node("old summary", id="summary", tags=["community-summary"], source="consolidator"))
+    raw.add_edge(Edge("summary", "public", "extends", origin="consolidator"))
+    raw.write_node(Node("old proposal", id="proposal", tags=["consolidation-proposal"], source="consolidator"))
+    raw.add_edge(Edge("proposal", "public", "extends", origin="consolidator"))
+    viewer = access.SecuredBrain(str(raw.path), graph_name="default", identity="bob")
+    assert {"legacy", "entity", "summary", "proposal"}.isdisjoint(n.id for n in viewer.read_nodes())
+    admin = access.SecuredBrain(str(raw.path), graph_name="default", identity="owner")
+    assert admin.read_node("legacy")
+    admin.write_node(Node("edited legacy secret", id="legacy"))
+    raw.write_edges([])
+    assert raw.read_node("legacy").derived_from == ["private"]
+    assert not viewer.can_access("read", "legacy")
+
+
+def test_structured_batch_inherits_uncited_inputs_and_reused_fact_sources(protected):
+    from graph_engine.consolidation import ConsolidationConfig, consolidate
+    raw, _, _ = protected
+    for nid in ("public", "private"):
+        raw.write_node(Node("shared fact", id=nid, ntype="episodic", created="2020-01-01T00:00:00Z"))
+    admin = access.SecuredBrain(str(raw.path), graph_name="default", identity="owner")
+    consolidate(admin, config=ConsolidationConfig(threshold=0, min_age_days=0), commit=False,
+                structured_extractor=lambda events: dict(version=1, abstain=False,
+                facts=[dict(text="shared fact", evidence=[dict(node_id="public", quote="shared fact")])]))
+    proposal = next(n for n in raw.read_nodes() if "consolidation-proposal" in n.tags)
+    assert proposal.derived_from == ["private", "public"]
+    viewer = access.SecuredBrain(str(raw.path), graph_name="default", identity="bob")
+    assert not viewer.can_access("read", proposal.id)
+    # Exact copy reuse accumulates every source, including a public existing note.
+    raw.write_edges([])
+    raw.write_node(Node("shared fact", id="existing"))
+    consolidate(admin, config=ConsolidationConfig(threshold=0, min_age_days=0), commit=False)
+    assert raw.read_node("existing").derived_from == ["private", "public"]
+    assert not viewer.can_access("read", "existing")
+
+
+def test_removing_legacy_evidence_preserves_private_lineage(protected):
+    raw, _, _ = protected
+    raw.write_node(Node("legacy copied secret", id="legacy"))
+    raw.write_edges([Edge("legacy", "private", "extends", origin="consolidator")])
+    admin = access.SecuredBrain(str(raw.path), graph_name="default", identity="owner")
+    admin.write_edges([])
+    assert raw.read_edges(include_rejected=True) == []
+    assert raw.read_node("legacy").derived_from == ["private"]
+    viewer = access.SecuredBrain(str(raw.path), graph_name="default", identity="bob")
+    assert not viewer.can_access("read", "legacy")
+
+
+@pytest.mark.parametrize("invalid", ['null', '"private"', '[null]', '["../private"]'])
+def test_malformed_derivation_metadata_is_not_readable(invalid):
+    raw = Node("text", derived_from=["private", "public", "private"]).to_markdown()
+    assert Node.from_markdown(raw).derived_from == ["private", "public"]
+    with pytest.raises(ValueError):
+        Node.from_markdown(raw.replace('["private", "public"]', invalid))
+
+
+def test_derivation_preserves_legacy_node_id_formats(protected):
+    raw, _, _ = protected
+    for nid in ("node.with.dots", "Deutschä", "name: test"):
+        raw.write_node(Node("source", id=nid))
+    raw.write_node(Node("derived", id="derived", derived_from=["node.with.dots", "Deutschä", "name: test"]))
+    viewer = access.SecuredBrain(str(raw.path), graph_name="default", identity="bob")
+    assert viewer.read_node("derived").text == "derived"
+
+
 def test_bulk_rewrites_preserve_hidden_records(protected):
     raw, _, _ = protected
     secured = runtime.make_brain()

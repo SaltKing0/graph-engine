@@ -40,13 +40,13 @@ def _suppressed_claims(nodes: dict[str, Node], edges: list[Edge]) -> set[str]:
 
 
 def _structured_batch(nodes: dict[str, Node], edges: list[Edge], facts: list[dict],
-                      result: dict) -> tuple[dict[str, Node], list[Edge]]:
+                      result: dict, source_ids: list[str]) -> tuple[dict[str, Node], list[Edge]]:
     """Plan proposals without changing existing records or review decisions."""
     suppressed = _suppressed_claims(nodes, edges)
     matches = {}
     for edge in edges:
         node = nodes.get(edge.source)
-        if (node and node.ntype == "semantic" and node.status != "tombstone" and PROPOSAL_TAG in node.tags
+        if (node and node.derived_from and node.ntype == "semantic" and node.status != "tombstone" and PROPOSAL_TAG in node.tags
                 and edge.origin == "consolidator" and edge.extracted_validity is not None):
             matches[(_key(_claim(node)), edge.extracted_validity["valid_from"],
                      edge.extracted_validity["valid_to"])] = node
@@ -68,6 +68,9 @@ def _structured_batch(nodes: dict[str, Node], edges: list[Edge], facts: list[dic
             result["created"] += 1
         else:
             result["reused"] += 1
+        # The model saw the entire batch, not just the quotes it selected.
+        fact.derived_from = sorted(set(fact.derived_from) | set(source_ids))
+        writes[fact.id] = fact
         # One reviewable assertion edge per source, carrying all that source's quotes.
         for nid in dict.fromkeys(ref["node_id"] for ref in item["evidence"]):
             if (fact.id, nid) in linked:
@@ -227,7 +230,7 @@ def consolidate(brain: Brain, *, config: ConsolidationConfig | None = None,
                        "observed_at": nodes[nid].observed_at or nodes[nid].created}
                       for nid in plan["candidates"]]
             facts = validate_consolidation(structured_extractor(events), events)
-            changed, links = _structured_batch(nodes, edges, facts, result)
+            changed, links = _structured_batch(nodes, edges, facts, result, plan["candidates"])
             result["abstained"] = not facts
             result["extraction_ran"] = True
         else:
@@ -294,6 +297,9 @@ def _copy_batch(nodes: dict[str, Node], edges: list[Edge], plan: dict, extractor
             if "consolidator" not in fact.sources:
                 fact.sources.append("consolidator")
                 changed[fact.id] = fact
+        fact.derived_from = sorted(set(fact.derived_from) | {nid} |
+            {e.target for e in edges if e.origin == "consolidator" and e.kind == "extends" and e.source == fact.id})
+        changed[fact.id] = fact
         links.append(Edge(source=fact.id, target=nid, kind="extends",
                           pending=pending_evidence, origin="consolidator"))
 

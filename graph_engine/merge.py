@@ -175,6 +175,8 @@ def merge_nodes(
         survivor.text.rstrip()
         + f"\n\n[consolidated from {deletee_id} on {now_iso}: {deletee.text.strip()}]"
     )
+    survivor.derived_from = sorted(set(survivor.derived_from) | {deletee_id} |
+        {e.target for e in edges if e.origin == "consolidator" and e.kind == "extends" and e.source == survivor_id})
     brain.write_node(survivor)
 
     # Tombstone the deletee (never hard-delete — Audit #3: previously unlink

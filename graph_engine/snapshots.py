@@ -92,7 +92,7 @@ def _records(brain: Brain, revision: str) -> tuple[str, str, dict[str, str]]:
 
 
 _NODE_KEYS = {"id", "created", "source", "type", "status", "storage_tier", "tier_locked",
-              "sources", "tags", "capture", "document", "entity_name", "entity_type",
+              "sources", "tags", "capture", "document", "derived_from", "entity_name", "entity_type",
               "aliases", "observed_at", "context", "recalls", "recall_queries", "last_recalled"}
 _EDGE_KEYS = {"id", "source", "target", "kind", "pending", "valid_from", "valid_to",
               "confidence", "invalidated_by", "rejected", "origin", "predicate", "evidence",
@@ -212,7 +212,15 @@ def snapshot(brain: Brain, revision: str, *, fact_valid_at: str | None = None) -
     sha, committed_at, records = _records(brain, revision)
     nodes, edges = _parse_records(records)
 
+    from .access import SecuredBrain, derivation_parents, provenance_allowed
+    current_view = brain._access_view() if isinstance(brain, SecuredBrain) else None
+    historical_parents = derivation_parents(nodes, edges) if current_view is not None else {}
+
     def allowed(nid: str) -> bool:
+        if current_view is not None:
+            # Historical text must satisfy historical lineage AND today's lineage/ACLs.
+            return provenance_allowed(nid, nodes, historical_parents,
+                lambda source: brain.can_access("read", source, _view=current_view))
         # Both the historical AND current copy-parent chain must be readable.
         # Removed IDs still use their current explicit ACL/graph membership.
         seen = set()
@@ -230,7 +238,6 @@ def snapshot(brain: Brain, revision: str, *, fact_valid_at: str | None = None) -
         _timestamp(nodes[nid].created) <= stamp)}
     # Reuse the storage ACL boundary for replacement records and their embedded
     # undo evidence. It checks current permissions against historical fact IDs.
-    from .access import SecuredBrain
 
     class SnapshotAccess:
         _edge_allowed = SecuredBrain._edge_allowed

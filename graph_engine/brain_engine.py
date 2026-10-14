@@ -558,7 +558,7 @@ class BrainEngine:
             if not semantic_text:
                 raise ValueError("Empty text cannot be extracted.")
             node = Node(text=semantic_text, source=source, tags=tags,
-                        ntype="semantic", status="probation")
+                        ntype="semantic", status="probation", derived_from=[episodic.id])
             self.brain.write_node(node)
             edge = Edge(source=node.id, target=episodic.id, kind="extends",
                         pending=False, origin="consolidator")

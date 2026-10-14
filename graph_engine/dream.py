@@ -387,7 +387,8 @@ def distill(brain: Brain, *, min_size: int = DREAM_MIN_COMMUNITY,
         if dry_run:
             continue
         brain.write_node(Node(id=summary_id, text=text, source="consolidator",
-                              tags=[SUMMARY_TAG], ntype="semantic", status="active"))
+                              tags=[SUMMARY_TAG], ntype="semantic", status="active",
+                              derived_from=members))
         nodes[summary_id] = Node(id=summary_id, text=text)
         strongest = sorted(members, key=lambda m: (-degree.get(m, 0), m))[:members_per_summary]
         for member in strongest:
