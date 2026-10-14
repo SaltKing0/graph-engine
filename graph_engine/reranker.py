@@ -58,7 +58,7 @@ class CrossEncoderReranker(Reranker):
                 "IDEAGRAPH_RERANKER=st requires 'sentence-transformers' "
                 "(pip install sentence-transformers)."
             ) from exc
-        self.model = CrossEncoder(model_name)
+        self.model = CrossEncoder(model_name, trust_remote_code=False)
 
     def rerank(self, query: str, candidates: list[Candidate], k: int) -> list[Candidate]:
         # Preserve the public search contract: scores in hits remain RRF.
@@ -78,9 +78,9 @@ class CrossEncoderReranker(Reranker):
 
 def get_reranker():
     """Factory from IDEAGRAPH_RERANKER: 'none' (default) | 'st' | model name/path."""
-    mode = os.environ.get("IDEAGRAPH_RERANKER", "none").strip().lower()
-    if not mode or mode == "none":
+    mode = os.environ.get("IDEAGRAPH_RERANKER", "none").strip()
+    if not mode or mode.lower() == "none":
         return None
-    if mode == "st":
+    if mode.lower() == "st":
         return CrossEncoderReranker()
     return CrossEncoderReranker(model_name=mode)

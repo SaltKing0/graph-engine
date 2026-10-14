@@ -35,6 +35,8 @@ python -m uvicorn graph_engine.server:app --host 127.0.0.1 --port 8000
 Open <http://localhost:8000>. The demo uses deterministic hash embeddings with
 no model download. For semantic search, install `python -m pip install -e ".[st]"`
 and set `IDEAGRAPH_EMBEDDER=st` before starting a fresh brain.
+Embedding and reranker models must use built-in modules: custom Python model
+code is disabled, including for local model directories.
 
 Browser realtime connections use a same-origin policy: `/ws` checks the page's
 scheme, hostname and port before accepting. Native clients may omit `Origin`;

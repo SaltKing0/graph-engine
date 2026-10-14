@@ -21,7 +21,7 @@ class Embedder:
     def _ensure_model(self):
         if self._model is None:
             from sentence_transformers import SentenceTransformer
-            self._model = SentenceTransformer(self.model_name)
+            self._model = SentenceTransformer(self.model_name, trust_remote_code=False)
         return self._model
 
     def embed(self, text: str) -> list[float]:
