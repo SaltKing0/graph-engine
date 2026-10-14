@@ -8,7 +8,9 @@ import socket
 import subprocess
 import sys
 import time
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from threading import Thread
 from urllib.request import urlopen
 
 import pytest
@@ -119,6 +121,89 @@ def assert_inert(page):
     assert page.locator('img[src="x"]').count() == 0
     assert not page.evaluate(
         "() => [...document.scripts].some(el => el.textContent.includes('__pwned'))")
+
+
+@pytest.fixture
+def second_origin():
+    """A real page on another loopback port, without cross-network restrictions."""
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html")
+            self.end_headers()
+            self.wfile.write(b"<!doctype html><title>Second origin</title>")
+
+        def log_message(self, *args):
+            pass
+
+    httpd = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    thread = Thread(target=httpd.serve_forever, daemon=True)
+    thread.start()
+    try:
+        yield f"http://127.0.0.1:{httpd.server_port}"
+    finally:
+        httpd.shutdown()
+        httpd.server_close()
+        thread.join(timeout=5)
+
+
+def test_second_origin_cannot_subscribe_to_private_websocket_updates(server, second_origin, page):
+    page.goto(second_origin)
+    cdp = page.context.new_cdp_session(page)
+    cdp.send("Network.enable")
+    handshake_errors = []
+    cdp.on("Network.webSocketFrameError",
+           lambda event: handshake_errors.append(event["errorMessage"]))
+    # Observe the real handshake and keep collecting messages after rejection.
+    connect = """url => new Promise(resolve => {
+        window.received = [];
+        window.opened = false;
+        window.socket = new WebSocket(url);
+        socket.onmessage = event => received.push(JSON.parse(event.data));
+        socket.onopen = () => { opened = true; resolve('open'); };
+        socket.onclose = () => resolve('closed');
+    })"""
+    ws_url = server.replace("http://", "ws://") + "/ws"
+    outcome = page.evaluate(connect, ws_url)
+    # Finish mutations even if the vulnerable server accepted the socket, so
+    # this regression also demonstrates the original note/edge disclosure.
+    trusted = page.context.browser.new_page()
+    try:
+        trusted.goto(f"{server}/api/graph")
+        assert trusted.evaluate(connect, ws_url) == "open"
+        text = "Synthetic private browser observation"
+        response = page.request.post(f"{server}/api/ingest", data={
+            "text": text, "allow_duplicates": True})
+        assert response.status == 200
+        decision = page.request.post(f"{server}/api/edge/suggestion/accept")
+        assert decision.status == 200
+        trusted.wait_for_function("received.length === 2")
+        events = trusted.evaluate("received")
+        assert events[0]["node"]["text"] == text
+        assert events[0]["edges"] == response.json()["suggested"]
+        assert events[1] == {"type": "edge_resolved", "edge": decision.json(), "accepted": True}
+        assert outcome == "closed", page.evaluate("received")
+        # Chromium reports a denied upgrade as a frame error, not a completed
+        # handshake response. Verify HTTP 403, not a browser network restriction.
+        assert any("Unexpected response code: 403" in error for error in handshake_errors), handshake_errors
+        assert page.evaluate("opened") is False
+        assert page.evaluate("received") == []
+    finally:
+        trusted.close()
+        cdp.detach()
+
+
+def test_same_origin_ui_receives_external_ingest_and_edge_updates(server, page):
+    open_graph(page, server)
+    expect(page.locator("#connection")).to_have_text("Live connected")
+    expect(page.locator('#cards [data-id="suggestion"]')).to_have_count(1)
+    text = "Synthetic private realtime astronomy observation"
+    response = page.request.post(f"{server}/api/ingest", data={
+        "text": text, "allow_duplicates": True})
+    assert response.status == 200
+    expect(page.locator("#graph .node title").filter(has_text=text)).to_have_count(1)
+    assert page.request.post(f"{server}/api/edge/suggestion/accept").status == 200
+    expect(page.locator('#cards [data-id="suggestion"]')).to_have_count(0)
 
 
 def test_hostile_node_text_is_inert(server, page):

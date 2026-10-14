@@ -76,6 +76,32 @@ Jump to [CLI](#cli), [entity extraction](#extract-entities-and-facts),
 [storage tiers and feedback](#storage-tiers-and-retrieval-feedback), or
 [isolated graphs and access control](#isolated-graphs-and-access-control).
 
+### Web UI realtime access
+
+In unprotected mode, `/ws` accepts browser connections only when the `Origin`
+header matches the request's HTTP(S) origin: scheme, hostname and effective
+port (`ws` maps to `http`, `wss` to `https`; default ports are 80 and 443).
+Hostname case and explicit default ports are normalized. Checks run before
+accepting the socket or registering it for note and edge broadcasts. Foreign,
+opaque (`null`), empty, malformed or multiple origins are denied with policy
+code 1008 before the handshake completes; a real server returns HTTP 403.
+This policy is independent of HTTP CORS.
+
+The localhost quickstart works unchanged: open the UI and its socket on
+`http://localhost:8000`, or use `http://127.0.0.1:8000` for both. Different
+hostnames or ports are different origins, including two loopback ports.
+There is no cross-origin allowlist; serve the UI and `/ws` on the same origin.
+Behind a trusted reverse proxy, preserve the public `Host` and configure the
+correct ASGI connection scheme for TLS termination. The origin check does not
+read arbitrary `Forwarded` or `X-Forwarded-Host` headers.
+
+Non-browser clients without an `Origin` header remain allowed in unprotected
+mode for compatibility. Origin validation is a browser boundary, not client
+authentication: native clients can omit or forge this header. Use protected
+mode for authenticated access; it continues to deny all WebSockets, even with
+a same-origin header and a valid bearer token. Broadcasts remain scoped to the
+connected graph.
+
 ## How it works
 
 ```

@@ -100,7 +100,8 @@ def test_viewer_search_no_cache_or_recall_writes(protected, monkeypatch):
         aggregate(brain)
 
 
-def test_http_auth_read_write_report_and_websocket(protected, monkeypatch, tmp_path):
+@pytest.mark.parametrize("origin", [None, "http://testserver", "https://untrusted.example"])
+def test_http_auth_read_write_report_and_websocket(protected, monkeypatch, tmp_path, origin):
     from graph_engine.server import app
     from starlette.websockets import WebSocketDisconnect
     fallback = tmp_path / "structural.json"
@@ -117,9 +118,11 @@ def test_http_auth_read_write_report_and_websocket(protected, monkeypatch, tmp_p
     assert report.status_code == 200
     assert "private" not in report.text and "secret fallback" not in report.text
     assert client.post("/api/ingest", headers=headers, json={"text": "no write"}).status_code == 403
-    with pytest.raises(WebSocketDisconnect):
-        with client.websocket_connect("/ws", headers=headers):
+    ws_headers = {**headers, **({"Origin": origin} if origin is not None else {})}
+    with pytest.raises(WebSocketDisconnect) as denied:
+        with client.websocket_connect("/ws", headers=ws_headers):
             pass
+    assert denied.value.code == 1008
     result = client.post("/api/ingest", headers={"Authorization": "Bearer editor-token"}, json={"text": "Completely unrelated cheese astronomy", "allow_duplicates": True})
     assert result.status_code == 200
 

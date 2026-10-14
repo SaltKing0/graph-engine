@@ -6,6 +6,11 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+- Check browser WebSocket origins before accepting note and edge subscriptions;
+  keep same-origin UI updates, native clients without Origin, and protected-mode
+  denial compatible (issue #45).
+
 ## [0.7.0] - 2026-10-13
 
 ### Added

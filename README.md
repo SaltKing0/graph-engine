@@ -36,6 +36,10 @@ Open <http://localhost:8000>. The demo uses deterministic hash embeddings with
 no model download. For semantic search, install `python -m pip install -e ".[st]"`
 and set `IDEAGRAPH_EMBEDDER=st` before starting a fresh brain.
 
+Browser realtime connections use a same-origin policy: `/ws` checks the page's
+scheme, hostname and port before accepting. Native clients may omit `Origin`;
+protected mode disables WebSockets. See [realtime access](docs/guide.md#web-ui-realtime-access).
+
 On Windows, activate with `.venv\Scripts\Activate.ps1` and set environment
 variables using PowerShell's `$env:NAME="value"` syntax.
 
