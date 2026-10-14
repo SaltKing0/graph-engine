@@ -265,6 +265,9 @@ Forgetting a `community-summary` therefore keeps it forgotten on repeated
 passes. Distillation also skips any changed community that shares **any**
 recorded source member with a forgotten summary. Adding/removing members,
 splitting a community or merging it into another cannot bypass that decision.
+Suppression also follows recorded descendants of those source members through
+node merges, including repeated merges and legacy `[consolidated from ...]`
+text provenance. A merge survivor cannot bypass suppression by using a new ID.
 Disjoint communities remain eligible. This conservative policy can suppress a
 substantially changed community too; it does not try to judge whether a new
 abstraction would express a different claim. Dry-run distillation uses the same

@@ -342,6 +342,80 @@ def test_distill_suppresses_unlinked_source_member(tmp_path):
     assert _saved_files(b) == before
 
 
+@pytest.mark.parametrize("dry_run", [False, True])
+@pytest.mark.parametrize("merge_depth", [1, 2])
+@pytest.mark.parametrize("legacy", [False, True])
+def test_distill_suppresses_merged_source_lineage(tmp_path, dry_run, merge_depth, legacy):
+    from graph_engine.merge import merge_nodes
+
+    b = _brain(tmp_path)
+    _two_clusters(b)
+    distill(b, min_size=2, members_per_summary=1, commit=False)
+    summary = next(n for n in b.read_nodes()
+                   if SUMMARY_TAG in n.tags and "a0" in n.derived_from)
+    assert not any(e.source == summary.id and e.target == "a2"
+                   for e in b.read_edges(include_rejected=True))
+    forget(b, summary.id, reason="rejected abstraction", commit=False)
+    # Split off an unlinked source member; its descendant must remain
+    # suppressed even when no summary edge is redirected to the survivor.
+    for edge in b.read_edges(include_rejected=True):
+        if "a2" in (edge.source, edge.target):
+            b.invalidate_edge(edge.id)
+    _node(b, "new")
+    b.write_edges(b.read_edges(include_rejected=True) + [_edge("newa2", "new", "a2")])
+    member = "a2"
+    for i in range(merge_depth):
+        survivor = f"survivor{i}"
+        _node(b, survivor)
+        merge_nodes(b, survivor, member, commit=False)
+        if legacy:
+            node = b.read_node(survivor)
+            node.derived_from = []  # Legacy merges retain the text marker.
+            b.write_node(node)
+        member = survivor
+
+    def unexpected(_):
+        pytest.fail("a descendant of a suppressed member must not reach the summarizer")
+
+    before = _saved_files(b)
+    result = distill(b, min_size=2, dry_run=dry_run, summarizer=unexpected, commit=False)
+    assert result["summaries"] == result["edges"] == 0
+    assert _saved_files(b) == before
+    assert b.read_node(summary.id).status == "tombstone"
+
+    # A disjoint community still distills while the merged source is blocked.
+    for nid in ("disjoint0", "disjoint1"):
+        _node(b, nid)
+    b.write_edges(b.read_edges(include_rejected=True)
+                  + [_edge("disjoint", "disjoint0", "disjoint1")])
+    assert distill(b, min_size=2, dry_run=dry_run, commit=False)["summaries"] == 1
+    # Explicit restoration clears suppression throughout the descendant chain.
+    b.promote_node(summary.id)
+    assert distill(b, min_size=2, commit=False)["summaries"] == (3 if dry_run else 2)
+    assert any(set(n.derived_from) == {member, "new"} for n in b.read_nodes()
+               if SUMMARY_TAG in n.tags and n.status == "active")
+    assert distill(b, min_size=2, commit=False)["summaries"] == 0
+
+
+def test_summary_suppression_handles_deep_and_cyclic_lineage():
+    from graph_engine.dream import _suppressed_summary_members
+
+    summary = Node(id="summary", text="forgotten", tags=[SUMMARY_TAG],
+                   status="tombstone", derived_from=["source"])
+    nodes = {summary.id: summary}
+    parent = "source"  # The saved source may itself be missing.
+    for i in range(1100):
+        node = Node(id=f"descendant{i}", text="derived", derived_from=[parent])
+        nodes[node.id] = node
+        parent = node.id
+    nodes["descendant0"].derived_from.append(parent)  # Corrupt legacy cycle.
+    nodes["unrelated"] = Node(id="unrelated", text="legacy", tags=[SUMMARY_TAG])
+    nodes["ordinary"] = Node(id="ordinary", text="forgotten note", status="tombstone")
+    nodes["independent"] = Node(id="independent", text="derived", derived_from=["ordinary"])
+    assert _suppressed_summary_members(nodes, []) == {
+        "source", "summary", *(f"descendant{i}" for i in range(1100))}
+
+
 @pytest.mark.parametrize("decision", ["pending", "rejected", "invalidated"])
 def test_distill_preserves_saved_summary_link_decisions(tmp_path, decision):
     from graph_engine.dream import _summary_id
