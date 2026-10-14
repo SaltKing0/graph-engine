@@ -57,6 +57,8 @@ jobs:
           pip install --upgrade pip
           pip install torch --index-url https://download.pytorch.org/whl/cpu
           pip install -e ".[dev,st]"
+      - name: Test local model trust, embeddings and cross-encoder without downloads
+        run: python -m pytest tests/test_model_trust.py --fail-on-skip -q
       - name: Test
         run: python -m pytest tests/ -q
 

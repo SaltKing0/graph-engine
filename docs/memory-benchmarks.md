@@ -104,7 +104,10 @@ model directory yourself. Selecting it explicitly enables local model execution:
 
 The loader uses CPU, an explicit seed, empty encode prompts, and
 [`local_files_only=True`](https://www.sbert.net/docs/package_reference/sentence_transformer/model.html).
-It never downloads a missing model and does not enable remote model code.
+It never downloads a missing model and sets `trust_remote_code=False`.
+The `[st]` extra pins Sentence Transformers 6.1.0, which rejects custom Python
+modules in local model directories as well as Hub repositories. Models that
+require custom code are unsupported; use a model with built-in modules.
 Model-file hashes and ST/Torch versions are recorded. The graph and vector
 adapters share this embedder; the lexical backend remains BM25. Semantic
 models cannot be selected for `--check`; they are optional experiments with

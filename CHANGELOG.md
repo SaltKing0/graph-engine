@@ -7,6 +7,10 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Fixed
+- Upgrade the optional Sentence Transformers dependency to 6.1.0 and explicitly
+  disable custom model code in embedding and cross-encoder loaders, enforcing
+  the trust boundary for local model directories too (issue #46). Preserve case
+  in configured reranker model paths; test real local models without downloads.
 - Check browser WebSocket origins before accepting note and edge subscriptions;
   keep same-origin UI updates, native clients without Origin, and protected-mode
   denial compatible (issue #45).

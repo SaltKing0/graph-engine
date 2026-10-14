@@ -42,7 +42,7 @@ class LocalEmbeddings:
                          "semantic_model": True, "seed": seed,
                          "sentence_transformers_version": importlib.metadata.version("sentence-transformers"),
                          "torch_version": torch.__version__,
-                         "dimension": self.model.get_sentence_embedding_dimension(),
+                         "dimension": self.model.get_embedding_dimension(),
                          "encode_prompt": ""}
 
     def embed(self, text: str) -> list[float]:

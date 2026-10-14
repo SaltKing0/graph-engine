@@ -280,7 +280,7 @@ def test_local_model_pins_bytes_and_blocks_downloads(tmp_path, monkeypatch):
     class Model:
         def __init__(self, path, **kwargs):
             options.append(kwargs)
-        def get_sentence_embedding_dimension(self):
+        def get_embedding_dimension(self):
             return 64
         def encode(self, texts, **kwargs):
             assert kwargs["prompt"] == ""

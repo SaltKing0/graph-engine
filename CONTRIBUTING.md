@@ -30,6 +30,19 @@ protection, capture, review and undo against a real server. The MCP and
 browser jobs use `--fail-on-skip`: missing optional dependencies cannot
 silently turn those jobs green.
 
+The semantic-model job also requires local trust and compatibility regressions:
+
+```bash
+.venv/bin/python -m pip install -e ".[dev,st]"
+.venv/bin/python -m pytest tests/test_model_trust.py --fail-on-skip -q
+```
+
+These tests use tiny locally generated BERT models and a harmless custom-module
+fixture; no model download is needed. The fixture must be rejected before its
+Python is imported with trust disabled, and a trusted control verifies it can
+detect execution. Embedding overrides, cross-encoder overrides and the offline
+benchmark adapter all use the real optional stack.
+
 To run the browser suite locally:
 
 ```bash
