@@ -10,7 +10,8 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 - Preserve current source permissions on derived memories and vectors across
   extraction, consolidation, community summaries, entity reuse, merges and
   historical queries. Reject missing/cyclic provenance and retain dependencies
-  on node rewrites (issue #44).
+  on node rewrites (issue #44). Scope entity model context to input text and
+  reject cyclic merges before changing records.
 - Upgrade the optional Sentence Transformers dependency to 6.1.0 and explicitly
   disable custom model code in embedding and cross-encoder loaders, enforcing
   the trust boundary for local model directories too (issue #46). Preserve case

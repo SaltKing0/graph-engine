@@ -329,7 +329,11 @@ def extract_entities(brain: Brain, text: str | None = None, *, node_id: str | No
         entity_nodes = [n for n in nodes if n.ntype == "entity" and n.entity_name and n.entity_type]
         known = [dict(name=n.entity_name, type=n.entity_type, aliases=n.aliases)
                  for n in entity_nodes if n.status != "tombstone"]
-        data = validate_extraction((extractor or rule_extract)(text, known), text)
+        # Only the fixed rules may resolve corpus names before identity linking.
+        # A model could copy any supplied name into an unrelated output alias or
+        # predicate. Keep its entire text input scoped to this evidence node.
+        context = known if extractor is None or extractor is rule_extract else []
+        data = validate_extraction((extractor or rule_extract)(text, context), text)
         if not data["entities"]:
             return dict(source_node_id=evidence_node.id if evidence_node else None,
                         entities=[], facts=[], created_entities=0, created_facts=0,

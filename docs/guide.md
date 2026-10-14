@@ -585,7 +585,12 @@ notes and do not revive tombstones. Both phases hold the same writer guard.
 For free prose or richer coreference, configure `IG_ENTITIES_LLM_CMD` and pass
 `--llm`. The shell command receives a JSON request on stdin containing `text`,
 `known_entities`, an extraction `instruction`, `entity_types` and a `schema`.
-It must print one JSON object on stdout (no Markdown):
+`known_entities` is empty for model commands and custom extractor callables:
+their context is limited to the input text so private corpus names cannot be
+copied into unrelated output. Exact typed name/alias linking to existing
+entities still runs after extraction. The built-in rules can resolve existing
+names directly because their identity matching is deterministic.
+The model command must print one JSON object on stdout (no Markdown):
 
 ```json
 {
@@ -1474,6 +1479,8 @@ changing tags, deleting an evidence edge or adding a permissive ACL to a
 derived ID does not publish its text. There is no application publication or
 declassification action; grant access by deliberately editing the trusted
 source policies. A derived write requires write permission on its sources.
+Merges that would create a provenance cycle are rejected before any node or
+edge changes, including when merging a derived note back into its source.
 
 For older records without `derived_from`, protected reads follow recorded
 consolidator extraction edges, entity mention edges, capture parents and merge

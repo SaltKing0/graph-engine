@@ -34,6 +34,7 @@ from __future__ import annotations
 from .write_guard import write_operation
 
 import json
+from copy import deepcopy
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -157,26 +158,55 @@ def merge_nodes(
         raise ValueError("Entity identities cannot be merged as near-duplicate text; use explicit aliases.")
     now_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
-    # Redirect + deduplicate edges — BEFORE deleting the deletee file
-    # (Audit #3: previously the node file was unlinked first; a crash
-    # between unlink and edge rewrite left a half-merged state with
-    # dangling edges pointing to a no-longer-existing node).
-    edges = brain.read_edges(include_rejected=False)
-    new_edges, removed, redirected, invalidated, redirected_ids, invalidated_ids = \
-        _redirect_edges(edges, survivor_id, deletee_id, now_iso)
-    # Keep unrelated dismissed suggestions available for undo. Decisions about
-    # the deleted node cannot be restored after consolidation.
-    rejected = [e for e in brain.read_edges(include_rejected=True)
-                if e.rejected and deletee_id not in (e.source, e.target)]
-    brain.write_edges(new_edges + rejected)
-
-    # Merge text (information preservation) — with merge provenance (Audit #41)
+    from .access import derivation_parents, provenance_allowed
+    all_edges = brain.read_edges(include_rejected=True)
+    previous_parents = derivation_parents(nodes, all_edges)
     survivor.text = (
         survivor.text.rstrip()
         + f"\n\n[consolidated from {deletee_id} on {now_iso}: {deletee.text.strip()}]"
     )
-    survivor.derived_from = sorted(set(survivor.derived_from) | {deletee_id} |
-        {e.target for e in edges if e.origin == "consolidator" and e.kind == "extends" and e.source == survivor_id})
+    survivor.derived_from = sorted(previous_parents.get(survivor_id, set()) | {deletee_id})
+
+    # Redirect + deduplicate edges — BEFORE deleting the deletee file
+    # (Audit #3: previously the node file was unlinked first; a crash
+    # between unlink and edge rewrite left a half-merged state with
+    # dangling edges pointing to a no-longer-existing node).
+    edges = deepcopy([e for e in all_edges if not e.rejected])
+    new_edges, removed, redirected, invalidated, redirected_ids, invalidated_ids = \
+        _redirect_edges(edges, survivor_id, deletee_id, now_iso)
+    # Keep unrelated dismissed suggestions available for undo. Decisions about
+    # the deleted node cannot be restored after consolidation.
+    rejected = [e for e in all_edges
+                if e.rejected and deletee_id not in (e.source, e.target)]
+    planned_edges = new_edges + rejected
+    parents = derivation_parents(nodes, planned_edges)
+    affected = {survivor_id, deletee_id} | {
+        nid for nid in parents if parents[nid] != previous_parents.get(nid, set())}
+    saved_sources = {nid: set(nodes[nid].derived_from) for nid in affected if nid in nodes}
+    for nid, sources in saved_sources.items():
+        nodes[nid].derived_from = sorted(sources | previous_parents.get(nid, set()))
+    # Recover legacy input metadata before inferring lineage from the new edges:
+    # an extraction whose edge disappears is still a complete derived record.
+    parents = derivation_parents(nodes, planned_edges)
+    # Retain legacy dependencies even when their evidence is redirected. Check
+    # the entire affected lineage before changing files, including raw Brain
+    # callers that may enable protected access later.
+    for nid, sources in previous_parents.items():
+        parents.setdefault(nid, set()).update(sources)
+    if any(not provenance_allowed(nid, nodes, parents, lambda _: True)
+           for nid in affected if nid in nodes):
+        raise ValueError("Merge would create cyclic or unavailable provenance")
+    # Persist the checked lineage before its evidence edges disappear. Crashes
+    # can retain extra restrictions, but cannot remove source permissions.
+    for nid in sorted(affected - {survivor_id}):
+        node = nodes.get(nid)
+        if node is not None and parents[nid] - saved_sources[nid]:
+            node.derived_from = sorted(parents[nid])
+            brain.write_node(node)
+    brain.write_edges(planned_edges)
+
+    # Merge text (information preservation) — with merge provenance (Audit #41)
+    survivor.derived_from = sorted(parents[survivor_id])
     brain.write_node(survivor)
 
     # Tombstone the deletee (never hard-delete — Audit #3: previously unlink

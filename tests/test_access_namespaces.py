@@ -120,6 +120,111 @@ def test_derived_memories_inherit_source_acl_on_every_read_surface(protected, mo
     assert "PrivateExampleCo" not in str(mcp_context("Alice", k=20))
 
 
+@pytest.mark.parametrize("secured", [False, True])
+def test_model_entity_context_cannot_copy_private_corpus_names(protected, secured):
+    from graph_engine.entities import extract_entities
+    raw, _, _ = protected
+    raw.write_node(Node("PrivateExampleCo is a company.", id="private"))
+    raw.write_node(Node("Alice is a person.", id="public"))
+    admin = access.SecuredBrain(str(raw.path), graph_name="default", identity="owner")
+    brain = admin if secured else raw
+    extract_entities(brain, node_id="private", commit=False)
+    seen = []
+
+    def extractor(text, known):
+        seen.append(known)
+        # Model aliases need not be literal mentions. A private name supplied
+        # as context can otherwise pass validation on an unrelated entity.
+        return dict(entities=[dict(name="Alice", type="person",
+                    aliases=[item["name"] for item in known])], facts=[])
+
+    result = extract_entities(brain, node_id="public", extractor=extractor, commit=False)
+    assert seen == [[]]
+    viewer = access.SecuredBrain(str(raw.path), graph_name="default", identity="bob")
+    alice = viewer.read_node(result["entities"][0]["id"])
+    assert alice.derived_from == ["public"]
+    assert alice.aliases == []
+    assert "PrivateExampleCo" not in str([n.to_dict() for n in viewer.read_nodes()])
+
+
+def test_model_extraction_still_reuses_private_alias_identity(protected):
+    from graph_engine.entities import extract_entities
+    raw, _, _ = protected
+    raw.write_node(Node("International Business Machines (IBM) is a company.", id="private"))
+    raw.write_node(Node("IBM is a company.", id="public"))
+    admin = access.SecuredBrain(str(raw.path), graph_name="default", identity="owner")
+    first = extract_entities(admin, node_id="private", commit=False)
+
+    def extractor(text, known):
+        assert known == []
+        return dict(entities=[dict(name="IBM", type="org")], facts=[])
+
+    second = extract_entities(admin, node_id="public", extractor=extractor, commit=False)
+    assert second["created_entities"] == 0
+    assert second["entities"][0]["id"] == first["entities"][0]["id"]
+    entity = raw.read_node(second["entities"][0]["id"])
+    assert entity.derived_from == ["private", "public"]
+    viewer = access.SecuredBrain(str(raw.path), graph_name="default", identity="bob")
+    assert not viewer.can_access("read", entity.id)
+
+
+@pytest.mark.parametrize("secured", [False, True])
+@pytest.mark.parametrize("lineage", ["persisted", "legacy", "receipt", "transitive", "redirect"])
+def test_merge_rejects_provenance_cycles_without_changing_files(protected, secured, lineage):
+    from graph_engine.merge import merge_nodes
+    raw, _, _ = protected
+    survivor = Node("source text", id="survivor")
+    deletee = Node("derived text", id="deletee")
+    edges = [Edge("deletee", "public", "linked")]
+    if lineage == "persisted":
+        deletee.derived_from = [survivor.id]
+    elif lineage == "legacy":
+        edges.append(Edge(deletee.id, survivor.id, "extends", origin="consolidator"))
+    elif lineage == "receipt":
+        deletee.capture = dict(input=deletee.text, node_id=survivor.id,
+                               duplicate=True, source="human")
+    elif lineage == "transitive":
+        raw.write_node(Node("intermediate", id="intermediate", derived_from=[survivor.id]))
+        deletee.derived_from = ["intermediate"]
+    else:
+        # Neither merge operand is derived from the other, but redirecting a
+        # third node's legacy parent onto its own descendant would form a cycle.
+        raw.write_node(Node("intermediate", id="intermediate"))
+        survivor.derived_from = ["intermediate"]
+        edges.append(Edge("intermediate", deletee.id, "extends", origin="consolidator"))
+    raw.write_node(survivor)
+    raw.write_node(deletee)
+    raw.write_edges(edges)
+    raw.write_vectors({survivor.id: [1.], deletee.id: [2.]})
+    raw.rebuild_index()
+    admin = access.SecuredBrain(str(raw.path), graph_name="default", identity="owner")
+    brain = admin if secured else raw
+    before = {str(p.relative_to(raw.path)): p.read_bytes()
+              for p in raw.path.rglob("*") if p.is_file()}
+    with pytest.raises(ValueError, match="provenance"):
+        merge_nodes(brain, survivor.id, deletee.id, commit=False)
+    after = {str(p.relative_to(raw.path)): p.read_bytes()
+             for p in raw.path.rglob("*") if p.is_file()}
+    assert after == before
+    assert {survivor.id, deletee.id} <= {n.id for n in admin.read_nodes()}
+
+
+@pytest.mark.parametrize("secured", [False, True])
+def test_merge_preserves_legacy_deletee_sources_for_future_protected_reads(protected, secured):
+    from graph_engine.merge import merge_nodes
+    raw, _, _ = protected
+    raw.write_node(Node("survivor text", id="survivor"))
+    raw.write_node(Node("private derived text", id="deletee", source="consolidator"))
+    raw.write_edges([Edge("deletee", "private", "extends", origin="consolidator")])
+    admin = access.SecuredBrain(str(raw.path), graph_name="default", identity="owner")
+    merge_nodes(admin if secured else raw, "survivor", "deletee", commit=False)
+    assert raw.read_node("deletee").derived_from == ["private"]
+    assert raw.read_node("deletee").status == "tombstone"
+    assert {"survivor", "deletee"} <= {n.id for n in admin.read_nodes()}
+    viewer = access.SecuredBrain(str(raw.path), graph_name="default", identity="bob")
+    assert not viewer.can_access("read", "survivor")
+
+
 def test_current_acl_revocation_transitive_multi_source_and_no_silent_publication(protected):
     raw, path, policy = protected
     raw.write_node(Node("first source", id="s1"))
