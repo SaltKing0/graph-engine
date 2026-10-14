@@ -7,6 +7,10 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Fixed
+- Community distillation preserves forgotten summary identities and suppresses
+  communities overlapping their recorded members or descendants, including
+  merge survivors, until an explicit operator restore. Keep saved link
+  decisions, evidence and provenance intact (issue #48).
 - Node merges preserve untouched relationships and deduplicate redirected
   assertions by kind, direction, validity and provenance, retaining distinct
   pending decisions, reviews and history records (issue #47).
