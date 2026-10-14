@@ -2,9 +2,10 @@
 
 import pytest
 from fastapi.testclient import TestClient
+from starlette.websockets import WebSocketDisconnect
 
 from graph_engine.brain import Brain, Edge, Node
-from graph_engine.server import app
+from graph_engine.server import app, manager
 
 
 @pytest.fixture
@@ -36,6 +37,59 @@ def test_saved_decision_can_be_undone_with_live_update(client_and_edge, action):
         assert ws.receive_json() == {"type": "edge_restored", "edge": edge.to_dict()}
         assert client.get("/api/graph").json()["edges"] == [edge.to_dict()]
         assert client.post(f"/api/edge/{edge.id}/undo").status_code == 409
+
+
+@pytest.mark.parametrize("origin", [
+    "https://untrusted.example", "http://testserver.evil.example",
+    "https://testserver", "http://testserver:8001", "http://localhost",
+    "null", "", "testserver", "//testserver", "ws://testserver",
+    "http://testserver/", "http://testserver/path", "http://testserver?query",
+    "http://testserver#fragment", "http://user@testserver",
+    "http://testserver:invalid", "http://[broken", "http://testserver, http://evil.example",
+    " http://testserver", "http://testserver\t",
+])
+def test_websocket_rejects_foreign_or_malformed_origin(client_and_edge, origin):
+    client, _ = client_and_edge
+    before = list(manager.active)
+    with pytest.raises(WebSocketDisconnect) as denied:
+        with client.websocket_connect("/ws", headers={"Origin": origin}):
+            pytest.fail("Untrusted WebSocket was accepted")
+    assert denied.value.code == 1008
+    assert manager.active == before
+
+
+def test_websocket_rejects_multiple_origins(client_and_edge):
+    client, _ = client_and_edge
+    with pytest.raises(WebSocketDisconnect) as denied:
+        with client.websocket_connect("/ws", headers={
+            "Origin": "http://testserver", "origin": "http://evil.example"
+        }):
+            pytest.fail("Ambiguous Origin headers were accepted")
+    assert denied.value.code == 1008
+
+
+@pytest.mark.parametrize("url,origin", [
+    ("ws://testserver/ws", None),
+    ("ws://testserver/ws", "http://testserver"),
+    ("ws://testserver/ws", "http://TESTSERVER:80"),
+    ("wss://testserver/ws", "https://testserver:443"),
+    ("ws://localhost:8000/ws", "http://localhost:8000"),
+    ("ws://127.0.0.1:8000/ws", "http://127.0.0.1:8000"),
+    ("ws://[::1]:8000/ws", "http://[::1]:8000"),
+])
+def test_websocket_trusted_and_originless_clients_receive_updates(client_and_edge, url, origin):
+    client, edge = client_and_edge
+    headers = {} if origin is None else {"Origin": origin}
+    with client.websocket_connect(url, headers=headers) as ws:
+        text = "Synthetic private incoming observation"
+        response = client.post("/api/ingest", json={"text": text, "allow_duplicates": True})
+        assert response.status_code == 200
+        event = ws.receive_json()
+        assert event["type"] == "ingested"
+        assert event["node"]["text"] == text
+        assert event["edges"] == response.json()["suggested"]
+        assert client.post(f"/api/edge/{edge.id}/accept").status_code == 200
+        assert ws.receive_json()["type"] == "edge_resolved"
 
 
 def test_unknown_undo_and_local_ui_routes(client_and_edge):

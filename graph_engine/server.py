@@ -12,6 +12,7 @@ Env control:
 from __future__ import annotations
 
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect
 from fastapi.concurrency import run_in_threadpool
@@ -287,9 +288,42 @@ async def link_edge(body: LinkBody):
     return edge.to_dict()
 
 
+def _http_origin(value: str) -> tuple[str, str, int] | None:
+    """Parse a single HTTP origin, rejecting opaque or malformed values."""
+    # urlsplit strips some control characters; reject them before parsing.
+    if not value or any(ord(char) <= 32 or ord(char) == 127 for char in value):
+        return None
+    try:
+        parts = urlsplit(value)
+        if (parts.scheme not in {"http", "https"} or not parts.hostname
+                or parts.username is not None or parts.password is not None
+                or value != f"{parts.scheme}://{parts.netloc}"
+                or "\\" in parts.netloc or parts.netloc.endswith(":")):
+            return None
+        port = parts.port
+        return parts.scheme, parts.hostname, port if port is not None else (
+            443 if parts.scheme == "https" else 80)
+    except ValueError:
+        return None
+
+
+def _websocket_origin_allowed(ws: WebSocket) -> bool:
+    """Browser sockets must match the request origin; native clients may omit it."""
+    origins = ws.headers.getlist("origin")
+    if not origins:
+        return True
+    hosts = ws.headers.getlist("host")
+    socket_scheme = ws.scope.get("scheme")
+    if len(origins) != 1 or len(hosts) != 1 or socket_scheme not in {"ws", "wss"}:
+        return False
+    origin = _http_origin(origins[0])
+    scheme = "https" if socket_scheme == "wss" else "http"
+    return origin is not None and origin == _http_origin(f"{scheme}://{hosts[0]}")
+
+
 @app.websocket("/ws")
 async def ws_endpoint(ws: WebSocket):
-    if access.policy_path():
+    if access.policy_path() or not _websocket_origin_allowed(ws):
         await ws.close(code=1008)
         return
     await manager.connect(ws)
