@@ -7,6 +7,11 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Fixed
+- Node merges preserve untouched relationships and deduplicate redirected
+  assertions by kind, direction, validity and provenance, retaining distinct
+  pending decisions, reviews and history records (issue #47).
+
+### Fixed
 - Preserve current source permissions on derived memories and vectors across
   extraction, consolidation, community summaries, entity reuse, merges and
   historical queries. Reject missing/cyclic provenance and retain dependencies

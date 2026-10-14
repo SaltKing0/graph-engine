@@ -1,11 +1,11 @@
 """Manual near-duplicate consolidation (`ig merge`).
 
 Consolidates two closely related nodes into one: all edges of the node
-being removed are redirected to the survivor (deduplicated, no
-self-loops), the text is appended to preserve information, and the
-removed node is marked as a tombstone (never hard-deleted — the
-graph remains an append-only history). INDEX.md is rebuilt and everything
-is written in ONE commit.
+being removed are redirected to the survivor (identical accepted assertions
+deduplicated, newly created self-loops removed), the text is appended to
+preserve information, and the removed node is marked as a tombstone (never
+hard-deleted — the graph remains an append-only history). INDEX.md is rebuilt
+and everything is written in ONE commit.
 
 Audit #3/#9/#41 fixes:
 - The deletee is tombstoned instead of being set to probation, and its file
@@ -39,7 +39,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .brain import Brain
+from .brain import Brain, Edge
 
 # Intent edges with directed semantics: a redirect deletee→X to
 # survivor→X would invert the statement (Audit #9). They are invalidated
@@ -56,32 +56,54 @@ class MergeResult:
     survivor: str
     deletee: str
     edges_redirected: int
-    edges_removed: int  # self-loops + duplicate pairs
+    edges_removed: int  # redirected self-loops + duplicate assertions
     edges_invalidated: int = 0  # directed intent edges (not redirectable)
     redirected_ids: list[str] = field(default_factory=list)
     invalidated_ids: list[str] = field(default_factory=list)
 
 
-def _redirect_edges(edges: list, survivor: str, deletee: str,
-                    now_iso: str) -> tuple[list, int, int, int, list[str], list[str]]:
-    """Redirect the deletee's edges to the survivor; removes self-loops + duplicates.
+def _edge_identity(edge: Edge, source: str, target: str) -> str:
+    """Compare complete assertions after redirect, preserving review/history IDs."""
+    record = edge.to_dict()
+    record.update(source=source, target=target)
+    # Only ordinary accepted assertions may collapse. Inbox items, explicit
+    # reviews and history records have individually addressable decision IDs,
+    # even when all their other metadata happens to match.
+    if not (edge.pending or edge.rejected or edge.is_invalidated
+            or edge.valid_to is not None or edge.invalidated_by is not None
+            or edge.replacement is not None or edge.superseded_by is not None
+            or edge.reviewed_at is not None or edge.reviewed_by is not None
+            or edge.kind in ("fact", "fact_replacement")):
+        record.pop("id")
+    # Includes kind, ordered endpoints, validity, confidence and all serialized
+    # provenance. Canonicalize nested dicts as well as the top-level fields.
+    return json.dumps(record, sort_keys=True, ensure_ascii=False)
+
+
+def _redirect_edges(edges: list[Edge], survivor: str, deletee: str,
+                    now_iso: str) -> tuple[list[Edge], int, int, int, list[str], list[str]]:
+    """Preserve untouched records; deduplicate only redirected assertions.
 
     Directed intent edges (DIRECTIONAL_KINDS) with the deletee as source are
     invalidated (valid_to set) instead of redirected — the survivor has not
     necessarily inherited the statement "supersedes X" (Audit #9).
     """
-    new_edges: list = []
-    seen: set[tuple] = set()
+    new_edges: list[Edge] = []
+    # Reserve untouched identities first so a redirected duplicate never
+    # replaces an existing survivor edge just because it appears earlier.
+    seen = {_edge_identity(e, e.source, e.target) for e in edges
+            if deletee not in (e.source, e.target)}
     removed = 0
     redirected = 0
     invalidated = 0
     redirected_ids: list[str] = []
     invalidated_ids: list[str] = []
     for e in edges:
-        if e.kind in ("fact", "fact_replacement"):
+        if deletee not in (e.source, e.target) or e.kind in ("fact", "fact_replacement"):
             # Entity identities cannot be text-merged (guard below). Preserve
             # all fact windows/evidence and each replacement decision's unique
-            # identity when unrelated semantic notes are merged.
+            # identity when unrelated semantic notes are merged. Untouched
+            # relationships also keep their order, IDs and metadata verbatim.
             new_edges.append(e)
             continue
         s, t = e.source, e.target
@@ -92,8 +114,6 @@ def _redirect_edges(edges: list, survivor: str, deletee: str,
                     e.invalidate(now_iso)
                     invalidated += 1
                     invalidated_ids.append(e.id)
-                else:
-                    removed += 1
                 new_edges.append(e)
                 continue
             if s == deletee:
@@ -106,8 +126,8 @@ def _redirect_edges(edges: list, survivor: str, deletee: str,
         if s == t:  # self-loop after merge
             removed += 1
             continue
-        key = tuple(sorted((s, t)))
-        if key in seen:  # duplicate pair (survivor already had that target)
+        key = _edge_identity(e, s, t)
+        if key in seen:  # identical assertion after redirect
             removed += 1
             continue
         seen.add(key)
@@ -171,14 +191,13 @@ def merge_nodes(
     # (Audit #3: previously the node file was unlinked first; a crash
     # between unlink and edge rewrite left a half-merged state with
     # dangling edges pointing to a no-longer-existing node).
-    edges = deepcopy([e for e in all_edges if not e.rejected])
+    # Keep unrelated dismissed suggestions in place for undo. Decisions about
+    # the deleted node cannot be restored after consolidation.
+    edges = deepcopy([e for e in all_edges
+                      if not (e.rejected and deletee_id in (e.source, e.target))])
     new_edges, removed, redirected, invalidated, redirected_ids, invalidated_ids = \
         _redirect_edges(edges, survivor_id, deletee_id, now_iso)
-    # Keep unrelated dismissed suggestions available for undo. Decisions about
-    # the deleted node cannot be restored after consolidation.
-    rejected = [e for e in all_edges
-                if e.rejected and deletee_id not in (e.source, e.target)]
-    planned_edges = new_edges + rejected
+    planned_edges = new_edges
     parents = derivation_parents(nodes, planned_edges)
     affected = {survivor_id, deletee_id} | {
         nid for nid in parents if parents[nid] != previous_parents.get(nid, set())}
