@@ -258,6 +258,44 @@ ig mcp                             # read-only MCP server over stdio (AI assista
 ig mcp --write                     # + remember/recall/forget (agent memory, opt-in)
 ```
 
+### Forgotten community summaries
+
+`ig dream --distill` checks every saved node identity, including tombstones.
+Forgetting a `community-summary` therefore keeps it forgotten on repeated
+passes. Distillation also skips any changed community that shares **any**
+recorded source member with a forgotten summary. Adding/removing members,
+splitting a community or merging it into another cannot bypass that decision.
+Disjoint communities remain eligible. This conservative policy can suppress a
+substantially changed community too; it does not try to judge whether a new
+abstraction would express a different claim. Dry-run distillation uses the same
+checks and never calls the summarizer for a suppressed community.
+
+Suppression uses the summary's complete `derived_from` list plus its saved
+consolidator `extends` links, including pending, rejected and invalidated links.
+Legacy summaries without `derived_from` protect the members recoverable from
+those links; if neither provenance nor links survive, only the exact saved
+summary ID can be protected. Keep tombstones and provenance in the brain.
+Existing saved relationships retain their IDs, evidence, review decisions and
+validity; distillation never adds a fresh accepted copy of the same summary link.
+
+Reversing suppression requires an explicit operator action on the forgotten
+summary. The trusted Python API can restore its node status:
+
+```python
+with brain.write_guard():
+    brain.authorize("admin")
+    brain.ensure_ready()
+    brain.pull()
+    brain.promote_node(summary_id)  # explicitly set the saved node to active
+    brain.rebuild_index()
+    brain.commit_and_push(f"operator restore community summary: {summary_id}")
+```
+
+This clears that summary's membership suppression. Its saved identity still
+prevents duplicate distillation, and its invalidated/rejected links stay in
+their saved states; restoring the node does not restore link decisions. Other
+forgotten summaries can still suppress overlapping communities.
+
 ### Local document import
 
 Import selected local files or directories with `ig import`. Markdown (`.md`)

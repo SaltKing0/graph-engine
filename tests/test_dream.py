@@ -14,6 +14,8 @@ import datetime
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from graph_engine.brain import Brain, Edge, Node
@@ -33,6 +35,7 @@ from graph_engine.dream import (
     refresh_plan,
 )
 from graph_engine.recall import record
+from graph_engine.agent_memory import forget
 
 
 def _brain(tmp_path) -> Brain:
@@ -206,6 +209,184 @@ def test_distill_is_idempotent(tmp_path):
     assert first["summaries"] == 2
     assert second["summaries"] == 0 and second["edges"] == 0
     assert len([n for n in b.read_nodes() if SUMMARY_TAG in (n.tags or [])]) == 2
+
+
+def _saved_files(b: Brain) -> dict[str, bytes]:
+    return {str(p.relative_to(b.path)): p.read_bytes()
+            for p in b.path.rglob("*") if p.is_file()}
+
+
+@pytest.mark.parametrize("status", ["probation", "active", "stale", "tombstone"])
+def test_distill_respects_all_saved_node_identities(tmp_path, status):
+    from graph_engine.dream import _summary_id
+
+    b = _brain(tmp_path)
+    for nid in ("a", "b"):
+        _node(b, nid)
+    b.write_edges([_edge("ab", "a", "b")])
+    # Even an untagged node occupying the deterministic ID is never overwritten.
+    b.write_node(Node(id=_summary_id(["a", "b"]), text="saved decision", status=status))
+    before = _saved_files(b)
+    assert distill(b, min_size=2, commit=False)["summaries"] == 0
+    assert _saved_files(b) == before
+
+
+@pytest.mark.parametrize("dry_run", [False, True])
+def test_distill_does_not_restore_forgotten_summary(tmp_path, monkeypatch, dry_run):
+    b = _brain(tmp_path)
+    _two_clusters(b)
+    distill(b, min_size=2, commit=False)
+    summaries = [n for n in b.read_nodes() if SUMMARY_TAG in n.tags]
+    for summary in summaries:
+        forget(b, summary.id, reason="explicit rejection", commit=False)
+    before = _saved_files(b)
+
+    def unexpected(*args, **kwargs):
+        pytest.fail("suppressed distillation must not call a model or commit")
+
+    monkeypatch.setattr(b, "commit_and_push", unexpected)
+    for _ in range(2):
+        res = distill(b, min_size=2, dry_run=dry_run, summarizer=unexpected)
+        assert res["summaries"] == res["edges"] == 0
+        assert _saved_files(b) == before
+        assert all(b.read_node(n.id).status == "tombstone" for n in summaries)
+
+
+@pytest.mark.parametrize("change", ["add", "remove", "split", "merge"])
+def test_distill_suppresses_changed_membership(tmp_path, change):
+    b = _brain(tmp_path)
+    _two_clusters(b)
+    distill(b, min_size=2, commit=False)
+    summary = next(n for n in b.read_nodes()
+                   if SUMMARY_TAG in n.tags and "a0" in n.derived_from)
+    forget(b, summary.id, reason="rejected abstraction", commit=False)
+    if change == "add":
+        _node(b, "a3")
+        b.write_edges(b.read_edges(include_rejected=True)
+                      + [_edge("a03", "a0", "a3")])
+    elif change == "remove":
+        forget(b, "a2", reason="remove member", commit=False)
+    elif change == "split":
+        # Two-node fragment plus an island: both still belong to the
+        # suppressed lineage, even if only one original member remains.
+        for edge in b.read_edges(include_rejected=True):
+            if edge.source == "a2" or edge.target == "a2":
+                b.invalidate_edge(edge.id)
+    else:
+        # Merge the triples into one dense community.
+        b.write_edges(b.read_edges(include_rejected=True) + [
+            _edge(f"cross{i}{j}", f"a{i}", f"b{j}")
+            for i in range(3) for j in range(3)])
+    before = _saved_files(b)
+    res = distill(b, min_size=1 if change == "split" else 2, commit=False)
+    assert res["summaries"] == res["edges"] == 0
+    assert _saved_files(b) == before
+
+
+def test_distill_suppression_allows_disjoint_community_and_explicit_restore(tmp_path):
+    b = _brain(tmp_path)
+    _two_clusters(b)
+    distill(b, min_size=2, commit=False)
+    summary = next(n for n in b.read_nodes()
+                   if SUMMARY_TAG in n.tags and "a0" in n.derived_from)
+    forget(b, summary.id, reason="rejected abstraction", commit=False)
+    _node(b, "a3")
+    _node(b, "new0")
+    _node(b, "new1")
+    b.write_edges(b.read_edges(include_rejected=True) + [
+        _edge("a03", "a0", "a3"), _edge("new01", "new0", "new1")])
+    assert distill(b, min_size=2, commit=False)["summaries"] == 1
+    assert b.read_node(summary.id).status == "tombstone"
+    # Only an explicit caller changes the tombstone; distill never restores
+    # its invalidated links, even after this operator action.
+    b.promote_node(summary.id)
+    prior_edges = {e.id: e.to_dict() for e in b.read_edges(include_rejected=True)}
+    assert distill(b, min_size=2, commit=False)["summaries"] == 1
+    assert b.read_node(summary.id).status == "active"
+    after_edges = {e.id: e.to_dict() for e in b.read_edges(include_rejected=True)}
+    assert all(after_edges[eid] == edge for eid, edge in prior_edges.items())
+    assert distill(b, min_size=2, commit=False)["summaries"] == 0
+
+
+def test_distill_legacy_suppression_uses_historical_links(tmp_path):
+    b = _brain(tmp_path)
+    _two_clusters(b)
+    distill(b, min_size=2, members_per_summary=3, commit=False)
+    summary = next(n for n in b.read_nodes()
+                   if SUMMARY_TAG in n.tags and "a0" in n.derived_from)
+    summary.derived_from = []  # summaries predating node provenance
+    b.write_node(summary)
+    forget(b, summary.id, reason="legacy rejection", commit=False)
+    _node(b, "a3")
+    b.write_edges(b.read_edges(include_rejected=True) + [_edge("a03", "a0", "a3")])
+    before = _saved_files(b)
+    assert distill(b, min_size=2, commit=False)["summaries"] == 0
+    assert _saved_files(b) == before
+
+
+def test_distill_suppresses_unlinked_source_member(tmp_path):
+    b = _brain(tmp_path)
+    _two_clusters(b)
+    distill(b, min_size=2, members_per_summary=1, commit=False)
+    summary = next(n for n in b.read_nodes()
+                   if SUMMARY_TAG in n.tags and "a0" in n.derived_from)
+    forget(b, summary.id, reason="rejected abstraction", commit=False)
+    # a2 was not among the linked hubs; complete node provenance still
+    # suppresses a later community containing only that original member.
+    forget(b, "a0", reason="remove hub", commit=False)
+    forget(b, "a1", reason="remove member", commit=False)
+    _node(b, "new")
+    b.write_edges(b.read_edges(include_rejected=True) + [_edge("newa2", "new", "a2")])
+    before = _saved_files(b)
+    assert distill(b, min_size=2, commit=False)["summaries"] == 0
+    assert _saved_files(b) == before
+
+
+@pytest.mark.parametrize("decision", ["pending", "rejected", "invalidated"])
+def test_distill_preserves_saved_summary_link_decisions(tmp_path, decision):
+    from graph_engine.dream import _summary_id
+
+    b = _brain(tmp_path)
+    for nid in ("a", "b"):
+        _node(b, nid)
+    summary_id = _summary_id(["a", "b"])
+    prior = Edge(id="saved", source=summary_id, target="a", kind="extends",
+                 origin="consolidator", pending=decision == "pending",
+                 rejected=decision == "rejected", confidence=0.4,
+                 evidence=[{"node_id": "a", "quote": "node a"}],
+                 reviewed_at="2026-10-14T00:00:00Z", reviewed_by="reviewer")
+    if decision == "invalidated":
+        prior.invalidate("2026-10-14T01:00:00Z")
+        prior.invalidated_by = "explicit-decision"
+    # Saved edges may survive a missing summary file; their decisions still
+    # belong to the deterministic summary identity.
+    b.write_edges([_edge("ab", "a", "b"), prior])
+    before = prior.to_dict()
+    res = distill(b, min_size=2, commit=False)
+    assert res["summaries"] == 1 and res["edges"] == 1
+    saved = [e for e in b.read_edges(include_rejected=True)
+             if e.source == summary_id and e.target == "a" and e.kind == "extends"]
+    assert len(saved) == 1 and saved[0].to_dict() == before
+
+
+def test_distill_commits_new_summary_without_new_links(tmp_path, monkeypatch):
+    from graph_engine.dream import _summary_id
+
+    b = _brain(tmp_path)
+    for nid in ("a", "b"):
+        _node(b, nid)
+    summary_id = _summary_id(["a", "b"])
+    b.write_edges([_edge("ab", "a", "b"), *[
+        Edge(source=summary_id, target=nid, kind="extends", rejected=True)
+        for nid in ("a", "b")]])
+    commits = []
+    monkeypatch.setattr(b, "commit_and_push", lambda msg: commits.append(msg))
+    before_edges = [e.to_dict() for e in b.read_edges(include_rejected=True)]
+    res = distill(b, min_size=2)
+    assert res["summaries"] == 1 and res["edges"] == 0
+    assert len(commits) == 1
+    assert summary_id in (b.path / "INDEX.md").read_text()
+    assert [e.to_dict() for e in b.read_edges(include_rejected=True)] == before_edges
 
 
 def test_distill_respects_min_size_and_limit(tmp_path):
