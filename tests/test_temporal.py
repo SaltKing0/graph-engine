@@ -22,6 +22,18 @@ def brain(tmp_path):
 
 
 class TestValidAt:
+    def test_current_validity_view_hides_forgotten_evidence_but_history_keeps_events(self, brain):
+        from graph_engine.temporal import valid_at, history
+        for nid in ("a", "b", "evidence"):
+            brain.write_node(Node(nid, id=nid, status="active", created="2000-01-01T00:00:00Z"))
+        brain.write_edges([Edge("a", "b", "fact", id="fact", pending=False,
+                               valid_from="2000-01-01T00:00:00Z",
+                               evidence=[{"node_id": "evidence", "text": "Synthetic quote"}])])
+        assert valid_at(brain, "2020-01-01T00:00:00Z")["edges"]
+        brain.tombstone_node("evidence")
+        assert valid_at(brain, "2020-01-01T00:00:00Z")["edges"] == []
+        assert history(brain, "a")[0]["edge_id"] == "fact"
+
     def test_returns_only_nodes_existing_at_timestamp(self, brain):
         from graph_engine.brain_engine import BrainEngine
         engine = BrainEngine(brain)

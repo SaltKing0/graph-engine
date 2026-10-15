@@ -102,6 +102,15 @@ def test_direct_relations_keep_direction_and_origin(brain):
     assert result["edges"] == [edge.to_dict()]
 
 
+def test_infer_and_explain_hide_forgotten_evidence(brain):
+    edge = fact("a", "b", "part_of", "ab", evidence=[{"node_id": "d", "text": "World"}])
+    brain.write_edges([edge])
+    assert infer(brain, "a -> b")["edges"]
+    brain.tombstone_node("d")
+    assert infer(brain, "a -> b")["edges"] == []
+    assert explain_node(brain, "a")["graph_context"] == []
+
+
 def test_conflicts_include_transitive_support_but_no_invented_negation(brain):
     brain.write_edges([fact("a", "b", "part_of", "ab"), fact("b", "c", "part_of", "bc"),
                        fact("a", "c", "not_part_of", "acn"),

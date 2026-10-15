@@ -789,6 +789,9 @@ class Brain:
     def resolve_edge(self, edge_id: str, accept: bool) -> Edge | None:
         with self._lock:
             edges = self.read_edges(include_rejected=True)
+            from .graph import edges_with_live_support
+            if edge_id not in {e.id for e in edges_with_live_support(self.read_nodes(), edges)}:
+                return None
             proposal = next((e for e in edges if e.id == edge_id and e.kind == "fact_replacement"), None)
             if proposal is not None:
                 from .replacements import resolve_replacement
@@ -811,6 +814,9 @@ class Brain:
         """Return a saved decision to the inbox without reviving invalidated facts."""
         with self._lock:
             edges = self.read_edges(include_rejected=True)
+            from .graph import edges_with_live_support
+            if edge_id not in {e.id for e in edges_with_live_support(self.read_nodes(), edges)}:
+                return None
             proposal = next((e for e in edges if e.id == edge_id and e.kind == "fact_replacement"), None)
             if proposal is not None:
                 from .replacements import resolve_replacement
@@ -834,12 +840,15 @@ class Brain:
     # ---------- Graph state for the frontend ----------
 
     def graph_state(self) -> dict:
+        """Live UI records; use snapshots for historical text and tombstones."""
+        from .graph import live_view
+        nodes, edges = live_view(self)
         return {
-            "nodes": [n.to_dict() for n in self.read_nodes()],
+            "nodes": [n.to_dict() for n in nodes.values()],
             "edges": [{**e.to_dict(), **({"current": e.is_current,
                                          "invalidated": e.is_invalidated}
                                         if e.extracted_validity is not None or e.kind == "fact_replacement" else {})}
-                      for e in self.read_edges()],
+                      for e in edges],
         }
 
     # ---------- Generated table of contents ----------

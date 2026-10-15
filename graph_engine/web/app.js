@@ -283,6 +283,8 @@ const short = (text, length = 36) => {
       if (version !== refreshVersion) return;
       const existing = new Map(nodes.map(node => [node.id, node]));
       nodes = graph.nodes.map(node => Object.assign(existing.get(node.id) || {}, node));
+      $("#tooltip").hidden = true;
+      $("#tooltip").textContent = "";
       const ids = new Set(nodes.map(node => node.id));
       const eligible = graph.edges.filter(edge => ids.has(edge.source) && ids.has(edge.target) && !edge.rejected);
       reviewEdgesById = Object.fromEntries(eligible.map(edge => [edge.id, edge]));
@@ -461,7 +463,14 @@ const short = (text, length = 36) => {
 
   function renderDetail(id) {
     const node = nodeById(id);
-    if (!node) { $("#detail").close(); return; }
+    if (!node) {
+      $("#detail").close();
+      detailId = null;
+      $("#detail-text").textContent = "";
+      $("#detail-meta").textContent = "";
+      $("#detail-relations").replaceChildren();
+      return;
+    }
     $("#detail-text").textContent = node.text;
     const date = new Date(node.created);
     $("#detail-meta").textContent = [node.entity_type, ...(node.aliases || []), node.source, Number.isNaN(date.getTime()) ? null : date.toLocaleDateString("en-US"), ...(node.tags || []).map(tag => `#${tag}`)].filter(Boolean).join(" · ");

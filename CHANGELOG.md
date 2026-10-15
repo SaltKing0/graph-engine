@@ -7,6 +7,10 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Fixed
+- Exclude forgotten nodes and edges with unavailable endpoints or evidence from
+  live graph, direct-node, neighborhood and review views. Apply the same support
+  checks to decisions, undo and bulk review; preserve authorized history and
+  Git snapshots (issue #49).
 - Community distillation preserves forgotten summary identities and suppresses
   communities overlapping their recorded members or descendants, including
   merge survivors, until an explicit operator restore. Keep saved link

@@ -51,8 +51,9 @@ def valid_at(brain: "Brain", timestamp: str) -> dict:
     except (ValueError, TypeError):
         raise ValueError(f"Invalid timestamp: {timestamp!r}")
 
+    current_nodes = brain.read_nodes()
     nodes: list[Node] = []
-    for n in brain.read_nodes():
+    for n in current_nodes:
         if n.status == "tombstone":
             continue
         try:
@@ -64,7 +65,10 @@ def valid_at(brain: "Brain", timestamp: str) -> dict:
         nodes.append(n)
 
     edges: list[Edge] = []
-    for e in brain.read_edges(include_rejected=True):
+    from .graph import edges_with_live_support
+    # Fact validity can predate recording its evidence. Require support to be
+    # live today without treating node creation time as the fact's start date.
+    for e in edges_with_live_support(current_nodes, brain.read_edges(include_rejected=True)):
         if e.pending or e.rejected:
             continue
         if _is_valid_at(e, ts):

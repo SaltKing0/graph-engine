@@ -51,6 +51,22 @@ def _seed_pending(brain: Brain, specs: list[tuple[str, str, str]]) -> None:
     brain.write_edges(edges)
 
 
+def test_pending_cli_and_bulk_review_hide_forgotten_support(tmp_path, capsys):
+    from graph_engine.__main__ import cmd_pending
+    b = _brain(tmp_path)
+    _seed_pending(b, [("safe", "similar", "a"), ("hidden", "extends", "b")])
+    b.write_node(Node("Synthetic forgotten review quote", id="evidence", status="tombstone"))
+    edges = b.read_edges()
+    edges[1].evidence = [{"node_id": "evidence", "quote": "Synthetic forgotten review quote"}]
+    b.write_edges(edges)
+    cmd_pending(BrainEngine(b, HashEmbedder()), [])
+    output = capsys.readouterr().out
+    assert "safe" in output
+    assert "hidden" not in output and "Synthetic forgotten" not in output
+    assert accept_pending(b, commit=False)["accepted"] == ["safe"]
+    assert {e.id: e.pending for e in b.read_edges()} == {"safe": False, "hidden": True}
+
+
 # ---------------------------------------------------------------------------
 # The cap at ingest time (the eval case, at unit level with explicit flags)
 # ---------------------------------------------------------------------------

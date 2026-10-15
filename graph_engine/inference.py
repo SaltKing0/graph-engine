@@ -20,10 +20,11 @@ TRANSITIVE = frozenset({"is_a", "part_of", "same_as"})
 
 
 def _snapshot(brain: Brain) -> tuple[dict[str, Node], list[Edge]]:
-    nodes = {n.id: n for n in brain.read_nodes() if n.status != "tombstone"}
+    from .graph import live_view
+    nodes, records = live_view(brain)
     now = datetime.now(timezone.utc)
     # Check both endpoints and actual start dates, including legacy edges.
-    edges = sorted((e for e in brain.read_edges()
+    edges = sorted((e for e in records
                     if e.source in nodes and e.target in nodes
                     and not e.pending and not e.rejected and e.is_current
                     and e.is_valid_at(now)), key=lambda e: e.id)

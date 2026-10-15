@@ -106,6 +106,10 @@ state. Optional `--valid-at <ISO-8601>` filters that snapshot by fact validity.
 Snapshot queries apply current permissions and leave the active brain unchanged.
 See [Git snapshots](docs/guide.md#git-revision-snapshots) for semantics and limits.
 
+Forgetting removes a node and edges supported by it from live graph, direct
+node, neighborhood and review views. Explicit history and Git snapshots retain
+records under current permissions. See [live views and history](docs/guide.md#live-views-and-history).
+
 For structured episodic consolidation, explicitly run `ig consolidate --structured`
 or `ig dream --consolidate --structured`. Exact quotes and event IDs are validated
 before one batch commit. Proposed semantic nodes are labelled and searchable;

@@ -52,6 +52,8 @@ def test_write_and_read_nodes(tmp_path):
 
 def test_edges_roundtrip_and_resolve(tmp_path):
     brain = make_brain(tmp_path)
+    for nid in "ab":
+        brain.write_node(Node(id=nid, text=nid))
     e = Edge(source="a", target="b", kind="similar")
     brain.add_edge(e)
     resolved = brain.resolve_edge(e.id, accept=True)
@@ -61,6 +63,8 @@ def test_edges_roundtrip_and_resolve(tmp_path):
 
 def test_edge_reject_removes(tmp_path):
     brain = make_brain(tmp_path)
+    for nid in "ab":
+        brain.write_node(Node(id=nid, text=nid))
     e = Edge(source="a", target="b", kind="extends")
     brain.add_edge(e)
     brain.resolve_edge(e.id, accept=False)
@@ -74,6 +78,8 @@ def test_resolve_unknown_returns_none(tmp_path):
 
 def test_undo_accept_returns_edge_to_inbox(tmp_path):
     brain = make_brain(tmp_path)
+    for nid in "ab":
+        brain.write_node(Node(id=nid, text=nid))
     edge = Edge(source="a", target="b", kind="similar")
     brain.add_edge(edge)
     engine = BrainEngine(brain, HashEmbedder())
@@ -86,6 +92,8 @@ def test_undo_accept_returns_edge_to_inbox(tmp_path):
 
 def test_undo_reject_survives_reload_and_other_decisions(tmp_path):
     brain = make_brain(tmp_path)
+    for nid in "abc":
+        brain.write_node(Node(id=nid, text=nid))
     first = Edge(source="a", target="b", kind="similar")
     second = Edge(source="b", target="c", kind="extends")
     brain.add_edge(first)
@@ -103,6 +111,8 @@ def test_undo_reject_survives_reload_and_other_decisions(tmp_path):
 
 def test_rejected_edge_cannot_be_resolved_again(tmp_path):
     brain = make_brain(tmp_path)
+    for nid in "ab":
+        brain.write_node(Node(id=nid, text=nid))
     edge = Edge(source="a", target="b", kind="similar")
     brain.add_edge(edge)
     brain.resolve_edge(edge.id, accept=False)
@@ -359,6 +369,8 @@ def test_ingest_auto_inits_missing_brain(tmp_path):
 
 def test_undo_preserves_edge_metadata_and_invalidated_facts(tmp_path):
     brain = make_brain(tmp_path)
+    for nid in "ab":
+        brain.write_node(Node(id=nid, text=nid))
     edge = Edge(source="a", target="b", kind="similar", confidence=.82,
                 valid_from="2026-08-01T00:00:00Z", invalidated_by="prior-event")
     brain.add_edge(edge)
@@ -373,6 +385,8 @@ def test_undo_preserves_edge_metadata_and_invalidated_facts(tmp_path):
 
 def test_invalidation_preserves_unrelated_undo_record(tmp_path):
     brain = make_brain(tmp_path)
+    for nid in "abc":
+        brain.write_node(Node(id=nid, text=nid))
     rejected = Edge(source="a", target="b", kind="similar")
     other = Edge(source="b", target="c", kind="extends", pending=False)
     brain.add_edge(rejected)

@@ -230,7 +230,10 @@ def build_context(query: str, budget: int = 2000, k: int = 5,
 
 @_tool
 def get_node(id: str, max_chars: int = fmt.DEFAULT_NODE_CHARS) -> dict:
-    """One node by id: full text (capped) + its live edges."""
+    """One live node by id: full text (capped) + its live edges.
+
+    Forgotten nodes are unavailable. Use explicit Git snapshots for history.
+    """
     node_id = (id or "").strip()
     if not node_id:
         return fmt.invalid("id must be a non-empty string")
@@ -240,12 +243,12 @@ def get_node(id: str, max_chars: int = fmt.DEFAULT_NODE_CHARS) -> dict:
     from ..runtime import make_brain
     brain = make_brain()
     node = brain.read_node(node_id)
-    if node is None:
+    if node is None or node.status == "tombstone":
         return fmt.node_not_found(node_id)
     text = node.text or ""
-    edges = [e for e in brain.read_edges()
-             if e.is_current and not e.rejected
-             and node_id in (e.source, e.target)]
+    from ..graph import live_edges
+    edges = [e for e in live_edges(brain, include_pending=True)
+             if node_id in (e.source, e.target)]
     out_edges = []
     id2node = {n.id: n for n in brain.read_nodes()}
     for e in edges:
@@ -304,7 +307,8 @@ def neighbors(id: str, hops: int = 1, kinds: list[str] | None = None,
     from ..runtime import make_brain
     from ..graph import neighbors as graph_neighbors
     brain = make_brain()
-    if brain.read_node(node_id) is None:
+    node = brain.read_node(node_id)
+    if node is None or node.status == "tombstone":
         return fmt.node_not_found(node_id)
     found = graph_neighbors(brain, node_id, hops=hops, kinds=kinds,
                             include_pending=include_pending, limit=limit)
@@ -338,7 +342,9 @@ def brain_status() -> dict:
     brain = make_brain()
     conn = connectivity(brain)
     counts = status_counts(brain)
-    pending = sum(1 for e in brain.read_edges() if e.pending)
+    from ..graph import live_view
+    _, edges = live_view(brain)
+    pending = sum(1 for e in edges if e.pending and not e.is_invalidated)
     return {"ok": True, "total": conn.total, "edges": conn.edges,
             "max_degree": conn.max_degree,
             "mean_degree": round(conn.mean_degree, 2),

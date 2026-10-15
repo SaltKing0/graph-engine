@@ -9,8 +9,46 @@ from __future__ import annotations
 import shutil
 import tempfile
 
+import pytest
+
 from graph_engine.brain import Brain, Edge, Node
 from graph_engine.graph import live_edges, neighbors, shortest_path
+
+
+@pytest.mark.parametrize("status", ["active", "probation", "stale", "tombstone", "missing"])
+@pytest.mark.parametrize("location", ["endpoint", "evidence", "replacement_fact", "undo_evidence"])
+def test_live_views_require_all_support_including_replacement_history(tmp_path, status, location):
+    brain = Brain(str(tmp_path / "brain"), mode="local")
+    for nid in ("a", "b"):
+        brain.write_node(Node(nid, id=nid))
+    if status != "missing":
+        brain.write_node(Node("Synthetic support quote", id="support", status=status))
+    fact = Edge("a", "b", "fact", id="old", pending=False, predicate="uses")
+    new = Edge("a", "b", "fact", id="new", predicate="uses")
+    proposal = Edge("a", "b", "fact_replacement", id="proposal", replacement={
+        "old_fact_id": "old", "new_fact_id": "new", "reason": "fixture", "basis": "explicit"})
+    records = [fact, new, proposal]
+    quote = [{"node_id": "support", "text": "Synthetic support quote"}]
+    if location == "endpoint":
+        fact.target = "support"
+    elif location == "evidence":
+        fact.evidence = quote
+    elif location == "replacement_fact":
+        new.evidence = quote
+    else:
+        old_row = fact.to_dict()
+        old_row["evidence"] = quote
+        proposal.replacement["decision"] = {"before": [old_row], "after": []}
+    brain.write_edges(records)
+    available = status not in ("tombstone", "missing")
+    visible = {e["id"] for e in brain.graph_state()["edges"]}
+    assert ("proposal" in visible) == available
+    if location in ("endpoint", "evidence"):
+        assert ("old" in {e.id for e in live_edges(brain)}) == available
+        assert bool(neighbors(brain, "a")) == available
+    assert (shortest_path(brain, "support", "support") == ["support"]) == available
+    assert [e.id for e in brain.read_edges()] == ["old", "new", "proposal"]
+
 
 TEXTS = {
     "hub": "agent memory systems store knowledge graphs for retrieval",

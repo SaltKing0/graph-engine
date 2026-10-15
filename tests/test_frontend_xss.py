@@ -116,6 +116,32 @@ def open_graph(page, server):
     expect(page.locator("#cards .card")).to_have_count(1)
 
 
+def test_forgetting_removes_text_from_graph_details_and_review(server, page, tmp_path):
+    from graph_engine.agent_memory import forget
+    brain = Brain(str(tmp_path / "brain"), mode="local")
+    secret = "Synthetic forgotten browser memory"
+    brain.write_node(Node(secret, id="forgotten", status="active"))
+    brain.add_edge(Edge("hostile", "safe", "fact", id="secret-fact", predicate="uses",
+                        evidence=[{"node_id": "forgotten", "text": secret}]))
+    page.goto(server)
+    expect(page.locator("#graph .node")).to_have_count(3)
+    expect(page.locator("#cards .card")).to_have_count(2)
+    page.locator('#graph .node').filter(has_text=secret).click()
+    expect(page.locator("#detail-text")).to_have_text(secret)
+    forget(brain, "forgotten", reason="synthetic browser regression", commit=False)
+    # Reload the graph data while the detail pane still holds the old selection.
+    assert page.request.post(f"{server}/api/edge", data={
+        "source": "hostile", "target": "safe", "kind": "same_as"}).status == 200
+    expect(page.locator("#graph .node")).to_have_count(2)
+    expect(page.locator("#cards .card")).to_have_count(1)
+    assert secret not in page.locator("body").inner_text()
+    assert secret not in page.locator("body").inner_html()
+    assert secret not in page.request.get(f"{server}/api/graph").text()
+    page.goto(f"{server}/review")
+    expect(page.locator("#count")).to_have_text("1 pending")
+    assert secret not in page.locator("body").inner_text()
+    assert brain.read_node("forgotten").text == secret
+
 def assert_inert(page):
     assert page.evaluate("() => window.__pwned === undefined")
     assert page.locator('img[src="x"]').count() == 0

@@ -82,12 +82,14 @@ def accept_pending(brain: Brain, *, max_intent_per_source: int | None = None,
     cap = (max_intent_per_source if max_intent_per_source is not None
            else intent_auto_accept_max(env))
     edges = brain.read_edges(include_rejected=True)
-    live_intent = Counter(e.source for e in edges if is_live_intent(e))
+    from .graph import edges_with_live_support
+    supported = edges_with_live_support(brain.read_nodes(), edges)
+    live_intent = Counter(e.source for e in supported if is_live_intent(e))
     accepted: list[str] = []
     held: list[str] = []
     replacement_facts = {(e.replacement or {}).get("new_fact_id") for e in edges
                          if e.kind == "fact_replacement" and e.pending and not e.rejected}
-    for edge in sorted((e for e in edges if e.pending and not e.rejected and not e.is_invalidated),
+    for edge in sorted((e for e in supported if e.pending and not e.rejected and not e.is_invalidated),
                        key=lambda e: e.id):
         if (edge.kind == "fact_replacement" or edge.id in replacement_facts
                 or (edge.origin == "consolidator" and edge.evidence)):

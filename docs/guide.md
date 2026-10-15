@@ -187,6 +187,29 @@ before filesystem writes. Choose a fresh path for each invocation; the tool
 never replaces or recursively deletes an explicit destination. If the system
 temporary directory is inside the source brain, set `TMPDIR` outside it.
 
+## Live views and history
+
+The web graph (`/api/graph`), both review pages, MCP `get_node`/`neighbors`,
+graph traversal and relationship explanations show live memories. Active,
+probation and stale nodes are live; tombstones are unavailable in these views.
+Edges require live, readable endpoints and evidence nodes. Replacement review
+also requires live support for both referenced facts and embedded undo evidence.
+Missing support hides the entire edge, including its quotes. Review decisions,
+undo, manual linking and `ig pending`/`accept-pending` use the same policy.
+
+Node lifecycle and fact-validity dates are separate: historical or scheduled
+fact proposals whose support is live remain available for review, while only
+currently valid relations are drawn or traversed. `ig valid-at` filters current
+records and does not restore forgotten evidence.
+
+For explicit historical inspection, `ig history <node_id>` retains edge events;
+`ig snapshot <commit-or-ref> --json` retains committed node text, tombstones and
+review decisions. Historical reads enforce current access permissions and
+recorded source permissions. Forgetting preserves files and Git history; it
+does not grant access to them. Internal `Brain.read_node/read_nodes/read_edges`
+remain storage reads for maintenance and historical operations; use
+`Brain.graph_state()` or `graph.live_view()` for live presentation.
+
 ## CLI
 
 ```bash

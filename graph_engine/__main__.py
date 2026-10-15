@@ -425,9 +425,11 @@ def cmd_ingest(engine: BrainEngine, args: list[str]) -> None:
 
 
 def cmd_pending(engine: BrainEngine, args: list[str]) -> None:
-    edges = [e for e in engine.brain.read_edges() if e.pending and not e.is_invalidated]
+    from .graph import live_view
+    nodes, records = live_view(engine.brain)
+    edges = [e for e in records if e.pending and not e.is_invalidated]
     facts = {e.id: e for e in engine.brain.read_edges(include_rejected=True)}
-    texts = {n.id: n.text for n in engine.brain.read_nodes()}
+    texts = {n.id: n.text for n in nodes.values()}
     if not edges:
         print("No pending suggestions.")
         return

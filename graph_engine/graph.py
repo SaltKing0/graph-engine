@@ -25,18 +25,57 @@ class Neighbor:
     predicate: str | None = None
 
 
+def edges_with_live_support(nodes: list[Node], edges: list[Edge]) -> list[Edge]:
+    """Lifecycle filter, independent of fact validity and review state.
+
+    Callers supply authorized records. Missing/tombstoned endpoints or evidence
+    hide the whole record, including replacement facts and embedded undo quotes.
+    Raw storage and explicit history/snapshots retain these records.
+    """
+    live = {node.id for node in nodes if node.status != "tombstone"}
+    by_id = {edge.id: edge for edge in edges}
+
+    def supported(source: str | None, target: str | None, evidence: list[dict]) -> bool:
+        return (isinstance(source, str) and source in live
+                and isinstance(target, str) and target in live
+                and all(isinstance(item, dict) and isinstance(item.get("node_id"), str)
+                        and item["node_id"] in live for item in evidence))
+
+    def allowed(edge: Edge) -> bool:
+        if not supported(edge.source, edge.target, edge.evidence):
+            return False
+        if edge.kind == "fact_replacement":
+            meta = edge.replacement or {}
+            for key in ("old_fact_id", "new_fact_id"):
+                fact = by_id.get(meta.get(key))
+                if (fact is None or fact.kind != "fact"
+                        or not supported(fact.source, fact.target, fact.evidence)):
+                    return False
+            for rows in meta.get("decision", {}).values():
+                for row in rows:
+                    if not supported(row.get("source"), row.get("target"), row.get("evidence", [])):
+                        return False
+        return True
+
+    return [edge for edge in edges if allowed(edge)]
+
+
+def live_view(brain: Brain) -> tuple[dict[str, Node], list[Edge]]:
+    """Authorized live nodes and supported records, retaining temporal review data."""
+    nodes = [node for node in brain.read_nodes() if node.status != "tombstone"]
+    # Replacement dependencies may be rejected facts, so filter support before
+    # choosing which review states to expose.
+    edges = edges_with_live_support(nodes, brain.read_edges(include_rejected=True))
+    return {node.id: node for node in nodes}, [edge for edge in edges if not edge.rejected]
+
+
 def live_edges(brain: Brain, include_pending: bool = False) -> list[Edge]:
     """Edges that count as real relations: currently valid and not invalidated,
-    not rejected, endpoints not tombstoned (hygiene.py precedent — tombstones
-    are edge-less BY DESIGN), and optionally not pending."""
-    node_status = {n.id: n.status for n in brain.read_nodes()}
+    not rejected, with live endpoints/evidence, and optionally not pending."""
+    _, edges = live_view(brain)
     out = []
-    for e in brain.read_edges():
+    for e in edges:
         if not e.is_current or e.rejected:
-            continue
-        if e.source in node_status and node_status[e.source] == "tombstone":
-            continue
-        if e.target in node_status and node_status[e.target] == "tombstone":
             continue
         if e.pending and not include_pending:
             continue
@@ -102,7 +141,8 @@ def shortest_path(brain: Brain, a: str, b: str, max_depth: int = 4,
     """BFS shortest path a -> b over undirected live edges, depth-capped.
     Returns the node id sequence INCLUDING both endpoints, or None."""
     if a == b:
-        return [a]
+        node = brain.read_node(a)
+        return [a] if node is not None and node.status != "tombstone" else None
     edges = live_edges(brain, include_pending=include_pending)
     adj: dict[str, list[str]] = {}
     for e in edges:
