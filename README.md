@@ -118,6 +118,7 @@ not factual entailment. Copy mode and legacy `--llm` remain available.
 
 | Variable | Default | Meaning |
 |---|---|---|
+| `IG_EDGE_CONF_FLOOR` | `0.0` | Minimum confidence for similarity suggestions; finite number from 0 through 1. Invalid values reject ingest before storage changes. |
 | `IG_CONSOLIDATE_STRUCTURED_CMD` | *(none)* | Opt-in JSON stdin/stdout proposal command for `--structured`; 300-second timeout, 128 KiB output limit. Separate from legacy `IG_CONSOLIDATE_LLM_CMD`. |
 
 See the [structured protocol and publication policy](docs/guide.md#structured-consolidation-proposals).

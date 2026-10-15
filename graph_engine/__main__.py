@@ -48,7 +48,7 @@ if TYPE_CHECKING:
     from .consolidation import ConsolidationConfig
 
 from . import runtime
-from .brain_engine import BrainEngine
+from .brain_engine import BrainEngine, IngestPartialError
 from .gaps import analyze_coverage, find_gaps, render, load_taxonomy
 from .hygiene import near_dup_pairs, connectivity, status_counts, render_near_dup, render_status
 from .merge import merge_nodes
@@ -400,8 +400,19 @@ def cmd_ingest(engine: BrainEngine, args: list[str]) -> None:
     if not text.strip():
         print("Nothing to ingest. Usage: ig ingest \"text\" | ig ingest - < file")
         sys.exit(1)
-    node, edges, dup, extracted = engine.capture(text, source=source,
-        allow_duplicates=allow_dup, extraction=extraction, accept_facts=accept_facts)
+    try:
+        node, edges, dup, extracted = engine.capture(text, source=source,
+            allow_duplicates=allow_dup, extraction=extraction, accept_facts=accept_facts)
+    except IngestPartialError as exc:
+        if as_json:
+            import json
+            print(json.dumps(exc.to_dict(), ensure_ascii=False))
+        else:
+            print(f"ingest: {exc.to_dict()['message']} Node: {exc.node_id}", file=sys.stderr)
+        sys.exit(1)
+    except ValueError as exc:
+        print(f"ingest: {exc}", file=sys.stderr)
+        sys.exit(1)
     if as_json:
         import json
         result = dict(node=node.to_dict(), suggested=[e.to_dict() for e in edges], duplicate=dup)

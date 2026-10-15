@@ -7,6 +7,13 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Fixed
+- Validate ingest configuration and metadata before storage changes, including
+  a finite 0–1 confidence floor. Rejected CLI, HTTP and shared-engine calls
+  preserve existing records and Git state. Report failures after saving a note
+  with an explicit partial-success receipt and extraction retry guidance.
+  Mark unfinished ingest receipts for manual recovery so retries cannot skip
+  missing vectors or relations and report extraction success
+  (issue #56).
 - Exclude forgotten nodes and edges with unavailable endpoints or evidence from
   live graph, direct-node, neighborhood and review views. Apply the same support
   checks to decisions, undo and bulk review; preserve authorized history and

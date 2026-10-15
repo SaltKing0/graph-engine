@@ -59,6 +59,25 @@ def test_unicode_locations_and_metadata_roundtrip(brain, tmp_path):
     assert file["source_id"] == 'custom, [source]\n---\nid: hostile\u2028'
 
 
+def test_import_retry_cannot_skip_unfinished_engine_ingest(brain, tmp_path, monkeypatch):
+    path = write(tmp_path)
+    engine = BrainEngine(brain, HashEmbedder())
+    def fail(*args, **kwargs):
+        raise RuntimeError('vector storage unavailable')
+    with monkeypatch.context() as failed:
+        failed.setattr(brain, 'write_vectors', fail)
+        result = import_documents(brain, [path], engine=engine, extraction='rules')
+    assert result['files'][0]['status'] == 'partial'
+    receipt_id = result['files'][0]['chunks'][0]['node_id']
+    assert brain.read_node(receipt_id).capture['ingest_incomplete']
+    before = snapshot(brain)
+    retry = import_documents(brain, [path], engine=engine, extraction='rules')
+    assert retry['files'][0]['status'] == 'partial'
+    assert retry['files'][0]['error'] == 'ingest_incomplete'
+    assert snapshot(brain) == before
+    assert not any(n.ntype == 'entity' for n in brain.read_nodes())
+
+
 @pytest.mark.parametrize("limit", [1, 2, 10, 40, 100])
 def test_chunk_hard_bound_and_complete_non_whitespace(limit):
     text = "# Heading\n\n" + "abc世界" * 40 + "\n\n## Next\n" + "sentence words. " * 20
@@ -124,7 +143,9 @@ def test_dry_run_existing_git_brain_unchanged(tmp_path):
     # Set identity only for this fixture's repository.
     brain.ensure_ready()
     subprocess.run(["git", "-C", str(brain.path), "add", "."], check=True, env=env)
-    subprocess.run(["git", "-C", str(brain.path), "commit", "-qm", "init"], check=True, env=env)
+    # Keep Git's detached housekeeping from changing .git after the snapshot.
+    subprocess.run(["git", "-C", str(brain.path), "-c", "maintenance.auto=false",
+                    "-c", "gc.auto=0", "commit", "-qm", "init"], check=True, env=env)
     before = {str(p.relative_to(brain.path)): p.read_bytes() for p in brain.path.rglob("*") if p.is_file()}
     assert import_documents(brain, [path], dry_run=True)["failed_files"] == 0
     assert {str(p.relative_to(brain.path)): p.read_bytes() for p in brain.path.rglob("*") if p.is_file()} == before

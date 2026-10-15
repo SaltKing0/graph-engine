@@ -9,6 +9,8 @@ from __future__ import annotations
 import os
 import sys
 import math
+from contextlib import contextmanager
+from collections.abc import Iterator
 from .write_guard import THREAD_LOCK
 from typing import TYPE_CHECKING
 
@@ -102,6 +104,44 @@ def write_lock_timeout_from_env() -> float:
     if not math.isfinite(value) or not 0 <= value <= 3600:
         raise ValueError(f"{WRITE_LOCK_TIMEOUT_ENV} must be finite and between 0 and 3600")
     return value
+
+
+EDGE_CONF_FLOOR_ENV = "IG_EDGE_CONF_FLOOR"
+EDGE_CONF_FLOOR = 0.0
+
+
+def edge_conf_floor_from_env(env: dict[str, str] | None = None) -> float:
+    """Per-call override > process environment; confidence is finite in [0, 1]."""
+    raw = (env or {}).get(EDGE_CONF_FLOOR_ENV,
+                          os.environ.get(EDGE_CONF_FLOOR_ENV, str(EDGE_CONF_FLOOR)))
+    try:
+        value = float(raw)
+    except (ValueError, TypeError, OverflowError):
+        raise ValueError(f"{EDGE_CONF_FLOOR_ENV} must be a finite number between 0 and 1") from None
+    if not math.isfinite(value) or not 0 <= value <= 1:
+        raise ValueError(f"{EDGE_CONF_FLOOR_ENV} must be a finite number between 0 and 1")
+    return value
+
+
+class IngestPartialError(RuntimeError):
+    """Ingest failed after saving a note; never represent this as rejection."""
+
+    def __init__(self, node_id: str, source_node_id: str | None, duplicate: bool,
+                 cause: Exception, *, retryable: bool = False):
+        self.node_id = node_id
+        self.source_node_id = source_node_id
+        self.duplicate = duplicate
+        self.retryable = retryable
+        super().__init__(f"Note {node_id} was saved, but ingest did not finish: {cause}")
+
+    def to_dict(self) -> dict:
+        # Do not expose backend exceptions (which may contain private paths/text).
+        return dict(error="ingest_incomplete", captured=True, node_id=self.node_id,
+                    source_node_id=self.source_node_id, duplicate=self.duplicate,
+                    retryable=self.retryable,
+                    message="Note saved; ingest incomplete. Inspect local state and Git sync. "
+                            + ("Retry identical input to resume extraction." if self.retryable else
+                               "Manual recovery is required before retrying extraction."))
 
 
 def auto_accept_from_env() -> bool:
@@ -217,6 +257,87 @@ class BrainEngine:
                 self.brain.rebuild_index()
             return count
 
+    def _prepare_ingest(self, text: str, source: str = "human", tags: list[str] | None = None,
+                        allow_duplicates: bool = False, ntype: str = "semantic",
+                        auto_accept: bool | None = None,
+                        relations: list[tuple[str, str]] | None = None,
+                        edge_origin: str = "manual", env: dict[str, str] | None = None,
+                        _capture_input: str | None = None, _document: dict | None = None,
+                        _node_id: str | None = None) -> tuple[Node, float, int]:
+        """Validate and serialize before init, pull, dedupe or vector cache writes.
+
+        Capture retries use the same preflight, even when they skip ingest.
+        Storage-dependent target authorization still runs under the writer guard.
+        """
+        if not isinstance(text, str) or not text.strip():
+            raise ValueError("Empty text cannot be ingested.")
+        if not isinstance(source, str):
+            raise ValueError("source must be a string")
+        if tags is not None and (not isinstance(tags, list)
+                                 or any(not isinstance(t, str) for t in tags)):
+            raise ValueError("tags must be a list of strings")
+        if ntype not in ("semantic", "episodic", "procedural", "entity"):
+            raise ValueError("Unknown ingest memory type")
+        if not isinstance(allow_duplicates, bool):
+            raise ValueError("allow_duplicates must be a boolean")
+        if auto_accept is not None and not isinstance(auto_accept, bool):
+            raise ValueError("auto_accept must be a boolean")
+        if not isinstance(edge_origin, str):
+            raise ValueError("edge_origin must be a string")
+        if relations is not None and (not isinstance(relations, list) or any(
+                not isinstance(pair, (tuple, list)) or len(pair) != 2
+                or any(not isinstance(v, str) or not v.strip() for v in pair)
+                for pair in relations)):
+            raise ValueError("relations must be a list of (target, kind) string pairs")
+        if env is not None and (not isinstance(env, dict) or any(
+                not isinstance(k, str) or not isinstance(v, str) for k, v in env.items())):
+            raise ValueError("env must be a dictionary of strings")
+        floor = edge_conf_floor_from_env(env)
+        intent_cap = intent_auto_accept_max(env)
+        # Thresholds above 1 remain supported to disable cosine deduplication.
+        if (not isinstance(self.dedupe_threshold, (int, float))
+                or not math.isfinite(self.dedupe_threshold)):
+            raise ValueError("dedupe_threshold must be finite")
+        if _node_id is not None and not isinstance(_node_id, str):
+            raise ValueError("node ID must be a string")
+        if _node_id is not None:
+            self.brain.node_path(_node_id)
+        node = Node(text=text.strip(), source=source, tags=tags, ntype=ntype,
+                    id=_node_id, document=_document)
+        if _capture_input is not None:
+            if not isinstance(_capture_input, str):
+                raise ValueError("capture input must be a string")
+            node.capture = dict(input=_capture_input, node_id=node.id,
+                                duplicate=False, source=source, ingest_incomplete=True)
+        node.to_markdown().encode("utf-8")  # Validate metadata and on-disk encoding.
+        return node, floor, intent_cap
+
+    def _complete_capture_ingest(self, receipt: Node | None) -> None:
+        """Only a fully written ingest may be skipped by an extraction retry."""
+        if receipt is None:
+            return
+        incomplete = receipt.capture
+        receipt.capture = {k: v for k, v in incomplete.items() if k != "ingest_incomplete"}
+        try:
+            self.brain.write_node(receipt)
+        except Exception:
+            receipt.capture = incomplete
+            raise
+
+    @contextmanager
+    def _after_capture(self, node: Node, receipt: Node | None = None,
+                       duplicate: bool = False) -> Iterator[None]:
+        """Convert post-save failures into a safe, machine-readable partial result."""
+        try:
+            yield
+        except Exception as exc:
+            self._heal_after_failed_commit()
+            receipt_id = (receipt.id if receipt is not None
+                          and self.brain.node_path(receipt.id).is_file() else None)
+            raise IngestPartialError(node.id, receipt_id,
+                                     duplicate, exc, retryable=receipt_id is not None
+                                     and not receipt.capture.get("ingest_incomplete", False)) from exc
+
     def ingest(self, text: str, source: str = "human", tags: list[str] | None = None,
                allow_duplicates: bool = False, ntype: str = "semantic",
                auto_accept: bool | None = None,
@@ -237,20 +358,13 @@ class BrainEngine:
         (IG_EDGE_CONF_FLOOR, default 0.0 = no filter) drops weak
         Auto-edge suggestions — ROADMAP_CASE `roadmap-confidence-floor`.
         """
+        node, floor, intent_auto_left = self._prepare_ingest(
+            text, source, tags, allow_duplicates, ntype, auto_accept, relations,
+            edge_origin, env, _capture_input, _document, _node_id)
+        text = node.text
         if auto_accept is None:
             auto_accept = auto_accept_from_env()
         intent_pending = intent_pending_from_env()
-        # Intent fan-out dam (ROADMAP_CASE `roadmap-intent-fanout-cap`): the
-        # marker heuristic auto-accepted every intent edge it produced, so one
-        # marker word could write dozens of false `contradicts` into the graph
-        # (live: 39 % of all intent edges ever created were invalidated again).
-        # At most `intent_auto_accept_max()` intent edges per source are
-        # auto-accepted; the rest are born PENDING (kept, reviewable, not
-        # dropped) — see graph_engine/review.py for the policy and its bounds.
-        intent_auto_left = intent_auto_accept_max(env)
-        text = text.strip()
-        if not text:
-            raise ValueError("Empty text cannot be ingested.")
         # The complete RMW chain (dedupe → node → embed → edges → vectors →
         # evolve → index → commit) runs under ONE lock: parallel ingests
         # must not duplicate each other's nodes/edges or lose
@@ -273,154 +387,124 @@ class BrainEngine:
             if not allow_duplicates:
                 dup = self._find_duplicate(vec)
                 if dup is not None:
-                    self.brain.merge_node(dup, source=source)
+                    receipt = None
                     if _capture_input is not None:
-                        # Cosine equivalence is not evidence equivalence. Store
-                        # a separate exact receipt in the capture commit.
-                        self.brain.write_node(Node(text=text, source=source, ntype=ntype,
-                            id=_node_id, document=_document,
-                            capture=dict(input=_capture_input, node_id=dup.id,
-                                         duplicate=True, source=source)))
-                    self.brain.rebuild_index()
-                    # Audit #31: a failing commit must not look like data loss —
-                    # catch, heal the derived index, re-raise with guidance.
-                    try:
+                        # Prepare exact evidence before touching the survivor.
+                        node.capture.update(node_id=dup.id, duplicate=True)
+                        receipt = node
+                    self.brain.merge_node(dup, source=source)
+                    with self._after_capture(dup, receipt, duplicate=True):
+                        if receipt is not None:
+                            self.brain.write_node(receipt)
+                        self.brain.rebuild_index()
+                        self._complete_capture_ingest(receipt)
                         self.brain.commit_and_push(
                             f"ingest dup of {dup.id[:8]}: {_normalize(text)[:50]}…")
-                    except Exception:
-                        self._heal_after_failed_commit()
-                        raise
-                    return dup, [], True
-            node = Node(text=text, source=source, tags=tags, ntype=ntype,
-                        id=_node_id, document=_document)
-            if _capture_input is not None:
-                node.capture = dict(input=_capture_input, node_id=node.id,
-                                    duplicate=False, source=source)
+                        return dup, [], True
             self.brain.write_node(node)
-            # Embedding cache: only new nodes get embedded, the rest comes from vectors.jsonl
-            others = {n.id for n in self.brain.read_nodes()
-                      if n.id != node.id and n.ntype != "entity"
-                      and self.brain.can_access("write", n.id)}
-            candidates = self.brain.vectors_for(
-                others,
-                lambda t: self.embedder.embed(_normalize(t)),
-                batch_fn=lambda ts: self.embedder.embed_batch([_normalize(t) for t in ts]),
-            )
-            # V2#3 intent edges + admit rule: the new node enters with its relations.
-            # Intent edges are pending=False (auto-accepted), so they must
-            # additionally prove real topical relatedness (ST cosine
-            # >= INTENT_SIM_THRESHOLD), otherwise a single marker word spams all nodes.
-            intent_edges: list[Edge] = []
-            # Sorted by target id: which edges fall inside the cap must not
-            # depend on the filesystem's node read order (determinism).
-            for ex in sorted(self.brain.read_nodes(), key=lambda n: n.id):
-                if (ex.id == node.id or ex.ntype == "entity"
-                        or not self.brain.can_access("write", ex.id)):
-                    continue
-                intent = detect_intent(node.text, ex.text)
-                if not intent:
-                    continue
-                ex_vec = candidates.get(ex.id)
-                if ex_vec is None or cosine(vec, ex_vec) < INTENT_SIM_THRESHOLD:
-                    continue
-                if intent_pending:
-                    pending = True
-                elif intent_auto_left > 0:
-                    pending = False
-                    intent_auto_left -= 1
-                else:
-                    pending = True
-                intent_edges.append(Edge(source=node.id, target=ex.id, kind=intent, pending=pending,
-                                         origin="intent"))
-            # Admit rule: explicitly declared relations (target_text|id, kind).
-            if relations:
-                for ref, kind in relations:
-                    target = next((n for n in self.brain.read_nodes()
-                                   if n.id == ref or n.text.strip().lower() == ref.strip().lower()), None)
-                    if target is not None and target.id != node.id:
-                        intent_edges.append(Edge(source=node.id, target=target.id, kind=kind, pending=False,
-                                             origin=edge_origin))
-            # Similarity edges (V2#3): pending unless either the confidence band (>=0.95)
-            # or the env override (IDEAGRAPH_AUTO_ACCEPT) auto-accepts the edge.
-            # Tier-3 confidence floor (roadmap-confidence-floor): suggestions below the
-            # floor (per-call env IG_EDGE_CONF_FLOOR, default 0.0 = no filter) are
-            # dropped instead of landing pending — protects autonomous cycles from
-            # a flood of low-confidence edges.
-            # Tier-3 confidence floor: non-numeric values get an
-            # understandable error instead of a bare float() ValueError
-            # (Audit #20: "unexplained 500s").
-            _floor_raw = (env or {}).get("IG_EDGE_CONF_FLOOR",
-                                         os.environ.get("IG_EDGE_CONF_FLOOR", "0.0"))
-            try:
-                floor = float(_floor_raw)
-            except (TypeError, ValueError):
-                raise ValueError(
-                    f"IG_EDGE_CONF_FLOOR must be a number, got: {_floor_raw!r}")
-            sim_edges = [Edge(source=s.source, target=s.target, kind=s.kind,
-                              pending=not (is_auto_accept(s.confidence) or auto_accept),
-                              confidence=s.confidence, origin="suggester")
-                         for s in suggest(node.id, vec, candidates)
-                         if s.confidence >= floor]
-            # Intent/admit-rule edges take precedence; similarity must not duplicate the same pair.
-            claimed = {(e.source, e.target) for e in intent_edges}
-            combined = list(intent_edges)
-            for e in sim_edges:
-                if (e.source, e.target) in claimed:
-                    continue
-                claimed.add((e.source, e.target))
-                combined.append(e)
-            existing_pairs = {(e.source, e.target) for e in self.brain.read_edges()}
-            new_edges = [e for e in combined if (e.source, e.target) not in existing_pairs]
-            for e in new_edges:
-                self.brain.add_edge(e)
-            # Cache the new node's vector
-            cached = self.brain.read_vectors()
-            cached[node.id] = vec
-            self.brain.write_vectors(cached)
-            # Memory evolution (A-Mem lesson): strong new connection (similar,
-            # auto-accepted via confidence band OR env) → enrich related old
-            # nodes with a cross-reference.
-            # Audit #22: the rewrite must preserve the target node's status (and
-            # created) — previously it lost status → active fell back to
-            # probation (status erosion, verified live).
-            # Audit #19: the annotation grows unboundedly and drifts the node's
-            # own embedding → hard cap; further references go into the
-            # edges (which exist anyway), not into the text.
-            EVOLVED_ANNOTATION_CAP = 5
-            evolved = 0
-            for e in new_edges:
-                if not e.pending and e.kind == "similar":
-                        target_node = next((n for n in self.brain.read_nodes()
-                                            if n.id == e.target), None)
-                        if (target_node is None or target_node.status == "tombstone"
-                                or target_node.ntype == "entity"
-                                or "consolidation-proposal" in target_node.tags):
-                            # Proposal text is the claim's reuse/decision key.
-                            # Keep automatic cross-references in edges only.
-                            continue
-                        existing = target_node.text.count("[evolved ")
-                        if existing >= EVOLVED_ANNOTATION_CAP:
-                            continue
-                        ref = f"[evolved {self._now_short()}: connected to {node.id[:8]} “{_normalize(text)[:40]}…”]"
-                        if "evolved" not in target_node.text or node.id[:8] not in target_node.text:
-                            # Enrich the existing object: reconstructing a Node
-                            # resets newer metadata (including pinned tiers).
-                            target_node.text += "\n\n" + ref
-                            self.brain.write_node(target_node)
-                            evolved += 1
-            self.brain.rebuild_index()
-            suffix = f", {evolved} nodes evolved" if evolved else ""
-            try:
+            with self._after_capture(node, node if node.capture else None):
+                # Embedding cache: only new nodes get embedded, the rest comes from vectors.jsonl
+                others = {n.id for n in self.brain.read_nodes()
+                          if n.id != node.id and n.ntype != "entity"
+                          and self.brain.can_access("write", n.id)}
+                candidates = self.brain.vectors_for(
+                    others,
+                    lambda t: self.embedder.embed(_normalize(t)),
+                    batch_fn=lambda ts: self.embedder.embed_batch([_normalize(t) for t in ts]),
+                )
+                # V2#3 intent edges + admit rule: the new node enters with its relations.
+                # Intent edges are pending=False (auto-accepted), so they must
+                # additionally prove real topical relatedness (ST cosine
+                # >= INTENT_SIM_THRESHOLD), otherwise a single marker word spams all nodes.
+                intent_edges: list[Edge] = []
+                # Sorted by target id: which edges fall inside the cap must not
+                # depend on the filesystem's node read order (determinism).
+                for ex in sorted(self.brain.read_nodes(), key=lambda n: n.id):
+                    if (ex.id == node.id or ex.ntype == "entity"
+                            or not self.brain.can_access("write", ex.id)):
+                        continue
+                    intent = detect_intent(node.text, ex.text)
+                    if not intent:
+                        continue
+                    ex_vec = candidates.get(ex.id)
+                    if ex_vec is None or cosine(vec, ex_vec) < INTENT_SIM_THRESHOLD:
+                        continue
+                    if intent_pending:
+                        pending = True
+                    elif intent_auto_left > 0:
+                        pending = False
+                        intent_auto_left -= 1
+                    else:
+                        pending = True
+                    intent_edges.append(Edge(source=node.id, target=ex.id, kind=intent, pending=pending,
+                                             origin="intent"))
+                # Admit rule: explicitly declared relations (target_text|id, kind).
+                if relations:
+                    for ref, kind in relations:
+                        target = next((n for n in self.brain.read_nodes()
+                                       if n.id == ref or n.text.strip().lower() == ref.strip().lower()), None)
+                        if target is not None and target.id != node.id:
+                            intent_edges.append(Edge(source=node.id, target=target.id, kind=kind, pending=False,
+                                                 origin=edge_origin))
+                # Apply the confidence floor resolved before any storage mutation.
+                sim_edges = [Edge(source=s.source, target=s.target, kind=s.kind,
+                                  pending=not (is_auto_accept(s.confidence) or auto_accept),
+                                  confidence=s.confidence, origin="suggester")
+                             for s in suggest(node.id, vec, candidates)
+                             if s.confidence >= floor]
+                # Intent/admit-rule edges take precedence; similarity must not duplicate the same pair.
+                claimed = {(e.source, e.target) for e in intent_edges}
+                combined = list(intent_edges)
+                for e in sim_edges:
+                    if (e.source, e.target) in claimed:
+                        continue
+                    claimed.add((e.source, e.target))
+                    combined.append(e)
+                existing_pairs = {(e.source, e.target) for e in self.brain.read_edges()}
+                new_edges = [e for e in combined if (e.source, e.target) not in existing_pairs]
+                for e in new_edges:
+                    self.brain.add_edge(e)
+                # Cache the new node's vector
+                cached = self.brain.read_vectors()
+                cached[node.id] = vec
+                self.brain.write_vectors(cached)
+                # Memory evolution (A-Mem lesson): strong new connection (similar,
+                # auto-accepted via confidence band OR env) → enrich related old
+                # nodes with a cross-reference.
+                # Audit #22: the rewrite must preserve the target node's status (and
+                # created) — previously it lost status → active fell back to
+                # probation (status erosion, verified live).
+                # Audit #19: the annotation grows unboundedly and drifts the node's
+                # own embedding → hard cap; further references go into the
+                # edges (which exist anyway), not into the text.
+                EVOLVED_ANNOTATION_CAP = 5
+                evolved = 0
+                for e in new_edges:
+                    if not e.pending and e.kind == "similar":
+                            target_node = next((n for n in self.brain.read_nodes()
+                                                if n.id == e.target), None)
+                            if (target_node is None or target_node.status == "tombstone"
+                                    or target_node.ntype == "entity"
+                                    or "consolidation-proposal" in target_node.tags):
+                                # Proposal text is the claim's reuse/decision key.
+                                # Keep automatic cross-references in edges only.
+                                continue
+                            existing = target_node.text.count("[evolved ")
+                            if existing >= EVOLVED_ANNOTATION_CAP:
+                                continue
+                            ref = f"[evolved {self._now_short()}: connected to {node.id[:8]} “{_normalize(text)[:40]}…”]"
+                            if "evolved" not in target_node.text or node.id[:8] not in target_node.text:
+                                # Enrich the existing object: reconstructing a Node
+                                # resets newer metadata (including pinned tiers).
+                                target_node.text += "\n\n" + ref
+                                self.brain.write_node(target_node)
+                                evolved += 1
+                self.brain.rebuild_index()
+                self._complete_capture_ingest(node if node.capture else None)
+                suffix = f", {evolved} nodes evolved" if evolved else ""
                 self.brain.commit_and_push(
                     f"ingest: {text[:50]}{'…' if len(text) > 50 else ''} (+{len(new_edges)} suggestions{suffix})")
-            except Exception:
-                # Audit #31: the mutation landed on disk but the commit/push
-                # failed. Heal the derived index and raise an actionable error
-                # instead of a bare CalledProcessError (no fake rollback — the
-                # next successful ingest commits whatever landed).
-                self._heal_after_failed_commit()
-                raise
-            return node, new_edges, False
+                return node, new_edges, False
 
     def capture(self, text: str, source: str = "human", tags: list[str] | None = None,
                 allow_duplicates: bool = False, *, extraction: str | None = None,
@@ -436,6 +520,8 @@ class BrainEngine:
 
         if extraction not in (None, "rules", "model"):
             raise ValueError("extraction must be rules or model")
+        if not isinstance(accept_facts, bool):
+            raise ValueError("accept_facts must be a boolean")
         if accept_facts and extraction is None:
             raise ValueError("accept_facts requires extraction")
         if extraction is None:
@@ -445,6 +531,7 @@ class BrainEngine:
             raise ValueError("Empty text cannot be ingested.")
         if kwargs.get("ntype", "semantic") not in ("semantic", "episodic", "procedural"):
             raise ValueError("capture requires a semantic, episodic or procedural note")
+        self._prepare_ingest(text, source, tags, allow_duplicates, **kwargs)
         # Reject missing model configuration before capture, but execute the
         # adapter only after the original input is durably stored.
         extractor = command_extractor() if extraction == "model" else None
@@ -469,6 +556,9 @@ class BrainEngine:
                 if node is None or node.status == "tombstone":
                     raise ValueError("Captured note is no longer live; retry cannot revive it")
                 self.brain.authorize("write", node.id)
+                if evidence.capture.get("ingest_incomplete", False):
+                    raise IngestPartialError(node.id, evidence.id, evidence.capture["duplicate"],
+                        RuntimeError("Capture ingest requires manual recovery"))
                 edges, duplicate = [], evidence.capture["duplicate"]
             summary = dict(mode=extraction, source_node_id=evidence.id,
                            captured=True, retried=retried)
@@ -650,7 +740,7 @@ class BrainEngine:
             self.brain.rebuild_index()
         except Exception:
             pass  # index rebuild is best-effort; nodes/edges/vectors are the truth
-        print("WARNING: brain mutated but commit/push failed — changes remain local "
+        print("WARNING: brain mutated but ingest did not finish — changes remain local "
               "and may already be committed. Inspect `git -C <brain> status` and "
               "`git -C <brain> log` before retrying sync.", file=sys.stderr)
 
