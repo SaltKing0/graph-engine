@@ -151,6 +151,8 @@ deployment](docs/guide.md#background-maintenance-worker).
   [storage tiers and feedback](docs/guide.md#storage-tiers-and-retrieval-feedback)
 - [Isolated graphs and access control](docs/guide.md#isolated-graphs-and-access-control)
 - [Opt-in graph retrieval and scoring](docs/graph-retrieval.md)
+- [Decision Memory v1 contract and worked example](docs/decision-memory-v1.md)
+  (specification; implementation planned)
 - [Memory answer-quality benchmarks](docs/memory-benchmarks.md)
 - [Retrieval performance and disposable indexes](docs/retrieval-performance.md)
 - [Budgeted agent context and two-session example](docs/guide.md#budgeted-context-and-a-complete-agent-turn)
