@@ -90,6 +90,8 @@ def test_concurrent_resolves_do_not_lose_updates(tmp_path):
     Before the fix, the last-writer-wins rewrite lost the other's writes.
     """
     brain = make_brain(tmp_path)
+    brain.write_node(Node(id="a", text="Source"))
+    brain.write_node(Node(id="b", text="Target"))
     brain.write_edges([Edge(source="a", target="b", kind="similar",
                             pending=True, id=f"{i:012x}") for i in range(20)])
     errors = []

@@ -684,7 +684,7 @@ class BrainEngine:
         with self.brain.write_guard():
             self.brain.ensure_ready()
             self.brain.pull()
-            ids = {n.id for n in self.brain.read_nodes()}
+            ids = {n.id for n in self.brain.read_nodes() if n.status != "tombstone"}
             missing = [nid for nid in (source_id, target_id) if nid not in ids]
             if missing:
                 raise ValueError(f"Node(s) not found: {', '.join(missing)}")

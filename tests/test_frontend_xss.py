@@ -116,6 +116,83 @@ def open_graph(page, server):
     expect(page.locator("#cards .card")).to_have_count(1)
 
 
+@pytest.mark.parametrize("close_detail", [False, True])
+def test_forgetting_removes_text_from_graph_details_and_review(server, page, tmp_path, close_detail):
+    from graph_engine.agent_memory import forget
+    brain = Brain(str(tmp_path / "brain"), mode="local")
+    secret = "Synthetic forgotten browser memory"
+    brain.write_node(Node(secret, id="forgotten", status="active"))
+    brain.add_edge(Edge("hostile", "safe", "fact", id="secret-fact", predicate="uses",
+                        evidence=[{"node_id": "forgotten", "text": secret}]))
+    page.goto(server)
+    expect(page.locator("#graph .node")).to_have_count(3)
+    expect(page.locator("#cards .card")).to_have_count(2)
+    page.locator('#graph .node').filter(has_text=secret).click()
+    expect(page.locator("#detail-text")).to_have_text(secret)
+    if close_detail:
+        page.locator("#close-detail").click()
+        expect(page.locator("#detail")).not_to_be_visible()
+    forget(brain, "forgotten", reason="synthetic browser regression", commit=False)
+    # Refresh with either an open detail pane or a previously closed one.
+    assert page.request.post(f"{server}/api/edge", data={
+        "source": "hostile", "target": "safe", "kind": "same_as"}).status == 200
+    expect(page.locator("#graph .node")).to_have_count(2)
+    expect(page.locator("#cards .card")).to_have_count(1)
+    assert secret not in page.locator("body").inner_text()
+    assert secret not in page.locator("body").inner_html()
+    assert secret not in page.request.get(f"{server}/api/graph").text()
+    page.goto(f"{server}/review")
+    expect(page.locator("#count")).to_have_text("1 pending")
+    assert secret not in page.locator("body").inner_text()
+    assert brain.read_node("forgotten").text == secret
+
+
+def test_refresh_removes_forgotten_focused_search_result(server, page, tmp_path):
+    from graph_engine.agent_memory import forget
+    brain = Brain(tmp_path / "brain", mode="local")
+    secret = "Synthetic forgotten search memory"
+    brain.write_node(Node(secret, id="forgotten", status="active"))
+    page.goto(server)
+    expect(page.locator("#graph .node")).to_have_count(3)
+    page.locator("#search").fill("Synthetic forgotten")
+    hit = page.locator('#search-results button[data-node="forgotten"]')
+    expect(hit).to_contain_text(secret)
+    hit.focus()
+    forget(brain, "forgotten", reason="search refresh regression", commit=False)
+    assert page.request.post(f"{server}/api/edge", data={
+        "source": "hostile", "target": "safe", "kind": "same_as"}).status == 200
+    expect(page.locator("#graph .node")).to_have_count(2)
+    expect(page.locator("#search-results")).to_contain_text("No matching idea")
+    expect(page.locator("#search")).to_be_focused()
+    assert secret not in page.locator("body").inner_html()
+    assert secret not in page.request.get(f"{server}/api/graph").text()
+
+
+def test_review_refresh_clears_forgotten_picker_and_search_hits(server, page, tmp_path):
+    from graph_engine.agent_memory import forget
+    brain = Brain(tmp_path / "brain", mode="local")
+    secret = "Synthetic forgotten picker memory"
+    brain.write_node(Node(secret, id="forgotten", status="active"))
+    brain.add_edge(Edge("forgotten", "safe", "similar", id="secret-edge"))
+    page.goto(f"{server}/review")
+    expect(page.locator("#count")).to_have_text("2 pending")
+    page.locator("#search").fill("Synthetic forgotten")
+    expect(page.locator("#hits")).to_contain_text(secret)
+    page.locator('.nodebox[data-pick="forgotten"]').click()
+    page.locator('.nodebox[data-pick="safe"]').first.click()
+    expect(page.locator("#slotA")).to_contain_text(secret)
+    expect(page.locator("#linkbtn")).to_be_enabled()
+    forget(brain, "forgotten", reason="picker refresh regression", commit=False)
+    page.locator('button[data-resolve="suggestion"][data-accept="1"]').click()
+    expect(page.locator("#count")).to_have_text("0 pending")
+    expect(page.locator("#slotA")).to_have_text("A: empty")
+    expect(page.locator("#slotB")).to_contain_text("A second idea")
+    expect(page.locator("#linkbtn")).to_be_disabled()
+    expect(page.locator("#hits")).to_be_empty()
+    assert secret not in page.locator("body").inner_html()
+    assert brain.read_node("forgotten").text == secret
+
+
 def assert_inert(page):
     assert page.evaluate("() => window.__pwned === undefined")
     assert page.locator('img[src="x"]').count() == 0
@@ -329,6 +406,7 @@ def test_ranked_highlights_survive_closing_search(server, page, outside_action):
         page.locator("#zoom-in").focus()
     expect(page.locator("#search-results")).to_be_hidden()
     expect(search).to_have_value("Benign")
+    expect(page.locator("#search-results")).to_be_empty()
     expect(semantic).not_to_have_class("node dimmed")
     expect(literal).not_to_have_class("node dimmed")
     # A different query must discard highlights from the previous ranking.

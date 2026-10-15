@@ -78,6 +78,25 @@ def test_restores_text_tombstone_and_review_decisions(saved):
     assert snapshot(brain, 'HEAD~1')['revision'] == accepted
 
 
+def test_live_views_hide_tombstones_but_snapshots_use_current_authorization(saved, tmp_path, monkeypatch):
+    from graph_engine.access import SecuredBrain
+    brain, _, accepted, latest = saved
+    assert 'python' not in {n['id'] for n in brain.graph_state()['nodes']}
+    assert brain.graph_state()['edges'] == []
+    assert brain.read_node('python').status == 'tombstone'
+    policy = tmp_path / 'policy.json'
+    config = {'roles': {'reader': 'viewer'}}
+    policy.write_text(json.dumps({'graphs': {'default': config}}))
+    monkeypatch.setenv('IG_ACCESS_POLICY', str(policy))
+    secured = SecuredBrain(str(brain.path), mode='git', graph_name='default', identity='reader')
+    assert 'python' in {n.id for n in snapshot(secured, accepted)['nodes']}
+    assert {n.id: n.status for n in snapshot(secured, latest)['nodes']}['python'] == 'tombstone'
+    config['nodes'] = {'python': {'read': ['owner']}}
+    policy.write_text(json.dumps({'graphs': {'default': config}}))
+    assert 'python' not in {n.id for n in snapshot(secured, accepted)['nodes']}
+    assert 'python' not in {n.id for n in snapshot(secured, latest)['nodes']}
+
+
 def test_validity_is_independent_of_commit_time(saved):
     brain, pending, accepted, latest = saved
     assert snapshot(brain, pending, fact_valid_at='2021-06-01T00:00:00Z')['edges'] == []

@@ -126,6 +126,26 @@ def _call(tool: str, args: dict):
 
 @pytest.mark.skipif(not MCP_AVAILABLE, reason="mcp extra not installed")
 class TestMCPTools:
+    def test_forgotten_node_and_evidence_leave_live_tools(self, mcp_env):
+        from graph_engine.brain import Brain, Node, Edge
+        from graph_engine.agent_memory import forget
+        brain = Brain(str(mcp_env), mode="local")
+        secret = "Synthetic forgotten evidence"
+        brain.write_node(Node(secret, id="forgotten", status="active"))
+        forget(brain, "forgotten", reason="synthetic regression", commit=False)
+        brain.add_edge(Edge("aaaaaaaaaaaa", "bbbbbbbbbbbb", "fact", pending=False,
+                            id="unsupported", predicate="uses",
+                            evidence=[{"node_id": "forgotten", "text": secret}]))
+        for tool in ("get_node", "neighbors"):
+            result, err = _call(tool, {"id": "forgotten"})
+            assert not err
+            assert result["error"]["code"] == "node_not_found"
+            assert secret not in json.dumps(result)
+        result, _ = _call("get_node", {"id": "aaaaaaaaaaaa"})
+        assert {e["id"] for e in result["edges"]} == {"edge00000001"}
+        result, _ = _call("neighbors", {"id": "aaaaaaaaaaaa"})
+        assert result["neighbors"] == []
+
     def test_search_brain_finds_node(self, mcp_env):
         payload, err = _call("search_brain", {"query": "agent memory"})
         assert err is False

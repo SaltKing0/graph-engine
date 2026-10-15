@@ -39,6 +39,39 @@ def test_saved_decision_can_be_undone_with_live_update(client_and_edge, action):
         assert client.post(f"/api/edge/{edge.id}/undo").status_code == 409
 
 
+@pytest.mark.parametrize("support", ["endpoint", "evidence"])
+@pytest.mark.parametrize("unavailable", ["forgotten", "missing"])
+def test_live_graph_and_review_require_live_support(client_and_edge, support, unavailable):
+    from graph_engine.agent_memory import forget
+    from graph_engine import runtime
+    client, safe_edge = client_and_edge
+    brain = runtime.make_brain()
+    secret = "Synthetic forgotten evidence must disappear"
+    brain.write_node(Node(secret, id="support", status="active"))
+    unsafe = Edge("first", "support" if support == "endpoint" else "second", "fact",
+                  id="unsafe", predicate="uses", evidence=[{"node_id": "support", "text": secret}])
+    brain.add_edge(unsafe)
+    assert "support" in {n["id"] for n in client.get("/api/graph").json()["nodes"]}
+    if unavailable == "forgotten":
+        forget(brain, "support", reason="synthetic regression", commit=False)
+    else:
+        brain.node_path("support").unlink()
+    # Also cover imported/legacy pending records that were never invalidated.
+    brain.write_edges([safe_edge, unsafe])
+    response = client.get("/api/graph")
+    assert secret not in response.text
+    assert {n["id"] for n in response.json()["nodes"]} == {"first", "second"}
+    assert [e["id"] for e in response.json()["edges"]] == [safe_edge.id]
+    hits = client.get("/api/search", params={"query": "Synthetic forgotten"}).json()["results"]
+    assert "support" not in {hit["id"] for hit in hits}
+    assert client.post("/api/edge/unsafe/accept").status_code == 404
+    assert client.post("/api/edge/unsafe/reject").status_code == 404
+    unsafe.pending = False
+    brain.write_edges([safe_edge, unsafe])
+    assert client.post("/api/edge/unsafe/undo").status_code == 409
+    assert client.post("/api/edge", json={"source": "first", "target": "support"}).status_code == 400
+
+
 @pytest.mark.parametrize("origin", [
     "https://untrusted.example", "http://testserver.evil.example",
     "https://testserver", "http://testserver:8001", "http://localhost",

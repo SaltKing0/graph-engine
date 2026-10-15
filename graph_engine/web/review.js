@@ -57,6 +57,10 @@ async function refresh() {
   }
   nodes = {};
   g.nodes.forEach(n => nodes[n.id] = n);
+  if (!Object.hasOwn(nodes, pickA)) pickA = null;
+  if (!Object.hasOwn(nodes, pickB)) pickB = null;
+  renderPick();
+  renderSearch();
   edgesById = Object.fromEntries(g.edges.map(e => [e.id, e]));
   pending = g.edges.filter(e => e.pending && !(e.invalidated ?? Boolean(e.valid_to)));
   const replacementFacts = new Set(pending.filter(e => e.kind === "fact_replacement").map(e => e.replacement.new_fact_id));
@@ -208,7 +212,7 @@ async function link() {
 }
 
 // Search
-$("search").addEventListener("input", () => {
+function renderSearch() {
   const q = $("search").value.trim().toLowerCase();
   const hits = $("hits");
   if (!q) return hits.innerHTML = "";
@@ -217,7 +221,8 @@ $("search").addEventListener("input", () => {
   hits.innerHTML = found.map(n =>
     `<div class="hit ${n.id === pickA ? "pickedA" : ""} ${n.id === pickB ? "pickedB" : ""}"
           data-pick="${esc(n.id)}"><span class="id">${esc(n.id.slice(0, 8))}</span>${esc(short(n.id, 55))}</div>`).join("");
-});
+}
+$("search").addEventListener("input", renderSearch);
 
 window.searchPick = id => { pick(id); $("search").value = ""; $("hits").innerHTML = ""; };
 
