@@ -8,7 +8,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from graph_engine.context import build_context
+from graph_engine.context import build_context, estimate_tokens
 from graph_engine.embedder import HashEmbedder
 from tools.memory_benchmark.adapters import GraphAdapter
 from tools.memory_benchmark.runner import checkpoint, source_metadata
@@ -16,6 +16,7 @@ from tools.memory_benchmark.runner import checkpoint, source_metadata
 from .corpus import canonical, digest, load_bundle, visible_inputs
 from .scoring import score
 
+TASK_VERSION = "decision-review-offline/2"
 TASK = ("Which documented decisions need review after this update to {path}? "
         "Explain exact source evidence, conditions, surviving support and uncertainty. "
         "A candidate requests review; it does not reverse a decision. Return decision IDs, "
@@ -37,6 +38,11 @@ def dependency_alerts(visible: dict, event: dict, mode: str) -> list[dict]:
 
 
 def prepare(visible: dict, event: dict, path: Path, k: int, budget: int) -> dict:
+    # The update is task input, not evidence the agent must rediscover in top-k.
+    # Use only the chronological source allowlist, retaining every exact chunk.
+    update = [doc for doc in visible["documents"] if doc["source_id"] == event["source_id"]]
+    if not update:
+        raise ValueError("update source has no visible content")
     documents = [{"id": doc["id"], "text": doc["text"]} for doc in visible["documents"]]
     adapter = GraphAdapter(path, HashEmbedder(), graph=False)
     adapter.ingest(documents)
@@ -51,9 +57,13 @@ def prepare(visible: dict, event: dict, path: Path, k: int, budget: int) -> dict
     context_ms = (time.perf_counter() - start) * 1000
     messages = [{"role": "system", "content": SYSTEM}, {"role": "user", "content":
                 task + "\nDecision inventory:\n" + json.dumps(visible["decisions"], sort_keys=True)
-                + "\nUpdate source: " + event["source_id"] + "\n" + context["context"]}]
+                + "\nUpdate source: " + event["source_id"]
+                + "\nUpdate documents (complete task input):\n" + json.dumps(update, sort_keys=True)
+                + "\nRetrieved context:\n" + context["context"]}]
     return {"hits": [{"id": nid, "score": value} for nid, value in hits],
             "context": context, "prompt": messages, "prompt_sha256": digest(canonical(messages)),
+            "update_node_ids": [doc["id"] for doc in update],
+            "prompt_estimated_tokens": estimate_tokens("\n\n".join(m["content"] for m in messages)),
             "latency_ms": {"retrieval": retrieval_ms, "context": context_ms},
             "graph": {"selected": False, "used_for_ranking": False, "relationships_ingested": 0}}
 
@@ -76,7 +86,9 @@ def run(root: Path, output: Path, *, split: str = "development") -> dict:
                      "freeze_sha256": digest((root / "freeze.json").read_bytes()),
                      "frozen_files": freeze["files"], "configuration": {
                          "k": freeze["k"], "context_budget_estimated_tokens": freeze["budget"],
-                         "task_version": freeze["task_version"], "task_template": TASK,
+                         "task_version": TASK_VERSION, "corpus_task_version": freeze["task_version"],
+                         "task_template": TASK, "update_input": "all visible chunks of the current update source",
+                         "context_budget_excludes": ["system/task text", "decision inventory", "current update"],
                          "system_prompt": SYSTEM, "graph_expansion": False,
                          "context_assembly": "graph_engine.context.build_context",
                          "source_chunk_chars": 800, "split": split, "embedder": "HashEmbedder",
@@ -111,7 +123,10 @@ def run(root: Path, output: Path, *, split: str = "development") -> dict:
                 "retrieval_ids_resolve": all(hit["id"] in {d["id"] for d in visible["documents"]}
                                              for hit in row.get("retrieval", {}).get("hits", [])),
                 "context_ids_resolve": set(row.get("retrieval", {}).get("context", {}).get("nodes", []))
-                                       <= {d["id"] for d in visible["documents"]}}
+                                       <= {d["id"] for d in visible["documents"]},
+                "complete_update_included": bool(row.get("retrieval", {}).get("update_node_ids")) and
+                    set(row["retrieval"]["update_node_ids"]) ==
+                    {d["id"] for d in visible["documents"] if d["source_id"] == event["source_id"]}}
             report["results"].append(row)
             checkpoint(output, report)
     for mode in ("curated", "proposed"):

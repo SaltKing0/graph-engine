@@ -64,7 +64,8 @@ def write_json(path: Path, value: dict) -> None:
     path.write_text(json.dumps(value, indent=2, ensure_ascii=False, allow_nan=False) + "\n", encoding="utf-8")
 
 
-def freeze(root: Path, inputs: dict, labels: dict, contract: bytes) -> None:
+def freeze(root: Path, inputs: dict, labels: dict, contract: bytes, *,
+           task_version: str = "decision-review-offline/1") -> None:
     write_json(root / "inputs.json", inputs)
     write_json(root / "labels.json", labels)
     (root / "contract.md").write_bytes(contract)
@@ -78,7 +79,7 @@ def freeze(root: Path, inputs: dict, labels: dict, contract: bytes) -> None:
                          "heldout_negative_min": 20, "heldout_inconclusive_min": 10,
                          "integrity_pass_min": 1, "median_review_time_reduction_min": 0.2},
                "split_policy": "whole decision families; no event from a family crosses splits",
-               "task_version": "decision-review-offline/1", "k": 5, "budget": 4000})
+               "task_version": task_version, "k": 5, "budget": 4000})
 
 
 def build_real(repository: Path, output: Path) -> None:

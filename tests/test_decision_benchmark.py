@@ -14,11 +14,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from tools.decision_benchmark.corpus import DATA, canonical, digest, load_bundle, validate, visible_inputs
 from tools.decision_benchmark.freeze_sources import freeze, verify_git
-from tools.decision_benchmark.runner import dependency_alerts, run
+from tools.decision_benchmark.runner import dependency_alerts, prepare, run
+from tools.decision_benchmark.synthetic import build
 from tools.decision_benchmark.scoring import score
 
 
-@pytest.mark.parametrize("name", ["project-v1", "controls-v1"])
+@pytest.mark.parametrize("name", ["project-v1", "controls-v1", "controls-v2"])
 def test_bundled_bytes_and_complete_pair_labels(name):
     inputs, labels, manifest = load_bundle(DATA / name)
     assert labels["pairs"] and manifest["gates"]["heldout_positive_min"] == 20
@@ -29,7 +30,7 @@ def test_bundled_bytes_and_complete_pair_labels(name):
 
 def test_frozen_bytes_reject_tampering_and_escaping_paths(tmp_path):
     root = tmp_path / "corpus"
-    shutil.copytree(DATA / "controls-v1", root)
+    shutil.copytree(DATA / "controls-v2", root)
     source = root / "sources/comparable-basis.txt"
     source.write_text("different")
     with pytest.raises(ValueError, match="frozen file changed"):
@@ -39,7 +40,7 @@ def test_frozen_bytes_reject_tampering_and_escaping_paths(tmp_path):
     manifest["sha256"] = digest(canonical(manifest["files"]))
     (root / "freeze.json").write_text(json.dumps(manifest))
     # Restore the earlier bytes so the escaping entry is the first failure.
-    shutil.copyfile(DATA / "controls-v1/sources/comparable-basis.txt", source)
+    shutil.copyfile(DATA / "controls-v2/sources/comparable-basis.txt", source)
     with pytest.raises(ValueError, match="inside the bundle"):
         load_bundle(root)
 
@@ -84,7 +85,7 @@ def test_offline_baseline_is_reproducible_without_gold_or_ambient_models(tmp_pat
     monkeypatch.setenv("IDEAGRAPH_EMBEDDER", "st")
     monkeypatch.setenv("IDEAGRAPH_RERANKER", "st")
     root = tmp_path / "corpus"
-    shutil.copytree(DATA / "controls-v1", root)
+    shutil.copytree(DATA / "controls-v2", root)
     first = run(root, tmp_path / "first.json", split="all")
     inputs, labels, _ = load_bundle(root)
     for label in labels["pairs"].values():
@@ -105,14 +106,66 @@ def test_offline_baseline_is_reproducible_without_gold_or_ambient_models(tmp_pat
 
 
 def test_proposed_and_curated_dependencies_are_separate():
-    inputs, _, _ = load_bundle(DATA / "controls-v1")
+    inputs, _, _ = load_bundle(DATA / "controls-v2")
     event = inputs["events"][0]
-    visible = visible_inputs(inputs, event, DATA / "controls-v1")
+    visible = visible_inputs(inputs, event, DATA / "controls-v2")
     curated = dependency_alerts(visible, event, "curated")
     assert len(curated) == 1 and dependency_alerts(visible, event, "proposed") == []
     visible["dependencies"][0]["status"] = "proposed"
     assert dependency_alerts(visible, event, "curated") == []
     assert len(dependency_alerts(visible, event, "proposed")) == 1
+
+
+def test_complete_update_is_task_input_even_without_retrieved_context(tmp_path):
+    inputs, _, _ = load_bundle(DATA / "controls-v2")
+    event = inputs["events"][0]
+    visible = visible_inputs(inputs, event, DATA / "controls-v2")
+    # A second chunk checks that the task retains content beyond a recall body.
+    visible["documents"].append({"id": "comparable-update-c001",
+                                 "source_id": event["source_id"],
+                                 "text": "x" * 790 + "END_OF_UPDATE"})
+    first = prepare(visible, event, tmp_path / "first", k=1, budget=0)
+    assert first["context"]["nodes"] == []
+    content = first["prompt"][1]["content"]
+    supplied = json.loads(content.split("Update documents (complete task input):\n")[1]
+                         .split("\nRetrieved context:\n")[0])
+    expected = [d for d in visible["documents"] if d["source_id"] == event["source_id"]]
+    assert supplied == expected
+    assert first["update_node_ids"] == [d["id"] for d in expected]
+    assert first["prompt_estimated_tokens"] > first["context"]["tokens"]
+    changed = copy.deepcopy(visible)
+    for doc in changed["documents"]:
+        if doc["source_id"] == event["source_id"]:
+            doc["text"] = doc["text"].replace("recall=0.2", "recall=0.8")
+    second = prepare(changed, event, tmp_path / "second", k=1, budget=0)
+    assert first["prompt_sha256"] != second["prompt_sha256"]
+    missing = {**visible, "documents": [d for d in visible["documents"]
+                                       if d["source_id"] != event["source_id"]]}
+    with pytest.raises(ValueError, match="update source has no visible content"):
+        prepare(missing, event, tmp_path / "missing", k=1, budget=0)
+
+
+def test_corrected_controls_are_reproducible_and_cosmetic_alert_is_false(tmp_path):
+    build(tmp_path, (DATA / "controls-v1" / "contract.md").read_bytes())
+    inputs, labels, manifest = load_bundle(tmp_path)
+    assert (tmp_path / "freeze.json").read_bytes() == (DATA / "controls-v2" / "freeze.json").read_bytes()
+    assert inputs["version"] == "controls-v2.0.0"
+    key = "event-unrelated/decision-unrelated-other"
+    assert labels["pairs"][key]["outcome"] == "negative"
+    assert labels["pairs"][key]["valid_paths"] == []
+    _, original_labels, _ = load_bundle(DATA / "controls-v1")
+    assert original_labels["pairs"][key]["outcome"] == "positive"  # Preserved historical freeze.
+    rows = []
+    for event in inputs["events"]:
+        visible = visible_inputs(inputs, event, tmp_path)
+        rows.append({"event_id": event["id"],
+                     "eligible_decisions": [d["id"] for d in visible["decisions"]],
+                     "alerts": dependency_alerts(visible, event, "curated")})
+    result = score(rows, labels)
+    assert result["recall"] == {"value": 1, "numerator": 3, "denominator": 3}
+    assert result["false_alert_rate"] == {"value": 5 / 95, "numerator": 5, "denominator": 95}
+    assert result["false_alert_rate"]["value"] > manifest["gates"]["false_alert_rate_max"]
+    assert result["precision"] == {"value": 3 / 8, "numerator": 3, "denominator": 8}
 
 
 def test_errors_unknown_alerts_wrong_paths_and_duplicates_keep_denominators():
@@ -147,7 +200,7 @@ def test_failed_retrieval_remains_visible_in_attempted_pairs(tmp_path, monkeypat
     def fail(*args, **kwargs):
         raise RuntimeError("do not persist raw provider or source error bodies")
     monkeypatch.setattr("tools.decision_benchmark.runner.prepare", fail)
-    report = run(DATA / "controls-v1", tmp_path / "errors.json", split="all")
+    report = run(DATA / "controls-v2", tmp_path / "errors.json", split="all")
     assert report["status"] == "completed_with_errors" and not report["smoke_passed"]
     assert all(row["error"] == "RuntimeError" for row in report["results"])
     assert report["scores"]["curated"]["miss_rate"]["value"] == 1

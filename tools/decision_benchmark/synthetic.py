@@ -38,7 +38,7 @@ OBSERVATIONS = {
 def build(output: Path, contract: bytes) -> None:
     output.mkdir(parents=True, exist_ok=True)
     (output / "sources").mkdir(exist_ok=True)
-    inputs: dict = {"schema": "dm.eval.inputs/1", "kind": "synthetic", "version": "controls-v1.0.0",
+    inputs: dict = {"schema": "dm.eval.inputs/1", "kind": "synthetic", "version": "controls-v2.0.0",
                     "sources": [], "decisions": [], "dependencies": [], "events": []}
     labels: dict = {"schema": "dm.eval.labels/1", "author": "Codex contract fixture author",
                     "reviewer": None, "disagreements": None, "pairs": {}}
@@ -79,16 +79,17 @@ def build(output: Path, contract: bytes) -> None:
             name = decision["family"]
             expected, explanation = next((o, t) for n, o, t in CONTROLS if n == name)
             primary = decision["id"] == f"decision-{name}-basis" and event["id"] == f"event-{name}"
-            # The unrelated update changes the palette source; that separate
-            # decision needs review, while mode A remains unaffected.
+            # Spacing leaves both the palette choice and mode A unchanged.
             palette = name == "unrelated" and event["id"] == "event-unrelated" and not primary
-            outcome = expected if primary else "positive" if palette else "negative"
+            outcome = expected if primary else "negative"
             path = [event["source_id"], event["changed_source_id"],
                     f"link-{name}-{'basis' if primary else 'other'}", decision["id"]]
             labels["pairs"][f"{event['id']}/{decision['id']}"] = {
-                "outcome": outcome, "rationale": explanation if primary else "Separate source dependency.",
+                "outcome": outcome, "rationale": explanation if primary else (
+                    "Only label spacing changed; the palette still supports choosing blue."
+                    if palette else "Separate source dependency."),
                 "valid_paths": [path] if outcome in ("positive", "inconclusive", "unanswerable") else [],
                 "control": name if primary else "unrelated-pair",
                 "annotation": {"status": "synthetic-authored", "annotator": "Codex",
                                "reviewer": None, "disagreements": None}}
-    freeze(output, inputs, labels, contract)
+    freeze(output, inputs, labels, contract, task_version="decision-review-offline/2")

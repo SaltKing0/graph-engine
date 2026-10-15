@@ -50,13 +50,20 @@ two positive synthetic graph questions, original dirty execution revision/code
 manifest, and absence of measured answer quality. Repeated timings and copied
 prose are not independent evidence. No experiment was run to fill a shortage.
 
-`controls-v1/` is a separate **synthetic** bundle. Ten fictional events cover
+`controls-v2/` is a separate **synthetic** bundle. Ten fictional events cover
 comparable opposition, changed conditions, non-contradictory time changes,
 duplicate lineage, surviving independent support, withdrawn evidence, unknown
 comparability, unrelated updates, formatting-only/no-review and an unanswerable
 artifact. Paired decisions and cross-topic negatives exercise denominators.
 Observation text is separate from gold review rationales. These authored labels
 are neither independent human gold nor real product evidence.
+
+Version 2 corrects the palette decision's formatting-only update to negative;
+changing label spacing does not change the choice of blue. The original
+`controls-v1/` freeze and `decision-evaluation-results/initial-v1/` reports are
+preserved for audit, including their incorrect positive palette label and
+prepared prompts that could omit the current update. Use version 2 for new
+runs; the two versions' scores and task inputs are not interchangeable.
 
 ## Annotation protocol
 
@@ -127,8 +134,15 @@ hybrid retrieval and the actual current `graph_engine.context.build_context`,
 k=5, estimated source context budget=4000, with its per-tier selection and
 recall truncation. Top-k hits and the context function's own selection are
 both recorded. Fixed task/system templates, decision inventory, prompt hashes,
-context and source/chunk IDs are saved. The budget excludes fixed task and
-inventory overhead; future comparisons must preserve this overhead too.
+context and source/chunk IDs are saved. Task version `decision-review-offline/2`
+supplies all visible chunks of the current update as complete task input,
+independently of retrieval rank and recall-body truncation. It fails if the
+update has no visible content. Only that update is supplied directly; historical
+context still uses the existing retrieval and budget policy. The 4000-token
+context budget excludes system/task text, decision inventory and current update;
+the estimated complete prompt size is recorded separately. Future comparisons
+must preserve this input and budget policy. Metadata records both the executing
+task version and the task version originally pinned by the corpus freeze.
 
 The search-plus-agent baseline is **prepared contexts only**: no decision-impact
 or answer score is inferred from rank. A separate simple explicit-dependency

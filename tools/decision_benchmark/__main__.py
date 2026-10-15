@@ -20,7 +20,7 @@ def main() -> int:
     args = parser.parse_args()
     if args.check and args.real_corpus:
         parser.error("--check is only for bounded synthetic CI controls")
-    root = DATA / ("project-v1" if args.real_corpus else "controls-v1")
+    root = DATA / ("project-v1" if args.real_corpus else "controls-v2")
     try:
         if args.verify_git:
             if not args.real_corpus:

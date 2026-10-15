@@ -1,0 +1,703 @@
+{
+  "schema": "dm.eval.inputs/1",
+  "kind": "synthetic",
+  "version": "controls-v2.0.0",
+  "sources": [
+    {
+      "id": "comparable-basis",
+      "file": "sources/comparable-basis.txt",
+      "available_at": "2026-01-01T00:00:00Z",
+      "split": "development",
+      "lineage": "fictional-comparable-basis",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "comparable-other",
+      "file": "sources/comparable-other.txt",
+      "available_at": "2026-01-01T00:00:00Z",
+      "split": "development",
+      "lineage": "fictional-comparable-other",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "comparable-update",
+      "file": "sources/comparable-update.txt",
+      "available_at": "2026-01-02T00:00:00Z",
+      "split": "development",
+      "lineage": "fictional-comparable-update",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "changed-conditions-basis",
+      "file": "sources/changed-conditions-basis.txt",
+      "available_at": "2026-01-01T00:00:00Z",
+      "split": "development",
+      "lineage": "fictional-changed-conditions-basis",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "changed-conditions-other",
+      "file": "sources/changed-conditions-other.txt",
+      "available_at": "2026-01-01T00:00:00Z",
+      "split": "development",
+      "lineage": "fictional-changed-conditions-other",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "changed-conditions-update",
+      "file": "sources/changed-conditions-update.txt",
+      "available_at": "2026-01-03T00:00:00Z",
+      "split": "development",
+      "lineage": "fictional-changed-conditions-update",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "time-only-basis",
+      "file": "sources/time-only-basis.txt",
+      "available_at": "2026-01-01T00:00:00Z",
+      "split": "development",
+      "lineage": "fictional-time-only-basis",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "time-only-other",
+      "file": "sources/time-only-other.txt",
+      "available_at": "2026-01-01T00:00:00Z",
+      "split": "development",
+      "lineage": "fictional-time-only-other",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "time-only-update",
+      "file": "sources/time-only-update.txt",
+      "available_at": "2026-01-04T00:00:00Z",
+      "split": "development",
+      "lineage": "fictional-time-only-update",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "duplicate-citation-basis",
+      "file": "sources/duplicate-citation-basis.txt",
+      "available_at": "2026-01-01T00:00:00Z",
+      "split": "development",
+      "lineage": "fictional-duplicate-citation-basis",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "duplicate-citation-other",
+      "file": "sources/duplicate-citation-other.txt",
+      "available_at": "2026-01-01T00:00:00Z",
+      "split": "development",
+      "lineage": "fictional-duplicate-citation-other",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "duplicate-citation-update",
+      "file": "sources/duplicate-citation-update.txt",
+      "available_at": "2026-01-05T00:00:00Z",
+      "split": "development",
+      "lineage": "fictional-duplicate-citation-update",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "surviving-support-basis",
+      "file": "sources/surviving-support-basis.txt",
+      "available_at": "2026-01-01T00:00:00Z",
+      "split": "development",
+      "lineage": "fictional-surviving-support-basis",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "surviving-support-other",
+      "file": "sources/surviving-support-other.txt",
+      "available_at": "2026-01-01T00:00:00Z",
+      "split": "development",
+      "lineage": "fictional-surviving-support-other",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "surviving-support-update",
+      "file": "sources/surviving-support-update.txt",
+      "available_at": "2026-01-06T00:00:00Z",
+      "split": "development",
+      "lineage": "fictional-surviving-support-update",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "withdrawn-basis",
+      "file": "sources/withdrawn-basis.txt",
+      "available_at": "2026-01-01T00:00:00Z",
+      "split": "evaluation",
+      "lineage": "fictional-withdrawn-basis",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "withdrawn-other",
+      "file": "sources/withdrawn-other.txt",
+      "available_at": "2026-01-01T00:00:00Z",
+      "split": "evaluation",
+      "lineage": "fictional-withdrawn-other",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "withdrawn-update",
+      "file": "sources/withdrawn-update.txt",
+      "available_at": "2026-01-07T00:00:00Z",
+      "split": "evaluation",
+      "lineage": "fictional-withdrawn-update",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "unknown-comparability-basis",
+      "file": "sources/unknown-comparability-basis.txt",
+      "available_at": "2026-01-01T00:00:00Z",
+      "split": "evaluation",
+      "lineage": "fictional-unknown-comparability-basis",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "unknown-comparability-other",
+      "file": "sources/unknown-comparability-other.txt",
+      "available_at": "2026-01-01T00:00:00Z",
+      "split": "evaluation",
+      "lineage": "fictional-unknown-comparability-other",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "unknown-comparability-update",
+      "file": "sources/unknown-comparability-update.txt",
+      "available_at": "2026-01-08T00:00:00Z",
+      "split": "evaluation",
+      "lineage": "fictional-unknown-comparability-update",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "unrelated-basis",
+      "file": "sources/unrelated-basis.txt",
+      "available_at": "2026-01-01T00:00:00Z",
+      "split": "evaluation",
+      "lineage": "fictional-unrelated-basis",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "unrelated-other",
+      "file": "sources/unrelated-other.txt",
+      "available_at": "2026-01-01T00:00:00Z",
+      "split": "evaluation",
+      "lineage": "fictional-unrelated-other",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "unrelated-update",
+      "file": "sources/unrelated-update.txt",
+      "available_at": "2026-01-09T00:00:00Z",
+      "split": "evaluation",
+      "lineage": "fictional-unrelated-update",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "no-review-basis",
+      "file": "sources/no-review-basis.txt",
+      "available_at": "2026-01-01T00:00:00Z",
+      "split": "evaluation",
+      "lineage": "fictional-no-review-basis",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "no-review-other",
+      "file": "sources/no-review-other.txt",
+      "available_at": "2026-01-01T00:00:00Z",
+      "split": "evaluation",
+      "lineage": "fictional-no-review-other",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "no-review-update",
+      "file": "sources/no-review-update.txt",
+      "available_at": "2026-01-10T00:00:00Z",
+      "split": "evaluation",
+      "lineage": "fictional-no-review-update",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "unanswerable-basis",
+      "file": "sources/unanswerable-basis.txt",
+      "available_at": "2026-01-01T00:00:00Z",
+      "split": "evaluation",
+      "lineage": "fictional-unanswerable-basis",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "unanswerable-other",
+      "file": "sources/unanswerable-other.txt",
+      "available_at": "2026-01-01T00:00:00Z",
+      "split": "evaluation",
+      "lineage": "fictional-unanswerable-other",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    },
+    {
+      "id": "unanswerable-update",
+      "file": "sources/unanswerable-update.txt",
+      "available_at": "2026-01-11T00:00:00Z",
+      "split": "evaluation",
+      "lineage": "fictional-unanswerable-update",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    }
+  ],
+  "decisions": [
+    {
+      "id": "decision-comparable-basis",
+      "family": "comparable",
+      "split": "development",
+      "source_id": "comparable-basis",
+      "action": "SYNTHETIC: choose mode A"
+    },
+    {
+      "id": "decision-comparable-other",
+      "family": "comparable",
+      "split": "development",
+      "source_id": "comparable-other",
+      "action": "SYNTHETIC: choose blue"
+    },
+    {
+      "id": "decision-changed-conditions-basis",
+      "family": "changed-conditions",
+      "split": "development",
+      "source_id": "changed-conditions-basis",
+      "action": "SYNTHETIC: choose mode A"
+    },
+    {
+      "id": "decision-changed-conditions-other",
+      "family": "changed-conditions",
+      "split": "development",
+      "source_id": "changed-conditions-other",
+      "action": "SYNTHETIC: choose blue"
+    },
+    {
+      "id": "decision-time-only-basis",
+      "family": "time-only",
+      "split": "development",
+      "source_id": "time-only-basis",
+      "action": "SYNTHETIC: choose mode A"
+    },
+    {
+      "id": "decision-time-only-other",
+      "family": "time-only",
+      "split": "development",
+      "source_id": "time-only-other",
+      "action": "SYNTHETIC: choose blue"
+    },
+    {
+      "id": "decision-duplicate-citation-basis",
+      "family": "duplicate-citation",
+      "split": "development",
+      "source_id": "duplicate-citation-basis",
+      "action": "SYNTHETIC: choose mode A"
+    },
+    {
+      "id": "decision-duplicate-citation-other",
+      "family": "duplicate-citation",
+      "split": "development",
+      "source_id": "duplicate-citation-other",
+      "action": "SYNTHETIC: choose blue"
+    },
+    {
+      "id": "decision-surviving-support-basis",
+      "family": "surviving-support",
+      "split": "development",
+      "source_id": "surviving-support-basis",
+      "action": "SYNTHETIC: choose mode A"
+    },
+    {
+      "id": "decision-surviving-support-other",
+      "family": "surviving-support",
+      "split": "development",
+      "source_id": "surviving-support-other",
+      "action": "SYNTHETIC: choose blue"
+    },
+    {
+      "id": "decision-withdrawn-basis",
+      "family": "withdrawn",
+      "split": "evaluation",
+      "source_id": "withdrawn-basis",
+      "action": "SYNTHETIC: choose mode A"
+    },
+    {
+      "id": "decision-withdrawn-other",
+      "family": "withdrawn",
+      "split": "evaluation",
+      "source_id": "withdrawn-other",
+      "action": "SYNTHETIC: choose blue"
+    },
+    {
+      "id": "decision-unknown-comparability-basis",
+      "family": "unknown-comparability",
+      "split": "evaluation",
+      "source_id": "unknown-comparability-basis",
+      "action": "SYNTHETIC: choose mode A"
+    },
+    {
+      "id": "decision-unknown-comparability-other",
+      "family": "unknown-comparability",
+      "split": "evaluation",
+      "source_id": "unknown-comparability-other",
+      "action": "SYNTHETIC: choose blue"
+    },
+    {
+      "id": "decision-unrelated-basis",
+      "family": "unrelated",
+      "split": "evaluation",
+      "source_id": "unrelated-basis",
+      "action": "SYNTHETIC: choose mode A"
+    },
+    {
+      "id": "decision-unrelated-other",
+      "family": "unrelated",
+      "split": "evaluation",
+      "source_id": "unrelated-other",
+      "action": "SYNTHETIC: choose blue"
+    },
+    {
+      "id": "decision-no-review-basis",
+      "family": "no-review",
+      "split": "evaluation",
+      "source_id": "no-review-basis",
+      "action": "SYNTHETIC: choose mode A"
+    },
+    {
+      "id": "decision-no-review-other",
+      "family": "no-review",
+      "split": "evaluation",
+      "source_id": "no-review-other",
+      "action": "SYNTHETIC: choose blue"
+    },
+    {
+      "id": "decision-unanswerable-basis",
+      "family": "unanswerable",
+      "split": "evaluation",
+      "source_id": "unanswerable-basis",
+      "action": "SYNTHETIC: choose mode A"
+    },
+    {
+      "id": "decision-unanswerable-other",
+      "family": "unanswerable",
+      "split": "evaluation",
+      "source_id": "unanswerable-other",
+      "action": "SYNTHETIC: choose blue"
+    }
+  ],
+  "dependencies": [
+    {
+      "id": "link-comparable-basis",
+      "source_id": "comparable-basis",
+      "decision_id": "decision-comparable-basis",
+      "available_at": "2026-01-01T00:00:00Z",
+      "status": "curated"
+    },
+    {
+      "id": "link-comparable-other",
+      "source_id": "comparable-other",
+      "decision_id": "decision-comparable-other",
+      "available_at": "2026-01-01T00:00:00Z",
+      "status": "curated"
+    },
+    {
+      "id": "link-changed-conditions-basis",
+      "source_id": "changed-conditions-basis",
+      "decision_id": "decision-changed-conditions-basis",
+      "available_at": "2026-01-01T00:00:00Z",
+      "status": "curated"
+    },
+    {
+      "id": "link-changed-conditions-other",
+      "source_id": "changed-conditions-other",
+      "decision_id": "decision-changed-conditions-other",
+      "available_at": "2026-01-01T00:00:00Z",
+      "status": "curated"
+    },
+    {
+      "id": "link-time-only-basis",
+      "source_id": "time-only-basis",
+      "decision_id": "decision-time-only-basis",
+      "available_at": "2026-01-01T00:00:00Z",
+      "status": "curated"
+    },
+    {
+      "id": "link-time-only-other",
+      "source_id": "time-only-other",
+      "decision_id": "decision-time-only-other",
+      "available_at": "2026-01-01T00:00:00Z",
+      "status": "curated"
+    },
+    {
+      "id": "link-duplicate-citation-basis",
+      "source_id": "duplicate-citation-basis",
+      "decision_id": "decision-duplicate-citation-basis",
+      "available_at": "2026-01-01T00:00:00Z",
+      "status": "curated"
+    },
+    {
+      "id": "link-duplicate-citation-other",
+      "source_id": "duplicate-citation-other",
+      "decision_id": "decision-duplicate-citation-other",
+      "available_at": "2026-01-01T00:00:00Z",
+      "status": "curated"
+    },
+    {
+      "id": "link-surviving-support-basis",
+      "source_id": "surviving-support-basis",
+      "decision_id": "decision-surviving-support-basis",
+      "available_at": "2026-01-01T00:00:00Z",
+      "status": "curated"
+    },
+    {
+      "id": "link-surviving-support-other",
+      "source_id": "surviving-support-other",
+      "decision_id": "decision-surviving-support-other",
+      "available_at": "2026-01-01T00:00:00Z",
+      "status": "curated"
+    },
+    {
+      "id": "link-withdrawn-basis",
+      "source_id": "withdrawn-basis",
+      "decision_id": "decision-withdrawn-basis",
+      "available_at": "2026-01-01T00:00:00Z",
+      "status": "curated"
+    },
+    {
+      "id": "link-withdrawn-other",
+      "source_id": "withdrawn-other",
+      "decision_id": "decision-withdrawn-other",
+      "available_at": "2026-01-01T00:00:00Z",
+      "status": "curated"
+    },
+    {
+      "id": "link-unknown-comparability-basis",
+      "source_id": "unknown-comparability-basis",
+      "decision_id": "decision-unknown-comparability-basis",
+      "available_at": "2026-01-01T00:00:00Z",
+      "status": "curated"
+    },
+    {
+      "id": "link-unknown-comparability-other",
+      "source_id": "unknown-comparability-other",
+      "decision_id": "decision-unknown-comparability-other",
+      "available_at": "2026-01-01T00:00:00Z",
+      "status": "curated"
+    },
+    {
+      "id": "link-unrelated-basis",
+      "source_id": "unrelated-basis",
+      "decision_id": "decision-unrelated-basis",
+      "available_at": "2026-01-01T00:00:00Z",
+      "status": "curated"
+    },
+    {
+      "id": "link-unrelated-other",
+      "source_id": "unrelated-other",
+      "decision_id": "decision-unrelated-other",
+      "available_at": "2026-01-01T00:00:00Z",
+      "status": "curated"
+    },
+    {
+      "id": "link-no-review-basis",
+      "source_id": "no-review-basis",
+      "decision_id": "decision-no-review-basis",
+      "available_at": "2026-01-01T00:00:00Z",
+      "status": "curated"
+    },
+    {
+      "id": "link-no-review-other",
+      "source_id": "no-review-other",
+      "decision_id": "decision-no-review-other",
+      "available_at": "2026-01-01T00:00:00Z",
+      "status": "curated"
+    },
+    {
+      "id": "link-unanswerable-basis",
+      "source_id": "unanswerable-basis",
+      "decision_id": "decision-unanswerable-basis",
+      "available_at": "2026-01-01T00:00:00Z",
+      "status": "curated"
+    },
+    {
+      "id": "link-unanswerable-other",
+      "source_id": "unanswerable-other",
+      "decision_id": "decision-unanswerable-other",
+      "available_at": "2026-01-01T00:00:00Z",
+      "status": "curated"
+    }
+  ],
+  "events": [
+    {
+      "id": "event-comparable",
+      "at": "2026-01-02T00:00:00Z",
+      "split": "development",
+      "source_id": "comparable-update",
+      "changed_source_id": "comparable-basis",
+      "changed_path": "fictional/comparable.txt"
+    },
+    {
+      "id": "event-changed-conditions",
+      "at": "2026-01-03T00:00:00Z",
+      "split": "development",
+      "source_id": "changed-conditions-update",
+      "changed_source_id": "changed-conditions-basis",
+      "changed_path": "fictional/changed-conditions.txt"
+    },
+    {
+      "id": "event-time-only",
+      "at": "2026-01-04T00:00:00Z",
+      "split": "development",
+      "source_id": "time-only-update",
+      "changed_source_id": "time-only-basis",
+      "changed_path": "fictional/time-only.txt"
+    },
+    {
+      "id": "event-duplicate-citation",
+      "at": "2026-01-05T00:00:00Z",
+      "split": "development",
+      "source_id": "duplicate-citation-update",
+      "changed_source_id": "duplicate-citation-basis",
+      "changed_path": "fictional/duplicate-citation.txt"
+    },
+    {
+      "id": "event-surviving-support",
+      "at": "2026-01-06T00:00:00Z",
+      "split": "development",
+      "source_id": "surviving-support-update",
+      "changed_source_id": "surviving-support-basis",
+      "changed_path": "fictional/surviving-support.txt"
+    },
+    {
+      "id": "event-withdrawn",
+      "at": "2026-01-07T00:00:00Z",
+      "split": "evaluation",
+      "source_id": "withdrawn-update",
+      "changed_source_id": "withdrawn-basis",
+      "changed_path": "fictional/withdrawn.txt"
+    },
+    {
+      "id": "event-unknown-comparability",
+      "at": "2026-01-08T00:00:00Z",
+      "split": "evaluation",
+      "source_id": "unknown-comparability-update",
+      "changed_source_id": "unknown-comparability-basis",
+      "changed_path": "fictional/unknown-comparability.txt"
+    },
+    {
+      "id": "event-unrelated",
+      "at": "2026-01-09T00:00:00Z",
+      "split": "evaluation",
+      "source_id": "unrelated-update",
+      "changed_source_id": "unrelated-other",
+      "changed_path": "fictional/unrelated.txt"
+    },
+    {
+      "id": "event-no-review",
+      "at": "2026-01-10T00:00:00Z",
+      "split": "evaluation",
+      "source_id": "no-review-update",
+      "changed_source_id": "no-review-basis",
+      "changed_path": "fictional/no-review.txt"
+    },
+    {
+      "id": "event-unanswerable",
+      "at": "2026-01-11T00:00:00Z",
+      "split": "evaluation",
+      "source_id": "unanswerable-update",
+      "changed_source_id": "unanswerable-basis",
+      "changed_path": "fictional/unanswerable.txt"
+    }
+  ]
+}
