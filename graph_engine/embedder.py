@@ -43,6 +43,14 @@ class Embedder:
         with self._model_lock:
             return self._load_model()
 
+    def matches_source(self, model_name: str, revision: str | None, digest: str | None) -> bool:
+        """Check loaded provenance before reusing a lazily created adapter."""
+        with self._model_lock:
+            requested = (model_name, revision)
+            return ((self.model_name, self.revision) == requested
+                    and (self._model is None or
+                         (self._loaded_source == requested and self._loaded_digest == digest)))
+
     def _load_model(self) -> Any:
         requested = (self.model_name, self.revision)
         if self._model is None or getattr(self, "_loaded_source", requested) != requested:

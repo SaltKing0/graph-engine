@@ -234,10 +234,9 @@ async def ingest_partial_handler(_req, exc: IngestPartialError):
 
 @app.post("/api/ingest")
 async def ingest(body: IngestBody):
-    # Audit #16: git pull/push + embedding inference are blocking I/O — they
-    # run in the threadpool, not on the event loop (otherwise a slow ingest
-    # stalls all requests and WS broadcasts).
-    engine = runtime.make_engine()
+    # Factory calls hash local model files and may load a reranker. Keep that
+    # work, as well as Git synchronization and inference, in the threadpool.
+    engine = await run_in_threadpool(runtime.make_engine)
     node, edges, is_dup, extracted = await run_in_threadpool(
         engine.capture, body.text, body.source, body.tags,
         body.allow_duplicates, extraction=body.extraction, accept_facts=body.accept_facts)
@@ -258,7 +257,8 @@ async def ingest(body: IngestBody):
 
 @app.post("/api/edge/{edge_id}/accept")
 async def accept_edge(edge_id: str):
-    edge = await run_in_threadpool(runtime.make_engine().resolve, edge_id, True)
+    engine = await run_in_threadpool(runtime.make_engine)
+    edge = await run_in_threadpool(engine.resolve, edge_id, True)
     if edge is None:
         return JSONResponse({"error": "edge not found or not pending"}, status_code=404)
     await manager.broadcast({"type": "edge_resolved", "edge": edge.to_dict(), "accepted": True})
@@ -267,7 +267,8 @@ async def accept_edge(edge_id: str):
 
 @app.post("/api/edge/{edge_id}/reject")
 async def reject_edge(edge_id: str):
-    edge = await run_in_threadpool(runtime.make_engine().resolve, edge_id, False)
+    engine = await run_in_threadpool(runtime.make_engine)
+    edge = await run_in_threadpool(engine.resolve, edge_id, False)
     if edge is None:
         return JSONResponse({"error": "edge not found or not pending"}, status_code=404)
     await manager.broadcast({"type": "edge_resolved", "edge": edge.to_dict(), "accepted": False})
@@ -351,7 +352,8 @@ async def ws_endpoint(ws: WebSocket):
 
 @app.post("/api/edge/{edge_id}/undo")
 async def undo_edge(edge_id: str):
-    edge = await run_in_threadpool(runtime.make_engine().undo, edge_id)
+    engine = await run_in_threadpool(runtime.make_engine)
+    edge = await run_in_threadpool(engine.undo, edge_id)
     if edge is None:
         return JSONResponse({"error": "edge not found or already resolved"}, status_code=409)
     await manager.broadcast({"type": "edge_restored", "edge": edge.to_dict()})

@@ -1,7 +1,9 @@
 """Model lifetimes must be independent of authorized corpus lifetimes."""
+import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
 import json
+from pathlib import Path
 import sys
 import threading
 import time
@@ -138,6 +140,69 @@ def test_replaced_local_model_is_not_reused(models, tmp_path, monkeypatch, setti
     weights.write_bytes(b"other")
     second = runtime.make_engine()
     assert getattr(second, resource) is not getattr(first, resource)
+
+
+@pytest.mark.parametrize("protected", [True, False])
+def test_local_model_rollback_after_lazy_load_uses_current_weights(models, tmp_path,
+                                                                 monkeypatch, protected):
+    if not protected:
+        monkeypatch.delenv("IG_ACCESS_POLICY")
+    folder = tmp_path / "model"
+    folder.mkdir()
+    weights = folder / "weights.bin"
+    weights.write_text("A")
+
+    class Model:
+        def __init__(self, name, **options):
+            self.value = 1. if (Path(name) / "weights.bin").read_text() == "A" else 2.
+
+        def encode(self, text):
+            return np.array([self.value])
+
+    monkeypatch.setattr(sys.modules["sentence_transformers"], "SentenceTransformer", Model)
+    monkeypatch.setenv("IDEAGRAPH_EMBEDDER_MODEL", str(folder))
+    first = runtime.make_engine()
+    assert first.embedder._model is None
+    weights.write_text("B")
+    assert first.embedder.embed("query") == [2.]
+    weights.write_text("A")
+    fresh = runtime.make_engine()
+    assert fresh.embedder.embed("query") == [1.]
+    assert runtime.make_engine().embedder is fresh.embedder
+    assert first.embedder.embed("active caller") == [2.]
+
+
+@pytest.mark.parametrize("operation", ["ingest", "accept", "reject", "undo", "link"])
+def test_async_http_handlers_hash_models_in_worker_thread(models, tmp_path, monkeypatch,
+                                                         operation):
+    from graph_engine import server
+
+    monkeypatch.delenv("IG_ACCESS_POLICY")
+    folder = tmp_path / "model"
+    folder.mkdir()
+    (folder / "weights.bin").write_bytes(b"weights")
+    monkeypatch.setenv("IDEAGRAPH_EMBEDDER_MODEL", str(folder))
+    engine = runtime.make_engine()  # Exercise a warm cache hit.
+    engine.brain.init()
+    event_loop_thread = threading.get_ident()
+    digest = runtime.local_model_digest
+    calls = []
+
+    def checked_digest(model):
+        assert threading.get_ident() != event_loop_thread, "model I/O blocked the event loop"
+        calls.append(model)
+        return digest(model)
+
+    monkeypatch.setattr(runtime, "local_model_digest", checked_digest)
+    handlers = {
+        "ingest": lambda: server.ingest(server.IngestBody(text="synthetic knowledge")),
+        "accept": lambda: server.accept_edge("missing-edge"),
+        "reject": lambda: server.reject_edge("missing-edge"),
+        "undo": lambda: server.undo_edge("missing-edge"),
+        "link": lambda: server.link_edge(server.LinkBody(source="missing", target="also-missing")),
+    }
+    asyncio.run(handlers[operation]())
+    assert str(folder) in calls
 
 
 def test_resource_retention_and_reset_are_bounded(models, monkeypatch):
