@@ -217,23 +217,14 @@ class SecuredBrain(Brain):
     def _edge_allowed(self, edge: Edge, action: str, *,
                       edges_by_id: dict[str, Edge] | None = None,
                       _view: tuple[dict[str, Node], dict[str, set[str]]] | None = None) -> bool:
-        # Evidence is embedded text: hiding only the endpoints would leak it.
-        ids = [edge.source, edge.target] + [e.get("node_id") for e in edge.evidence]
-        if edge.kind == "fact_replacement":
-            meta = edge.replacement or {}
-            records = (edges_by_id if edges_by_id is not None else
-                       {e.id: e for e in self._raw.read_edges(include_rejected=True)})
-            for key in ("old_fact_id", "new_fact_id"):
-                fact = records.get(meta.get(key))
-                if fact is None or fact.kind != "fact" or not self._edge_allowed(fact, action, _view=_view):
-                    return False
-            # Undo snapshots contain embedded quotes too; their permissions
-            # remain mandatory even if the current fact later loses support.
-            for rows in meta.get("decision", {}).values():
-                for row in rows:
-                    ids.extend([row["source"], row["target"],
-                                *(e.get("node_id") for e in row.get("evidence", []))])
-        return all(isinstance(nid, str) and (
+        # Embedded evidence and undo quotes require the source's permission.
+        from .graph import edge_support_ids
+        records = edges_by_id
+        if records is None:
+            records = ({e.id: e for e in self._raw.read_edges(include_rejected=True)}
+                       if edge.kind == "fact_replacement" else {})
+        ids = edge_support_ids(edge, records)
+        return ids is not None and all((
             self.can_access(action, nid, _view=_view) if _view is not None else
             self.can_access(action, nid)) for nid in ids)
 

@@ -25,6 +25,52 @@ class Neighbor:
     predicate: str | None = None
 
 
+def edge_support_ids(edge: Edge, edges_by_id: dict[str, Edge]) -> set[str] | None:
+    """All referenced nodes, or None for malformed persisted support metadata.
+
+    Lifecycle and permission filters share this parsing so a bad replacement
+    cannot abort unrelated reads or decisions. Raw storage retains the record.
+    """
+    def record_ids(source: str | None, target: str | None, evidence: list[dict]) -> set[str] | None:
+        if (not isinstance(source, str) or not isinstance(target, str)
+                or not isinstance(evidence, list)
+                or any(not isinstance(item, dict) or not isinstance(item.get("node_id"), str)
+                       for item in evidence)):
+            return None
+        return {source, target, *(item["node_id"] for item in evidence)}
+
+    ids = record_ids(edge.source, edge.target, edge.evidence)
+    if ids is None or edge.kind != "fact_replacement":
+        return ids
+    meta = edge.replacement
+    if not isinstance(meta, dict):
+        return None
+    for key in ("old_fact_id", "new_fact_id"):
+        fact_id = meta.get(key)
+        fact = edges_by_id.get(fact_id) if isinstance(fact_id, str) else None
+        if fact is None or fact.kind != "fact":
+            return None
+        support = record_ids(fact.source, fact.target, fact.evidence)
+        if support is None:
+            return None
+        ids.update(support)
+    if "decision" in meta:
+        decision = meta["decision"]
+        if not isinstance(decision, dict) or set(decision) != {"before", "after"}:
+            return None
+        for rows in decision.values():
+            if not isinstance(rows, list):
+                return None
+            for row in rows:
+                if not isinstance(row, dict):
+                    return None
+                support = record_ids(row.get("source"), row.get("target"), row.get("evidence", []))
+                if support is None:
+                    return None
+                ids.update(support)
+    return ids
+
+
 def edges_with_live_support(nodes: list[Node], edges: list[Edge]) -> list[Edge]:
     """Lifecycle filter, independent of fact validity and review state.
 
@@ -34,30 +80,8 @@ def edges_with_live_support(nodes: list[Node], edges: list[Edge]) -> list[Edge]:
     """
     live = {node.id for node in nodes if node.status != "tombstone"}
     by_id = {edge.id: edge for edge in edges}
-
-    def supported(source: str | None, target: str | None, evidence: list[dict]) -> bool:
-        return (isinstance(source, str) and source in live
-                and isinstance(target, str) and target in live
-                and all(isinstance(item, dict) and isinstance(item.get("node_id"), str)
-                        and item["node_id"] in live for item in evidence))
-
-    def allowed(edge: Edge) -> bool:
-        if not supported(edge.source, edge.target, edge.evidence):
-            return False
-        if edge.kind == "fact_replacement":
-            meta = edge.replacement or {}
-            for key in ("old_fact_id", "new_fact_id"):
-                fact = by_id.get(meta.get(key))
-                if (fact is None or fact.kind != "fact"
-                        or not supported(fact.source, fact.target, fact.evidence)):
-                    return False
-            for rows in meta.get("decision", {}).values():
-                for row in rows:
-                    if not supported(row.get("source"), row.get("target"), row.get("evidence", [])):
-                        return False
-        return True
-
-    return [edge for edge in edges if allowed(edge)]
+    return [edge for edge in edges
+            if (ids := edge_support_ids(edge, by_id)) is not None and ids <= live]
 
 
 def live_view(brain: Brain) -> tuple[dict[str, Node], list[Edge]]:

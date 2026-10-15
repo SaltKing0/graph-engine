@@ -286,6 +286,11 @@ const short = (text, length = 36) => {
       $("#tooltip").hidden = true;
       $("#tooltip").textContent = "";
       const ids = new Set(nodes.map(node => node.id));
+      const searchActive = Boolean(document.activeElement.closest(".search"));
+      searchResults = searchResults.filter(result => ids.has(result.id));
+      for (const row of $("#search-results").querySelectorAll("li[data-result]")) {
+        if (!ids.has(row.dataset.result)) row.remove();
+      }
       const eligible = graph.edges.filter(edge => ids.has(edge.source) && ids.has(edge.target) && !edge.rejected);
       reviewEdgesById = Object.fromEntries(eligible.map(edge => [edge.id, edge]));
       edges = eligible.filter(edge => edge.current ?? !edge.valid_to);
@@ -314,7 +319,12 @@ const short = (text, length = 36) => {
       simulation.alpha(.6).restart();
       if (initialFit && nodes.length) { simulation.tick(80); tick(); fitNodes(nodes); initialFit = false; }
       if (detailId) renderDetail(detailId);
-      if (updateSearch && document.activeElement === $("#search")) renderSearch();
+      if (updateSearch) {
+        if (searchActive) {
+          $("#search").focus();
+          renderSearch();
+        } else closeSearch();
+      }
     } catch (error) {
       if (version !== refreshVersion) return;
       if (!loaded) {
@@ -461,14 +471,18 @@ const short = (text, length = 36) => {
     if (event.key === "Enter" && !event.shiftKey && !event.isComposing) { event.preventDefault(); $("#bar").requestSubmit(); }
   });
 
+  function clearDetail() {
+    detailId = null;
+    $("#detail-text").textContent = "";
+    $("#detail-meta").textContent = "";
+    $("#detail-relations").replaceChildren();
+  }
+
   function renderDetail(id) {
     const node = nodeById(id);
     if (!node) {
       $("#detail").close();
-      detailId = null;
-      $("#detail-text").textContent = "";
-      $("#detail-meta").textContent = "";
-      $("#detail-relations").replaceChildren();
+      clearDetail();
       return;
     }
     $("#detail-text").textContent = node.text;
@@ -493,7 +507,7 @@ const short = (text, length = 36) => {
     if (button) { showDetail(button.dataset.node); $("#close-detail").focus(); }
   };
   $("#close-detail").onclick = () => $("#detail").close();
-  $("#detail").addEventListener("close", () => { detailId = null; });
+  $("#detail").addEventListener("close", clearDetail);
   $("#detail").addEventListener("click", event => {
     const rect = $("#detail").getBoundingClientRect();
     if (event.target === $("#detail") && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) $("#detail").close();
@@ -505,6 +519,7 @@ const short = (text, length = 36) => {
     // Hiding the dropdown keeps ranked highlights for the active query.
     if (!$("#search").value.trim()) searchResults = [];
     searchExplanations.clear();
+    $("#search-results").replaceChildren();
     $("#search-results").hidden = true;
     $("#search-results").setAttribute("aria-busy", "false");
     $("#search").setAttribute("aria-expanded", "false");
