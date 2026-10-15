@@ -184,3 +184,24 @@ def test_mcp_get_node_keeps_current_bounded_facts(brain, monkeypatch):
     monkeypatch.setenv("IG_BRAIN_MODE", "local")
     edge = extract(brain, accept_facts=True)
     assert edge.id in {e["id"] for e in get_node(edge.source)["edges"]}
+
+
+@pytest.mark.parametrize("start", ["2021-01-01", "2021-01-01T00:00:00",
+                                  "2021-01-01T00:00:00Z", "2021-01-01T01:00:00+01:00"])
+@pytest.mark.parametrize("end", ["2022-01-01", "2022-01-01T00:00:00",
+                                "2022-01-01T00:00:00Z", "2021-12-31T19:00:00-05:00"])
+def test_normalized_validity_stays_half_open_and_invalidation_cuts_it_off(brain, start, end):
+    from graph_engine.brain import Node
+
+    for nid in ("a", "b"):
+        brain.write_node(Node(nid, id=nid, created="2020-01-01"))
+    edge = Edge("a", "b", "fact", id="fact", pending=False, valid_from=start, valid_to=end,
+                extracted_validity={"valid_from": start, "valid_to": end})
+    brain.write_edges([edge])
+    for at, included in [("2020-12-31T23:59:59Z", False), ("2021-01-01", True),
+                         ("2021-12-31T23:59:59", True), ("2022-01-01", False)]:
+        assert bool(valid_at(brain, at)["edges"]) is included
+    edge.invalidated_at = "2021-06-01T01:00:00+01:00"
+    brain.write_edges([edge])
+    assert valid_at(brain, "2021-05-31T23:59:59Z")["edges"]
+    assert not valid_at(brain, "2021-06-01")["edges"]

@@ -217,7 +217,11 @@ def cmd_timeline(engine: BrainEngine, args: list[str]) -> None:
             i += 2
         else:
             i += 1
-    nodes = engine.timeline(since=since, until=until, limit=limit)
+    try:
+        nodes = engine.timeline(since=since, until=until, limit=limit)
+    except ValueError as e:
+        print(f"Error: {e}")
+        sys.exit(1)
     if not nodes:
         print("No episodic nodes found.")
         return

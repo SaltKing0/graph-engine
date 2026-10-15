@@ -104,6 +104,8 @@ Use `ig snapshot HEAD~1 "attention" --json` to search historical committed text,
 or `ig snapshot <commit-or-ref> --json` to inspect historical records and review
 state. Optional `--valid-at <ISO-8601>` filters that snapshot by fact validity.
 Snapshot queries apply current permissions and leave the active brain unchanged.
+Temporal queries interpret date-only inputs as midnight UTC and timezone-free
+datetimes as UTC; explicit offsets and `Z` are compared as equivalent instants.
 See [Git snapshots](docs/guide.md#git-revision-snapshots) for semantics and limits.
 
 Forgetting removes a node and edges supported by it from live graph, direct

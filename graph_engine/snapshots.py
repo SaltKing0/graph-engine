@@ -5,7 +5,6 @@ Historical records are untrusted input; incompatible schemas fail explicitly.
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
 from collections.abc import Callable
 import os
 from pathlib import Path
@@ -14,14 +13,10 @@ import subprocess
 from typing import TYPE_CHECKING
 
 from .brain import Brain, Edge, Node, VALID_STATUS, STORAGE_TIERS
+from .timestamps import parse_timestamp as _timestamp
 
 if TYPE_CHECKING:
     from .brain_engine import BrainEngine
-
-
-def _timestamp(value: str) -> datetime:
-    stamp = datetime.fromisoformat(value.replace("Z", "+00:00"))
-    return stamp if stamp.tzinfo is not None else stamp.replace(tzinfo=timezone.utc)
 
 
 class SnapshotError(ValueError):
@@ -170,7 +165,7 @@ def _parse_records(records: dict[str, str]) -> tuple[dict[str, Node], list[Edge]
                     or meta.get("tier_locked", "false") not in ("true", "false")
                     or meta.get("storage_tier", "recall") not in STORAGE_TIERS):
                 raise ValueError("unsupported node metadata")
-            datetime.fromisoformat(meta["created"].replace("Z", "+00:00"))
+            _timestamp(meta["created"])
             int(meta.get("recalls", "0"))
             node = Node.from_markdown(text)
             if (node.id.startswith(".") or "\\" in node.id or "\x00" in node.id

@@ -375,3 +375,18 @@ def test_structured_consolidation_quote_schema(saved):
     assert result['edges'][0].valid_from is None
     assert result['edges'][0].evidence == edge.evidence
     assert result['edges'][0].pending
+
+
+@pytest.mark.parametrize("timestamp", ["2021-01-01", "2021-01-01T00:00:00",
+                                       "2021-01-01T00:00:00Z", "2020-12-31T19:00:00-05:00"])
+def test_snapshot_validity_normalizes_legacy_timestamps(saved, timestamp):
+    brain, _, _, _ = saved
+    brain.write_node(Node("legacy alpha", id="legacy-a", created="2020-01-01"))
+    brain.write_node(Node("legacy beta", id="legacy-b", created="2020-01-01T01:00:00+01:00"))
+    brain.write_edges([Edge("legacy-a", "legacy-b", "fact", id="legacy-fact", pending=False,
+                           valid_from="2021-01-01T00:00:00", valid_to="2022-01-01")])
+    revision = commit(brain)
+    before = state(brain)
+    result = snapshot(brain, revision, fact_valid_at=timestamp)
+    assert [e.id for e in result["edges"]] == ["legacy-fact"]
+    assert state(brain) == before

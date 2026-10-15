@@ -664,19 +664,26 @@ class BrainEngine:
         """Query episodic nodes by time range (Phase 1: temporal reasoning).
 
         Returns episodic nodes sorted by `observed_at` (newest first).
-        `since`/`until` are ISO-8601 date strings. Without arguments,
+        `since`/`until` are inclusive ISO-8601 instants (naive means UTC).
+        Malformed legacy observation timestamps are skipped. Without arguments,
         returns the most recent `limit` episodic nodes.
         """
-        nodes = [n for n in self.brain.read_nodes()
-                 if n.ntype == "episodic" and n.status != "tombstone"]
-        if since:
-            nodes = [n for n in nodes
-                     if (n.observed_at or n.created) >= since]
-        if until:
-            nodes = [n for n in nodes
-                     if (n.observed_at or n.created) <= until]
-        nodes.sort(key=lambda n: n.observed_at or n.created, reverse=True)
-        return nodes[:limit]
+        from .timestamps import parse_timestamp
+
+        start = parse_timestamp(since) if since is not None else None
+        end = parse_timestamp(until) if until is not None else None
+        dated = []
+        for node in self.brain.read_nodes():
+            if node.ntype != "episodic" or node.status == "tombstone":
+                continue
+            try:
+                stamp = parse_timestamp(node.observed_at or node.created)
+            except ValueError:
+                continue
+            if (start is None or stamp >= start) and (end is None or stamp <= end):
+                dated.append((stamp, node))
+        dated.sort(key=lambda item: item[0], reverse=True)
+        return [node for _, node in dated[:limit]]
 
     def valid_at(self, timestamp: str) -> dict:
         """Current records filtered by creation and fact-validity time.
