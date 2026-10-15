@@ -33,7 +33,7 @@ dependencies = [
 # v6 enforces trust_remote_code=False for local custom modules (issue #46).
 st = ["sentence-transformers==6.1.0"]
 mcp = ["mcp>=1.28,<2", "sse-starlette>=1.6.1,<3"]
-dev = ["pytest==8.4.0"]
+dev = ["pytest==9.0.3"]
 pdf = ["pypdf>=6.1,<7"]
 
 [project.scripts]

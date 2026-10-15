@@ -88,6 +88,51 @@ See [retrieval performance](docs/retrieval-performance.md) for stage timings,
 cached/uncached quality comparisons, freshness guarantees and measurement limits.
 The full test suite includes small deterministic index invalidation checks.
 
+## Dependency advisory gate
+
+The separate `Dependency advisories` workflow runs on PRs, main pushes, weekly,
+and on demand. It resolves clean Ubuntu environments for core, development,
+semantic-model (`st`), MCP and PDF dependencies, plus the legacy
+`requirements.txt` install on Python 3.12. A Python 3.14 core job covers the
+newer numpy marker. Each profile includes transitive dependencies, resolved
+from PyPI using `pip install --dry-run --ignore-installed --report` without installing model
+libraries or downloading model weights. These checks describe
+those resolved platform/interpreter combinations, not every possible user
+installation or model artifact. The test matrix above remains required.
+
+`pip-audit==2.10.1` lives in a separate CI-only environment, outside all shipped
+runtime and extras requirements. To reproduce a profile locally (change
+`.[dev]` to the desired extra):
+
+```bash
+python3 -m venv /tmp/graph-audit-target
+/tmp/graph-audit-target/bin/python -m pip install --upgrade pip
+/tmp/graph-audit-target/bin/python -m pip install --dry-run --ignore-installed --report /tmp/graph-resolved.json ".[dev]"
+python3 -m venv /tmp/graph-audit-tool
+/tmp/graph-audit-tool/bin/python -m pip install "pip-audit==2.10.1"
+/tmp/graph-audit-tool/bin/python -m tools.dependency_audit /tmp/graph-resolved.json --pip-report --output /tmp/graph-audit.json
+```
+
+The scanner queries the PyPI advisory service for every resolved package, without
+resolving again. Raw JSON, normalized JSON and resolved requirements are saved
+as CI artifacts. Connected CVE/GHSA/database aliases and duplicate database rows
+count as one advisory, preserving every affected package/version and available
+fix. Any advisory fails the gate; scanner errors, skipped packages and missing
+or malformed reports also fail. There are currently **no advisory exceptions**
+and no severity threshold. Any future exception must document the exact
+advisory, affected profile, rationale, owner and expiry in this section and get
+reviewed with its implementation.
+
+The local GraphEngine project itself is excluded because its local source
+has no published-version advisory mapping; its resolved dependencies are still
+checked. Bootstrap pip/setuptools/wheel and the scanner's own environment
+are outside the target scope unless included in the dependency resolution. The gate audits
+PyPI distributions; CI's alternate-index CPU torch build is not separately
+covered. The real-model test job still uses CPU torch. Development-only pytest
+[CVE-2025-71176 / GHSA-6w46-j5rx-g56g](https://github.com/advisories/GHSA-6w46-j5rx-g56g)
+concerns local Unix temporary-directory handling. Both manifests pin patched
+pytest 9.0.3; this finding does not establish remote server exploitability.
+
 ## Code style
 
 - **Python 3.11+** (uses `str | None` type hints). Type hints are required.
