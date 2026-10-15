@@ -350,3 +350,37 @@ assert brain.vectors_for({"a"}, unexpected, persist=False,
                          embedder_key=model_identity(HashEmbedder()))["a"] == HashEmbedder().embed("alpha beta")
 '''
     subprocess.run([sys.executable, '-c', script, str(engine.brain.path)], check=True)
+
+
+@pytest.mark.parametrize("cached", [False, True])
+def test_cased_queries_match_normalized_vectors_on_cold_and_warm_search(engine, cached):
+    from graph_engine.retrieval import explain
+
+    class CasedAdapter:
+        def embed(self, text):
+            return [1., 0.] if text == "nasa launched a satellite" else [0., 1.]
+
+    engine.brain.write_node(Node("NASA launched a satellite", id="nasa", status="active"))
+    engine.embedder = CasedAdapter()
+    engine.search_cache_enabled = cached
+    for query in ("NASA launched a satellite", "  NASA\n launched  a satellite "):
+        assert explain(engine, "nasa", query)["dense"]["score"] == pytest.approx(1.)
+
+
+@pytest.mark.parametrize("cached", [False, True])
+@pytest.mark.parametrize("corpus", ["empty", "tombstones", "blank-per-tier"])
+def test_search_without_eligible_nodes_does_not_load_model(tmp_path, monkeypatch, cached, corpus):
+    from graph_engine.embedder import Embedder
+
+    brain = Brain(str(tmp_path / "brain"))
+    brain.init()
+    if corpus == "tombstones":
+        brain.write_node(Node("forgotten", id="note", status="tombstone"))
+    elif corpus == "blank-per-tier":
+        brain.write_node(Node("  ", id="note", status="active"))
+    embedder = Embedder("unavailable-offline")
+    load = Mock(side_effect=OSError("model unavailable offline"))
+    monkeypatch.setattr(embedder, "_ensure_model", load)
+    engine = BrainEngine(brain, embedder, reranker=False, search_cache_enabled=cached)
+    assert retrieve(engine, "query", persist=False, per_tier=corpus == "blank-per-tier") == []
+    load.assert_not_called()

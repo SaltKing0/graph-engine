@@ -920,3 +920,23 @@ def test_protected_retrieval_recomputes_same_dimension_model_revision(protected)
     assert explain(engine, 'public', 'query')['dense']['score'] == pytest.approx(0)
     assert raw.vectors_file.read_bytes() == before
     assert not hasattr(engine, '_search_index')
+
+
+def test_protected_cased_query_matches_normalized_text_without_writing(protected):
+    from graph_engine.retrieval import explain, retrieve
+
+    class CasedAdapter:
+        def embed(self, text):
+            return [1., 0.] if text in {"nasa launched a satellite", "space agency"} else [0., 1.]
+
+    raw, _, _ = protected
+    raw.write_node(Node("NASA launched a satellite", id="public", status="active"))
+    raw.write_node(Node("Space agency", id="private", status="active"))
+    viewer = access.SecuredBrain(str(raw.path), graph_name="default", identity="bob")
+    engine = BrainEngine(viewer, CasedAdapter(), reranker=False)
+    engine.reranker = None
+    before = raw.vectors_file.read_bytes()
+    assert explain(engine, "public", "Space   agency")["dense"]["score"] == pytest.approx(1.)
+    assert [nid for nid, _ in retrieve(engine, "Space   agency", persist=True)] == ["public"]
+    assert raw.vectors_file.read_bytes() == before
+    assert not hasattr(engine, "_search_index")

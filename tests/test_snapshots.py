@@ -78,6 +78,23 @@ def test_restores_text_tombstone_and_review_decisions(saved):
     assert snapshot(brain, 'HEAD~1')['revision'] == accepted
 
 
+def test_snapshot_query_normalizes_both_document_and_query(saved):
+    class CasedAdapter:
+        def embed(self, text):
+            return [1., 0.] if text in {"nasa launched a satellite", "space agency"} else [0., 1.]
+
+    brain, _, _, _ = saved
+    brain.write_node(Node("NASA launched a satellite", id="nasa", status="active"))
+    revision = commit(brain)
+    engine = BrainEngine(brain, CasedAdapter(), reranker=False)
+    engine.reranker = None
+    before = state(brain)
+    result = engine.snapshot_query(revision, "Space   agency")
+    assert result["hits"] == [("nasa", pytest.approx(1 / 61))]
+    assert result["query"] == "Space   agency"
+    assert state(brain) == before
+
+
 def test_live_views_hide_tombstones_but_snapshots_use_current_authorization(saved, tmp_path, monkeypatch):
     from graph_engine.access import SecuredBrain
     brain, _, accepted, latest = saved

@@ -131,8 +131,10 @@ entries. The runtime retains at most eight engines, each with one snapshot.
 
 `vectors.jsonl` records carry a schema `version`, a SHA-256 `text_hash` of
 lowercased, whitespace-normalized node text, and a serialized `model_key`.
-Vectors are computed from that same normalized text. Retrieval and ingest
-cosine deduplication validate all three fields before reuse, including when
+Vectors and dense query embeddings use that same normalization, including
+historical snapshot queries. Searches with no eligible nodes return without
+loading the embedding model. Retrieval and ingest cosine deduplication
+validate all three fields before reuse, including when
 loading a populated file after an editor save, enrichment, merge or model
 change. Legacy entries without provenance are recomputed; clearing the search
 snapshot alone is no longer necessary to repair stale persisted embeddings.
