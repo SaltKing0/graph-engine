@@ -143,7 +143,9 @@ def test_dry_run_existing_git_brain_unchanged(tmp_path):
     # Set identity only for this fixture's repository.
     brain.ensure_ready()
     subprocess.run(["git", "-C", str(brain.path), "add", "."], check=True, env=env)
-    subprocess.run(["git", "-C", str(brain.path), "commit", "-qm", "init"], check=True, env=env)
+    # Keep Git's detached housekeeping from changing .git after the snapshot.
+    subprocess.run(["git", "-C", str(brain.path), "-c", "maintenance.auto=false",
+                    "-c", "gc.auto=0", "commit", "-qm", "init"], check=True, env=env)
     before = {str(p.relative_to(brain.path)): p.read_bytes() for p in brain.path.rglob("*") if p.is_file()}
     assert import_documents(brain, [path], dry_run=True)["failed_files"] == 0
     assert {str(p.relative_to(brain.path)): p.read_bytes() for p in brain.path.rglob("*") if p.is_file()} == before
