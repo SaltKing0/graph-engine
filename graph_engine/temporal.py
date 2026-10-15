@@ -17,14 +17,19 @@ from __future__ import annotations
 import datetime
 from typing import TYPE_CHECKING
 
+from .timestamps import parse_timestamp as _parse_ts
+
 if TYPE_CHECKING:
     from .brain import Brain, Edge, Node
     from .brain_engine import BrainEngine
 
 
-def _parse_ts(ts: str) -> datetime.datetime:
-    """Parse ISO-8601 timestamp, tolerating 'Z' suffix."""
-    return datetime.datetime.fromisoformat(ts.replace("Z", "+00:00"))
+def _event_time(event: dict) -> datetime.datetime:
+    """Sort legacy events with missing/malformed dates before dated events."""
+    try:
+        return _parse_ts(event["timestamp"])
+    except ValueError:
+        return datetime.datetime.min.replace(tzinfo=datetime.timezone.utc)
 
 
 def _is_valid_at(edge: "Edge", ts: datetime.datetime) -> bool:
@@ -115,7 +120,7 @@ def history(brain: "Brain", node_id: str) -> list[dict]:
                 "origin": e.origin,
                 "rejected": e.rejected,
             })
-    events.sort(key=lambda x: x["timestamp"] or "")
+    events.sort(key=_event_time)
     return events
 
 
@@ -168,6 +173,10 @@ def edge_timeline(brain: "Brain", *, since: str | None = None,
     Useful for "what changed in the brain recently?" — the temporal
     equivalent of `ig report --since`.
     """
+    # Validate bounds even on an empty brain. Bounds are inclusive instants,
+    # not lexical comparisons of their original ISO-8601 representations.
+    start = _parse_ts(since) if since is not None else None
+    end = _parse_ts(until) if until is not None else None
     events: list[dict] = []
     for e in brain.read_edges(include_rejected=True):
         if e.pending or e.rejected:
@@ -178,10 +187,6 @@ def edge_timeline(brain: "Brain", *, since: str | None = None,
             vf = None
 
         if vf:
-            if since and vf < _parse_ts(since):
-                pass  # still include, filtered below
-            if until and vf > _parse_ts(until):
-                pass
             events.append({
                 "timestamp": e.valid_from,
                 "event": "created",
@@ -211,11 +216,10 @@ def edge_timeline(brain: "Brain", *, since: str | None = None,
                 "origin": e.origin,
             })
 
-    # Filter by range
-    if since:
-        events = [e for e in events if (e["timestamp"] or "") >= since]
-    if until:
-        events = [e for e in events if (e["timestamp"] or "") <= until]
+    if start is not None:
+        events = [e for e in events if _parse_ts(e["timestamp"]) >= start]
+    if end is not None:
+        events = [e for e in events if _parse_ts(e["timestamp"]) <= end]
 
-    events.sort(key=lambda x: x["timestamp"] or "")
+    events.sort(key=_event_time)
     return events

@@ -176,3 +176,135 @@ class TestEdgeTimeline:
         engine.ingest("Something")
         events = edge_timeline(brain, until="2020-01-01T00:00:00Z")
         assert events == []
+
+
+# All four forms name the same instant: naive values are interpreted as UTC.
+UTC_MIDNIGHT = ["2021-01-01", "2021-01-01T00:00:00",
+                "2021-01-01T00:00:00Z", "2020-12-31T19:00:00-05:00"]
+
+
+@pytest.mark.parametrize("stored", UTC_MIDNIGHT)
+@pytest.mark.parametrize("query", UTC_MIDNIGHT)
+def test_valid_at_and_when_normalize_query_and_legacy_creation(brain, stored, query):
+    from graph_engine.brain_engine import BrainEngine
+    from graph_engine.embedder import HashEmbedder
+
+    brain.write_node(Node("alpha memory", id="alpha", created=stored))
+    brain.write_node(Node("alpha future", id="future", created="2021-01-01T00:00:01Z"))
+    brain.write_node(Node("alpha forgotten", id="gone", created=stored, status="tombstone"))
+    engine = BrainEngine(brain, HashEmbedder(), reranker=False)
+    engine.reranker = None
+    assert [n.id for n in engine.valid_at(query)["nodes"]] == ["alpha"]
+    assert [nid for nid, _ in engine.when("alpha", query)] == ["alpha"]
+    assert brain.read_node("alpha").created == stored
+
+
+@pytest.mark.parametrize("stored", UTC_MIDNIGHT)
+@pytest.mark.parametrize("bound", UTC_MIDNIGHT)
+def test_edge_timeline_inclusive_bounds_use_instants(brain, stored, bound):
+    from graph_engine.temporal import edge_timeline
+
+    brain.write_edges([
+        Edge("a", "b", "fact", id="at", pending=False, valid_from=stored,
+             valid_to=stored, invalidated_at=stored,
+             extracted_validity={"valid_from": stored, "valid_to": stored}),
+        Edge("a", "b", "fact", id="before", pending=False,
+             valid_from="2021-01-01T00:59:59+01:00"),
+        Edge("a", "b", "fact", id="after", pending=False,
+             valid_from="2020-12-31T19:00:01-05:00"),
+    ])
+    events = edge_timeline(brain, since=bound, until=bound)
+    assert [(e["edge_id"], e["event"], e["timestamp"]) for e in events] == [
+        ("at", "created", stored), ("at", "expired", stored), ("at", "invalidated", stored)]
+    assert {e["edge_id"] for e in edge_timeline(brain, since=bound)} == {"at", "after"}
+    assert {e["edge_id"] for e in edge_timeline(brain, until=bound)} == {"before", "at"}
+
+
+def test_edge_history_and_timeline_sort_by_instant(brain):
+    from graph_engine.temporal import edge_timeline, history
+
+    brain.write_edges([
+        Edge("a", "b", "fact", id="late", pending=False,
+             valid_from="2020-12-31T20:00:00-05:00", valid_to="2021-01-01T02:00:00"),
+        Edge("a", "b", "fact", id="early", pending=False, valid_from="2021-01-01"),
+        Edge("a", "b", "fact", id="middle", pending=False,
+             valid_from="2021-01-01T01:30:00+01:00"),
+    ])
+    for events in (history(brain, "a"), edge_timeline(brain)):
+        assert [(e["edge_id"], e["event"]) for e in events] == [
+            ("early", "created"), ("middle", "created"),
+            ("late", "created"), ("late", "invalidated")]
+
+
+@pytest.mark.parametrize("bad", ["", "invalid", "2021-02-30", "2021-01-01T25:00:00", 123, {}])
+@pytest.mark.parametrize("populated", [False, True])
+def test_invalid_temporal_inputs_raise_validation_errors(brain, bad, populated):
+    from graph_engine.brain_engine import BrainEngine
+    from graph_engine.embedder import HashEmbedder
+    from graph_engine.temporal import edge_timeline
+
+    if populated:
+        brain.write_node(Node("alpha", id="a", created="2020-01-01", ntype="episodic"))
+        brain.write_edges([Edge("a", "b", "fact", pending=False, valid_from="2020-01-01")])
+    engine = BrainEngine(brain, HashEmbedder(), reranker=False)
+    engine.reranker = None
+    for call in (lambda: engine.valid_at(bad), lambda: engine.when("alpha", bad),
+                 lambda: edge_timeline(brain, since=bad), lambda: edge_timeline(brain, until=bad),
+                 lambda: engine.timeline(since=bad), lambda: engine.timeline(until=bad)):
+        with pytest.raises(ValueError, match="Invalid timestamp"):
+            call()
+
+
+@pytest.mark.parametrize("bound", UTC_MIDNIGHT)
+def test_episodic_timeline_compares_observed_and_fallback_creation_times(brain, bound):
+    from graph_engine.brain_engine import BrainEngine
+    from graph_engine.embedder import HashEmbedder
+
+    for nid, observed, created in [
+        ("late", "2020-12-31T20:00:00-05:00", "2020-01-01"),
+        ("early", None, "2021-01-01"),
+        ("middle", "2021-01-01T01:30:00+01:00", "2020-01-01"),
+    ]:
+        brain.write_node(Node(nid, id=nid, ntype="episodic", created=created, observed_at=observed))
+    engine = BrainEngine(brain, HashEmbedder(), reranker=False)
+    engine.reranker = None
+    assert [n.id for n in engine.timeline()] == ["late", "middle", "early"]
+    assert [n.id for n in engine.timeline(since=bound, until=bound)] == ["early"]
+
+
+@pytest.mark.parametrize("timestamp", UTC_MIDNIGHT)
+def test_timestamp_parser_returns_aware_utc(timestamp):
+    from datetime import datetime, timezone
+    from graph_engine.timestamps import parse_timestamp
+
+    stamp = parse_timestamp(timestamp)
+    assert stamp == datetime(2021, 1, 1, tzinfo=timezone.utc)
+    assert stamp.tzinfo is timezone.utc
+
+
+@pytest.mark.parametrize("bad", [None, 123, {}, "", "invalid", "0001-01-01T00:00:00+01:00",
+                                "9999-12-31T23:59:59-01:00"])
+def test_timestamp_parser_rejects_invalid_or_unrepresentable_utc(bad):
+    from graph_engine.timestamps import parse_timestamp
+
+    with pytest.raises(ValueError, match="Invalid timestamp"):
+        parse_timestamp(bad)
+
+
+def test_malformed_legacy_timestamps_keep_tolerant_read_behavior(brain):
+    from graph_engine.brain_engine import BrainEngine
+    from graph_engine.embedder import HashEmbedder
+    from graph_engine.temporal import edge_timeline, history
+
+    brain.write_node(Node("alpha", id="a", created="legacy-unknown", ntype="episodic"))
+    brain.write_node(Node("beta", id="b", created="2020-01-01"))
+    brain.write_edges([Edge("a", "b", "fact", id="fact", pending=False,
+                           valid_from="legacy-unknown", valid_to="2022-01-01")])
+    engine = BrainEngine(brain, HashEmbedder(), reranker=False)
+    engine.reranker = None
+    assert {n.id for n in engine.valid_at("2021-01-01")["nodes"]} == {"a", "b"}
+    assert [e.id for e in engine.valid_at("2021-01-01")["edges"]] == ["fact"]
+    assert [nid for nid, _ in engine.when("alpha", "2021-01-01")] == ["a"]
+    assert engine.timeline() == []
+    assert [e["event"] for e in edge_timeline(brain)] == ["invalidated"]
+    assert [e["event"] for e in history(brain, "a")] == ["created", "invalidated"]

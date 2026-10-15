@@ -614,3 +614,30 @@ def test_structured_command_requires_separate_configuration(tmp_path):
     assert result.returncode != 0 and "IG_CONSOLIDATE_STRUCTURED_CMD" in result.stderr
     result = run_cli(["dream", "--structured"], tmp_path)
     assert result.returncode != 0 and "requires --consolidate" in result.stderr
+
+
+@pytest.mark.parametrize("timestamp", ["2021-01-01", "2021-01-01T00:00:00",
+                                       "2021-01-01T00:00:00Z", "2021-01-01T01:00:00+01:00"])
+@pytest.mark.parametrize("command", ["valid-at", "when", "timeline"])
+def test_temporal_cli_accepts_equivalent_timestamps(tmp_path, timestamp, command):
+    from graph_engine.brain import Brain, Node
+
+    brain = Brain(tmp_path / "brain", mode="local")
+    brain.ensure_ready()
+    brain.write_node(Node("alpha memory", id="alpha", ntype="episodic", created="2021-01-01"))
+    args = {"valid-at": [timestamp], "when": [timestamp, "alpha"],
+            "timeline": ["--since", timestamp, "--until", timestamp]}[command]
+    result = run_cli([command, *args], tmp_path)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "alpha" in result.stdout
+    assert "Traceback" not in result.stderr
+
+
+@pytest.mark.parametrize("args", [["valid-at", "invalid"], ["when", "invalid", "alpha"],
+                                  ["timeline", "--since", "invalid"],
+                                  ["timeline", "--until", "invalid"]])
+def test_temporal_cli_invalid_timestamp_is_friendly_error(tmp_path, args):
+    result = run_cli(args, tmp_path)
+    assert result.returncode == 1
+    assert "Invalid timestamp" in result.stdout
+    assert "Traceback" not in result.stderr

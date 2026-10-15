@@ -27,6 +27,8 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
+from .timestamps import parse_timestamp
+
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -324,9 +326,7 @@ class Edge:
             if value is None:
                 continue
             try:
-                stamp = datetime.fromisoformat(value.replace("Z", "+00:00"))
-                if stamp.tzinfo is None:
-                    stamp = stamp.replace(tzinfo=timezone.utc)
+                stamp = parse_timestamp(value)
             except (ValueError, TypeError, AttributeError):
                 continue  # Preserve temporal queries' tolerance of legacy timestamps.
             if (is_start and at < stamp) or (not is_start and at >= stamp):

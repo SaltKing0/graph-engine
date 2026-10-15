@@ -1370,6 +1370,27 @@ unreleased changes.
 
 ## Git revision snapshots
 
+All temporal query inputs (`valid-at`, `when`, `timeline` bounds and snapshot
+`--valid-at`) accept ISO-8601 dates and datetimes. Dates mean midnight UTC;
+timezone-free datetimes are interpreted as UTC, including legacy stored dates.
+`2021-01-01`, `2021-01-01T00:00:00`, `2021-01-01T00:00:00Z` and
+`2020-12-31T19:00:00-05:00` therefore identify the same instant. The host's
+local timezone has no effect. Comparisons and timeline ordering use normalized
+UTC instants; returned records retain their original timestamp text. Invalid
+query timestamps produce validation errors even when no records match.
+
+Node creation cutoffs and timeline bounds are inclusive. Fact validity stays
+half-open: `valid_from <= T < valid_to`, with `invalidated_at` also excluding
+the fact from that instant onward. A date-only `--until` means midnight at the
+start of that date, not the end of the day.
+
+Legacy malformed timestamps keep the tolerant current-record behavior:
+unknown creation dates do not exclude nodes from `valid-at`/`when`, and invalid
+fact bounds are ignored. Edge timelines skip malformed event dates; explicit
+history retains them before dated events. Episodic timelines skip records
+whose observation/creation date cannot be parsed. Git snapshots continue to
+reject malformed historical records explicitly.
+
 `ig snapshot` reads an explicit commit from the selected Git-mode brain without
 changing its checkout. This restores historical note text, edges, review
 decisions and tombstone state, even after those records have changed today:
