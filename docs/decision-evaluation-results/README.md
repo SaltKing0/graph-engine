@@ -3,7 +3,9 @@
 All three reports use task version `decision-review-offline/2`, with HashEmbedder, graph expansion
 disabled, no reranker, no provider calls and no answer model. Full code and
 corpus manifests, configuration, prompts, timestamps, errors and timings are
-inside each report. Each prompt includes the complete current update even when
+inside each report. All three ran against clean source commit
+`8adb83a20a6c288ae981357087919c595d1df84c` and were copied into this later report commit.
+Each prompt includes the complete current update even when
 retrieval omits it. Its estimated token count includes that task input; the
 4000-token retrieved-context budget is recorded separately. The synthetic report
 uses the corrected `controls-v2.0.0` freeze; real sources remain `project-v1.0.0`.
