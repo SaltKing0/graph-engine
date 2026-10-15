@@ -1,0 +1,63 @@
+name: Dependency advisories
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '23 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: audit (${{ matrix.profile }}, Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.12']
+        profile: [core, dev, st, mcp, pdf, legacy]
+        include:
+          # Exercise the separate numpy marker for newer interpreters.
+          - python-version: '3.14'
+            profile: core
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Resolve target dependencies in a clean environment
+        env:
+          PROFILE: ${{ matrix.profile }}
+        run: |
+          python -m venv "$RUNNER_TEMP/audit-target"
+          target="$RUNNER_TEMP/audit-target/bin/python"
+          "$target" -m pip install --upgrade pip
+          case "$PROFILE" in
+            core) set -- . ;;
+            legacy) set -- -r requirements.txt ;;
+            *) set -- ".[${PROFILE}]" ;;
+          esac
+          # Resolve all transitive dependencies, without installing model libraries.
+          "$target" -m pip install --dry-run --ignore-installed \
+            --report "$RUNNER_TEMP/resolved.json" "$@"
+      - name: Install isolated advisory scanner
+        run: |
+          python -m venv "$RUNNER_TEMP/audit-tool"
+          "$RUNNER_TEMP/audit-tool/bin/python" -m pip install 'pip-audit==2.10.1'
+      - name: Check advisories and deduplicate aliases
+        run: >-
+          "$RUNNER_TEMP/audit-tool/bin/python" -m tools.dependency_audit
+          "$RUNNER_TEMP/resolved.json" --pip-report --output "$RUNNER_TEMP/audit.json"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: advisories-${{ matrix.profile }}-${{ matrix.python-version }}
+          path: |
+            ${{ runner.temp }}/resolved.json
+            ${{ runner.temp }}/audit.requirements.txt
+            ${{ runner.temp }}/audit*.json
