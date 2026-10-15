@@ -127,9 +127,9 @@ def history(brain: "Brain", node_id: str) -> list[dict]:
 def when(engine: "BrainEngine", query: str, at: str, k: int = 5) -> list[tuple[str, float]]:
     """Retrieval of current text restricted by creation time (Phase 2).
 
-    Runs the normal hybrid retrieval, then filters the results to only
-    include nodes that existed at the given timestamp. This is the
-    temporal filter; it does not restore old text or review decisions.
+    Runs normal hybrid retrieval over only the authorized, live nodes that
+    existed at the given timestamp, without writes or recall tracking. This
+    temporal filter does not restore old text or review decisions.
     """
     from .retrieval import retrieve
 
@@ -140,30 +140,14 @@ def when(engine: "BrainEngine", query: str, at: str, k: int = 5) -> list[tuple[s
     except (ValueError, TypeError):
         raise ValueError(f"Invalid timestamp: {at!r}")
 
-    # Get the full ranking (no tracking — this is a historical query)
-    results = retrieve(engine, query, k=k * 3, track=False)
-    if not results:
-        return []
-
-    # Filter to nodes that existed at the timestamp
-    filtered: list[tuple[str, float]] = []
-    for node_id, score in results:
-        node = engine.brain.read_node(node_id)
-        if node is None:
-            continue
-        if node.status == "tombstone":
-            continue
+    def eligible(node: "Node") -> bool:
         try:
             created = _parse_ts(node.created) if node.created else None
         except (ValueError, TypeError):
             created = None
-        if created and created > ts:
-            continue
-        filtered.append((node_id, score))
-        if len(filtered) >= k:
-            break
+        return created is None or created <= ts
 
-    return filtered
+    return retrieve(engine, query, k=k, persist=False, track=False, node_filter=eligible)
 
 
 def edge_timeline(brain: "Brain", *, since: str | None = None,

@@ -1364,9 +1364,12 @@ unreleased changes.
   `ig merge`; ingest deduplication uses its separate 0.92 threshold.
 - **Temporal queries filter current records.** `ig valid-at` applies stored
   creation/validity timestamps and current review/tombstone state; `ig when`
-  filters a bounded search of current text by creation time. Neither restores
-  old node text or past review decisions from Git. Use `ig snapshot` for
-  historical committed records; see [Git snapshots](#git-revision-snapshots).
+  filters the eligible corpus by creation time before hybrid scoring and
+  candidate limits. Temporal retrieval keeps normal feedback, tier priority
+  and optional reranking, without persisting vectors or tracking recalls.
+  Neither restores old node text or past review decisions from Git. Use
+  `ig snapshot` for historical committed records; see
+  [Git snapshots](#git-revision-snapshots).
 
 ## Git revision snapshots
 

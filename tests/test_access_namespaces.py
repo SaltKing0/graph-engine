@@ -55,6 +55,38 @@ def test_nodes_edges_vectors_and_shared_memo_do_not_leak(protected):
     assert raw.read_node("readonly").text == "readonly knowledge"
 
 
+def test_when_filters_authorized_corpus_and_respects_live_revocation(protected):
+    from graph_engine.retrieval import retrieve
+
+    raw, policy_path, policy = protected
+    for node in raw.read_nodes():
+        node.created = "2020-01-01"
+        raw.write_node(node)
+    raw.write_node(Node("knowledge future", id="future", created="2030-01-01"))
+    raw.write_node(Node("knowledge forgotten", id="gone", created="2020-01-01",
+                        status="tombstone"))
+    unprotected = BrainEngine(raw, HashEmbedder(), reranker=False)
+    unprotected.reranker = None
+    retrieve(unprotected, "knowledge", persist=False)
+    viewer = access.SecuredBrain(str(raw.path), graph_name="default", identity="bob")
+    engine = BrainEngine(viewer, HashEmbedder(), reranker=False)
+    engine.reranker = None
+    engine._search_index = unprotected._search_index
+    before = {str(p.relative_to(raw.path)): p.read_bytes()
+              for p in raw.path.rglob("*") if p.is_file() and ".git" not in p.parts}
+    for _ in range(2):
+        assert set(dict(engine.when("knowledge", "2021-01-01"))) == {"public", "readonly"}
+    policy["graphs"]["default"]["nodes"]["readonly"]["read"] = ["owner"]
+    policy_path.write_text(json.dumps(policy))
+    assert set(dict(engine.when("knowledge", "2021-01-01"))) == {"public"}
+    policy["graphs"]["default"]["roles"].pop("bob")
+    policy_path.write_text(json.dumps(policy))
+    with pytest.raises(PermissionError):
+        engine.when("knowledge", "2021-01-01")
+    assert {str(p.relative_to(raw.path)): p.read_bytes()
+            for p in raw.path.rglob("*") if p.is_file() and ".git" not in p.parts} == before
+
+
 def test_hygiene_corruption_recovery_keeps_current_acl_and_cache_isolation(protected):
     from graph_engine.hygiene import near_dup_pairs
     from graph_engine.report import report_data

@@ -7,6 +7,10 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Fixed
+- Filter `when` queries by creation time before hybrid scoring and candidate
+  limits, so newer matches cannot crowd out eligible memories. Keep temporal
+  retrieval read-only with no vector persistence or recall tracking, while
+  preserving access checks, feedback, tiers and reranking (issue #53).
 - Validate ingest configuration and metadata before storage changes, including
   a finite 0–1 confidence floor. Rejected CLI, HTTP and shared-engine calls
   preserve existing records and Git state. Report failures after saving a note
