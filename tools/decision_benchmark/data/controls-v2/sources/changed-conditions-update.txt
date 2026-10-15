@@ -1,0 +1,1 @@
+SYNTHETIC UPDATE: Observation X2: recall=0.2 fraction; workload W2; environment E; code C; corpus H2; protocol P. Original observation X1 used workload W and corpus H.

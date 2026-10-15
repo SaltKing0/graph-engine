@@ -1,0 +1,16 @@
+diff --git a/graph_engine/runtime.py b/graph_engine/runtime.py
+index 1ab49c4..e019683 100644
+--- a/graph_engine/runtime.py
++++ b/graph_engine/runtime.py
+@@ -92,6 +92,11 @@ def make_engine() -> BrainEngine:
+     rerank_key = (rerank_model, rerank_revision, local_model_digest(rerank_model)
+                   if rerank_model and rerank_model.lower() != "none" else None)
+     with _CACHE_LOCK:
++        cached = _EMBEDDERS.get(embed_key)
++        if isinstance(cached, Embedder) and not cached.matches_source(model, revision, embed_key[-1]):
++            # Files may have changed between adapter creation and lazy loading.
++            # Drop only the cache reference; active callers keep their model.
++            del _EMBEDDERS[embed_key]
+         embedder = _cached(_EMBEDDERS, embed_key,
+                            lambda: get_embedder(embedder_name, model, revision=revision))
+         reranker = _cached(_RERANKERS, rerank_key,

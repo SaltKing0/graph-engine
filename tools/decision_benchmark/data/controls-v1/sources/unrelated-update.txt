@@ -1,0 +1,1 @@
+SYNTHETIC UPDATE: Palette artifact P2: the blue label now has two spaces instead of one. No mode-A measurements occur in this artifact.

@@ -1,0 +1,6 @@
+## Evaluation
+
+See [graph comparison commands and measured limits](memory-benchmarks.md#graph-expansion-comparison).
+The synthetic fixture checks retrieval/evidence and latency; it does not
+measure real answer correctness, extraction quality or general graph benefit.
+Expansion remains opt-in.

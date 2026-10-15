@@ -1,0 +1,46 @@
+diff --git a/graph_engine/retrieval.py b/graph_engine/retrieval.py
+index e3c692f..d845d51 100644
+--- a/graph_engine/retrieval.py
++++ b/graph_engine/retrieval.py
+@@ -18,7 +18,7 @@ from datetime import datetime, timezone
+ import numpy as np
+ 
+ from .brain_engine import BrainEngine
+-from .vector_cache import model_identity
++from .vector_cache import model_identity, normalize_text
+ from .brain import Brain
+ from .search_index import SearchIndex, corpus_stamp, embedder_stamp
+ from .feedback import LearningProfile, learning_profile
+@@ -146,10 +146,13 @@ def _retrieve_trace(engine: BrainEngine, query: str, rerank_k: int,
+     if type(engine.brain) is not Brain:
+         engine.__dict__.pop("_search_index", None)
+     with _stage(engine, "freshness_scan"):
+-        key = ((corpus_stamp(engine.brain.path), embedder_stamp(engine.embedder), persist, per_tier)
+-               if cacheable else None)
++        stamp = corpus_stamp(engine.brain.path) if cacheable else None
+     index = getattr(engine, "_search_index", None) if cacheable else None
+-    if not isinstance(index, SearchIndex) or index.key != key or not index.valid():
++    # Reuse parsed nodes only while the corpus and visibility mode match.
++    # Resolve model identity after the empty-corpus return: doing so may load
++    # weights or download a model even though there is nothing to search.
++    if (not isinstance(index, SearchIndex) or not index.valid()
++            or index.key[0] != stamp or index.key[2:] != (persist, per_tier)):
+         index = None
+     with _stage(engine, "filesystem_parsing"):
+         nodes = index.nodes if index is not None else engine.brain.read_nodes()
+@@ -164,9 +167,14 @@ def _retrieve_trace(engine: BrainEngine, query: str, rerank_k: int,
+     if not nodes:
+         trace.graph = expand(engine.brain, set(), [], graph)
+         return trace
++    with _stage(engine, "freshness_scan"):
++        key = ((stamp, embedder_stamp(engine.embedder), persist, per_tier)
++               if cacheable else None)
++    if index is not None and index.key != key:
++        index = None
+     node_ids = [n.id for n in nodes]
+     with _stage(engine, "query_embedding"):
+-        qvec = engine.embedder.embed(query)
++        qvec = engine.embedder.embed(normalize_text(query))
+ 
+     if index is not None and index.dimension != len(qvec):
+         index = None

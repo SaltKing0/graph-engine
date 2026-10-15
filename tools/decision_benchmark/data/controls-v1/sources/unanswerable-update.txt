@@ -1,0 +1,1 @@
+SYNTHETIC UPDATE: The result artifact was not retained. There are no values, environment fields or measurement timestamps in this update.

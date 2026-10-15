@@ -1,0 +1,14 @@
+diff --git a/graph_engine/document_import.py b/graph_engine/document_import.py
+index 90b91c2..56f1af1 100644
+--- a/graph_engine/document_import.py
++++ b/graph_engine/document_import.py
+@@ -311,6 +311,9 @@ def import_documents(brain: Brain, paths: Iterable[str | Path], *,
+                         if existing.status == "tombstone" or survivor is None or survivor.status == "tombstone":
+                             receipt["status"] = "tombstone"
+                             continue
++                        if existing.capture and existing.capture.get("ingest_incomplete", False):
++                            raise ImportProblem("ingest_incomplete",
++                                "Capture ingest incomplete; inspect stored note and Git state before retrying extraction")
+                         # Finish a prior failed commit without rewriting any note.
+                         if receipt["status"] == "reused":
+                             # The node may have landed before an index write failed.

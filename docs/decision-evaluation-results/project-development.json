@@ -1,0 +1,1800 @@
+{
+  "schema": "dm.eval.report/1",
+  "status": "complete",
+  "metadata": {
+    "source_commit": "8adb83a20a6c288ae981357087919c595d1df84c",
+    "source_dirty": false,
+    "code_sha256": "228fbd1286f56050af6923f77d97204f0497d1ac41d5c44f3d559740e99a15c4",
+    "code_manifest": {
+      "graph_engine/__init__.py": "8a8d8c7b6d82373e8288533d448f7809f1d7402ae942b8e39238050f6b3904cd",
+      "graph_engine/__main__.py": "e3d56bb95aced3e08b36bce563363ab9e486378ff0e6ab2132624a03d033bdd1",
+      "graph_engine/access.py": "8d10e998f2425ad22e9080956fadcb07eb372ff7bbe48e54131cf24a8c983bf2",
+      "graph_engine/agent_memory.py": "5371149e2eefd7a89b48d11834b11dc8f6a82cf5b44cd96b95046d6acf790240",
+      "graph_engine/brain.py": "d762457a58db5c2f252f8dd2d8d3f2cf554c92c4f76b6856d99136862e92cc5e",
+      "graph_engine/brain_engine.py": "dd05cec10d0e06b3dc8b58fc4638ead70d91f8b565190f9570798b88209f108f",
+      "graph_engine/communities.py": "85eb3e66b3c0e0385e108f6ccadc16646bbc38f2f0acee379eaaef7d9547e958",
+      "graph_engine/consolidation.py": "9ee178a7f5ca2d7aa218e05d1f1e6d93eadefeeccb0b6b57bf7e6ae25dbf276b",
+      "graph_engine/consolidation_protocol.py": "015ef7cccd4b4d53aa5d76463a926c26513124abfb1892400718f0875f6aea0d",
+      "graph_engine/context.py": "def373d0bace62e2b59bff048b0df66c69635c6f5dd90a935442fe944962f133",
+      "graph_engine/decay.py": "4f8d18e6193120b8a6c8696bf7bc6448f2578ffd4a3acfbcecf903bebf3a0822",
+      "graph_engine/demo.py": "5f433788e7b7e37f511a8dd4976e37a70844c8be39e2d7449e9213dc9b964333",
+      "graph_engine/document_import.py": "386df0d6d23dd3105cc882951c853b759722d0b18c46f3e1f9c0324d44c35d5e",
+      "graph_engine/dream.py": "d542521b417321e3ec7b16a4dfad96e4b201bdd3a133f10fde6758d59137d487",
+      "graph_engine/embedder.py": "249b80e4f1eee10c6a684515a88f515a1a46f757c4290fc6af0f5e8cecfe0262",
+      "graph_engine/engine.py": "afd83939e362af9ca9f6fcbfce76c7b964a8ac74a5dca497af248b3ebe11b071",
+      "graph_engine/entities.py": "a2f522a9261daa98f0e55fcb321f759a977cba3481acbc0e9b7111267ae9bf77",
+      "graph_engine/evals.py": "89707e51401bb893b91d3209a2fd63b9b7d21b0ac1241b5d64718d9881b76d96",
+      "graph_engine/feedback.py": "1e4962e08365449ac7ad2b43c4f36fb43f0f03340b984bb9b2d8ea366fd20935",
+      "graph_engine/gaps.py": "55157c66838aa66383aee65a06c6c4ee8aafdf308146335cc7a31cbdefa624a8",
+      "graph_engine/graph.py": "05ef8ae744842ccff02c523cc620c91b1a4f905c394a897520461d5127a2f40d",
+      "graph_engine/graph_retrieval.py": "2a4b2d5dce255054fb83816a3478dc9aac6c919682c3aa0ae9b537485989c769",
+      "graph_engine/hygiene.py": "9bf533e606cb6cd7abe6e5e2791b6ad312d96fba88fe90b43a9e3c70ffa4d812",
+      "graph_engine/inference.py": "547494fcd8060ca94188d0de032952bc04a032e6b1dace72c5eb943616081269",
+      "graph_engine/intent.py": "42bcd85e156ee3433135b3f9286fbd47036649f25022d5fa93b54636c6b772a5",
+      "graph_engine/maintenance.py": "8f3ff8701b6994ab2e30b42f9cdb73891de47f5ca869aa0d0be4dfdef05b0d62",
+      "graph_engine/mcp/__init__.py": "8d44f4694966bc465fae60344c86a8d7436e2c6de9faaa7119694c9cb67ac649",
+      "graph_engine/mcp/format.py": "c89cfeedc39fbb4adb20c897590123084b94411ce04ee964c295117d8b8cb937",
+      "graph_engine/mcp/server.py": "c17db28aaf76f18d1cf74fd1167285962a7165490a6aa4664f1547626159f6e8",
+      "graph_engine/merge.py": "cf21956ec4083ef2769a8d55fd76d693efb7a70d1fa35e7928482d2337b1553a",
+      "graph_engine/model.py": "ff001150b344b9207552180d873c2c2dad492b11fc8e8a23d856c12ba97af60b",
+      "graph_engine/namespaces.py": "04117225ed38c2d4dfa466aff6014af681e9336d07ae8aeacdfaace6528c8dcb",
+      "graph_engine/recall.py": "af8d139631e2d1d87fdf0449ec3e7413d8597916e1c673d74aa289d6a0b9c6fd",
+      "graph_engine/replacements.py": "4401a4bb6ea06c6f9409dd5109c52011cbadb8b39aca55dbd01eb6ae9282fdb9",
+      "graph_engine/report.py": "3f1ee4be9ecc1bd43f981fc7960dd00d6875d5221a11d49651989c8bde63253f",
+      "graph_engine/reranker.py": "c2139f2fef02d3818cec7555ebcdb28781f7c1441977fd12b7a44621c1456dc7",
+      "graph_engine/retrieval.py": "aeefb80f9818247a2879263d438fda755802622a1bb0ca87919651fa96ad177d",
+      "graph_engine/review.py": "866475018dea7babdd1c160703139e71444facf0026af99e4b91f495fca88f1f",
+      "graph_engine/runtime.py": "63ba83979a6b7990c27dbddd387a3eee338376895f24c9584837d9c027b80f3b",
+      "graph_engine/search_index.py": "2910dd74fb065d205bcb5c5c1233c4c4bfd99a82ee0359c5d2e574ccb815884e",
+      "graph_engine/server.py": "d1a8df52b06ca54dfaa6dea60c4ee5201967fc48af93b4f957b6031292fa7141",
+      "graph_engine/similarity.py": "9ffd20d70bdc45b7358858ae34d7d31977db02b72a153d1034195cf7b2b1f82f",
+      "graph_engine/snapshots.py": "6c21e535c00c82db56123d5fff13d926e39eefb97e26066bf057919a1b9ff861",
+      "graph_engine/store.py": "e9b478a3ccea228d76c9867d297e9632866865f2fd9b14d39f74b9a26b0f078e",
+      "graph_engine/suggester.py": "39043e874b0fd9d3e8ff51f4815a6f99bf00430038b6ec632344dcaa94c94808",
+      "graph_engine/temporal.py": "83002c390232dcc45983588138c4354b043474fd4e582c5e3f7aeef16d0d44e9",
+      "graph_engine/tiers.py": "96fab08fc6a2358587e0deff0d5541a602387ae2b385dc91ac12f339c8f177f8",
+      "graph_engine/timestamps.py": "18a83710d2d5219941b55e7c7c765c8d51f2e81eed4b5e7222f6c3ba2d73423e",
+      "graph_engine/vector_cache.py": "c5d8139848d88e8b552343fb060b7f082fa6036ae2f6526353f93c6694c27d96",
+      "graph_engine/write_guard.py": "9b589bd35ca3a97db4f9432dcfbe8cdb5d82aa3c5b349cb136bb3b4ea7ab2e3f",
+      "tools/decision_benchmark/__init__.py": "b4fe842811829eb9c9966c8707bb1af33a4cf382d31cab1c91bbc2728a8e7b78",
+      "tools/decision_benchmark/__main__.py": "2bac4fa31396aaf4324368f82acd8fa1b3c35a76597d7afb9929b95470790b97",
+      "tools/decision_benchmark/corpus.py": "46f1cef375c0ada4b18ffbdeec300c648b68af59adf7ed44ade358fdace58d8a",
+      "tools/decision_benchmark/freeze_sources.py": "6177bfc0d0cae4f6127c585f365bb1863a3fae9b562cf1cd9f20a1a460804166",
+      "tools/decision_benchmark/runner.py": "13d65a992eec0d4168e65172ad5ea4bb47fc9b176980f8f9c7c09e9aaf20da71",
+      "tools/decision_benchmark/scoring.py": "59598b29f31f61d5316910c4bfdab7b0b79523b1689aff761ed077608a0a10ad",
+      "tools/decision_benchmark/synthetic.py": "96f0b1db91b05de5be9c49c9e238b64c0e2202a54259c89c302c183142d7df82",
+      "tools/memory_benchmark/__init__.py": "4697afa15d32363557e9e5a66f6625a291d33a04eadca592c682b3b747ecb17f",
+      "tools/memory_benchmark/__main__.py": "6e90c6a8f91b02854c6068a68cc39c6f1718aab4cf24c8067cf0ae252c930d84",
+      "tools/memory_benchmark/adapters.py": "146b187e10dc96409facc39f99e8dc8f092c5014b7b8982c42be3445204d2be4",
+      "tools/memory_benchmark/answers.py": "7334a046def3dc42ebe38cc2e96b47c2f4c3fa7921318a6d58f1a19d39bff3bf",
+      "tools/memory_benchmark/dataset.py": "bfe01cede6465347dfd569ef950a614cbe39317e09d988c9aeded3e7685af122",
+      "tools/memory_benchmark/embeddings.py": "bfdc69edc0ee75f9845b5338a7adc6545a38ed69fa117485f3861142bf217be8",
+      "tools/memory_benchmark/runner.py": "c09feaffc9b8c2d2e3b5f27246ba98f0c03992c51b04ae1069ecd5d55dfd3eb5",
+      "tools/memory_benchmark/scoring.py": "a2e53fb042c443a0a8e15a393c10624734596cb99e77fe26d4f799b5ecfc539e"
+    },
+    "python": "3.12.14",
+    "platform": "macOS-26.7.1-arm64-arm-64bit",
+    "dependencies": {
+      "graph-engine-memory": "0.7.0",
+      "numpy": "2.3.1",
+      "httpx": "0.28.1"
+    },
+    "captured_at": "2026-10-15T21:24:02.504247+00:00",
+    "corpus_version": "project-v1.0.0",
+    "kind": "real",
+    "freeze_sha256": "1f3c33f1b68a85659b5e3f17378168a2e7be16e5a748c6704760e9ea4a0b9e08",
+    "frozen_files": {
+      "LICENSE": "8e7e434d98c41d656e7657a7049e9f49bd8e66e15cb4c4527d916b744faef9d1",
+      "contract.md": "5f2dbaeabd5586794df8d3be88587c8a025dc8581fae1cbd15f09f21bd47530b",
+      "inputs.json": "a80f99adb5cbd5db23d61cf0382deb236db1d3452aba5cc7539a19ca064f04ce",
+      "labels.json": "1dafa542eaf223ec7fbc6e1ec23bc1adac97d4c810e4ef0ac25823b7f7d08da0",
+      "sources/cache-basis.txt": "a8278e3095044cf1e09819bab75d2b12bc83d241ad66968b909083d9295c14e0",
+      "sources/cache-update-1.txt": "b52a84d3f2f9bc6e2eaeaa4cbcd40a61c47e3d158a608b2e126726756cb54840",
+      "sources/cache-update-2.txt": "5ed9aaaa43f2d1a9fc57fe9820d2a16d7b218bc42e621d947f1791036c1c1fa5",
+      "sources/context-basis.txt": "6b3aa6c55de240dc0b48980a6949ba44e9712ad2480af2fec4fe86f6fcb275f4",
+      "sources/context-update-1.txt": "4cbdfef5a0e22144daebb8ea826a022c10e137137d2fded2499bacbe7c4d7b2a",
+      "sources/context-update-2.txt": "cc95dba7dd1f854e5b8c11986a88398dc28715a9f4e44b059b918d28b2ec8e9a",
+      "sources/documents-basis.txt": "0653ca0e07e351df9cac345d8a545a6f29b97d122db6f4c3f53ae4dca16ef3b7",
+      "sources/documents-update-1.txt": "2cf3ce4ca23a789498715d72bd66213998c313cd5c06b471ea9fae1809bf4e44",
+      "sources/documents-update-2.txt": "a5e9a7c8bfd05987ef988b8fcd9106ac69a6a4f43bf30f1bd8c0c13f8708f1ae",
+      "sources/forget-basis.txt": "3aaf28fe4e07685c37d80a1ec2a6d9d8ee8afc64e2b4180e0e86dd64d123d9e2",
+      "sources/forget-update-1.txt": "59048bab80c43cb175e24d4f199cdb4ed1deb56596d50fe1c929695f5360b88a",
+      "sources/forget-update-2.txt": "32b43a6bd9ffc6593dba29de12d30e6ce292a638212910a63b03dde325a1534d",
+      "sources/graph-basis.txt": "f8fd4889472a34e5a85da9bf18911cc122840b0be737cbaad29029109696692a",
+      "sources/graph-fixture.txt": "3e01f83419bc92afde7ec01093096dca2b5514738b9fe5fbc19d63a81fc7f718",
+      "sources/graph-protocol.txt": "f91efb0d4b0351d7bd9625042f994777df23bf3ed95c744e25af7ada0f8ebb99",
+      "sources/graph-report.txt": "ffecd1b60acd57cb9b6a4b6be877a71f3ff539fe64ce44f267f5df1a293939c6",
+      "sources/graph-update-1.txt": "8c5180f68204316905f5e1015f5dbc58e66f852bbecf27101c1ad57313157c93",
+      "sources/graph-update-2.txt": "5497ae91315d1a8708efd819ba96a0019734118c45e68f893249b997424f0810",
+      "sources/models-basis.txt": "1e80f2132d547be44fa82611ec9e6e94fa4e40e5db654ad0f25f5dda5c047965",
+      "sources/models-update-1.txt": "b25413a3fefe0934f16e9bb8483dd9305893454258bc141e59ecb1723d394334",
+      "sources/models-update-2.txt": "7e607f2126791e30fdc5b063fbd3bab0faf6ab2419f86d57545d13d87bc8c963",
+      "sources/temporal-basis.txt": "8cd9bc9c06f0c2a9a62aa7b2c65303a91b10d63191e7fb08be9fdf1bd752ed2b",
+      "sources/temporal-update-1.txt": "56fb978721b3b2b7fefbed6fe0609d2e19d994e1f1b45dace14e26e81a198027",
+      "sources/temporal-update-2.txt": "84bb2e651adb0671f6d2187b9dc92d148f43c29b02550b87aa493c048a0e1f16",
+      "sources/writer-basis.txt": "2bc4e1a861c60180e2caa1155d45bbadc0d9bbe8191772fcce5c2bf148664434",
+      "sources/writer-update-1.txt": "97fba931f5614ead33f0fd60733ebc0a49a3471564e698fb6185b2b1a6edec51",
+      "sources/writer-update-2.txt": "e4f9003e78f1cfd2b72a71db0bb42c0aebd99c47bc39559b84efaa9cf3e16291"
+    },
+    "configuration": {
+      "k": 5,
+      "context_budget_estimated_tokens": 4000,
+      "task_version": "decision-review-offline/2",
+      "corpus_task_version": "decision-review-offline/1",
+      "task_template": "Which documented decisions need review after this update to {path}? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.",
+      "update_input": "all visible chunks of the current update source",
+      "context_budget_excludes": [
+        "system/task text",
+        "decision inventory",
+        "current update"
+      ],
+      "system_prompt": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources.",
+      "graph_expansion": false,
+      "context_assembly": "graph_engine.context.build_context",
+      "source_chunk_chars": 800,
+      "split": "development",
+      "embedder": "HashEmbedder",
+      "embedder_dimension": 64,
+      "reranker": null,
+      "provider_calls": false,
+      "answer_model": null,
+      "dependency_profiles": [
+        "curated",
+        "proposed"
+      ],
+      "extraction_quality_measured": false
+    }
+  },
+  "results": [
+    {
+      "event_id": "event-graph-1",
+      "split": "development",
+      "eligible_decisions": [
+        "decision-graph",
+        "decision-context"
+      ],
+      "available_source_ids": [
+        "context-basis",
+        "graph-basis",
+        "graph-fixture",
+        "graph-protocol",
+        "graph-report",
+        "graph-update-1"
+      ],
+      "visible_inputs_sha256": "40fd5394212f2a37494091675d7f66f78428f4ebc83093ba4b86ce911bedaac2",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "graph-protocol-c007",
+            "score": 0.032018442622950824
+          },
+          {
+            "id": "context-basis-c002",
+            "score": 0.031099324975891997
+          },
+          {
+            "id": "context-basis-c000",
+            "score": 0.030117753623188408
+          },
+          {
+            "id": "graph-protocol-c002",
+            "score": 0.02886002886002886
+          },
+          {
+            "id": "graph-protocol-c009",
+            "score": 0.02804284323271665
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:graph-protocol-c007] [semantic, active] source: benchmark\nt\nanswers are unscored and counted as errors where appropriate: compare error\ncounts and scored denominators, not only the mean. Inspect the per-question\nresults by language/category. No paid model ju… [truncated]\n\n[memory:context-basis-c002] [semantic, active] source: benchmark\nhides type/status). Accepted,\ncurrent edges add `edge_id@evidence_node_id` references when their endpoints\nand evidence sources are visible and live. Evidence references identify\nsupporting nodes; fet… [truncated]\n\n[memory:context-basis-c000] [semantic, active] source: benchmark\n### Budgeted context and a complete agent turn\n\n`ig context \"answer preferences\" --budget 500 --json` and Python\n`build_context(engine, query, budget=500, k=5)` assemble **persisted** main,\nrecall and… [truncated]\n\n[memory:graph-protocol-c002] [semantic, active] source: benchmark\noptions. All runs support `--k`, `--context-budget`\n(estimated tokens), and `--seed`. The defaults are k=5, budget=256, seed=0.\nThe smoke gate requires complete retrieval and packed-context evidence f… [truncated]\n\n[memory:graph-protocol-c009] [semantic, active] source: benchmark\ndefault deterministic gate.\n\n## Optional answer generation and cost limits\n\nUse an explicitly selected Chat Completions compatible endpoint, with a pinned\nmodel snapshot/revision served there. The end… [truncated]",
+          "tokens": 355,
+          "nodes": [
+            "graph-protocol-c007",
+            "context-basis-c002",
+            "context-basis-c000",
+            "graph-protocol-c002",
+            "graph-protocol-c009"
+          ],
+          "budget": 4000,
+          "truncated": true,
+          "memories": [
+            {
+              "id": "graph-protocol-c007",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "context-basis-c002",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "context-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "graph-protocol-c002",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "graph-protocol-c009",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "graph-protocol-c007",
+                "context-basis-c002",
+                "context-basis-c000",
+                "graph-protocol-c002",
+                "graph-protocol-c009"
+              ],
+              "tokens": 355
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to .github/workflows/ci.yml? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"Keep graph expansion opt-in; synthetic diagnostic results do not establish production answer quality.\", \"id\": \"decision-graph\", \"source_id\": \"graph-basis\"}, {\"action\": \"Assemble citation-bearing context by persisted tier within an estimated token budget.\", \"id\": \"decision-context\", \"source_id\": \"context-basis\"}]\nUpdate source: graph-update-1\nUpdate documents (complete task input):\n[{\"id\": \"graph-update-1-c000\", \"source_id\": \"graph-update-1\", \"text\": \"diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml\\nindex 2ef32ed..308a64c 100644\\n--- a/.github/workflows/ci.yml\\n+++ b/.github/workflows/ci.yml\\n@@ -74,7 +74,7 @@ jobs:\\n       - name: Test MCP transport, tools and access boundaries\\n         run: >-\\n           python -m pytest tests/test_mcp.py tests/test_access_namespaces.py\\n-          tests/test_entities.py tests/test_fact_validity.py\\n+          tests/test_entities.py tests/test_fact_validity.py tests/test_graph_retrieval.py\\n           --fail-on-skip -q\\n \\n   test-browser:\\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:graph-protocol-c007] [semantic, active] source: benchmark\nt\nanswers are unscored and counted as errors where appropriate: compare error\ncounts and scored denominators, not only the mean. Inspect the per-question\nresults by language/category. No paid model ju… [truncated]\n\n[memory:context-basis-c002] [semantic, active] source: benchmark\nhides type/status). Accepted,\ncurrent edges add `edge_id@evidence_node_id` references when their endpoints\nand evidence sources are visible and live. Evidence references identify\nsupporting nodes; fet… [truncated]\n\n[memory:context-basis-c000] [semantic, active] source: benchmark\n### Budgeted context and a complete agent turn\n\n`ig context \"answer preferences\" --budget 500 --json` and Python\n`build_context(engine, query, budget=500, k=5)` assemble **persisted** main,\nrecall and… [truncated]\n\n[memory:graph-protocol-c002] [semantic, active] source: benchmark\noptions. All runs support `--k`, `--context-budget`\n(estimated tokens), and `--seed`. The defaults are k=5, budget=256, seed=0.\nThe smoke gate requires complete retrieval and packed-context evidence f… [truncated]\n\n[memory:graph-protocol-c009] [semantic, active] source: benchmark\ndefault deterministic gate.\n\n## Optional answer generation and cost limits\n\nUse an explicitly selected Chat Completions compatible endpoint, with a pinned\nmodel snapshot/revision served there. The end… [truncated]"
+          }
+        ],
+        "prompt_sha256": "d3306cec7f28ed6cebcf2a4255047e0df00ce9f58f1ee5f7b3b98996459c1daf",
+        "update_node_ids": [
+          "graph-update-1-c000"
+        ],
+        "prompt_estimated_tokens": 726,
+        "latency_ms": {
+          "retrieval": 16.124540998134762,
+          "context": 10.178415977861732
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-graph",
+            "path": [
+              "graph-update-1",
+              "graph-basis",
+              "dependency-graph",
+              "decision-graph"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 55.49995799083263,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    },
+    {
+      "event_id": "event-graph-2",
+      "split": "development",
+      "eligible_decisions": [
+        "decision-graph",
+        "decision-context"
+      ],
+      "available_source_ids": [
+        "context-basis",
+        "graph-basis",
+        "graph-fixture",
+        "graph-protocol",
+        "graph-report",
+        "graph-update-1",
+        "graph-update-2"
+      ],
+      "visible_inputs_sha256": "48391ae2b41133a958a83857005d8f8a3444c98b8c5446b6b967a22395aeabb4",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "graph-protocol-c007",
+            "score": 0.03131881575727918
+          },
+          {
+            "id": "context-basis-c002",
+            "score": 0.030834914611005692
+          },
+          {
+            "id": "context-basis-c000",
+            "score": 0.029513888888888888
+          },
+          {
+            "id": "graph-protocol-c002",
+            "score": 0.02886002886002886
+          },
+          {
+            "id": "graph-protocol-c017",
+            "score": 0.028006267136701922
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:graph-protocol-c007] [semantic, active] source: benchmark\nt\nanswers are unscored and counted as errors where appropriate: compare error\ncounts and scored denominators, not only the mean. Inspect the per-question\nresults by language/category. No paid model ju… [truncated]\n\n[memory:context-basis-c002] [semantic, active] source: benchmark\nhides type/status). Accepted,\ncurrent edges add `edge_id@evidence_node_id` references when their endpoints\nand evidence sources are visible and live. Evidence references identify\nsupporting nodes; fet… [truncated]\n\n[memory:context-basis-c000] [semantic, active] source: benchmark\n### Budgeted context and a complete agent turn\n\n`ig context \"answer preferences\" --budget 500 --json` and Python\n`build_context(engine, query, budget=500, k=5)` assemble **persisted** main,\nrecall and… [truncated]\n\n[memory:graph-protocol-c002] [semantic, active] source: benchmark\noptions. All runs support `--k`, `--context-budget`\n(estimated tokens), and `--seed`. The defaults are k=5, budget=256, seed=0.\nThe smoke gate requires complete retrieval and packed-context evidence f… [truncated]\n\n[memory:graph-protocol-c017] [semantic, active] source: benchmark\ny of question/reference/evidence labels.\nBoth engine adapters ingest identical nodes, vectors and relationships;\nlexical/vector baselines receive the same source documents and ignore edges.\nThere is n… [truncated]",
+          "tokens": 355,
+          "nodes": [
+            "graph-protocol-c007",
+            "context-basis-c002",
+            "context-basis-c000",
+            "graph-protocol-c002",
+            "graph-protocol-c017"
+          ],
+          "budget": 4000,
+          "truncated": true,
+          "memories": [
+            {
+              "id": "graph-protocol-c007",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "context-basis-c002",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "context-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "graph-protocol-c002",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "graph-protocol-c017",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "graph-protocol-c007",
+                "context-basis-c002",
+                "context-basis-c000",
+                "graph-protocol-c002",
+                "graph-protocol-c017"
+              ],
+              "tokens": 355
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to graph_engine/__main__.py? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"Keep graph expansion opt-in; synthetic diagnostic results do not establish production answer quality.\", \"id\": \"decision-graph\", \"source_id\": \"graph-basis\"}, {\"action\": \"Assemble citation-bearing context by persisted tier within an estimated token budget.\", \"id\": \"decision-context\", \"source_id\": \"context-basis\"}]\nUpdate source: graph-update-2\nUpdate documents (complete task input):\n[{\"id\": \"graph-update-2-c000\", \"source_id\": \"graph-update-2\", \"text\": \"diff --git a/graph_engine/__main__.py b/graph_engine/__main__.py\\nindex ea03b2b..638401a 100644\\n--- a/graph_engine/__main__.py\\n+++ b/graph_engine/__main__.py\\n@@ -759,7 +759,7 @@ def cmd_search(engine: BrainEngine, args: list[str]) -> None:\\n     parser.add_argument(\\\"--json\\\", action=\\\"store_true\\\")\\n     parser.add_argument(\\\"--graph-hops\\\", type=int, default=0, choices=range(4))\\n     parser.add_argument(\\\"--focal-id\\\")\\n-    options = parser.parse_args(args)\\n+    options = parser.parse_intermixed_args(args)\\n     as_json = options.json\\n     q = \\\" \\\".join(options.terms)\\n     try:\\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:graph-protocol-c007] [semantic, active] source: benchmark\nt\nanswers are unscored and counted as errors where appropriate: compare error\ncounts and scored denominators, not only the mean. Inspect the per-question\nresults by language/category. No paid model ju… [truncated]\n\n[memory:context-basis-c002] [semantic, active] source: benchmark\nhides type/status). Accepted,\ncurrent edges add `edge_id@evidence_node_id` references when their endpoints\nand evidence sources are visible and live. Evidence references identify\nsupporting nodes; fet… [truncated]\n\n[memory:context-basis-c000] [semantic, active] source: benchmark\n### Budgeted context and a complete agent turn\n\n`ig context \"answer preferences\" --budget 500 --json` and Python\n`build_context(engine, query, budget=500, k=5)` assemble **persisted** main,\nrecall and… [truncated]\n\n[memory:graph-protocol-c002] [semantic, active] source: benchmark\noptions. All runs support `--k`, `--context-budget`\n(estimated tokens), and `--seed`. The defaults are k=5, budget=256, seed=0.\nThe smoke gate requires complete retrieval and packed-context evidence f… [truncated]\n\n[memory:graph-protocol-c017] [semantic, active] source: benchmark\ny of question/reference/evidence labels.\nBoth engine adapters ingest identical nodes, vectors and relationships;\nlexical/vector baselines receive the same source documents and ignore edges.\nThere is n… [truncated]"
+          }
+        ],
+        "prompt_sha256": "e905bc067f127547b3d150a1b3fb8874670a5f113ccaecf7bed7e75df771e3f8",
+        "update_node_ids": [
+          "graph-update-2-c000"
+        ],
+        "prompt_estimated_tokens": 737,
+        "latency_ms": {
+          "retrieval": 16.45316695794463,
+          "context": 9.456166008021683
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-graph",
+            "path": [
+              "graph-update-2",
+              "graph-basis",
+              "dependency-graph",
+              "decision-graph"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 55.139666015747935,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    },
+    {
+      "event_id": "event-documents-1",
+      "split": "development",
+      "eligible_decisions": [
+        "decision-graph",
+        "decision-context",
+        "decision-documents"
+      ],
+      "available_source_ids": [
+        "context-basis",
+        "documents-basis",
+        "documents-update-1",
+        "graph-basis",
+        "graph-fixture",
+        "graph-protocol",
+        "graph-report",
+        "graph-update-1",
+        "graph-update-2"
+      ],
+      "visible_inputs_sha256": "d4068e5dbab890bae93d85668db093dc2b671187d6a46c00325a55ba3f442e1e",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "documents-basis-c005",
+            "score": 0.03252247488101534
+          },
+          {
+            "id": "graph-protocol-c007",
+            "score": 0.031024531024531024
+          },
+          {
+            "id": "context-basis-c002",
+            "score": 0.029957522915269395
+          },
+          {
+            "id": "context-basis-c000",
+            "score": 0.028850145288501453
+          },
+          {
+            "id": "graph-protocol-c002",
+            "score": 0.02804284323271665
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:documents-basis-c005] [semantic, active] source: benchmark\nivate. Provenance stores\nno other original path, but the terminal/JSON summary includes local paths.\nChanging the source identifier intentionally creates an independent source.\n\nReceipts have determin… [truncated]\n\n[memory:graph-protocol-c007] [semantic, active] source: benchmark\nt\nanswers are unscored and counted as errors where appropriate: compare error\ncounts and scored denominators, not only the mean. Inspect the per-question\nresults by language/category. No paid model ju… [truncated]\n\n[memory:context-basis-c002] [semantic, active] source: benchmark\nhides type/status). Accepted,\ncurrent edges add `edge_id@evidence_node_id` references when their endpoints\nand evidence sources are visible and live. Evidence references identify\nsupporting nodes; fet… [truncated]\n\n[memory:context-basis-c000] [semantic, active] source: benchmark\n### Budgeted context and a complete agent turn\n\n`ig context \"answer preferences\" --budget 500 --json` and Python\n`build_context(engine, query, budget=500, k=5)` assemble **persisted** main,\nrecall and… [truncated]\n\n[memory:graph-protocol-c002] [semantic, active] source: benchmark\noptions. All runs support `--k`, `--context-budget`\n(estimated tokens), and `--seed`. The defaults are k=5, budget=256, seed=0.\nThe smoke gate requires complete retrieval and packed-context evidence f… [truncated]",
+          "tokens": 356,
+          "nodes": [
+            "documents-basis-c005",
+            "graph-protocol-c007",
+            "context-basis-c002",
+            "context-basis-c000",
+            "graph-protocol-c002"
+          ],
+          "budget": 4000,
+          "truncated": true,
+          "memories": [
+            {
+              "id": "documents-basis-c005",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "graph-protocol-c007",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "context-basis-c002",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "context-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "graph-protocol-c002",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "documents-basis-c005",
+                "graph-protocol-c007",
+                "context-basis-c002",
+                "context-basis-c000",
+                "graph-protocol-c002"
+              ],
+              "tokens": 356
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to graph_engine/document_import.py? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"Keep graph expansion opt-in; synthetic diagnostic results do not establish production answer quality.\", \"id\": \"decision-graph\", \"source_id\": \"graph-basis\"}, {\"action\": \"Assemble citation-bearing context by persisted tier within an estimated token budget.\", \"id\": \"decision-context\", \"source_id\": \"context-basis\"}, {\"action\": \"Import local documents with exact source provenance, bounded chunks and retry receipts.\", \"id\": \"decision-documents\", \"source_id\": \"documents-basis\"}]\nUpdate source: documents-update-1\nUpdate documents (complete task input):\n[{\"id\": \"documents-update-1-c000\", \"source_id\": \"documents-update-1\", \"text\": \"diff --git a/graph_engine/document_import.py b/graph_engine/document_import.py\\nindex 14ae6b1..90b91c2 100644\\n--- a/graph_engine/document_import.py\\n+++ b/graph_engine/document_import.py\\n@@ -261,6 +261,7 @@ def import_documents(brain: Brain, paths: Iterable[str | Path], *,\\n                 if not dry_run and chunks:\\n                     brain.ensure_ready()\\n                     brain.pull()\\n+                repaired_index = False\\n                 for index, chunk in enumerate(chunks, 1):\\n                     provenance = dict(version=1, source_id=identifier, content_sha256=digest,\\n                         chunk_index=index, chunk_count=len(chunks), chunk_chars=chunk_chars,\\n@@ -275,11 +276,18 @@ def import_documents(brain: Brain, paths: Iterable[str | Path], *,\\n                     stored_pat\"}, {\"id\": \"documents-update-1-c001\", \"source_id\": \"documents-update-1\", \"text\": \"h = brain.node_path(nid)\\n                     if existing is None and (stored_path.exists() or stored_path.is_symlink()):\\n                         raise ImportProblem(\\\"receipt_unreadable\\\", \\\"Existing receipt cannot be read; refusing overwrite\\\")\\n-                    receipt: dict = dict(node_id=nid, provenance=provenance)\\n-                    row[\\\"chunks\\\"].append(receipt)\\n                     if existing is not None:\\n                         if existing.document != provenance:\\n                             raise ImportProblem(\\\"receipt_conflict\\\", \\\"Receipt ID belongs to different metadata; refusing overwrite\\\")\\n+                        capture = existing.capture\\n+                        if (capture is None or capture[\\\"input\\\"] != chunk.text\\n+                                or capture[\\\"source\\\"] !=\"}, {\"id\": \"documents-update-1-c002\", \"source_id\": \"documents-update-1\", \"text\": \" \\\"document\\\"\\n+                                or not capture[\\\"node_id\\\"]\\n+                                or capture[\\\"duplicate\\\"] != (capture[\\\"node_id\\\"] != nid)):\\n+                            raise ImportProblem(\\\"receipt_conflict\\\", \\\"Capture receipt conflicts with original input or linkage; refusing reuse\\\")\\n+                    receipt: dict = dict(node_id=nid, provenance=provenance)\\n+                    row[\\\"chunks\\\"].append(receipt)\\n+                    if existing is not None:\\n                         receipt.update(status=\\\"tombstone\\\" if existing.status == \\\"tombstone\\\" else \\\"reused\\\",\\n                             edited=existing.text != chunk.text.strip())\\n                     elif dry_run:\\n@@ -305,6 +313,11 @@ def import_documents(brain: Brain, paths: Iterable[str | Path], *,\\n               \"}, {\"id\": \"documents-update-1-c003\", \"source_id\": \"documents-update-1\", \"text\": \"              continue\\n                         # Finish a prior failed commit without rewriting any note.\\n                         if receipt[\\\"status\\\"] == \\\"reused\\\":\\n+                            # The node may have landed before an index write failed.\\n+                            # Repair derived state once per file before syncing it.\\n+                            if not repaired_index:\\n+                                brain.rebuild_index()\\n+                                repaired_index = True\\n                             brain.commit_and_push(f\\\"import receipt: {nid}\\\", sync_pending=True)\\n                         if extraction:\\n                             try:\\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:documents-basis-c005] [semantic, active] source: benchmark\nivate. Provenance stores\nno other original path, but the terminal/JSON summary includes local paths.\nChanging the source identifier intentionally creates an independent source.\n\nReceipts have determin… [truncated]\n\n[memory:graph-protocol-c007] [semantic, active] source: benchmark\nt\nanswers are unscored and counted as errors where appropriate: compare error\ncounts and scored denominators, not only the mean. Inspect the per-question\nresults by language/category. No paid model ju… [truncated]\n\n[memory:context-basis-c002] [semantic, active] source: benchmark\nhides type/status). Accepted,\ncurrent edges add `edge_id@evidence_node_id` references when their endpoints\nand evidence sources are visible and live. Evidence references identify\nsupporting nodes; fet… [truncated]\n\n[memory:context-basis-c000] [semantic, active] source: benchmark\n### Budgeted context and a complete agent turn\n\n`ig context \"answer preferences\" --budget 500 --json` and Python\n`build_context(engine, query, budget=500, k=5)` assemble **persisted** main,\nrecall and… [truncated]\n\n[memory:graph-protocol-c002] [semantic, active] source: benchmark\noptions. All runs support `--k`, `--context-budget`\n(estimated tokens), and `--seed`. The defaults are k=5, budget=256, seed=0.\nThe smoke gate requires complete retrieval and packed-context evidence f… [truncated]"
+          }
+        ],
+        "prompt_sha256": "10a1db03aff38486515c15a548c69b29b4aea8783afbca8cc7b2e539e250237b",
+        "update_node_ids": [
+          "documents-update-1-c000",
+          "documents-update-1-c001",
+          "documents-update-1-c002",
+          "documents-update-1-c003"
+        ],
+        "prompt_estimated_tokens": 1483,
+        "latency_ms": {
+          "retrieval": 18.56145798228681,
+          "context": 10.79483301145956
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-documents",
+            "path": [
+              "documents-update-1",
+              "documents-basis",
+              "dependency-documents",
+              "decision-documents"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 63.011165999341756,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    },
+    {
+      "event_id": "event-context-1",
+      "split": "development",
+      "eligible_decisions": [
+        "decision-graph",
+        "decision-context",
+        "decision-documents",
+        "decision-cache"
+      ],
+      "available_source_ids": [
+        "cache-basis",
+        "context-basis",
+        "context-update-1",
+        "documents-basis",
+        "documents-update-1",
+        "graph-basis",
+        "graph-fixture",
+        "graph-protocol",
+        "graph-report",
+        "graph-update-1",
+        "graph-update-2"
+      ],
+      "visible_inputs_sha256": "794d2fe04e3deef23d314446e413dcacc2483dec1ee4295d7cc8598179a744b9",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "documents-basis-c005",
+            "score": 0.0315136476426799
+          },
+          {
+            "id": "graph-protocol-c007",
+            "score": 0.03057889822595705
+          },
+          {
+            "id": "cache-basis-c012",
+            "score": 0.029273504273504274
+          },
+          {
+            "id": "cache-basis-c011",
+            "score": 0.029211087420042643
+          },
+          {
+            "id": "context-basis-c002",
+            "score": 0.028612012987012988
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:documents-basis-c005] [semantic, active] source: benchmark\nivate. Provenance stores\nno other original path, but the terminal/JSON summary includes local paths.\nChanging the source identifier intentionally creates an independent source.\n\nReceipts have determin… [truncated]\n\n[memory:graph-protocol-c007] [semantic, active] source: benchmark\nt\nanswers are unscored and counted as errors where appropriate: compare error\ncounts and scored denominators, not only the mean. Inspect the per-question\nresults by language/category. No paid model ju… [truncated]\n\n[memory:cache-basis-c012] [semantic, active] source: benchmark\nmed in-memory index is\nrejected and rebuilt. The underlying readers retain their existing skip-broken\nrecord behavior. No disk search index can become corrupt; canonical knowledge\nis never migrated. F… [truncated]\n\n[memory:cache-basis-c011] [semantic, active] source: benchmark\nthe new\nsnapshot entirely, including a snapshot accidentally attached from an\nunprotected engine. Every search uses current authorized node/vector reads;\nrevocation and evidence ACLs remain at the sto… [truncated]\n\n[memory:context-basis-c002] [semantic, active] source: benchmark\nhides type/status). Accepted,\ncurrent edges add `edge_id@evidence_node_id` references when their endpoints\nand evidence sources are visible and live. Evidence references identify\nsupporting nodes; fet… [truncated]",
+          "tokens": 354,
+          "nodes": [
+            "documents-basis-c005",
+            "graph-protocol-c007",
+            "cache-basis-c012",
+            "cache-basis-c011",
+            "context-basis-c002"
+          ],
+          "budget": 4000,
+          "truncated": true,
+          "memories": [
+            {
+              "id": "documents-basis-c005",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "graph-protocol-c007",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "cache-basis-c012",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "cache-basis-c011",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "context-basis-c002",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "documents-basis-c005",
+                "graph-protocol-c007",
+                "cache-basis-c012",
+                "cache-basis-c011",
+                "context-basis-c002"
+              ],
+              "tokens": 354
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to graph_engine/access.py? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"Keep graph expansion opt-in; synthetic diagnostic results do not establish production answer quality.\", \"id\": \"decision-graph\", \"source_id\": \"graph-basis\"}, {\"action\": \"Assemble citation-bearing context by persisted tier within an estimated token budget.\", \"id\": \"decision-context\", \"source_id\": \"context-basis\"}, {\"action\": \"Import local documents with exact source provenance, bounded chunks and retry receipts.\", \"id\": \"decision-documents\", \"source_id\": \"documents-basis\"}, {\"action\": \"Use disposable retrieval caches while validating freshness and preserving current authorization.\", \"id\": \"decision-cache\", \"source_id\": \"cache-basis\"}]\nUpdate source: context-update-1\nUpdate documents (complete task input):\n[{\"id\": \"context-update-1-c000\", \"source_id\": \"context-update-1\", \"text\": \"diff --git a/graph_engine/access.py b/graph_engine/access.py\\nindex 57b382d..e4ad630 100644\\n--- a/graph_engine/access.py\\n+++ b/graph_engine/access.py\\n@@ -8,10 +8,12 @@ from __future__ import annotations\\n from .write_guard import write_operation\\n \\n from contextvars import ContextVar\\n+from collections.abc import Callable\\n from datetime import datetime, timezone\\n import hashlib\\n import json\\n import os\\n+import re\\n from pathlib import Path\\n \\n from .brain import Brain, Edge, Node\\n@@ -97,6 +99,53 @@ def require(graph: str, identity: str, action: str, node_id: str | None = None)\\n         raise PermissionError(\\\"Access denied\\\")\\n \\n \\n+def derivation_parents(nodes: dict[str, Node], edges: list[Edge]) -> dict[str, set[str]]:\\n+    \\\"\\\"\\\"Recorded dependencies, including conservative legacy lineage recovery.\\\"\\\"\"}, {\"id\": \"context-update-1-c001\", \"source_id\": \"context-update-1\", \"text\": \"\\\"\\n+    parents: dict[str, set[str]] = {}\\n+    for edge in edges:\\n+        if edge.origin == \\\"consolidator\\\" and edge.kind == \\\"extends\\\":\\n+            parents.setdefault(edge.source, set()).add(edge.target)\\n+        elif edge.origin == \\\"entity-extractor\\\" and edge.kind == \\\"mentions\\\":\\n+            parents.setdefault(edge.target, set()).add(edge.source)\\n+    for node in nodes.values():\\n+        parents.setdefault(node.id, set()).update(node.derived_from)\\n+        parents[node.id].update(re.findall(\\n+            r\\\"\\\\[consolidated from ([^/\\\\\\\\\\\\r\\\\n\\\\]\\\\x00]+?) on \\\", node.text))\\n+        if not node.derived_from:\\n+            # Old summaries/proposals omit model inputs beyond their cited edges.\\n+            if \\\"community-summary\\\" in node.tags or \\\"consolidation-proposal\\\" in node.tags:\\n+                pa\"}, {\"id\": \"context-update-1-c002\", \"source_id\": \"context-update-1\", \"text\": \"rents[node.id].add(\\\"\\\")\\n+            if (node.source in (\\\"consolidator\\\", \\\"entity-extractor\\\")\\n+                    or \\\"episodic-extraction\\\" in node.tags) and not parents[node.id]:\\n+                parents[node.id].add(\\\"\\\")\\n+        if node.capture and node.capture[\\\"duplicate\\\"]:\\n+            parents[node.id].add(node.capture[\\\"node_id\\\"])\\n+    return parents\\n+\\n+\\n+def provenance_allowed(node_id: str, nodes: dict[str, Node], parents: dict[str, set[str]],\\n+                       check: Callable[[str], bool], *, allow_new: bool = False) -> bool:\\n+    \\\"\\\"\\\"Iterative DFS: allow shared ancestors; deny missing sources and cycles.\\\"\\\"\\\"\\n+    active, complete = set(), set()\\n+    stack = [(node_id, False)]\\n+    while stack:\\n+        nid, leaving = stack.pop()\\n+        if leaving:\\n+            active.remove(nid)\"}, {\"id\": \"context-update-1-c003\", \"source_id\": \"context-update-1\", \"text\": \"\\n+            complete.add(nid)\\n+            continue\\n+        if nid in complete:\\n+            continue\\n+        if nid in active or not check(nid):\\n+            return False\\n+        if nid not in nodes:\\n+            return allow_new and nid == node_id and not active\\n+        active.add(nid)\\n+        stack.append((nid, True))\\n+        stack.extend((parent, False) for parent in sorted(parents.get(nid, set()), reverse=True))\\n+    return True\\n+\\n+\\n class SecuredBrain(Brain):\\n     \\\"\\\"\\\"Filter reads and authorize mutations at the shared storage boundary.\\\"\\\"\\\"\\n \\n@@ -112,25 +161,27 @@ class SecuredBrain(Brain):\\n         if not allowed:\\n             raise PermissionError(\\\"Access denied\\\")\\n \\n-    def can_access(self, action: str, node_id: str | None = None) -> bool:\\n-        # Evidence copies inherit t\"}, {\"id\": \"context-update-1-c004\", \"source_id\": \"context-update-1\", \"text\": \"heir survivor's CURRENT permissions, in\\n-        # addition to any ACL of their own. Policy changes must also apply to\\n-        # copies already on disk, including their vectors and fact supports.\\n-        seen = set()\\n-        while True:\\n-            if node_id in seen or not permitted(self.graph_name, self.identity, action, node_id):\\n-                return False\\n-            seen.add(node_id)\\n-            node = self._raw.read_node(node_id) if node_id is not None else None\\n-            if node is None:\\n-                return len(seen) == 1  # new IDs are allowed; orphan copies fail closed\\n-            if not node.capture or not node.capture[\\\"duplicate\\\"]:\\n-                return True\\n-            node_id = node.capture[\\\"node_id\\\"]\\n+    def _access_view(self) -> tuple[dict[str, Node], di\"}, {\"id\": \"context-update-1-c005\", \"source_id\": \"context-update-1\", \"text\": \"ct[str, set[str]]]:\\n+        \\\"\\\"\\\"Operation-local provenance snapshot; never cache permissions across reads.\\\"\\\"\\\"\\n+        nodes = {n.id: n for n in self._raw.read_nodes()}\\n+        # Compatibility for copies/extractions predating persisted provenance.\\n+        # Review state does not remove a dependency on embedded source text.\\n+        parents = derivation_parents(nodes, self._raw.read_edges(include_rejected=True))\\n+        return nodes, parents\\n+\\n+    def can_access(self, action: str, node_id: str | None = None, *,\\n+                   _view: tuple[dict[str, Node], dict[str, set[str]]] | None = None) -> bool:\\n+        if node_id is None:\\n+            return permitted(self.graph_name, self.identity, action)\\n+        nodes, parents = _view or self._access_view()\\n+        # New root IDs are per\"}, {\"id\": \"context-update-1-c006\", \"source_id\": \"context-update-1\", \"text\": \"mitted for writes; missing sources fail closed.\\n+        return provenance_allowed(node_id, nodes, parents,\\n+            lambda nid: permitted(self.graph_name, self.identity, action, nid), allow_new=True)\\n \\n     def read_nodes(self) -> list[Node]:\\n         self.authorize(\\\"read\\\")\\n-        return [n for n in self._raw.read_nodes() if self.can_access(\\\"read\\\", n.id)]\\n+        view = self._access_view()\\n+        return [n for n in view[0].values() if self.can_access(\\\"read\\\", n.id, _view=view)]\\n \\n     def read_node(self, node_id: str) -> Node | None:\\n         self.authorize(\\\"read\\\", node_id)\\n@@ -139,11 +190,19 @@ class SecuredBrain(Brain):\\n     @write_operation\\n     def write_node(self, node: Node) -> None:\\n         self.authorize(\\\"write\\\", node.id)\\n+        node._validate_derivation()\\n+        node\"}, {\"id\": \"context-update-1-c007\", \"source_id\": \"context-update-1\", \"text\": \"s, parents = self._access_view()\\n+        # A normal rewrite must not silently publish previously private text.\\n+        # Keep historical dependencies even if edges or capture metadata change.\\n+        inherited = parents.get(node.id, set())\\n+        node.derived_from = sorted(set(node.derived_from) | inherited)\\n+        proposed = set(node.derived_from)\\n         if node.capture and node.capture[\\\"duplicate\\\"]:\\n-            parent_id = node.capture[\\\"node_id\\\"]\\n-            if self._raw.read_node(parent_id) is None:\\n-                raise PermissionError(\\\"Capture survivor unavailable\\\")\\n-            self.authorize(\\\"write\\\", parent_id)\\n+            proposed.add(node.capture[\\\"node_id\\\"])\\n+        nodes[node.id], parents[node.id] = node, proposed\\n+        if not self.can_access(\\\"write\\\", node.id, _v\"}, {\"id\": \"context-update-1-c008\", \"source_id\": \"context-update-1\", \"text\": \"iew=(nodes, parents)):\\n+            audit(self.graph_name, self.identity, \\\"write\\\", False, node.id)\\n+            raise PermissionError(\\\"Derived source unavailable or access denied\\\")\\n         self._raw.write_node(node)\\n \\n     def capture_receipts(self, node_id: str) -> list[Node]:\\n@@ -156,7 +215,8 @@ class SecuredBrain(Brain):\\n         return receipts\\n \\n     def _edge_allowed(self, edge: Edge, action: str, *,\\n-                      edges_by_id: dict[str, Edge] | None = None) -> bool:\\n+                      edges_by_id: dict[str, Edge] | None = None,\\n+                      _view: tuple[dict[str, Node], dict[str, set[str]]] | None = None) -> bool:\\n         # Evidence is embedded text: hiding only the endpoints would leak it.\\n         ids = [edge.source, edge.target] + [e.get(\\\"node_id\\\") for e i\"}, {\"id\": \"context-update-1-c009\", \"source_id\": \"context-update-1\", \"text\": \"n edge.evidence]\\n         if edge.kind == \\\"fact_replacement\\\":\\n@@ -165,7 +225,7 @@ class SecuredBrain(Brain):\\n                        {e.id: e for e in self._raw.read_edges(include_rejected=True)})\\n             for key in (\\\"old_fact_id\\\", \\\"new_fact_id\\\"):\\n                 fact = records.get(meta.get(key))\\n-                if fact is None or fact.kind != \\\"fact\\\" or not self._edge_allowed(fact, action):\\n+                if fact is None or fact.kind != \\\"fact\\\" or not self._edge_allowed(fact, action, _view=_view):\\n                     return False\\n             # Undo snapshots contain embedded quotes too; their permissions\\n             # remain mandatory even if the current fact later loses support.\\n@@ -173,22 +233,27 @@ class SecuredBrain(Brain):\\n                 for row in rows:\\n                 \"}, {\"id\": \"context-update-1-c010\", \"source_id\": \"context-update-1\", \"text\": \"    ids.extend([row[\\\"source\\\"], row[\\\"target\\\"],\\n                                 *(e.get(\\\"node_id\\\") for e in row.get(\\\"evidence\\\", []))])\\n-        return all(isinstance(nid, str) and self.can_access(action, nid) for nid in ids)\\n+        return all(isinstance(nid, str) and (\\n+            self.can_access(action, nid, _view=_view) if _view is not None else\\n+            self.can_access(action, nid)) for nid in ids)\\n \\n     def read_edges(self, include_rejected: bool = False) -> list[Edge]:\\n         self.authorize(\\\"read\\\")\\n-        return [e for e in self._raw.read_edges(include_rejected) if self._edge_allowed(e, \\\"read\\\")]\\n+        view = self._access_view()\\n+        return [e for e in self._raw.read_edges(include_rejected)\\n+                if self._edge_allowed(e, \\\"read\\\", _view=view)]\\n \\n     @write_o\"}, {\"id\": \"context-update-1-c011\", \"source_id\": \"context-update-1\", \"text\": \"peration\\n     def write_edges(self, edges: list[Edge]) -> None:\\n         self.authorize(\\\"write\\\")\\n         with self._lock:\\n+            view = self._access_view()\\n             old = {e.id: e for e in self._raw.read_edges(include_rejected=True)}\\n             new = {e.id: e for e in edges}\\n             # Complete the proposed view before checking references. Hidden\\n             # records survive bulk rewrites regardless of validation order.\\n             for eid in old.keys() - new.keys():\\n-                if not self._edge_allowed(old[eid], \\\"read\\\", edges_by_id=old):\\n+                if not self._edge_allowed(old[eid], \\\"read\\\", edges_by_id=old, _view=view):\\n                     new[eid] = old[eid]\\n             for eid in old.keys() | new.keys():\\n                 before, after = old.get(eid), n\"}, {\"id\": \"context-update-1-c012\", \"source_id\": \"context-update-1\", \"text\": \"ew.get(eid)\\n@@ -197,24 +262,41 @@ class SecuredBrain(Brain):\\n                 # Check the saved record against saved facts and the proposed\\n                 # record against facts in this same atomic write.\\n                 for edge, records in ((before, old), (after, new)):\\n-                    if edge is not None and not self._edge_allowed(edge, \\\"write\\\", edges_by_id=records):\\n+                    if edge is not None and not self._edge_allowed(edge, \\\"write\\\", edges_by_id=records, _view=view):\\n                         audit(self.graph_name, self.identity, \\\"write_edge\\\", False)\\n                         raise PermissionError(\\\"Access denied\\\")\\n+            # Persist legacy dependencies before their evidence is removed or\\n+            # redirected. A crash can leave extra restrictions, never publ\"}, {\"id\": \"context-update-1-c013\", \"source_id\": \"context-update-1\", \"text\": \"ication.\\n+            affected = set()\\n+            for eid, edge in old.items():\\n+                if eid in new and edge.to_dict() == new[eid].to_dict():\\n+                    continue\\n+                if edge.origin == \\\"consolidator\\\" and edge.kind == \\\"extends\\\":\\n+                    affected.add(edge.source)\\n+                elif edge.origin == \\\"entity-extractor\\\" and edge.kind == \\\"mentions\\\":\\n+                    affected.add(edge.target)\\n+            for nid in sorted(affected):\\n+                node = view[0].get(nid)\\n+                if node is not None and view[1].get(nid, set()) - set(node.derived_from):\\n+                    self.write_node(node)\\n             self._raw.write_edges(list(new.values()))\\n \\n     def read_vectors(self) -> dict[str, list[float]]:\\n         self.authorize(\\\"read\"}, {\"id\": \"context-update-1-c014\", \"source_id\": \"context-update-1\", \"text\": \"\\\")\\n-        return {nid: v for nid, v in self._raw.read_vectors().items() if self.can_access(\\\"read\\\", nid)}\\n+        view = self._access_view()\\n+        return {nid: v for nid, v in self._raw.read_vectors().items()\\n+                if nid in view[0] and self.can_access(\\\"read\\\", nid, _view=view)}\\n \\n     @write_operation\\n     def write_vectors(self, vectors: dict[str, list[float]]) -> None:\\n         self.authorize(\\\"write\\\")\\n         old = self._raw.read_vectors()\\n+        view = self._access_view()\\n         for nid, vector in vectors.items():\\n             if old.get(nid) != vector:\\n                 self.authorize(\\\"write\\\", nid)\\n         # Preserve vectors outside the caller's view, including node ACLs.\\n-        preserved = {nid: v for nid, v in old.items() if not self.can_access(\\\"read\\\", nid)}\\n+ \"}, {\"id\": \"context-update-1-c015\", \"source_id\": \"context-update-1\", \"text\": \"       preserved = {nid: v for nid, v in old.items() if not self.can_access(\\\"read\\\", nid, _view=view)}\\n         for nid in old.keys() - vectors.keys() - preserved.keys():\\n             self.authorize(\\\"write\\\", nid)\\n         self._raw.write_vectors({**preserved, **vectors})\\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:documents-basis-c005] [semantic, active] source: benchmark\nivate. Provenance stores\nno other original path, but the terminal/JSON summary includes local paths.\nChanging the source identifier intentionally creates an independent source.\n\nReceipts have determin… [truncated]\n\n[memory:graph-protocol-c007] [semantic, active] source: benchmark\nt\nanswers are unscored and counted as errors where appropriate: compare error\ncounts and scored denominators, not only the mean. Inspect the per-question\nresults by language/category. No paid model ju… [truncated]\n\n[memory:cache-basis-c012] [semantic, active] source: benchmark\nmed in-memory index is\nrejected and rebuilt. The underlying readers retain their existing skip-broken\nrecord behavior. No disk search index can become corrupt; canonical knowledge\nis never migrated. F… [truncated]\n\n[memory:cache-basis-c011] [semantic, active] source: benchmark\nthe new\nsnapshot entirely, including a snapshot accidentally attached from an\nunprotected engine. Every search uses current authorized node/vector reads;\nrevocation and evidence ACLs remain at the sto… [truncated]\n\n[memory:context-basis-c002] [semantic, active] source: benchmark\nhides type/status). Accepted,\ncurrent edges add `edge_id@evidence_node_id` references when their endpoints\nand evidence sources are visible and live. Evidence references identify\nsupporting nodes; fet… [truncated]"
+          }
+        ],
+        "prompt_sha256": "8a8cc4ce949c414ccccc41ffd7d2161a5c52aac80f3ec2fcffd6081a79f0a03f",
+        "update_node_ids": [
+          "context-update-1-c000",
+          "context-update-1-c001",
+          "context-update-1-c002",
+          "context-update-1-c003",
+          "context-update-1-c004",
+          "context-update-1-c005",
+          "context-update-1-c006",
+          "context-update-1-c007",
+          "context-update-1-c008",
+          "context-update-1-c009",
+          "context-update-1-c010",
+          "context-update-1-c011",
+          "context-update-1-c012",
+          "context-update-1-c013",
+          "context-update-1-c014",
+          "context-update-1-c015"
+        ],
+        "prompt_estimated_tokens": 4127,
+        "latency_ms": {
+          "retrieval": 25.349582952912897,
+          "context": 14.269208011683077
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-context",
+            "path": [
+              "context-update-1",
+              "context-basis",
+              "dependency-context",
+              "decision-context"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 85.35983297042549,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    },
+    {
+      "event_id": "event-documents-2",
+      "split": "development",
+      "eligible_decisions": [
+        "decision-graph",
+        "decision-context",
+        "decision-documents",
+        "decision-cache"
+      ],
+      "available_source_ids": [
+        "cache-basis",
+        "context-basis",
+        "context-update-1",
+        "documents-basis",
+        "documents-update-1",
+        "documents-update-2",
+        "graph-basis",
+        "graph-fixture",
+        "graph-protocol",
+        "graph-report",
+        "graph-update-1",
+        "graph-update-2"
+      ],
+      "visible_inputs_sha256": "e725e727c55cb37d305e47ad63acb3cc41f116dff02c6fd3619299e41e5834d8",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "documents-basis-c005",
+            "score": 0.031754032258064516
+          },
+          {
+            "id": "graph-protocol-c007",
+            "score": 0.03036576949620428
+          },
+          {
+            "id": "cache-basis-c012",
+            "score": 0.028850145288501453
+          },
+          {
+            "id": "cache-basis-c011",
+            "score": 0.028790389395194696
+          },
+          {
+            "id": "context-basis-c002",
+            "score": 0.028371628371628373
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:documents-basis-c005] [semantic, active] source: benchmark\nivate. Provenance stores\nno other original path, but the terminal/JSON summary includes local paths.\nChanging the source identifier intentionally creates an independent source.\n\nReceipts have determin… [truncated]\n\n[memory:graph-protocol-c007] [semantic, active] source: benchmark\nt\nanswers are unscored and counted as errors where appropriate: compare error\ncounts and scored denominators, not only the mean. Inspect the per-question\nresults by language/category. No paid model ju… [truncated]\n\n[memory:cache-basis-c012] [semantic, active] source: benchmark\nmed in-memory index is\nrejected and rebuilt. The underlying readers retain their existing skip-broken\nrecord behavior. No disk search index can become corrupt; canonical knowledge\nis never migrated. F… [truncated]\n\n[memory:cache-basis-c011] [semantic, active] source: benchmark\nthe new\nsnapshot entirely, including a snapshot accidentally attached from an\nunprotected engine. Every search uses current authorized node/vector reads;\nrevocation and evidence ACLs remain at the sto… [truncated]\n\n[memory:context-basis-c002] [semantic, active] source: benchmark\nhides type/status). Accepted,\ncurrent edges add `edge_id@evidence_node_id` references when their endpoints\nand evidence sources are visible and live. Evidence references identify\nsupporting nodes; fet… [truncated]",
+          "tokens": 354,
+          "nodes": [
+            "documents-basis-c005",
+            "graph-protocol-c007",
+            "cache-basis-c012",
+            "cache-basis-c011",
+            "context-basis-c002"
+          ],
+          "budget": 4000,
+          "truncated": true,
+          "memories": [
+            {
+              "id": "documents-basis-c005",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "graph-protocol-c007",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "cache-basis-c012",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "cache-basis-c011",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "context-basis-c002",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "documents-basis-c005",
+                "graph-protocol-c007",
+                "cache-basis-c012",
+                "cache-basis-c011",
+                "context-basis-c002"
+              ],
+              "tokens": 354
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to graph_engine/document_import.py? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"Keep graph expansion opt-in; synthetic diagnostic results do not establish production answer quality.\", \"id\": \"decision-graph\", \"source_id\": \"graph-basis\"}, {\"action\": \"Assemble citation-bearing context by persisted tier within an estimated token budget.\", \"id\": \"decision-context\", \"source_id\": \"context-basis\"}, {\"action\": \"Import local documents with exact source provenance, bounded chunks and retry receipts.\", \"id\": \"decision-documents\", \"source_id\": \"documents-basis\"}, {\"action\": \"Use disposable retrieval caches while validating freshness and preserving current authorization.\", \"id\": \"decision-cache\", \"source_id\": \"cache-basis\"}]\nUpdate source: documents-update-2\nUpdate documents (complete task input):\n[{\"id\": \"documents-update-2-c000\", \"source_id\": \"documents-update-2\", \"text\": \"diff --git a/graph_engine/document_import.py b/graph_engine/document_import.py\\nindex 90b91c2..56f1af1 100644\\n--- a/graph_engine/document_import.py\\n+++ b/graph_engine/document_import.py\\n@@ -311,6 +311,9 @@ def import_documents(brain: Brain, paths: Iterable[str | Path], *,\\n                         if existing.status == \\\"tombstone\\\" or survivor is None or survivor.status == \\\"tombstone\\\":\\n                             receipt[\\\"status\\\"] = \\\"tombstone\\\"\\n                             continue\\n+                        if existing.capture and existing.capture.get(\\\"ingest_incomplete\\\", False):\\n+                            raise ImportProblem(\\\"ingest_incomplete\\\",\\n+                                \\\"Capture ingest incomplete; inspect stored note and Git state before retrying extraction\\\")\\n                      \"}, {\"id\": \"documents-update-2-c001\", \"source_id\": \"documents-update-2\", \"text\": \"   # Finish a prior failed commit without rewriting any note.\\n                         if receipt[\\\"status\\\"] == \\\"reused\\\":\\n                             # The node may have landed before an index write failed.\\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:documents-basis-c005] [semantic, active] source: benchmark\nivate. Provenance stores\nno other original path, but the terminal/JSON summary includes local paths.\nChanging the source identifier intentionally creates an independent source.\n\nReceipts have determin… [truncated]\n\n[memory:graph-protocol-c007] [semantic, active] source: benchmark\nt\nanswers are unscored and counted as errors where appropriate: compare error\ncounts and scored denominators, not only the mean. Inspect the per-question\nresults by language/category. No paid model ju… [truncated]\n\n[memory:cache-basis-c012] [semantic, active] source: benchmark\nmed in-memory index is\nrejected and rebuilt. The underlying readers retain their existing skip-broken\nrecord behavior. No disk search index can become corrupt; canonical knowledge\nis never migrated. F… [truncated]\n\n[memory:cache-basis-c011] [semantic, active] source: benchmark\nthe new\nsnapshot entirely, including a snapshot accidentally attached from an\nunprotected engine. Every search uses current authorized node/vector reads;\nrevocation and evidence ACLs remain at the sto… [truncated]\n\n[memory:context-basis-c002] [semantic, active] source: benchmark\nhides type/status). Accepted,\ncurrent edges add `edge_id@evidence_node_id` references when their endpoints\nand evidence sources are visible and live. Evidence references identify\nsupporting nodes; fet… [truncated]"
+          }
+        ],
+        "prompt_sha256": "eed82cae2db986a9d11a699d0e2e7eb0f0444ee68fb3a6bebe878de97ac26936",
+        "update_node_ids": [
+          "documents-update-2-c000",
+          "documents-update-2-c001"
+        ],
+        "prompt_estimated_tokens": 953,
+        "latency_ms": {
+          "retrieval": 26.280792022589594,
+          "context": 15.565250010695308
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-documents",
+            "path": [
+              "documents-update-2",
+              "documents-basis",
+              "dependency-documents",
+              "decision-documents"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 86.67220798088238,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    },
+    {
+      "event_id": "event-cache-1",
+      "split": "development",
+      "eligible_decisions": [
+        "decision-graph",
+        "decision-context",
+        "decision-documents",
+        "decision-cache"
+      ],
+      "available_source_ids": [
+        "cache-basis",
+        "cache-update-1",
+        "context-basis",
+        "context-update-1",
+        "documents-basis",
+        "documents-update-1",
+        "documents-update-2",
+        "graph-basis",
+        "graph-fixture",
+        "graph-protocol",
+        "graph-report",
+        "graph-update-1",
+        "graph-update-2"
+      ],
+      "visible_inputs_sha256": "5ff12ef2b6d57d6cfc55bbd2be4b6ea51230864089b00583953cb82c73e31f5d",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "documents-basis-c005",
+            "score": 0.0315136476426799
+          },
+          {
+            "id": "graph-protocol-c007",
+            "score": 0.031024531024531024
+          },
+          {
+            "id": "cache-basis-c012",
+            "score": 0.029437229437229435
+          },
+          {
+            "id": "context-basis-c002",
+            "score": 0.028949545078577336
+          },
+          {
+            "id": "cache-basis-c011",
+            "score": 0.02877846790890269
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:documents-basis-c005] [semantic, active] source: benchmark\nivate. Provenance stores\nno other original path, but the terminal/JSON summary includes local paths.\nChanging the source identifier intentionally creates an independent source.\n\nReceipts have determin… [truncated]\n\n[memory:graph-protocol-c007] [semantic, active] source: benchmark\nt\nanswers are unscored and counted as errors where appropriate: compare error\ncounts and scored denominators, not only the mean. Inspect the per-question\nresults by language/category. No paid model ju… [truncated]\n\n[memory:cache-basis-c012] [semantic, active] source: benchmark\nmed in-memory index is\nrejected and rebuilt. The underlying readers retain their existing skip-broken\nrecord behavior. No disk search index can become corrupt; canonical knowledge\nis never migrated. F… [truncated]\n\n[memory:context-basis-c002] [semantic, active] source: benchmark\nhides type/status). Accepted,\ncurrent edges add `edge_id@evidence_node_id` references when their endpoints\nand evidence sources are visible and live. Evidence references identify\nsupporting nodes; fet… [truncated]\n\n[memory:cache-basis-c011] [semantic, active] source: benchmark\nthe new\nsnapshot entirely, including a snapshot accidentally attached from an\nunprotected engine. Every search uses current authorized node/vector reads;\nrevocation and evidence ACLs remain at the sto… [truncated]",
+          "tokens": 354,
+          "nodes": [
+            "documents-basis-c005",
+            "graph-protocol-c007",
+            "cache-basis-c012",
+            "context-basis-c002",
+            "cache-basis-c011"
+          ],
+          "budget": 4000,
+          "truncated": true,
+          "memories": [
+            {
+              "id": "documents-basis-c005",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "graph-protocol-c007",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "cache-basis-c012",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "context-basis-c002",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "cache-basis-c011",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "documents-basis-c005",
+                "graph-protocol-c007",
+                "cache-basis-c012",
+                "context-basis-c002",
+                "cache-basis-c011"
+              ],
+              "tokens": 354
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to graph_engine/brain.py? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"Keep graph expansion opt-in; synthetic diagnostic results do not establish production answer quality.\", \"id\": \"decision-graph\", \"source_id\": \"graph-basis\"}, {\"action\": \"Assemble citation-bearing context by persisted tier within an estimated token budget.\", \"id\": \"decision-context\", \"source_id\": \"context-basis\"}, {\"action\": \"Import local documents with exact source provenance, bounded chunks and retry receipts.\", \"id\": \"decision-documents\", \"source_id\": \"documents-basis\"}, {\"action\": \"Use disposable retrieval caches while validating freshness and preserving current authorization.\", \"id\": \"decision-cache\", \"source_id\": \"cache-basis\"}]\nUpdate source: cache-update-1\nUpdate documents (complete task input):\n[{\"id\": \"cache-update-1-c000\", \"source_id\": \"cache-update-1\", \"text\": \"diff --git a/graph_engine/brain.py b/graph_engine/brain.py\\nindex 0cfb760..e98be79 100644\\n--- a/graph_engine/brain.py\\n+++ b/graph_engine/brain.py\\n@@ -639,10 +639,10 @@ class Brain:\\n     def vectors_file(self) -> Path:\\n         return self.path / \\\"vectors.jsonl\\\"\\n \\n-    def read_vectors(self) -> dict[str, list[float]]:\\n+    def _read_vector_records(self) -> dict[str, dict]:\\n         if not self.vectors_file.exists():\\n             return {}\\n-        out: dict[str, list[float]] = {}\\n+        out: dict[str, dict] = {}\\n         for line in self.vectors_file.read_text(encoding=\\\"utf-8\\\").splitlines():\\n             if not line.strip():\\n                 continue\\n@@ -655,69 +655,72 @@ class Brain:\\n                         or any(not isinstance(value, (int, float)) or isinstance(value, bool)\\n           \"}, {\"id\": \"cache-update-1-c001\", \"source_id\": \"cache-update-1\", \"text\": \"                     or not math.isfinite(value) for value in vector)):\\n                     continue\\n-                out[nid] = vector\\n+                out[nid] = d\\n             except (json.JSONDecodeError, KeyError, TypeError, OverflowError):\\n                 continue\\n         return out\\n \\n+    def read_vectors(self) -> dict[str, list[float]]:\\n+        \\\"\\\"\\\"Raw values for maintenance/legacy callers; not a freshness check.\\\"\\\"\\\"\\n+        return {nid: entry[\\\"vec\\\"] for nid, entry in self._read_vector_records().items()}\\n+\\n     @write_operation\\n-    def write_vectors(self, vectors: dict[str, list[float]]) -> None:\\n-        content = \\\"\\\".join(\\n-            _jsonl_dumps({\\\"id\\\": nid, \\\"vec\\\": vec}) + \\\"\\\\n\\\"\\n-            for nid, vec in sorted(vectors.items()))\\n+    def _write_vector_records(self, records\"}, {\"id\": \"cache-update-1-c002\", \"source_id\": \"cache-update-1\", \"text\": \": dict[str, dict]) -> None:\\n+        content = \\\"\\\".join(_jsonl_dumps(entry) + \\\"\\\\n\\\"\\n+                          for nid, entry in sorted(records.items()))\\n         _atomic_write(self.vectors_file, content)\\n \\n-    # Read-only computed vectors remain in memory across Brain instances.\\n-    # Fingerprint node files as well as vectors so new/missing/edited nodes\\n-    # cannot be hidden by a previous partial memo. Retrieval supplies the\\n-    # model identity; persist modes are separate to preserve writer opt-in.\\n-    # At most eight corpora/model combinations are retained.\\n+    @write_operation\\n+    def write_vectors(self, vectors: dict[str, list[float]]) -> None:\\n+        \\\"\\\"\\\"Legacy bulk rewrite: retain provenance only for unchanged vectors.\\n+\\n+        New/changed values without an embedding identi\"}, {\"id\": \"cache-update-1-c003\", \"source_id\": \"cache-update-1\", \"text\": \"ty remain legacy entries\\n+        and will be recomputed by semantic consumers.\\n+        \\\"\\\"\\\"\\n+        old = self._read_vector_records()\\n+        self._write_vector_records({nid: old[nid] if nid in old and old[nid][\\\"vec\\\"] == vec\\n+                                    else {\\\"id\\\": nid, \\\"vec\\\": vec}\\n+                                    for nid, vec in vectors.items()})\\n+\\n+    @write_operation\\n+    def cache_vectors(self, vectors: dict[str, list[float]], *, embedder_key: tuple) -> None:\\n+        \\\"\\\"\\\"Save newly computed normalized embeddings, preserving other records.\\\"\\\"\\\"\\n+        from .vector_cache import model_key, record\\n+        key = model_key(None, embedder_key)\\n+        nodes = {n.id: n for n in self.read_nodes()}\\n+        entries = self._read_vector_records()\\n+        entries.update((nid, rec\"}, {\"id\": \"cache-update-1-c004\", \"source_id\": \"cache-update-1\", \"text\": \"ord(nid, nodes[nid].text, vec, key))\\n+                       for nid, vec in vectors.items() if nid in nodes)\\n+        self._write_vector_records(entries)\\n+\\n+    # Only validated requested records enter the process-local memo. Protected\\n+    # stores use the same compatibility check without this unscoped memo.\\n     _VECTOR_MEMO: dict = {}\\n \\n     def vectors_for(self, node_ids: set[str], embed_fn, batch_fn=None,\\n                     persist: bool = True, *, embedder_key: tuple | None = None) -> dict[str, list[float]]:\\n-        \\\"\\\"\\\"Vectors from cache; missing ones are computed and \\u2014 unless\\n-        `persist=False` \\u2014 stored. Audit #4: reads nodes/vectors ONCE up front\\n-        instead of per missing ID. Audit #60: when batch_fn is provided, all\\n-        missing nodes are embedded in ONE batch \"}, {\"id\": \"cache-update-1-c005\", \"source_id\": \"cache-update-1\", \"text\": \"call instead of N sequential\\n-        embed_fn calls (sentence-transformers encodes lists natively).\\n-        `persist=False` (report #1) is the strictly read-only path for the MCP\\n-        server: nothing is written to vectors.jsonl (a cold-cache write into\\n-        the private repo would dirty it and churn the cron rebase); results\\n-        are memoized in-process instead so the NEXT search is warm.\\\"\\\"\\\"\\n+        \\\"\\\"\\\"Recompute legacy/stale vectors; read-only calls never change files.\\\"\\\"\\\"\\n+        from .search_index import corpus_stamp\\n+        from .vector_cache import model_key, refresh\\n         with self.write_guard() if persist else nullcontext():\\n-            from .search_index import corpus_stamp\\n-            memo_key = (str(self.path), corpus_stamp(self.path), embedder_key, persist)\\n- \"}, {\"id\": \"cache-update-1-c006\", \"source_id\": \"cache-update-1\", \"text\": \"           memo = Brain._VECTOR_MEMO.get(memo_key)\\n-            if memo is not None and node_ids <= memo.keys():\\n-                return {nid: v for nid, v in memo.items() if nid in node_ids}\\n+            key = model_key(embed_fn, embedder_key)\\n+            initial_stamp = corpus_stamp(self.path)\\n+            memo_key = (str(self.path), initial_stamp, key, persist)\\n+            memo = Brain._VECTOR_MEMO.get(memo_key, {})\\n+            if node_ids <= memo.keys():\\n+                return {nid: memo[nid][\\\"vec\\\"] for nid in node_ids}\\n             nodes = {n.id: n for n in self.read_nodes()}\\n-            cached = self.read_vectors()\\n-            missing = [nid for nid in node_ids if nid not in cached and nid in nodes]\\n-            if missing and batch_fn is not None:\\n-                vecs = batch\"}, {\"id\": \"cache-update-1-c007\", \"source_id\": \"cache-update-1\", \"text\": \"_fn([nodes[nid].text for nid in missing])\\n-                for nid, vec in zip(missing, vecs):\\n-                    cached[nid] = vec\\n-                dirty = True\\n-            else:\\n-                dirty = False\\n-                for nid in node_ids:\\n-                    if nid not in cached:\\n-                        node = nodes.get(nid)\\n-                        if node is None:\\n-                            continue\\n-                        cached[nid] = embed_fn(node.text)\\n-                        dirty = True\\n-            if dirty and persist:\\n-                self.write_vectors(cached)\\n-                # The vector stamp changed; memoize under the new writer key.\\n-                Brain._VECTOR_MEMO[(str(self.path), corpus_stamp(self.path), embedder_key, persist)] = dict(cached)\\n-     \"}, {\"id\": \"cache-update-1-c008\", \"source_id\": \"cache-update-1\", \"text\": \"       elif not persist:\\n-                Brain._VECTOR_MEMO[memo_key] = dict(cached)\\n-            # Bound retained corpora in a process serving many brains/models.\\n+            stored = self._read_vector_records()\\n+            current = refresh({**stored, **memo}, nodes, node_ids, embed_fn, batch_fn, key)\\n+            if persist and any(stored.get(nid) != entry for nid, entry in current.items()):\\n+                self._write_vector_records({**stored, **current})\\n+            final_stamp = corpus_stamp(self.path)\\n+            if initial_stamp[:2] == final_stamp[:2] and (persist or initial_stamp == final_stamp):\\n+                memo_key = (str(self.path), final_stamp, key, persist)\\n+                Brain._VECTOR_MEMO[memo_key] = {**memo, **current}\\n             while len(Brain._VECTOR_MEMO\"}, {\"id\": \"cache-update-1-c009\", \"source_id\": \"cache-update-1\", \"text\": \") > 8:\\n-                Brain._VECTOR_MEMO.pop(next(iter(Brain._VECTOR_MEMO), None), None)\\n-            return {nid: v for nid, v in cached.items() if nid in node_ids}\\n+                Brain._VECTOR_MEMO.pop(next(iter(Brain._VECTOR_MEMO)))\\n+            return {nid: entry[\\\"vec\\\"] for nid, entry in current.items()}\\n \\n     # ---------- Edges ----------\\n \\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:documents-basis-c005] [semantic, active] source: benchmark\nivate. Provenance stores\nno other original path, but the terminal/JSON summary includes local paths.\nChanging the source identifier intentionally creates an independent source.\n\nReceipts have determin… [truncated]\n\n[memory:graph-protocol-c007] [semantic, active] source: benchmark\nt\nanswers are unscored and counted as errors where appropriate: compare error\ncounts and scored denominators, not only the mean. Inspect the per-question\nresults by language/category. No paid model ju… [truncated]\n\n[memory:cache-basis-c012] [semantic, active] source: benchmark\nmed in-memory index is\nrejected and rebuilt. The underlying readers retain their existing skip-broken\nrecord behavior. No disk search index can become corrupt; canonical knowledge\nis never migrated. F… [truncated]\n\n[memory:context-basis-c002] [semantic, active] source: benchmark\nhides type/status). Accepted,\ncurrent edges add `edge_id@evidence_node_id` references when their endpoints\nand evidence sources are visible and live. Evidence references identify\nsupporting nodes; fet… [truncated]\n\n[memory:cache-basis-c011] [semantic, active] source: benchmark\nthe new\nsnapshot entirely, including a snapshot accidentally attached from an\nunprotected engine. Every search uses current authorized node/vector reads;\nrevocation and evidence ACLs remain at the sto… [truncated]"
+          }
+        ],
+        "prompt_sha256": "7e34097cd62bc05de4aa5206ff5001b7aea75415a2ea63a51ba3ccc9dfac55d7",
+        "update_node_ids": [
+          "cache-update-1-c000",
+          "cache-update-1-c001",
+          "cache-update-1-c002",
+          "cache-update-1-c003",
+          "cache-update-1-c004",
+          "cache-update-1-c005",
+          "cache-update-1-c006",
+          "cache-update-1-c007",
+          "cache-update-1-c008",
+          "cache-update-1-c009"
+        ],
+        "prompt_estimated_tokens": 2775,
+        "latency_ms": {
+          "retrieval": 29.066124989185482,
+          "context": 16.413665958680212
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-cache",
+            "path": [
+              "cache-update-1",
+              "cache-basis",
+              "dependency-cache",
+              "decision-cache"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 105.09483300847933,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    },
+    {
+      "event_id": "event-cache-2",
+      "split": "development",
+      "eligible_decisions": [
+        "decision-graph",
+        "decision-context",
+        "decision-documents",
+        "decision-cache"
+      ],
+      "available_source_ids": [
+        "cache-basis",
+        "cache-update-1",
+        "cache-update-2",
+        "context-basis",
+        "context-update-1",
+        "documents-basis",
+        "documents-update-1",
+        "documents-update-2",
+        "graph-basis",
+        "graph-fixture",
+        "graph-protocol",
+        "graph-report",
+        "graph-update-1",
+        "graph-update-2"
+      ],
+      "visible_inputs_sha256": "02219a939322adbbb3139e6882678582cb34250d9d46b4a203c16150483fe752",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "documents-basis-c005",
+            "score": 0.03225806451612903
+          },
+          {
+            "id": "graph-protocol-c007",
+            "score": 0.029030910609857977
+          },
+          {
+            "id": "context-basis-c000",
+            "score": 0.028594771241830064
+          },
+          {
+            "id": "context-basis-c002",
+            "score": 0.028309409888357256
+          },
+          {
+            "id": "cache-basis-c002",
+            "score": 0.027579737335834898
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:documents-basis-c005] [semantic, active] source: benchmark\nivate. Provenance stores\nno other original path, but the terminal/JSON summary includes local paths.\nChanging the source identifier intentionally creates an independent source.\n\nReceipts have determin… [truncated]\n\n[memory:graph-protocol-c007] [semantic, active] source: benchmark\nt\nanswers are unscored and counted as errors where appropriate: compare error\ncounts and scored denominators, not only the mean. Inspect the per-question\nresults by language/category. No paid model ju… [truncated]\n\n[memory:context-basis-c000] [semantic, active] source: benchmark\n### Budgeted context and a complete agent turn\n\n`ig context \"answer preferences\" --budget 500 --json` and Python\n`build_context(engine, query, budget=500, k=5)` assemble **persisted** main,\nrecall and… [truncated]\n\n[memory:context-basis-c002] [semantic, active] source: benchmark\nhides type/status). Accepted,\ncurrent edges add `edge_id@evidence_node_id` references when their endpoints\nand evidence sources are visible and live. Evidence references identify\nsupporting nodes; fet… [truncated]\n\n[memory:cache-basis-c002] [semantic, active] source: benchmark\ns content-pinned and loaded with\nnetwork access disabled. Model load and fixture creation are reported\nseparately. This is a source-checkout tool, not a packaged console command.\n\nReports include sour… [truncated]",
+          "tokens": 355,
+          "nodes": [
+            "documents-basis-c005",
+            "graph-protocol-c007",
+            "context-basis-c000",
+            "context-basis-c002",
+            "cache-basis-c002"
+          ],
+          "budget": 4000,
+          "truncated": true,
+          "memories": [
+            {
+              "id": "documents-basis-c005",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "graph-protocol-c007",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "context-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "context-basis-c002",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "cache-basis-c002",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "documents-basis-c005",
+                "graph-protocol-c007",
+                "context-basis-c000",
+                "context-basis-c002",
+                "cache-basis-c002"
+              ],
+              "tokens": 355
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to graph_engine/retrieval.py? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"Keep graph expansion opt-in; synthetic diagnostic results do not establish production answer quality.\", \"id\": \"decision-graph\", \"source_id\": \"graph-basis\"}, {\"action\": \"Assemble citation-bearing context by persisted tier within an estimated token budget.\", \"id\": \"decision-context\", \"source_id\": \"context-basis\"}, {\"action\": \"Import local documents with exact source provenance, bounded chunks and retry receipts.\", \"id\": \"decision-documents\", \"source_id\": \"documents-basis\"}, {\"action\": \"Use disposable retrieval caches while validating freshness and preserving current authorization.\", \"id\": \"decision-cache\", \"source_id\": \"cache-basis\"}]\nUpdate source: cache-update-2\nUpdate documents (complete task input):\n[{\"id\": \"cache-update-2-c000\", \"source_id\": \"cache-update-2\", \"text\": \"diff --git a/graph_engine/retrieval.py b/graph_engine/retrieval.py\\nindex e3c692f..d845d51 100644\\n--- a/graph_engine/retrieval.py\\n+++ b/graph_engine/retrieval.py\\n@@ -18,7 +18,7 @@ from datetime import datetime, timezone\\n import numpy as np\\n \\n from .brain_engine import BrainEngine\\n-from .vector_cache import model_identity\\n+from .vector_cache import model_identity, normalize_text\\n from .brain import Brain\\n from .search_index import SearchIndex, corpus_stamp, embedder_stamp\\n from .feedback import LearningProfile, learning_profile\\n@@ -146,10 +146,13 @@ def _retrieve_trace(engine: BrainEngine, query: str, rerank_k: int,\\n     if type(engine.brain) is not Brain:\\n         engine.__dict__.pop(\\\"_search_index\\\", None)\\n     with _stage(engine, \\\"freshness_scan\\\"):\\n-        key = ((corpus_stamp(engine.brai\"}, {\"id\": \"cache-update-2-c001\", \"source_id\": \"cache-update-2\", \"text\": \"n.path), embedder_stamp(engine.embedder), persist, per_tier)\\n-               if cacheable else None)\\n+        stamp = corpus_stamp(engine.brain.path) if cacheable else None\\n     index = getattr(engine, \\\"_search_index\\\", None) if cacheable else None\\n-    if not isinstance(index, SearchIndex) or index.key != key or not index.valid():\\n+    # Reuse parsed nodes only while the corpus and visibility mode match.\\n+    # Resolve model identity after the empty-corpus return: doing so may load\\n+    # weights or download a model even though there is nothing to search.\\n+    if (not isinstance(index, SearchIndex) or not index.valid()\\n+            or index.key[0] != stamp or index.key[2:] != (persist, per_tier)):\\n         index = None\\n     with _stage(engine, \\\"filesystem_parsing\\\"):\\n         nodes = index.\"}, {\"id\": \"cache-update-2-c002\", \"source_id\": \"cache-update-2\", \"text\": \"nodes if index is not None else engine.brain.read_nodes()\\n@@ -164,9 +167,14 @@ def _retrieve_trace(engine: BrainEngine, query: str, rerank_k: int,\\n     if not nodes:\\n         trace.graph = expand(engine.brain, set(), [], graph)\\n         return trace\\n+    with _stage(engine, \\\"freshness_scan\\\"):\\n+        key = ((stamp, embedder_stamp(engine.embedder), persist, per_tier)\\n+               if cacheable else None)\\n+    if index is not None and index.key != key:\\n+        index = None\\n     node_ids = [n.id for n in nodes]\\n     with _stage(engine, \\\"query_embedding\\\"):\\n-        qvec = engine.embedder.embed(query)\\n+        qvec = engine.embedder.embed(normalize_text(query))\\n \\n     if index is not None and index.dimension != len(qvec):\\n         index = None\\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:documents-basis-c005] [semantic, active] source: benchmark\nivate. Provenance stores\nno other original path, but the terminal/JSON summary includes local paths.\nChanging the source identifier intentionally creates an independent source.\n\nReceipts have determin… [truncated]\n\n[memory:graph-protocol-c007] [semantic, active] source: benchmark\nt\nanswers are unscored and counted as errors where appropriate: compare error\ncounts and scored denominators, not only the mean. Inspect the per-question\nresults by language/category. No paid model ju… [truncated]\n\n[memory:context-basis-c000] [semantic, active] source: benchmark\n### Budgeted context and a complete agent turn\n\n`ig context \"answer preferences\" --budget 500 --json` and Python\n`build_context(engine, query, budget=500, k=5)` assemble **persisted** main,\nrecall and… [truncated]\n\n[memory:context-basis-c002] [semantic, active] source: benchmark\nhides type/status). Accepted,\ncurrent edges add `edge_id@evidence_node_id` references when their endpoints\nand evidence sources are visible and live. Evidence references identify\nsupporting nodes; fet… [truncated]\n\n[memory:cache-basis-c002] [semantic, active] source: benchmark\ns content-pinned and loaded with\nnetwork access disabled. Model load and fixture creation are reported\nseparately. This is a source-checkout tool, not a packaged console command.\n\nReports include sour… [truncated]"
+          }
+        ],
+        "prompt_sha256": "e57ebd8267d15088f6a6cb04c8451fec5e76d86ee0e249863650ab16b211ebfa",
+        "update_node_ids": [
+          "cache-update-2-c000",
+          "cache-update-2-c001",
+          "cache-update-2-c002"
+        ],
+        "prompt_estimated_tokens": 1309,
+        "latency_ms": {
+          "retrieval": 30.58108303230256,
+          "context": 22.760208987165242
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-cache",
+            "path": [
+              "cache-update-2",
+              "cache-basis",
+              "dependency-cache",
+              "decision-cache"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 104.8343749716878,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    },
+    {
+      "event_id": "event-context-2",
+      "split": "development",
+      "eligible_decisions": [
+        "decision-graph",
+        "decision-context",
+        "decision-documents",
+        "decision-cache"
+      ],
+      "available_source_ids": [
+        "cache-basis",
+        "cache-update-1",
+        "cache-update-2",
+        "context-basis",
+        "context-update-1",
+        "context-update-2",
+        "documents-basis",
+        "documents-update-1",
+        "documents-update-2",
+        "graph-basis",
+        "graph-fixture",
+        "graph-protocol",
+        "graph-report",
+        "graph-update-1",
+        "graph-update-2"
+      ],
+      "visible_inputs_sha256": "0d111ccda30529ff8f52760c4939508b4ed73f1270224beb560a1468390e396e",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "documents-basis-c005",
+            "score": 0.03225806451612903
+          },
+          {
+            "id": "graph-protocol-c007",
+            "score": 0.029030910609857977
+          },
+          {
+            "id": "context-basis-c000",
+            "score": 0.028381642512077296
+          },
+          {
+            "id": "context-basis-c002",
+            "score": 0.02813852813852814
+          },
+          {
+            "id": "cache-basis-c002",
+            "score": 0.027579737335834898
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:documents-basis-c005] [semantic, active] source: benchmark\nivate. Provenance stores\nno other original path, but the terminal/JSON summary includes local paths.\nChanging the source identifier intentionally creates an independent source.\n\nReceipts have determin… [truncated]\n\n[memory:graph-protocol-c007] [semantic, active] source: benchmark\nt\nanswers are unscored and counted as errors where appropriate: compare error\ncounts and scored denominators, not only the mean. Inspect the per-question\nresults by language/category. No paid model ju… [truncated]\n\n[memory:context-basis-c000] [semantic, active] source: benchmark\n### Budgeted context and a complete agent turn\n\n`ig context \"answer preferences\" --budget 500 --json` and Python\n`build_context(engine, query, budget=500, k=5)` assemble **persisted** main,\nrecall and… [truncated]\n\n[memory:context-basis-c002] [semantic, active] source: benchmark\nhides type/status). Accepted,\ncurrent edges add `edge_id@evidence_node_id` references when their endpoints\nand evidence sources are visible and live. Evidence references identify\nsupporting nodes; fet… [truncated]\n\n[memory:cache-basis-c002] [semantic, active] source: benchmark\ns content-pinned and loaded with\nnetwork access disabled. Model load and fixture creation are reported\nseparately. This is a source-checkout tool, not a packaged console command.\n\nReports include sour… [truncated]",
+          "tokens": 355,
+          "nodes": [
+            "documents-basis-c005",
+            "graph-protocol-c007",
+            "context-basis-c000",
+            "context-basis-c002",
+            "cache-basis-c002"
+          ],
+          "budget": 4000,
+          "truncated": true,
+          "memories": [
+            {
+              "id": "documents-basis-c005",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "graph-protocol-c007",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "context-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "context-basis-c002",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "cache-basis-c002",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "documents-basis-c005",
+                "graph-protocol-c007",
+                "context-basis-c000",
+                "context-basis-c002",
+                "cache-basis-c002"
+              ],
+              "tokens": 355
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to graph_engine/retrieval.py? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"Keep graph expansion opt-in; synthetic diagnostic results do not establish production answer quality.\", \"id\": \"decision-graph\", \"source_id\": \"graph-basis\"}, {\"action\": \"Assemble citation-bearing context by persisted tier within an estimated token budget.\", \"id\": \"decision-context\", \"source_id\": \"context-basis\"}, {\"action\": \"Import local documents with exact source provenance, bounded chunks and retry receipts.\", \"id\": \"decision-documents\", \"source_id\": \"documents-basis\"}, {\"action\": \"Use disposable retrieval caches while validating freshness and preserving current authorization.\", \"id\": \"decision-cache\", \"source_id\": \"cache-basis\"}]\nUpdate source: context-update-2\nUpdate documents (complete task input):\n[{\"id\": \"context-update-2-c000\", \"source_id\": \"context-update-2\", \"text\": \"diff --git a/graph_engine/retrieval.py b/graph_engine/retrieval.py\\nindex d845d51..de7970f 100644\\n--- a/graph_engine/retrieval.py\\n+++ b/graph_engine/retrieval.py\\n@@ -11,7 +11,7 @@ from __future__ import annotations\\n import math\\n import time\\n from contextlib import contextmanager\\n-from typing import Iterator\\n+from typing import Callable, Iterator\\n from dataclasses import dataclass, field\\n from datetime import datetime, timezone\\n \\n@@ -19,7 +19,7 @@ import numpy as np\\n \\n from .brain_engine import BrainEngine\\n from .vector_cache import model_identity, normalize_text\\n-from .brain import Brain\\n+from .brain import Brain, Node\\n from .search_index import SearchIndex, corpus_stamp, embedder_stamp\\n from .feedback import LearningProfile, learning_profile\\n from .tiers import order_by_tier\\n@@ -138,11 +13\"}, {\"id\": \"context-update-2-c001\", \"source_id\": \"context-update-2\", \"text\": \"8,15 @@ def _limit_hits(hits: list[tuple[str, float]], k: int,\\n \\n def _retrieve_trace(engine: BrainEngine, query: str, rerank_k: int,\\n                     persist: bool, *, learn: bool = True,\\n-                    per_tier: bool = False, graph: GraphOptions | None = None) -> _RetrievalTrace:\\n+                    per_tier: bool = False, graph: GraphOptions | None = None,\\n+                    node_filter: Callable[[Node], bool] | None = None) -> _RetrievalTrace:\\n     \\\"\\\"\\\"One scoring path for normal retrieval and its explanation.\\\"\\\"\\\"\\n     # Protected/custom stores always use fresh authorized reads. Never retain\\n     # a principal's corpus or reuse it after revocation or across graphs.\\n-    cacheable = type(engine.brain) is Brain and getattr(engine, \\\"search_cache_enabled\\\", True)\\n+    # A filtere\"}, {\"id\": \"context-update-2-c002\", \"source_id\": \"context-update-2\", \"text\": \"d corpus has different dense rows and BM25 statistics. Bypass\\n+    # the ordinary index entirely so cutoffs cannot reuse or publish its data.\\n+    cacheable = (node_filter is None and type(engine.brain) is Brain\\n+                 and getattr(engine, \\\"search_cache_enabled\\\", True))\\n     if type(engine.brain) is not Brain:\\n         engine.__dict__.pop(\\\"_search_index\\\", None)\\n     with _stage(engine, \\\"freshness_scan\\\"):\\n@@ -159,7 +163,8 @@ def _retrieve_trace(engine: BrainEngine, query: str, rerank_k: int,\\n     # Audit #7: tombstones are \\\"forgotten\\\" \\u2014 they must not come back as\\n     # search answers (consolidate/_find_duplicate already exclude them).\\n     nodes = [n for n in nodes if n.status != \\\"tombstone\\\"\\n-             and (not per_tier or n.text.strip())]\\n+             and (not per_tier or n.\"}, {\"id\": \"context-update-2-c003\", \"source_id\": \"context-update-2\", \"text\": \"text.strip())\\n+             and (node_filter is None or node_filter(n))]\\n     trace = _RetrievalTrace([n.id for n in nodes], {n.id: n.text for n in nodes})\\n     trace.tiers = {n.id: n.storage_tier for n in nodes}\\n     trace.learning = learning_profile(engine.brain, query, nodes) if learn else LearningProfile(query)\\n@@ -344,7 +349,8 @@ def explain(engine: BrainEngine, node_id: str, query: str, *, k: int = 5,\\n \\n def retrieve(engine: BrainEngine, query: str, k: int = 5, rerank_k: int = 30,\\n              persist: bool = True, track: bool = False, *,\\n-             per_tier: bool = False, graph: GraphOptions | None = None) -> list[tuple[str, float]]:\\n+             per_tier: bool = False, graph: GraphOptions | None = None,\\n+             node_filter: Callable[[Node], bool] | None = None) -> list[t\"}, {\"id\": \"context-update-2-c004\", \"source_id\": \"context-update-2\", \"text\": \"uple[str, float]]:\\n     \\\"\\\"\\\"Hybrid retrieval over the brain. Returns top-k (node_id, rrf_score).\\n \\n     Dense: cosine of the query embedding against the cached node vectors.\\n@@ -359,12 +365,15 @@ def retrieve(engine: BrainEngine, query: str, k: int = 5, rerank_k: int = 30,\\n     With per_tier=True, both limits apply independently to each persisted\\n     tier, and empty bodies are excluded. This bounds context candidates\\n     without letting a populated higher tier crowd out the lower tiers.\\n+    node_filter restricts authorized live nodes before learning, scoring and\\n+    candidate limits; filtered queries bypass the ordinary search index.\\n     track (recall tracking): append the returned ids to the local recall ledger\\n     (`recall.record`). Off by default so read-only surfaces (MCP) stay\\n  \"}, {\"id\": \"context-update-2-c005\", \"source_id\": \"context-update-2\", \"text\": \"   read-only; CLI/HTTP pass True. The ledger write is an append to a\\n     gitignored file \\u2014 it never dirties the brain repo.\\n     \\\"\\\"\\\"\\n-    trace = _retrieve_trace(engine, query, rerank_k, persist, per_tier=per_tier, graph=graph)\\n+    trace = _retrieve_trace(engine, query, rerank_k, persist, per_tier=per_tier,\\n+                            graph=graph, node_filter=node_filter)\\n     return _finish_retrieval(engine, query, k, trace, track=track, per_tier=per_tier)\\n \\n \\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:documents-basis-c005] [semantic, active] source: benchmark\nivate. Provenance stores\nno other original path, but the terminal/JSON summary includes local paths.\nChanging the source identifier intentionally creates an independent source.\n\nReceipts have determin… [truncated]\n\n[memory:graph-protocol-c007] [semantic, active] source: benchmark\nt\nanswers are unscored and counted as errors where appropriate: compare error\ncounts and scored denominators, not only the mean. Inspect the per-question\nresults by language/category. No paid model ju… [truncated]\n\n[memory:context-basis-c000] [semantic, active] source: benchmark\n### Budgeted context and a complete agent turn\n\n`ig context \"answer preferences\" --budget 500 --json` and Python\n`build_context(engine, query, budget=500, k=5)` assemble **persisted** main,\nrecall and… [truncated]\n\n[memory:context-basis-c002] [semantic, active] source: benchmark\nhides type/status). Accepted,\ncurrent edges add `edge_id@evidence_node_id` references when their endpoints\nand evidence sources are visible and live. Evidence references identify\nsupporting nodes; fet… [truncated]\n\n[memory:cache-basis-c002] [semantic, active] source: benchmark\ns content-pinned and loaded with\nnetwork access disabled. Model load and fixture creation are reported\nseparately. This is a source-checkout tool, not a packaged console command.\n\nReports include sour… [truncated]"
+          }
+        ],
+        "prompt_sha256": "c2160879aecc1d1166c562f3be6fcbf9cab0cd7635d0f08a80ced7a23881e024",
+        "update_node_ids": [
+          "context-update-2-c000",
+          "context-update-2-c001",
+          "context-update-2-c002",
+          "context-update-2-c003",
+          "context-update-2-c004",
+          "context-update-2-c005"
+        ],
+        "prompt_estimated_tokens": 1913,
+        "latency_ms": {
+          "retrieval": 29.832832980901003,
+          "context": 16.535207978449762
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-context",
+            "path": [
+              "context-update-2",
+              "context-basis",
+              "dependency-context",
+              "decision-context"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 100.00695899361745,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    }
+  ],
+  "scores": {
+    "curated": {
+      "counts": {
+        "raw_alerts": 8,
+        "attempted_pairs": 27,
+        "pending": 27,
+        "surfaced_pairs": 8,
+        "error_pairs": 0,
+        "error_cases": 0
+      },
+      "precision": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "recall": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "false_alert_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "false_discovery_fraction": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "miss_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "path_correctness": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "inconclusive_handling": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "unanswerable_handling": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "false_abstention_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "rationale_correctness": null,
+      "unsupported_conclusions": null,
+      "answer_quality": null,
+      "human_review_time": null
+    },
+    "proposed": {
+      "counts": {
+        "raw_alerts": 0,
+        "attempted_pairs": 27,
+        "pending": 27,
+        "surfaced_pairs": 0,
+        "error_pairs": 0,
+        "error_cases": 0
+      },
+      "precision": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "recall": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "false_alert_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "false_discovery_fraction": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "miss_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "path_correctness": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "inconclusive_handling": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "unanswerable_handling": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "false_abstention_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "rationale_correctness": null,
+      "unsupported_conclusions": null,
+      "answer_quality": null,
+      "human_review_time": null
+    }
+  },
+  "limitations": [
+    "Real labels await independent annotation; draft labels are not scored.",
+    "Synthetic controls are scored separately and cannot establish product readiness.",
+    "No model, answer-quality, rationale judgment, user time or human effort measurement.",
+    "Curated/proposed dependencies are supplied inputs, not measured extraction quality."
+  ],
+  "latency_ms": {
+    "p50": 85.35983297042549,
+    "p95": 105.09483300847933,
+    "n": 8
+  },
+  "cost_effort": {
+    "provider_calls": 0,
+    "provider_cost": 0,
+    "currency": null,
+    "wall_ms": 655.6189979310147,
+    "human_annotation_minutes": null,
+    "human_review_minutes": null
+  },
+  "retrieval_scores": null,
+  "release_readiness": {
+    "passed": false,
+    "frozen_thresholds": {
+      "false_alert_rate_max": 0.05,
+      "miss_rate_max": 0.05,
+      "provenance_correctness_min": 1,
+      "inconclusive_handling_min": 1,
+      "unsupported_conclusions_max": 0,
+      "heldout_positive_min": 20,
+      "heldout_negative_min": 20,
+      "heldout_inconclusive_min": 10,
+      "integrity_pass_min": 1,
+      "median_review_time_reduction_min": 0.2
+    },
+    "reason": "Independent held-out labels, minimum strata and integrity/statement/user studies are incomplete."
+  },
+  "smoke_passed": true
+}

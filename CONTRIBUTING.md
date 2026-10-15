@@ -78,6 +78,17 @@ See [memory benchmarks](docs/memory-benchmarks.md) for full DE/EN comparisons.
 Keep model calls and downloads opt-in; do not replace the engine golden-set
 gates with this small diagnostic fixture.
 
+Decision Memory has an additional bounded offline harness check:
+
+```bash
+.venv/bin/python -m tools.decision_benchmark --split all --check --output /tmp/decision-controls.json
+```
+
+See [Decision Memory evaluation](docs/decision-evaluation.md) for the opt-in
+project corpus, frozen sources/split, annotation protocol and baseline limits.
+Real annotations still require independent review; this check establishes no
+product release, extraction, answer-quality or review-time result.
+
 Large performance measurements are opt-in and stay outside required CI:
 
 ```bash

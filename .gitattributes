@@ -1,0 +1,3 @@
+# Frozen source excerpts/diffs retain original whitespace for exact byte hashes.
+tools/decision_benchmark/data/** -text
+tools/decision_benchmark/data/project-v1/sources/*.txt -whitespace -text

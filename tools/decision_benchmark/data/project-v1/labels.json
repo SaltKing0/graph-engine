@@ -1,0 +1,880 @@
+{
+  "schema": "dm.eval.labels/1",
+  "pairs": {
+    "event-graph-1/decision-graph": {
+      "outcome": "pending",
+      "draft_outcome": "inconclusive",
+      "draft_rationale": "Implementation topic changed; independent review must establish whether this changes the decision basis. A code fix does not demonstrate measured performance or opposition.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-graph-1/decision-context": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-graph-2/decision-graph": {
+      "outcome": "pending",
+      "draft_outcome": "inconclusive",
+      "draft_rationale": "Implementation topic changed; independent review must establish whether this changes the decision basis. A code fix does not demonstrate measured performance or opposition.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-graph-2/decision-context": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-writer-1/decision-temporal": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-writer-1/decision-forget": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-writer-1/decision-writer": {
+      "outcome": "pending",
+      "draft_outcome": "inconclusive",
+      "draft_rationale": "Implementation topic changed; independent review must establish whether this changes the decision basis. A code fix does not demonstrate measured performance or opposition.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-writer-2/decision-temporal": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-writer-2/decision-forget": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-writer-2/decision-writer": {
+      "outcome": "pending",
+      "draft_outcome": "inconclusive",
+      "draft_rationale": "Implementation topic changed; independent review must establish whether this changes the decision basis. A code fix does not demonstrate measured performance or opposition.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-documents-1/decision-graph": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-documents-1/decision-context": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-documents-1/decision-documents": {
+      "outcome": "pending",
+      "draft_outcome": "inconclusive",
+      "draft_rationale": "Implementation topic changed; independent review must establish whether this changes the decision basis. A code fix does not demonstrate measured performance or opposition.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-context-1/decision-graph": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-context-1/decision-context": {
+      "outcome": "pending",
+      "draft_outcome": "inconclusive",
+      "draft_rationale": "Implementation topic changed; independent review must establish whether this changes the decision basis. A code fix does not demonstrate measured performance or opposition.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-context-1/decision-documents": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-context-1/decision-cache": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-forget-1/decision-temporal": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-forget-1/decision-models": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-forget-1/decision-forget": {
+      "outcome": "pending",
+      "draft_outcome": "inconclusive",
+      "draft_rationale": "Implementation topic changed; independent review must establish whether this changes the decision basis. A code fix does not demonstrate measured performance or opposition.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-forget-1/decision-writer": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-forget-2/decision-temporal": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-forget-2/decision-models": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-forget-2/decision-forget": {
+      "outcome": "pending",
+      "draft_outcome": "inconclusive",
+      "draft_rationale": "Implementation topic changed; independent review must establish whether this changes the decision basis. A code fix does not demonstrate measured performance or opposition.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-forget-2/decision-writer": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-documents-2/decision-graph": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-documents-2/decision-context": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-documents-2/decision-documents": {
+      "outcome": "pending",
+      "draft_outcome": "inconclusive",
+      "draft_rationale": "Implementation topic changed; independent review must establish whether this changes the decision basis. A code fix does not demonstrate measured performance or opposition.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-documents-2/decision-cache": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-cache-1/decision-graph": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-cache-1/decision-context": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-cache-1/decision-documents": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-cache-1/decision-cache": {
+      "outcome": "pending",
+      "draft_outcome": "inconclusive",
+      "draft_rationale": "Implementation topic changed; independent review must establish whether this changes the decision basis. A code fix does not demonstrate measured performance or opposition.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-cache-2/decision-graph": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-cache-2/decision-context": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-cache-2/decision-documents": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-cache-2/decision-cache": {
+      "outcome": "pending",
+      "draft_outcome": "inconclusive",
+      "draft_rationale": "Implementation topic changed; independent review must establish whether this changes the decision basis. A code fix does not demonstrate measured performance or opposition.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-temporal-1/decision-temporal": {
+      "outcome": "pending",
+      "draft_outcome": "inconclusive",
+      "draft_rationale": "Implementation topic changed; independent review must establish whether this changes the decision basis. A code fix does not demonstrate measured performance or opposition.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-temporal-1/decision-models": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-temporal-1/decision-forget": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-temporal-1/decision-writer": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-context-2/decision-graph": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-context-2/decision-context": {
+      "outcome": "pending",
+      "draft_outcome": "inconclusive",
+      "draft_rationale": "Implementation topic changed; independent review must establish whether this changes the decision basis. A code fix does not demonstrate measured performance or opposition.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-context-2/decision-documents": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-context-2/decision-cache": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-temporal-2/decision-temporal": {
+      "outcome": "pending",
+      "draft_outcome": "inconclusive",
+      "draft_rationale": "Implementation topic changed; independent review must establish whether this changes the decision basis. A code fix does not demonstrate measured performance or opposition.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-temporal-2/decision-models": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-temporal-2/decision-forget": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-temporal-2/decision-writer": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-models-1/decision-temporal": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-models-1/decision-models": {
+      "outcome": "pending",
+      "draft_outcome": "inconclusive",
+      "draft_rationale": "Implementation topic changed; independent review must establish whether this changes the decision basis. A code fix does not demonstrate measured performance or opposition.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-models-1/decision-forget": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-models-1/decision-writer": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-models-2/decision-temporal": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-models-2/decision-models": {
+      "outcome": "pending",
+      "draft_outcome": "inconclusive",
+      "draft_rationale": "Implementation topic changed; independent review must establish whether this changes the decision basis. A code fix does not demonstrate measured performance or opposition.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-models-2/decision-forget": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    },
+    "event-models-2/decision-writer": {
+      "outcome": "pending",
+      "draft_outcome": "negative",
+      "draft_rationale": "No declared direct dependency; reviewer must check indirect scope before a negative label.",
+      "valid_paths": [],
+      "annotation": {
+        "status": "draft",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null,
+        "reviewed_at": null
+      }
+    }
+  },
+  "claims": [
+    {
+      "decision_id": "decision-graph",
+      "claim": "Keep graph expansion opt-in; synthetic diagnostic results do not establish production answer quality.",
+      "supporting_source_ids": [
+        "graph-basis"
+      ],
+      "opposing_source_ids": [],
+      "irrelevant_source_ids": [],
+      "context": {
+        "code_revision": "9bf005074685aebb131d7f442705c0732ee7698b",
+        "environment": "unknown",
+        "workload": "repository implementation; not a benchmark run"
+      },
+      "epistemic_status": "unassessed",
+      "annotation_status": "draft; not independently reviewed"
+    },
+    {
+      "decision_id": "decision-context",
+      "claim": "Assemble citation-bearing context by persisted tier within an estimated token budget.",
+      "supporting_source_ids": [
+        "context-basis"
+      ],
+      "opposing_source_ids": [],
+      "irrelevant_source_ids": [],
+      "context": {
+        "code_revision": "9b41afc740ce8f083f859944bdebe67b4bbfd1c7",
+        "environment": "unknown",
+        "workload": "repository implementation; not a benchmark run"
+      },
+      "epistemic_status": "unassessed",
+      "annotation_status": "draft; not independently reviewed"
+    },
+    {
+      "decision_id": "decision-documents",
+      "claim": "Import local documents with exact source provenance, bounded chunks and retry receipts.",
+      "supporting_source_ids": [
+        "documents-basis"
+      ],
+      "opposing_source_ids": [],
+      "irrelevant_source_ids": [],
+      "context": {
+        "code_revision": "d0b415663dcc04c8430183cb9469fe197b7c0b18",
+        "environment": "unknown",
+        "workload": "repository implementation; not a benchmark run"
+      },
+      "epistemic_status": "unassessed",
+      "annotation_status": "draft; not independently reviewed"
+    },
+    {
+      "decision_id": "decision-cache",
+      "claim": "Use disposable retrieval caches while validating freshness and preserving current authorization.",
+      "supporting_source_ids": [
+        "cache-basis"
+      ],
+      "opposing_source_ids": [],
+      "irrelevant_source_ids": [],
+      "context": {
+        "code_revision": "0ca70b51b1fd088675491e117889714b1acb794c",
+        "environment": "unknown",
+        "workload": "repository implementation; not a benchmark run"
+      },
+      "epistemic_status": "unassessed",
+      "annotation_status": "draft; not independently reviewed"
+    },
+    {
+      "decision_id": "decision-temporal",
+      "claim": "Filter current records by temporal validity; this does not reconstruct historical Git snapshots.",
+      "supporting_source_ids": [
+        "temporal-basis"
+      ],
+      "opposing_source_ids": [],
+      "irrelevant_source_ids": [],
+      "context": {
+        "code_revision": "00eb0d5e7a48710a97e7faa240af8f71d6269d47",
+        "environment": "unknown",
+        "workload": "repository implementation; not a benchmark run"
+      },
+      "epistemic_status": "unassessed",
+      "annotation_status": "draft; not independently reviewed"
+    },
+    {
+      "decision_id": "decision-models",
+      "claim": "Use built-in model modules and disable custom Python code in the offline benchmark loader.",
+      "supporting_source_ids": [
+        "models-basis"
+      ],
+      "opposing_source_ids": [],
+      "irrelevant_source_ids": [],
+      "context": {
+        "code_revision": "e8946a57d1e2ab953f2e87d1ff7d910d735b06b7",
+        "environment": "unknown",
+        "workload": "repository implementation; not a benchmark run"
+      },
+      "epistemic_status": "unassessed",
+      "annotation_status": "draft; not independently reviewed"
+    },
+    {
+      "decision_id": "decision-forget",
+      "claim": "Forget by tombstoning and invalidating; keep forgotten memories out of live views.",
+      "supporting_source_ids": [
+        "forget-basis"
+      ],
+      "opposing_source_ids": [],
+      "irrelevant_source_ids": [],
+      "context": {
+        "code_revision": "c504835e1b4d8b59aa242fd8f6bd4fc7652df941",
+        "environment": "unknown",
+        "workload": "repository implementation; not a benchmark run"
+      },
+      "epistemic_status": "unassessed",
+      "annotation_status": "draft; not independently reviewed"
+    },
+    {
+      "decision_id": "decision-writer",
+      "claim": "Serialize cooperating local brain writes using a shared writer guard.",
+      "supporting_source_ids": [
+        "writer-basis"
+      ],
+      "opposing_source_ids": [],
+      "irrelevant_source_ids": [],
+      "context": {
+        "code_revision": "4df4cb46f13cd5f070b651dce682008bc27e1dc8",
+        "environment": "unknown",
+        "workload": "repository implementation; not a benchmark run"
+      },
+      "epistemic_status": "unassessed",
+      "annotation_status": "draft; not independently reviewed"
+    }
+  ],
+  "annotation_protocol": "docs/decision-evaluation.md#annotation-protocol",
+  "author": "Codex source-only draft; not independent human gold",
+  "reviewer": null,
+  "disagreements": null
+}

@@ -1,0 +1,1 @@
+SYNTHETIC: Choose mode A when recall >=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.

@@ -1,0 +1,77 @@
+diff --git a/graph_engine/retrieval.py b/graph_engine/retrieval.py
+index d845d51..de7970f 100644
+--- a/graph_engine/retrieval.py
++++ b/graph_engine/retrieval.py
+@@ -11,7 +11,7 @@ from __future__ import annotations
+ import math
+ import time
+ from contextlib import contextmanager
+-from typing import Iterator
++from typing import Callable, Iterator
+ from dataclasses import dataclass, field
+ from datetime import datetime, timezone
+ 
+@@ -19,7 +19,7 @@ import numpy as np
+ 
+ from .brain_engine import BrainEngine
+ from .vector_cache import model_identity, normalize_text
+-from .brain import Brain
++from .brain import Brain, Node
+ from .search_index import SearchIndex, corpus_stamp, embedder_stamp
+ from .feedback import LearningProfile, learning_profile
+ from .tiers import order_by_tier
+@@ -138,11 +138,15 @@ def _limit_hits(hits: list[tuple[str, float]], k: int,
+ 
+ def _retrieve_trace(engine: BrainEngine, query: str, rerank_k: int,
+                     persist: bool, *, learn: bool = True,
+-                    per_tier: bool = False, graph: GraphOptions | None = None) -> _RetrievalTrace:
++                    per_tier: bool = False, graph: GraphOptions | None = None,
++                    node_filter: Callable[[Node], bool] | None = None) -> _RetrievalTrace:
+     """One scoring path for normal retrieval and its explanation."""
+     # Protected/custom stores always use fresh authorized reads. Never retain
+     # a principal's corpus or reuse it after revocation or across graphs.
+-    cacheable = type(engine.brain) is Brain and getattr(engine, "search_cache_enabled", True)
++    # A filtered corpus has different dense rows and BM25 statistics. Bypass
++    # the ordinary index entirely so cutoffs cannot reuse or publish its data.
++    cacheable = (node_filter is None and type(engine.brain) is Brain
++                 and getattr(engine, "search_cache_enabled", True))
+     if type(engine.brain) is not Brain:
+         engine.__dict__.pop("_search_index", None)
+     with _stage(engine, "freshness_scan"):
+@@ -159,7 +163,8 @@ def _retrieve_trace(engine: BrainEngine, query: str, rerank_k: int,
+     # Audit #7: tombstones are "forgotten" — they must not come back as
+     # search answers (consolidate/_find_duplicate already exclude them).
+     nodes = [n for n in nodes if n.status != "tombstone"
+-             and (not per_tier or n.text.strip())]
++             and (not per_tier or n.text.strip())
++             and (node_filter is None or node_filter(n))]
+     trace = _RetrievalTrace([n.id for n in nodes], {n.id: n.text for n in nodes})
+     trace.tiers = {n.id: n.storage_tier for n in nodes}
+     trace.learning = learning_profile(engine.brain, query, nodes) if learn else LearningProfile(query)
+@@ -344,7 +349,8 @@ def explain(engine: BrainEngine, node_id: str, query: str, *, k: int = 5,
+ 
+ def retrieve(engine: BrainEngine, query: str, k: int = 5, rerank_k: int = 30,
+              persist: bool = True, track: bool = False, *,
+-             per_tier: bool = False, graph: GraphOptions | None = None) -> list[tuple[str, float]]:
++             per_tier: bool = False, graph: GraphOptions | None = None,
++             node_filter: Callable[[Node], bool] | None = None) -> list[tuple[str, float]]:
+     """Hybrid retrieval over the brain. Returns top-k (node_id, rrf_score).
+ 
+     Dense: cosine of the query embedding against the cached node vectors.
+@@ -359,12 +365,15 @@ def retrieve(engine: BrainEngine, query: str, k: int = 5, rerank_k: int = 30,
+     With per_tier=True, both limits apply independently to each persisted
+     tier, and empty bodies are excluded. This bounds context candidates
+     without letting a populated higher tier crowd out the lower tiers.
++    node_filter restricts authorized live nodes before learning, scoring and
++    candidate limits; filtered queries bypass the ordinary search index.
+     track (recall tracking): append the returned ids to the local recall ledger
+     (`recall.record`). Off by default so read-only surfaces (MCP) stay
+     read-only; CLI/HTTP pass True. The ledger write is an append to a
+     gitignored file — it never dirties the brain repo.
+     """
+-    trace = _retrieve_trace(engine, query, rerank_k, persist, per_tier=per_tier, graph=graph)
++    trace = _retrieve_trace(engine, query, rerank_k, persist, per_tier=per_tier,
++                            graph=graph, node_filter=node_filter)
+     return _finish_retrieval(engine, query, k, trace, track=track, per_tier=per_tier)
+ 
+ 

@@ -1,0 +1,53 @@
+diff --git a/graph_engine/dream.py b/graph_engine/dream.py
+index 7f601c2..f4fc115 100644
+--- a/graph_engine/dream.py
++++ b/graph_engine/dream.py
+@@ -344,7 +344,9 @@ def _suppressed_summary_members(nodes: dict[str, Node], edges: list[Edge]) -> se
+     Any overlap blocks a new abstraction until the operator explicitly restores
+     the forgotten summary. Legacy summaries lack derived_from; their saved
+     consolidator links retain at least the linked members, regardless of review
+-    or validity state. Never infer suppression from ordinary forgotten notes.
++    or validity state. Their recorded descendants remain suppressed through
++    merges, including legacy text provenance. Never infer suppression from
++    ordinary forgotten notes.
+     """
+     forgotten = {n.id for n in nodes.values()
+                  if n.status == "tombstone" and SUMMARY_TAG in n.tags}
+@@ -353,7 +355,24 @@ def _suppressed_summary_members(nodes: dict[str, Node], edges: list[Edge]) -> se
+         if (edge.source in forgotten and edge.origin == "consolidator"
+                 and edge.kind == "extends"):
+             members.add(edge.target)
+-    return members
++    if not forgotten:
++        return set()
++
++    from .access import derivation_parents
++
++    children: dict[str, set[str]] = collections.defaultdict(set)
++    for child, parents in derivation_parents(nodes, edges).items():
++        for parent in parents:
++            if parent:  # Unknown legacy lineage is not a shared source identity.
++                children[parent].add(child)
++    suppressed = members | forgotten
++    pending = list(suppressed)
++    while pending:
++        for child in children.get(pending.pop(), ()):
++            if child not in suppressed:
++                suppressed.add(child)
++                pending.append(child)
++    return suppressed
+ 
+ 
+ @write_operation
+@@ -372,8 +391,9 @@ def distill(brain: Brain, *, min_size: int = DREAM_MIN_COMMUNITY,
+     Idempotent: the summary id is derived from the member set, so a second pass
+     over an unchanged community finds the node (including tombstones) and skips
+     it. Forgotten summaries also suppress any community sharing their recorded
+-    members; a changed partition cannot undo forgetting. Only an explicit
+-    operator restore clears this lineage suppression. Saved link decisions and
++    members or their recorded descendants; a changed partition or merge cannot
++    undo forgetting. Only an explicit operator restore clears this lineage
++    suppression. Saved link decisions and
+     provenance are never replaced with fresh accepted links. Summary nodes are
+     `status="active"` (a distillation is a deliberate consolidation act) and
+     carry the `community-summary` tag; their edges are `origin="consolidator"`.

@@ -1,0 +1,1201 @@
+{
+  "method": "One process, one discarded warm-up per dataset, ten alternating-order runs, nearest-rank p95; no answer model calls.",
+  "source": {
+    "source_commit": "c1a670329f252be3e4f41fdb5d233e417c1d4f70",
+    "source_dirty": true,
+    "code_sha256": "981928c3b2f8de3bbdf5c19e96244525f666b4776755e98e948ca56de9cd8f9f",
+    "code_manifest": {
+      "graph_engine/__init__.py": "8a8d8c7b6d82373e8288533d448f7809f1d7402ae942b8e39238050f6b3904cd",
+      "graph_engine/__main__.py": "4a779bd5d92fa15101d56d96e034700311c0484a25e01e53a56ce787df04b3f4",
+      "graph_engine/access.py": "a082eb104f1bda5432e5d41e4bc81a54928c8ea554ed8ad964290a58cab13b54",
+      "graph_engine/agent_memory.py": "3b01b715d3a410dc6e992d319bf89f118983c15b7e0b5f327d075d4ce7bf0b79",
+      "graph_engine/brain.py": "c5c3e878d47338fa4103cad4bd780921c7beefe624698c62e1d936c8602780be",
+      "graph_engine/brain_engine.py": "2cd75bdbd1ebd8fdd07f23e5f19ac9e9652ff787af5f897ed6cfd3843b1b731d",
+      "graph_engine/communities.py": "85eb3e66b3c0e0385e108f6ccadc16646bbc38f2f0acee379eaaef7d9547e958",
+      "graph_engine/consolidation.py": "986f3457e53dd56ba08351d0c34ab31b019f4c7ba9efa68db1817f9c8d8d90ef",
+      "graph_engine/context.py": "def373d0bace62e2b59bff048b0df66c69635c6f5dd90a935442fe944962f133",
+      "graph_engine/decay.py": "4f8d18e6193120b8a6c8696bf7bc6448f2578ffd4a3acfbcecf903bebf3a0822",
+      "graph_engine/demo.py": "8573ede0a4ed95cb09985915e5a5f264fb3fc3f59298d731e9a1efde86737695",
+      "graph_engine/dream.py": "64eca5556204f8d65a0e774f4b19814c9be582ca8235dbbd0566d9a960819c03",
+      "graph_engine/embedder.py": "5f8ff2bdaaa70a5a012a35bd4185769094460d94b288f5041da7b957bf9062bc",
+      "graph_engine/engine.py": "afd83939e362af9ca9f6fcbfce76c7b964a8ac74a5dca497af248b3ebe11b071",
+      "graph_engine/entities.py": "989a8a29d00b906c98e96c22713c51302cc653e9b80401c29a11e8a12651d086",
+      "graph_engine/evals.py": "89707e51401bb893b91d3209a2fd63b9b7d21b0ac1241b5d64718d9881b76d96",
+      "graph_engine/feedback.py": "ddd3b418d59fbf23d9d84f02320c3e2823115c8fb2e171cbf59ba45fe45b7015",
+      "graph_engine/gaps.py": "55157c66838aa66383aee65a06c6c4ee8aafdf308146335cc7a31cbdefa624a8",
+      "graph_engine/graph.py": "1a135b8ab371e5f7fb60141e1291289f415b86ddf6966296f7a57beb51d81b10",
+      "graph_engine/graph_retrieval.py": "2a4b2d5dce255054fb83816a3478dc9aac6c919682c3aa0ae9b537485989c769",
+      "graph_engine/hygiene.py": "8b2f6cb4d5fc238f1f5cf7cb35566ac1e9b650e9a699a2ff6cca88917b184741",
+      "graph_engine/inference.py": "778e83d9ab6dba1d17a0e3fed76dc38e9af011467d8aa6aed9f38eeaf3ca83e4",
+      "graph_engine/intent.py": "42bcd85e156ee3433135b3f9286fbd47036649f25022d5fa93b54636c6b772a5",
+      "graph_engine/mcp/__init__.py": "8d44f4694966bc465fae60344c86a8d7436e2c6de9faaa7119694c9cb67ac649",
+      "graph_engine/mcp/format.py": "c89cfeedc39fbb4adb20c897590123084b94411ce04ee964c295117d8b8cb937",
+      "graph_engine/mcp/server.py": "ba8c21db6d2365b86bb156bef6cbf8261fec773fc9aed8eff87df1f89ceebfb3",
+      "graph_engine/merge.py": "c38080c784a44c73e52389c928555c740de8ec7da28522958094f5dc034e501c",
+      "graph_engine/model.py": "ff001150b344b9207552180d873c2c2dad492b11fc8e8a23d856c12ba97af60b",
+      "graph_engine/namespaces.py": "ea4914a6c3a08bb3aaa8556242be3fe52ab33b319558a31f31bf8ea5575c285f",
+      "graph_engine/recall.py": "6850e178badbc0cdefa37c2b0598b11b80d8f51657f749da3ead54863a851927",
+      "graph_engine/report.py": "0cd009bc49a806e445e10bb1ee79ad9b103fd1f52d44082d731f837774c0a9d4",
+      "graph_engine/reranker.py": "80b441a72d1fb52c9ac8e592939062c991a8fac498aa7d56ea0aa68b44f38ea4",
+      "graph_engine/retrieval.py": "7358b94840d8f90a36df4093e136104a2337ec033d4fb3b9a675aedada81ca04",
+      "graph_engine/review.py": "40be15fd0e8ee2497b9f63881c14bfca27f7e3add9c66cea9b129afa65bf4eeb",
+      "graph_engine/runtime.py": "56db3857a5b84fe598da13a882f976850d4f733c84ce60cf1bbe0491a98a2c10",
+      "graph_engine/server.py": "ccdc547c61bc3f71bdcd4db1f90324fc63ccb31ed0234da78de02941bafaff8d",
+      "graph_engine/similarity.py": "9ffd20d70bdc45b7358858ae34d7d31977db02b72a153d1034195cf7b2b1f82f",
+      "graph_engine/store.py": "e9b478a3ccea228d76c9867d297e9632866865f2fd9b14d39f74b9a26b0f078e",
+      "graph_engine/suggester.py": "39043e874b0fd9d3e8ff51f4815a6f99bf00430038b6ec632344dcaa94c94808",
+      "graph_engine/temporal.py": "b79d09b641de22a0e7fdc27b734c3f68630c3eb97f7d576f7623bb0a58c84291",
+      "graph_engine/tiers.py": "54d0aa59e55d46d403f2c98ccc6524a6806e5d13981215406c4f3bcc89a4a9fb",
+      "tools/memory_benchmark/__init__.py": "4697afa15d32363557e9e5a66f6625a291d33a04eadca592c682b3b747ecb17f",
+      "tools/memory_benchmark/__main__.py": "6e90c6a8f91b02854c6068a68cc39c6f1718aab4cf24c8067cf0ae252c930d84",
+      "tools/memory_benchmark/adapters.py": "146b187e10dc96409facc39f99e8dc8f092c5014b7b8982c42be3445204d2be4",
+      "tools/memory_benchmark/answers.py": "7334a046def3dc42ebe38cc2e96b47c2f4c3fa7921318a6d58f1a19d39bff3bf",
+      "tools/memory_benchmark/dataset.py": "bfe01cede6465347dfd569ef950a614cbe39317e09d988c9aeded3e7685af122",
+      "tools/memory_benchmark/embeddings.py": "598650374549cace0b5a41f290bb3a06f4d3c2b3109f4f2437fbd2a8dc6ad3cf",
+      "tools/memory_benchmark/runner.py": "c09feaffc9b8c2d2e3b5f27246ba98f0c03992c51b04ae1069ecd5d55dfd3eb5",
+      "tools/memory_benchmark/scoring.py": "a2e53fb042c443a0a8e15a393c10624734596cb99e77fe26d4f799b5ecfc539e"
+    },
+    "python": "3.14.3",
+    "platform": "macOS-26.7.1-arm64-arm-64bit-Mach-O",
+    "dependencies": {
+      "graph-engine-memory": "0.6.1",
+      "numpy": "2.5.4",
+      "httpx": "0.28.1"
+    },
+    "embedder": {
+      "name": "HashEmbedder",
+      "dimension": 64,
+      "semantic_model": false,
+      "projection": "sha256-bag-of-words-v1"
+    },
+    "reranker": null,
+    "answer_model": null
+  },
+  "measurements": [
+    {
+      "dataset_version": "graph-expansion-de-en-v1.0.0",
+      "dataset_sha256": "3e01f83419bc92afde7ec01093096dca2b5514738b9fe5fbc19d63a81fc7f718",
+      "repeats": 10,
+      "warmup_runs_discarded": 1,
+      "adapters": {
+        "graph-engine": {
+          "recall_at_k": {
+            "mean": 0.0,
+            "n": 2
+          },
+          "mrr": {
+            "mean": 0.0,
+            "n": 2
+          },
+          "evidence_coverage": {
+            "mean": 0.0,
+            "n": 2
+          },
+          "answer_correct_exact": {
+            "mean": null,
+            "n": 0
+          },
+          "retrieval_ms": {
+            "p50": 0.6759795069228858,
+            "p95": 1.2047500058542937,
+            "n": 40,
+            "samples": [
+              0.930957990931347,
+              0.3370409831404686,
+              0.7302919984795153,
+              0.33716700272634625,
+              0.8430419838987291,
+              0.39549998473376036,
+              0.7967500132508576,
+              0.32724998891353607,
+              0.8706249936949462,
+              0.33275000168941915,
+              0.6598340114578605,
+              0.411917018936947,
+              0.7129170116968453,
+              0.3479169972706586,
+              0.65983398235403,
+              0.33216600422747433,
+              1.2047500058542937,
+              0.49620799836702645,
+              0.9684580145403743,
+              0.4109170113224536,
+              1.501374994404614,
+              1.3314580137375742,
+              1.0623339912854135,
+              0.9991249826271087,
+              1.0317499982193112,
+              0.3868339990731329,
+              1.149582996731624,
+              0.5247500084806234,
+              0.8603330061305314,
+              0.37066699587740004,
+              0.7850000110920519,
+              0.4999999946448952,
+              0.8669999951962382,
+              0.3267499851062894,
+              0.7840830076020211,
+              0.4335420089773834,
+              0.6994580035097897,
+              0.3302499826531857,
+              0.6921250023879111,
+              0.3658339846879244
+            ]
+          }
+        },
+        "graph-engine-expanded": {
+          "recall_at_k": {
+            "mean": 1.0,
+            "n": 2
+          },
+          "mrr": {
+            "mean": 0.3333333333333333,
+            "n": 2
+          },
+          "evidence_coverage": {
+            "mean": 1.0,
+            "n": 2
+          },
+          "answer_correct_exact": {
+            "mean": null,
+            "n": 0
+          },
+          "retrieval_ms": {
+            "p50": 0.7715210085734725,
+            "p95": 1.5091660025063902,
+            "n": 40,
+            "samples": [
+              0.9152080165222287,
+              0.5726660019718111,
+              0.8053329947870225,
+              0.3295410133432597,
+              0.9792500059120357,
+              0.3416669787839055,
+              0.7633750210516155,
+              0.34208298893645406,
+              0.8557910041417927,
+              0.335165997967124,
+              0.7400830218102783,
+              0.3277079958934337,
+              0.975500006461516,
+              0.35454201861284673,
+              0.8888749871402979,
+              0.3696249914355576,
+              1.2717090139631182,
+              0.4966659762430936,
+              0.8102919964585453,
+              0.342417013598606,
+              1.5091660025063902,
+              0.43770900811068714,
+              0.9391250205226243,
+              0.5540840211324394,
+              0.9207499970216304,
+              1.5540839813183993,
+              2.731916989432648,
+              0.8302079804707319,
+              1.0772920213639736,
+              0.3660829970613122,
+              1.2333749909885228,
+              0.3909170045517385,
+              0.9217920014634728,
+              0.3412080113776028,
+              0.7796669960953295,
+              0.33429102040827274,
+              0.9360840194858611,
+              0.3497090074233711,
+              0.9760840039234608,
+              0.4144580161664635
+            ]
+          }
+        }
+      },
+      "configuration": {
+        "adapters": [
+          "graph-engine",
+          "graph-engine-expanded"
+        ],
+        "k": 5,
+        "context_budget_estimated_tokens": 256,
+        "seed": 0,
+        "questions": [
+          "en-two-hop",
+          "en-unanswerable",
+          "de-two-hop",
+          "de-unanswerable"
+        ],
+        "ingestion": "whole dated turns, no extraction/dedup; optional declared source relationships",
+        "graph_expansion_adapters": [
+          "graph-engine-expanded"
+        ],
+        "graph_used_for_ranking": true,
+        "graph_expansion_enabled": true,
+        "context_policy": "ranked-whole-turn-packing-v1",
+        "prompt_version": "concise-json-v1",
+        "scoring": "normalized-exact-and-proxy-v1"
+      },
+      "sample_results": [
+        {
+          "adapter": "graph-engine",
+          "question_id": "en-two-hop",
+          "expected_evidence_ids": [
+            "en-2",
+            "en-3"
+          ],
+          "context_node_ids": [
+            "en-0",
+            "en-1"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "en-0",
+            "en-1"
+          ]
+        },
+        {
+          "adapter": "graph-engine",
+          "question_id": "en-unanswerable",
+          "expected_evidence_ids": [],
+          "context_node_ids": [],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": []
+        },
+        {
+          "adapter": "graph-engine",
+          "question_id": "de-two-hop",
+          "expected_evidence_ids": [
+            "de-2",
+            "de-3"
+          ],
+          "context_node_ids": [
+            "de-0",
+            "de-1"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "de-0",
+            "de-1"
+          ]
+        },
+        {
+          "adapter": "graph-engine",
+          "question_id": "de-unanswerable",
+          "expected_evidence_ids": [],
+          "context_node_ids": [],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": []
+        },
+        {
+          "adapter": "graph-engine-expanded",
+          "question_id": "en-two-hop",
+          "expected_evidence_ids": [
+            "en-2",
+            "en-3"
+          ],
+          "context_node_ids": [
+            "en-0",
+            "en-1",
+            "en-2",
+            "en-3"
+          ],
+          "graph_used_for_ranking": true,
+          "retrieved_ids": [
+            "en-0",
+            "en-1",
+            "en-2",
+            "en-3"
+          ]
+        },
+        {
+          "adapter": "graph-engine-expanded",
+          "question_id": "en-unanswerable",
+          "expected_evidence_ids": [],
+          "context_node_ids": [],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": []
+        },
+        {
+          "adapter": "graph-engine-expanded",
+          "question_id": "de-two-hop",
+          "expected_evidence_ids": [
+            "de-2",
+            "de-3"
+          ],
+          "context_node_ids": [
+            "de-0",
+            "de-1",
+            "de-2",
+            "de-3"
+          ],
+          "graph_used_for_ranking": true,
+          "retrieved_ids": [
+            "de-0",
+            "de-1",
+            "de-2",
+            "de-3"
+          ]
+        },
+        {
+          "adapter": "graph-engine-expanded",
+          "question_id": "de-unanswerable",
+          "expected_evidence_ids": [],
+          "context_node_ids": [],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": []
+        }
+      ]
+    },
+    {
+      "dataset_version": "de-en-memory-v1.0.0",
+      "dataset_sha256": "ecd55eef857eee0975f334b2e31ef6b658e245111c9712b0b9af19b43a37c6e3",
+      "repeats": 10,
+      "warmup_runs_discarded": 1,
+      "adapters": {
+        "graph-engine": {
+          "recall_at_k": {
+            "mean": 1.0,
+            "n": 10
+          },
+          "mrr": {
+            "mean": 0.95,
+            "n": 10
+          },
+          "evidence_coverage": {
+            "mean": 1.0,
+            "n": 10
+          },
+          "answer_correct_exact": {
+            "mean": null,
+            "n": 0
+          },
+          "retrieval_ms": {
+            "p50": 0.6931250100024045,
+            "p95": 1.611834013601765,
+            "n": 120,
+            "samples": [
+              1.5341250109486282,
+              0.6845839961897582,
+              0.6604589871130884,
+              0.6635839818045497,
+              0.6449579959735274,
+              0.6364159926306456,
+              1.7151249921880662,
+              0.6962920015212148,
+              0.7591669855173677,
+              0.846999988425523,
+              1.366083015454933,
+              0.7657910173293203,
+              1.5445839962922037,
+              0.6713749899063259,
+              0.6393749790731817,
+              0.6415839889086783,
+              0.6268339930102229,
+              0.6202499789651483,
+              1.5859999984968454,
+              1.2005000025965273,
+              0.7859159959480166,
+              1.424249989213422,
+              1.0810000239871442,
+              0.6857499829493463,
+              1.6136670019477606,
+              0.7131249876692891,
+              0.6746670114807785,
+              0.7048330153338611,
+              0.7690830097999424,
+              0.6717500218655914,
+              1.4894579944666475,
+              0.7068330014590174,
+              0.6727080035489053,
+              0.6758339877706021,
+              0.6870829965919256,
+              0.6682499952148646,
+              1.679790992056951,
+              0.8211669919546694,
+              0.8360419888049364,
+              0.7682919967919588,
+              0.7233749784063548,
+              0.7071660074871033,
+              1.3972500164527446,
+              0.7313750102184713,
+              0.6943329935893416,
+              0.6810000049881637,
+              0.6812909850850701,
+              0.6532089901156723,
+              1.5934580005705357,
+              0.7148750009946525,
+              0.7704159943386912,
+              0.6712909962516278,
+              0.6431660149246454,
+              0.6297499930951744,
+              1.3852080155629665,
+              0.6611249991692603,
+              0.6451250228565186,
+              0.6354580109473318,
+              0.6431250076275319,
+              0.6287919823080301,
+              1.431499986210838,
+              0.7307499763555825,
+              0.7067920232657343,
+              0.6952920230105519,
+              0.6509580125566572,
+              0.6836669926997274,
+              1.386332995025441,
+              0.6795410008635372,
+              0.672499998472631,
+              0.6446669867727906,
+              0.6653339951299131,
+              0.6342080014292151,
+              2.147249993868172,
+              1.3394590059760958,
+              1.3957080082036555,
+              0.8795830071903765,
+              0.850957992952317,
+              0.901999999769032,
+              1.556417002575472,
+              0.6919170264154673,
+              0.6699579826090485,
+              0.6601659988518804,
+              0.6474580150097609,
+              0.6589999829884619,
+              1.8729170260485262,
+              0.77495799632743,
+              0.7706250180490315,
+              0.8348329865839332,
+              0.7559169898740947,
+              0.6328749877866358,
+              1.3585829874500632,
+              0.6730000022798777,
+              0.6605840171687305,
+              0.6625840032938868,
+              0.7113750034477562,
+              0.647542008664459,
+              1.611834013601765,
+              0.6815000087954104,
+              0.6431249785237014,
+              0.6750839820597321,
+              0.6407089822459966,
+              0.6383339932654053,
+              1.343499985523522,
+              0.6607499963138252,
+              0.641417020233348,
+              0.6465830083470792,
+              0.6709999870508909,
+              0.6475830159615725,
+              1.9082500075455755,
+              0.7327090133912861,
+              0.7353750115726143,
+              0.7105419936124235,
+              0.7722080044914037,
+              0.6404999876394868,
+              1.5322499966714531,
+              0.7484159723389894,
+              0.649666995741427,
+              0.6429170025512576,
+              0.6489160005003214,
+              0.6209159910213202
+            ]
+          }
+        },
+        "graph-engine-expanded": {
+          "recall_at_k": {
+            "mean": 1.0,
+            "n": 10
+          },
+          "mrr": {
+            "mean": 0.95,
+            "n": 10
+          },
+          "evidence_coverage": {
+            "mean": 1.0,
+            "n": 10
+          },
+          "answer_correct_exact": {
+            "mean": null,
+            "n": 0
+          },
+          "retrieval_ms": {
+            "p50": 0.7718955021118745,
+            "p95": 1.8914169922936708,
+            "n": 120,
+            "samples": [
+              1.7335840093437582,
+              1.1740829795598984,
+              0.977999996393919,
+              2.0779999904334545,
+              1.0395830031484365,
+              0.8802079828456044,
+              1.827083993703127,
+              1.8380839901510626,
+              0.9291669994127005,
+              1.4548340113833547,
+              1.1353340232744813,
+              1.752249983837828,
+              1.5936669951770455,
+              0.723167002433911,
+              0.6836249958723783,
+              0.6912920216564089,
+              0.680833007209003,
+              0.6693749746773392,
+              1.3974159955978394,
+              0.7043750083539635,
+              0.6919160077814013,
+              1.078582979971543,
+              0.7562499959021807,
+              0.6900410226080567,
+              1.9286659953650087,
+              1.4711660041939467,
+              0.9830420021899045,
+              0.7964160176925361,
+              0.9155000152532011,
+              0.7715410029049963,
+              1.4741250197403133,
+              0.7479170162696391,
+              0.7334589899983257,
+              0.7238340040203184,
+              0.7223749998956919,
+              0.8675830031279474,
+              1.8914169922936708,
+              0.8536670065950602,
+              0.9962079930119216,
+              0.8397919882554561,
+              0.7718330016359687,
+              0.7484170200768858,
+              1.6402500041294843,
+              0.8035000064410269,
+              0.8445420244242996,
+              0.7259999983943999,
+              0.7258330006152391,
+              0.7033750007394701,
+              1.6916659951675683,
+              0.8039590029511601,
+              0.7146669959183782,
+              0.7342919998336583,
+              0.6882080051582307,
+              0.6756249931640923,
+              1.3574589975178242,
+              1.774333999492228,
+              0.7375830027740449,
+              0.7719580025877804,
+              0.896541983820498,
+              0.7912919973023236,
+              2.288916992256418,
+              0.7700410205870867,
+              0.7182080007623881,
+              0.7069169951137155,
+              0.6827919860370457,
+              0.6758339877706021,
+              1.572333014337346,
+              0.8831250015646219,
+              0.7681249990127981,
+              0.743416982004419,
+              0.7266250031534582,
+              0.6824580195825547,
+              1.5955839771777391,
+              0.7287079934030771,
+              0.7026249950286001,
+              0.7336670241784304,
+              0.7684169977437705,
+              0.6896659906487912,
+              2.3505409772042185,
+              0.726790982298553,
+              0.7160829845815897,
+              0.715540983946994,
+              0.7157500076573342,
+              0.6864999886602163,
+              1.9016250153072178,
+              0.827083014883101,
+              0.993583002127707,
+              0.8458340016659349,
+              0.7300830038730055,
+              0.7138749933801591,
+              1.7032500181812793,
+              0.7558749930467457,
+              0.7279999845195562,
+              0.7149589946493506,
+              0.7524579996243119,
+              1.1337499890942127,
+              4.185249999864027,
+              0.7780829910188913,
+              0.7107919955160469,
+              0.7111250015441328,
+              0.6999580073170364,
+              0.6827500183135271,
+              1.706583017949015,
+              0.7455830054823309,
+              0.9612500143703073,
+              0.8946659800130874,
+              1.2642079964280128,
+              1.0903749789576977,
+              1.644083997234702,
+              0.7346670026890934,
+              0.7017919851932675,
+              0.7155420025810599,
+              0.7201670086942613,
+              0.6810420018155128,
+              1.6820000018924475,
+              0.8524589939042926,
+              0.8148749766405672,
+              0.9417919791303575,
+              0.880625011632219,
+              0.716334005119279
+            ]
+          }
+        }
+      },
+      "configuration": {
+        "adapters": [
+          "graph-engine",
+          "graph-engine-expanded"
+        ],
+        "k": 5,
+        "context_budget_estimated_tokens": 256,
+        "seed": 0,
+        "questions": [
+          "en-preference",
+          "en-temporal",
+          "en-ambiguity",
+          "en-multi-hop",
+          "en-irrelevant",
+          "en-unanswerable",
+          "de-preference",
+          "de-temporal",
+          "de-ambiguity",
+          "de-multi-hop",
+          "de-irrelevant",
+          "de-unanswerable"
+        ],
+        "ingestion": "whole dated turns, no extraction/dedup; optional declared source relationships",
+        "graph_expansion_adapters": [
+          "graph-engine-expanded"
+        ],
+        "graph_used_for_ranking": false,
+        "graph_expansion_enabled": true,
+        "context_policy": "ranked-whole-turn-packing-v1",
+        "prompt_version": "concise-json-v1",
+        "scoring": "normalized-exact-and-proxy-v1"
+      },
+      "sample_results": [
+        {
+          "adapter": "graph-engine",
+          "question_id": "en-preference",
+          "expected_evidence_ids": [
+            "en-t00"
+          ],
+          "context_node_ids": [
+            "en-t00",
+            "en-t01",
+            "en-t10",
+            "en-t12",
+            "en-t05"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "en-t00",
+            "en-t01",
+            "en-t10",
+            "en-t12",
+            "en-t05"
+          ]
+        },
+        {
+          "adapter": "graph-engine",
+          "question_id": "en-temporal",
+          "expected_evidence_ids": [
+            "en-t02",
+            "en-t03"
+          ],
+          "context_node_ids": [
+            "en-t02",
+            "en-t03",
+            "en-t04",
+            "en-t06",
+            "en-t09"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "en-t02",
+            "en-t03",
+            "en-t04",
+            "en-t06",
+            "en-t09"
+          ]
+        },
+        {
+          "adapter": "graph-engine",
+          "question_id": "en-ambiguity",
+          "expected_evidence_ids": [
+            "en-t04"
+          ],
+          "context_node_ids": [
+            "en-t04",
+            "en-t05",
+            "en-t10"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "en-t04",
+            "en-t05",
+            "en-t10"
+          ]
+        },
+        {
+          "adapter": "graph-engine",
+          "question_id": "en-multi-hop",
+          "expected_evidence_ids": [
+            "en-t06",
+            "en-t07"
+          ],
+          "context_node_ids": [
+            "en-t06",
+            "en-t11",
+            "en-t08",
+            "en-t07",
+            "en-t04"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "en-t06",
+            "en-t11",
+            "en-t08",
+            "en-t07",
+            "en-t04"
+          ]
+        },
+        {
+          "adapter": "graph-engine",
+          "question_id": "en-irrelevant",
+          "expected_evidence_ids": [
+            "en-t09"
+          ],
+          "context_node_ids": [
+            "en-t09",
+            "en-t03",
+            "en-t00",
+            "en-t02",
+            "en-t05"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "en-t09",
+            "en-t03",
+            "en-t00",
+            "en-t02",
+            "en-t05"
+          ]
+        },
+        {
+          "adapter": "graph-engine",
+          "question_id": "en-unanswerable",
+          "expected_evidence_ids": [],
+          "context_node_ids": [
+            "en-t09",
+            "en-t06",
+            "en-t05",
+            "en-t00",
+            "en-t04"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "en-t09",
+            "en-t06",
+            "en-t05",
+            "en-t00",
+            "en-t04"
+          ]
+        },
+        {
+          "adapter": "graph-engine",
+          "question_id": "de-preference",
+          "expected_evidence_ids": [
+            "de-t00"
+          ],
+          "context_node_ids": [
+            "de-t00",
+            "de-t12",
+            "de-t10",
+            "de-t11",
+            "de-t07"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "de-t00",
+            "de-t12",
+            "de-t10",
+            "de-t11",
+            "de-t07"
+          ]
+        },
+        {
+          "adapter": "graph-engine",
+          "question_id": "de-temporal",
+          "expected_evidence_ids": [
+            "de-t02",
+            "de-t03"
+          ],
+          "context_node_ids": [
+            "de-t03",
+            "de-t02",
+            "de-t09",
+            "de-t04",
+            "de-t05"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "de-t03",
+            "de-t02",
+            "de-t09",
+            "de-t04",
+            "de-t05"
+          ]
+        },
+        {
+          "adapter": "graph-engine",
+          "question_id": "de-ambiguity",
+          "expected_evidence_ids": [
+            "de-t04"
+          ],
+          "context_node_ids": [
+            "de-t05",
+            "de-t04",
+            "de-t11",
+            "de-t10",
+            "de-t12"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "de-t05",
+            "de-t04",
+            "de-t11",
+            "de-t10",
+            "de-t12"
+          ]
+        },
+        {
+          "adapter": "graph-engine",
+          "question_id": "de-multi-hop",
+          "expected_evidence_ids": [
+            "de-t06",
+            "de-t07"
+          ],
+          "context_node_ids": [
+            "de-t06",
+            "de-t02",
+            "de-t07",
+            "de-t11",
+            "de-t10"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "de-t06",
+            "de-t02",
+            "de-t07",
+            "de-t11",
+            "de-t10"
+          ]
+        },
+        {
+          "adapter": "graph-engine",
+          "question_id": "de-irrelevant",
+          "expected_evidence_ids": [
+            "de-t09"
+          ],
+          "context_node_ids": [
+            "de-t09",
+            "de-t03",
+            "de-t02",
+            "de-t07",
+            "de-t06"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "de-t09",
+            "de-t03",
+            "de-t02",
+            "de-t07",
+            "de-t06"
+          ]
+        },
+        {
+          "adapter": "graph-engine",
+          "question_id": "de-unanswerable",
+          "expected_evidence_ids": [],
+          "context_node_ids": [
+            "de-t02",
+            "de-t08",
+            "de-t07",
+            "de-t00",
+            "de-t06"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "de-t02",
+            "de-t08",
+            "de-t07",
+            "de-t00",
+            "de-t06"
+          ]
+        },
+        {
+          "adapter": "graph-engine-expanded",
+          "question_id": "en-preference",
+          "expected_evidence_ids": [
+            "en-t00"
+          ],
+          "context_node_ids": [
+            "en-t00",
+            "en-t01",
+            "en-t10",
+            "en-t12",
+            "en-t05"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "en-t00",
+            "en-t01",
+            "en-t10",
+            "en-t12",
+            "en-t05"
+          ]
+        },
+        {
+          "adapter": "graph-engine-expanded",
+          "question_id": "en-temporal",
+          "expected_evidence_ids": [
+            "en-t02",
+            "en-t03"
+          ],
+          "context_node_ids": [
+            "en-t02",
+            "en-t03",
+            "en-t04",
+            "en-t06",
+            "en-t09"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "en-t02",
+            "en-t03",
+            "en-t04",
+            "en-t06",
+            "en-t09"
+          ]
+        },
+        {
+          "adapter": "graph-engine-expanded",
+          "question_id": "en-ambiguity",
+          "expected_evidence_ids": [
+            "en-t04"
+          ],
+          "context_node_ids": [
+            "en-t04",
+            "en-t05",
+            "en-t10"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "en-t04",
+            "en-t05",
+            "en-t10"
+          ]
+        },
+        {
+          "adapter": "graph-engine-expanded",
+          "question_id": "en-multi-hop",
+          "expected_evidence_ids": [
+            "en-t06",
+            "en-t07"
+          ],
+          "context_node_ids": [
+            "en-t06",
+            "en-t11",
+            "en-t08",
+            "en-t07",
+            "en-t04"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "en-t06",
+            "en-t11",
+            "en-t08",
+            "en-t07",
+            "en-t04"
+          ]
+        },
+        {
+          "adapter": "graph-engine-expanded",
+          "question_id": "en-irrelevant",
+          "expected_evidence_ids": [
+            "en-t09"
+          ],
+          "context_node_ids": [
+            "en-t09",
+            "en-t03",
+            "en-t00",
+            "en-t02",
+            "en-t05"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "en-t09",
+            "en-t03",
+            "en-t00",
+            "en-t02",
+            "en-t05"
+          ]
+        },
+        {
+          "adapter": "graph-engine-expanded",
+          "question_id": "en-unanswerable",
+          "expected_evidence_ids": [],
+          "context_node_ids": [
+            "en-t09",
+            "en-t06",
+            "en-t05",
+            "en-t00",
+            "en-t04"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "en-t09",
+            "en-t06",
+            "en-t05",
+            "en-t00",
+            "en-t04"
+          ]
+        },
+        {
+          "adapter": "graph-engine-expanded",
+          "question_id": "de-preference",
+          "expected_evidence_ids": [
+            "de-t00"
+          ],
+          "context_node_ids": [
+            "de-t00",
+            "de-t12",
+            "de-t10",
+            "de-t11",
+            "de-t07"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "de-t00",
+            "de-t12",
+            "de-t10",
+            "de-t11",
+            "de-t07"
+          ]
+        },
+        {
+          "adapter": "graph-engine-expanded",
+          "question_id": "de-temporal",
+          "expected_evidence_ids": [
+            "de-t02",
+            "de-t03"
+          ],
+          "context_node_ids": [
+            "de-t03",
+            "de-t02",
+            "de-t09",
+            "de-t04",
+            "de-t05"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "de-t03",
+            "de-t02",
+            "de-t09",
+            "de-t04",
+            "de-t05"
+          ]
+        },
+        {
+          "adapter": "graph-engine-expanded",
+          "question_id": "de-ambiguity",
+          "expected_evidence_ids": [
+            "de-t04"
+          ],
+          "context_node_ids": [
+            "de-t05",
+            "de-t04",
+            "de-t11",
+            "de-t10",
+            "de-t12"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "de-t05",
+            "de-t04",
+            "de-t11",
+            "de-t10",
+            "de-t12"
+          ]
+        },
+        {
+          "adapter": "graph-engine-expanded",
+          "question_id": "de-multi-hop",
+          "expected_evidence_ids": [
+            "de-t06",
+            "de-t07"
+          ],
+          "context_node_ids": [
+            "de-t06",
+            "de-t02",
+            "de-t07",
+            "de-t11",
+            "de-t10"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "de-t06",
+            "de-t02",
+            "de-t07",
+            "de-t11",
+            "de-t10"
+          ]
+        },
+        {
+          "adapter": "graph-engine-expanded",
+          "question_id": "de-irrelevant",
+          "expected_evidence_ids": [
+            "de-t09"
+          ],
+          "context_node_ids": [
+            "de-t09",
+            "de-t03",
+            "de-t02",
+            "de-t07",
+            "de-t06"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "de-t09",
+            "de-t03",
+            "de-t02",
+            "de-t07",
+            "de-t06"
+          ]
+        },
+        {
+          "adapter": "graph-engine-expanded",
+          "question_id": "de-unanswerable",
+          "expected_evidence_ids": [],
+          "context_node_ids": [
+            "de-t02",
+            "de-t08",
+            "de-t07",
+            "de-t00",
+            "de-t06"
+          ],
+          "graph_used_for_ranking": false,
+          "retrieved_ids": [
+            "de-t02",
+            "de-t08",
+            "de-t07",
+            "de-t00",
+            "de-t06"
+          ]
+        }
+      ],
+      "unchanged_retrieval_scores_order_and_context": true
+    }
+  ]
+}

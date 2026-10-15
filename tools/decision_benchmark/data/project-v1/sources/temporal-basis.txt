@@ -1,0 +1,20 @@
+### Known limitations
+
+- **Intent heuristics use marker words and a similarity gate.** They can
+  produce false positives. Set `IDEAGRAPH_INTENT_PENDING=1` to require review;
+  `ig accept-pending` caps `contradicts`/`supersedes`/`continues` fan-out but does not verify
+  the claims. Inspect a bulk-review dry run before accepting suggestions.
+- **Lifecycle promotion measures use and connectivity.** A frequently retrieved
+  memory is not necessarily important or true. With the default gates, only
+  never-recalled, weakly connected nodes at least 30 days old become stale.
+- **Distillation is extractive by default.** `--llm` needs `IG_DREAM_LLM_CMD`;
+  the summaries are structured evidence, not prose abstractions.
+- **`ig near-dup` flags related-but-distinct pairs.** The 0.78–0.92 band is a
+  review list, and the command does not merge nodes. Review pairs before using
+  `ig merge`; ingest deduplication uses its separate 0.92 threshold.
+- **Temporal queries filter current records.** `ig valid-at` applies stored
+  creation/validity timestamps and current review/tombstone state; `ig when`
+  filters a bounded search of current text by creation time. Neither restores
+  old node text or past review decisions from Git. Use Git history when an
+  exact historical snapshot is needed.
+
