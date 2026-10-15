@@ -15,6 +15,7 @@ determines the final ranking.
 from __future__ import annotations
 
 import os
+from threading import Lock
 
 Candidate = tuple[str, str, float]
 
@@ -50,7 +51,8 @@ class ReverseReranker(Reranker):
 class CrossEncoderReranker(Reranker):
     """Real cross-encoder model (sentence-transformers), loaded on demand."""
 
-    def __init__(self, model_name: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"):
+    def __init__(self, model_name: str = "cross-encoder/ms-marco-MiniLM-L-6-v2", *,
+                 revision: str | None = None):
         try:
             from sentence_transformers import CrossEncoder
         except ImportError as exc:  # pragma: no cover
@@ -58,7 +60,9 @@ class CrossEncoderReranker(Reranker):
                 "IDEAGRAPH_RERANKER=st requires 'sentence-transformers' "
                 "(pip install sentence-transformers)."
             ) from exc
-        self.model = CrossEncoder(model_name, trust_remote_code=False)
+        options = {"revision": revision} if revision is not None else {}
+        self.model = CrossEncoder(model_name, trust_remote_code=False, **options)
+        self._model_lock = Lock()
 
     def rerank(self, query: str, candidates: list[Candidate], k: int) -> list[Candidate]:
         # Preserve the public search contract: scores in hits remain RRF.
@@ -69,18 +73,21 @@ class CrossEncoderReranker(Reranker):
         if not candidates:
             return [], {}
         pairs = [(query, text) for _, text, _ in candidates]
-        scores = self.model.predict(pairs, show_progress_bar=False)
+        with self._model_lock:
+            scores = self.model.predict(pairs, show_progress_bar=False)
         scored = sorted(zip(candidates, scores), key=lambda x: x[1], reverse=True)
         # Include predictions for candidates excluded by the final top-k too.
         return ([cand for cand, _ in scored][:k],
                 {cand[0]: float(score) for cand, score in scored})
 
 
-def get_reranker():
+def get_reranker(mode: str | None = None, *, revision: str | None = None) -> Reranker | None:
     """Factory from IDEAGRAPH_RERANKER: 'none' (default) | 'st' | model name/path."""
-    mode = os.environ.get("IDEAGRAPH_RERANKER", "none").strip()
+    mode = (os.environ.get("IDEAGRAPH_RERANKER", "none") if mode is None else mode).strip()
+    if revision is None:
+        revision = os.environ.get("IDEAGRAPH_RERANKER_REVISION") or None
     if not mode or mode.lower() == "none":
         return None
     if mode.lower() == "st":
-        return CrossEncoderReranker()
-    return CrossEncoderReranker(model_name=mode)
+        return CrossEncoderReranker(revision=revision)
+    return CrossEncoderReranker(model_name=mode, revision=revision)

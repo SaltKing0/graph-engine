@@ -1299,6 +1299,7 @@ environment, log paths and a shutdown grace longer than `--pass-timeout`.
 | `IG_PRINCIPAL` | *(none)* | trusted CLI/MCP process identity in protected mode; never used to authenticate HTTP |
 | `IDEAGRAPH_EMBEDDER` | `st` | `hash` = deterministic test embedder |
 | `IDEAGRAPH_EMBEDDER_MODEL` | `all-MiniLM-L6-v2` | sentence-transformers model override |
+| `IDEAGRAPH_EMBEDDER_REVISION` | unset | embedding repository revision; prefer an immutable commit SHA |
 | `IDEAGRAPH_AUTO_ACCEPT` | off | `1` = auto-accept similarity suggestions; intent and entity-fact review have separate controls |
 | `IG_EDGE_CONF_FLOOR` | `0.0` | discard similarity suggestions below this confidence; finite 0–1 inclusive, validated before ingest mutations |
 | `IG_INTENT_AUTO_ACCEPT_MAX` | `2` | maximum accepted intent edges per source during ingest and bulk review |
@@ -1310,6 +1311,7 @@ environment, log paths and a shutdown grace longer than `--pass-timeout`.
 | `IG_MCP_MAX_NEIGHBORS` | `20` | neighbors result cap (hard max 50) |
 | `IDEAGRAPH_INTENT_PENDING` | off | `1` = intent edges become pending (HITL) |
 | `IDEAGRAPH_RERANKER` | `none` | `st` or a model name/path enables the cross-encoder; requires `[st]` |
+| `IDEAGRAPH_RERANKER_REVISION` | unset | cross-encoder repository revision; prefer an immutable commit SHA |
 | `IG_BOT_NAME` | `graph-engine-bot` | Git commit author name |
 | `IG_BOT_EMAIL` | `bot@graph-engine.local` | Git commit author email |
 | `IG_DREAM_LLM_CMD` | *(none)* | stdin/stdout summary command for `ig dream --distill --llm` |
@@ -1321,6 +1323,18 @@ environment, log paths and a shutdown grace longer than `--pass-timeout`.
 | `IG_CONSOLIDATE_LLM_CMD` | *(none)* | optional stdin/stdout fact extractor, invoked only with `--llm` |
 | `IG_CONSOLIDATE_STRUCTURED_CMD` | *(none)* | separate JSON proposal command, invoked only with `--structured`; 300-second timeout; exact quotes/IDs/dates checked; 128 KiB output bound |
 | `IG_ENTITIES_LLM_CMD` | *(none)* | optional JSON stdin/stdout entity and triple extractor for `ig entities --llm`, `ig ingest --extract-model`, and HTTP/MCP `extraction: "model"`; 300-second timeout; never enabled automatically |
+
+Model resources are reused per process by model name/path, revision and local
+directory content digest. Each model cache and the unprotected engine cache
+retain at most eight entries; cached engines may also retain their adapters.
+Eviction drops cache references without interrupting active requests. Protected
+engines, identities and authorized corpus views are always request-local;
+permissions and revocation are checked on reads. Model initialization and
+inference are serialized for safe sharing. Local model directories are hashed
+on factory calls to detect replacements; prefer immutable repository revisions
+to avoid this file I/O. Restart or call `runtime.reset_engine_cache()` to discard
+retained resources, including mutable remote revision aliases. This does not
+unload models still held by active callers.
 
 Dedupe: near-duplicate ingests (cosine ≥ 0.92) merge into the existing node
 (`sources:` provenance); opt out with `ig ingest --allow-dup` or the
