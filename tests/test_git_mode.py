@@ -161,6 +161,44 @@ def test_search_snapshot_invalidates_after_git_pull(remote, tmp_path):
     assert _git("status", "--porcelain", cwd=str(reader.path)).stdout == ""
 
 
+@pytest.mark.parametrize("vectors", ["missing", "stale", "valid"])
+def test_when_preserves_files_ledger_and_git_on_cold_and_warm_calls(remote, monkeypatch, vectors):
+    from graph_engine import recall
+    from graph_engine.retrieval import retrieve
+
+    bare, brain = remote
+    brain.write_node(Node("alpha old extra words", id="old", created="2020-01-01"))
+    brain.write_node(Node("alpha future", id="new", created="2030-01-01"))
+    engine = BrainEngine(brain, HashEmbedder(), reranker=False)
+    engine.reranker = None
+    if vectors != "missing":
+        retrieve(engine, "alpha")
+        if vectors == "stale":
+            node = brain.read_node("old")
+            node.text = "alpha edited old extra words"
+            brain.write_node(node)
+    brain.rebuild_index()
+    brain.commit_and_push("seed temporal corpus")
+    (brain.path / "recalls.jsonl").write_text('{"sentinel": true}\n')
+    (brain.path / "unrelated.txt").write_text("uncommitted work")
+    monkeypatch.delenv("IG_NO_RECALL_TRACKING", raising=False)
+    monkeypatch.setattr(recall, "record", lambda *args: pytest.fail("temporal recall tracking"))
+    Brain._VECTOR_MEMO.clear()
+    engine.__dict__.pop("_search_index", None)
+
+    def state():
+        files = {str(p.relative_to(brain.path)): (p.read_bytes(), p.stat().st_mtime_ns)
+                 for p in brain.path.rglob("*") if p.is_file() and ".git" not in p.parts}
+        return (files, _git("status", "--porcelain", cwd=str(brain.path)).stdout,
+                _git("rev-parse", "HEAD", cwd=str(brain.path)).stdout,
+                _git("rev-parse", "main", cwd=str(bare)).stdout)
+
+    before = state()
+    for _ in range(2):
+        assert [nid for nid, _ in engine.when("alpha", "2021-01-01", k=1)] == ["old"]
+        assert state() == before
+
+
 @pytest.mark.parametrize('raw', ['invalid', 'nan', 'inf', '-0.01', '1.01'])
 @pytest.mark.parametrize('extraction', [None, 'rules'])
 def test_rejected_ingest_config_preserves_git_and_all_records(remote, monkeypatch, raw, extraction):

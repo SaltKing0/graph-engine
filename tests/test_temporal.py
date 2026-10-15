@@ -116,6 +116,105 @@ class TestHistory:
 
 
 class TestWhen:
+    @pytest.mark.parametrize("rerank", [False, True])
+    def test_keeps_feedback_tier_and_reranker_semantics(self, brain, tmp_path, rerank):
+        import json
+        from graph_engine.brain_engine import BrainEngine
+        from graph_engine.embedder import HashEmbedder
+        from graph_engine.retrieval import retrieve
+
+        past = [Node(text, id=nid, storage_tier=tier, created="2020-01-01")
+                for nid, text, tier in [
+                    ("first", "alpha", "recall"),
+                    ("preferred", "alpha older extra words", "recall"),
+                    ("main", "alpha main extra words", "main"),
+                    ("archive", "alpha archive", "archival")]]
+        reference = Brain(tmp_path / "eligible", mode="local")
+        reference.ensure_ready()
+        feedback = json.dumps({"version": 1, "judgments": [
+            {"query": "alpha", "node_id": nid, "label": "relevant",
+             "dense_rank": 1, "bm25_rank": 2} for nid in ("preferred", "future")]})
+        for store in (brain, reference):
+            for node in past:
+                store.write_node(node)
+            (store.path / "feedback.json").write_text(feedback)
+        brain.write_node(Node("alpha futuretoken", id="future", created="2030-01-01"))
+
+        class ReverseReranker:
+            def rerank(self, query, candidates, k):
+                assert {nid for nid, _, _ in candidates} == {n.id for n in past}
+                return list(reversed(candidates))[:k]
+
+        engines = [BrainEngine(store, HashEmbedder(), reranker=False)
+                   for store in (brain, reference)]
+        for engine in engines:
+            engine.reranker = ReverseReranker() if rerank else None
+        expected = retrieve(engines[1], "alpha", k=4, persist=False)
+        actual = engines[0].when("alpha", "2021-01-01", k=4)
+        assert actual == expected
+        assert actual[0][0] == "main" and actual[-1][0] == "archive"
+        assert [nid for nid, _ in actual[1:3]] == (
+            ["first", "preferred"] if rerank else ["preferred", "first"])
+
+    @pytest.mark.parametrize("rerank", [False, True])
+    def test_old_match_survives_newer_matches_beyond_candidate_limit(self, brain, rerank):
+        from graph_engine.brain_engine import BrainEngine
+        from graph_engine.embedder import HashEmbedder
+        from graph_engine.retrieval import retrieve
+
+        brain.write_node(Node("alpha old extra words", id="old", created="2020-01-01"))
+        for i in range(40):  # exceeds both 3*k and the default rerank_k=30
+            brain.write_node(Node("alpha", id=f"new{i}", created="2030-01-01"))
+        seen = []
+
+        class Reranker:
+            def rerank(self, query, candidates, k):
+                seen.append([nid for nid, _, _ in candidates])
+                return candidates[:k]
+
+        engine = BrainEngine(brain, HashEmbedder(), reranker=Reranker() if rerank else False)
+        if not rerank:
+            engine.reranker = None
+        # Warm the ordinary full-corpus index before the temporal call.
+        assert "old" not in dict(retrieve(engine, "alpha", k=30, persist=False))
+        seen.clear()
+        assert [nid for nid, _ in engine.when("alpha", "2021-01-01", k=1)] == ["old"]
+        if rerank:
+            assert seen == [["old"]]
+        # A different cutoff and ordinary search must not reuse a filtered corpus.
+        assert engine.when("alpha", "2019-01-01", k=1) == []
+        assert engine.when("alpha", "2031-01-01", k=1)[0][0] != "old"
+        assert retrieve(engine, "alpha", k=1, persist=False)[0][0] != "old"
+
+    def test_only_eligible_text_is_embedded_and_used_for_bm25(self, brain, monkeypatch):
+        from graph_engine.brain_engine import BrainEngine
+        from graph_engine.embedder import HashEmbedder
+        from graph_engine import retrieval
+
+        brain.write_node(Node("alpha old extra words", id="old", created="2020-01-01"))
+        brain.write_node(Node("alpha future", id="new", created="2030-01-01"))
+        engine = BrainEngine(brain, HashEmbedder(), reranker=False)
+        engine.reranker = None
+        texts = []
+        original_embed = engine.embedder.embed
+
+        def embed(text):
+            texts.append(text)
+            return original_embed(text)
+
+        original_bm25 = retrieval.BM25
+        corpora = []
+
+        def bm25(corpus):
+            corpora.append(corpus)
+            return original_bm25(corpus)
+
+        monkeypatch.setattr(engine.embedder, "embed", embed)
+        monkeypatch.setattr(retrieval, "BM25", bm25)
+        assert engine.when("alpha", "2021-01-01", k=1)
+        assert texts == ["alpha", "alpha old extra words"]
+        assert corpora == [["alpha old extra words"]]
+
     def test_returns_results_from_past(self, brain):
         from graph_engine.brain_engine import BrainEngine
         engine = BrainEngine(brain)
