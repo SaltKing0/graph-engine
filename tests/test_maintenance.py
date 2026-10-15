@@ -173,6 +173,17 @@ def test_refresh_noop_and_report_failure_are_observable(brain, monkeypatch):
     assert "secret" not in str(caught.value)
 
 
+def test_strict_worker_refresh_tolerates_vector_damage(brain, damaged_vector_cache):
+    for nid in ("a", "b"):
+        brain.write_node(Node(id=nid, text=nid))
+    brain.vectors_file.write_text(damaged_vector_cache, encoding="utf-8")
+    for _ in range(2):
+        assert perform_pass(MaintenanceConfig(), "refresh")["recalls"] == 0
+        assert "## Hygiene" in (brain.path / "BRAIN_REPORT.md").read_text(encoding="utf-8")
+        assert brain.vectors_file.read_text(encoding="utf-8") == damaged_vector_cache
+        assert {n.id for n in brain.read_nodes()} == {"a", "b"}
+
+
 @pytest.mark.parametrize("family", ["nodes", "edges.jsonl", "vectors.jsonl", "recalls.jsonl", "bytes"])
 def test_input_limits_fail_before_mutation(brain, family):
     config = MaintenanceConfig(max_records=1)

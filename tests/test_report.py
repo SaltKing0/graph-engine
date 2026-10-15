@@ -67,6 +67,16 @@ def test_report_empty_brain_valid_and_zeroed():
         _teardown(eng)
 
 
+def test_report_with_no_usable_vectors_is_read_only(tmp_path):
+    brain = Brain(str(tmp_path / "brain"), mode="local")
+    brain.write_node(Node("alpha", id="a"))
+    for contents in ('{}\n', '{"id": "a", "vec": []}\n', ''):
+        brain.vectors_file.write_text(contents, encoding="utf-8")
+        assert report_data(brain, full_near_dup=True)["hygiene"]["near_dup_pairs"] == 0
+        assert "## Hygiene" in render_report(brain)
+        assert brain.vectors_file.read_text(encoding="utf-8") == contents
+
+
 def test_md_cell_truncates_first_then_escapes():
     # Audit #55 order: truncate FIRST, then escape. A pipe AFTER char 60
     # must be cut away, not escaped; a pipe WITHIN the first 60 chars
