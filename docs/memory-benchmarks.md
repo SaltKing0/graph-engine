@@ -1,5 +1,9 @@
 # Memory answer-quality experiments
 
+Decision Memory has a separate [frozen project-corpus baseline](decision-evaluation.md)
+with chronological source availability and isolated impact labels. Its real
+annotations await independent review; synthetic control scores stay separate.
+
 Run this separate source-checkout tool alongside the deterministic engine
 oracles in `graph_engine/evals.py`. Those regression gates remain unchanged.
 The bundled `de-en-memory-v1.0.0` dataset contains 26 synthetic conversation

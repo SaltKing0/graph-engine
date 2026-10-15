@@ -1,0 +1,1 @@
+SYNTHETIC UPDATE: Observation X2 at 2026-01-04: recall=0.8 fraction; workload W; environment E; code C; corpus H; protocol P. Observation X1 at 2026-01-01 had the same value and conditions.

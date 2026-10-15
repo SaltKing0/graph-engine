@@ -1,0 +1,96 @@
+diff --git a/graph_engine/dream.py b/graph_engine/dream.py
+index 2e55533..7f601c2 100644
+--- a/graph_engine/dream.py
++++ b/graph_engine/dream.py
+@@ -338,6 +338,24 @@ def _summary_ids(brain: Brain) -> set[str]:
+             if SUMMARY_TAG in n.tags or PROPOSAL_TAG in n.tags}
+ 
+ 
++def _suppressed_summary_members(nodes: dict[str, Node], edges: list[Edge]) -> set[str]:
++    """Forget suppresses the recorded source lineage, even after repartitioning.
++
++    Any overlap blocks a new abstraction until the operator explicitly restores
++    the forgotten summary. Legacy summaries lack derived_from; their saved
++    consolidator links retain at least the linked members, regardless of review
++    or validity state. Never infer suppression from ordinary forgotten notes.
++    """
++    forgotten = {n.id for n in nodes.values()
++                 if n.status == "tombstone" and SUMMARY_TAG in n.tags}
++    members = {member for nid in forgotten for member in nodes[nid].derived_from}
++    for edge in edges:
++        if (edge.source in forgotten and edge.origin == "consolidator"
++                and edge.kind == "extends"):
++            members.add(edge.target)
++    return members
++
++
+ @write_operation
+ def distill(brain: Brain, *, min_size: int = DREAM_MIN_COMMUNITY,
+             limit: int = DREAM_MAX_DISTILL, members_per_summary: int = DREAM_MEMBERS_PER_SUMMARY,
+@@ -352,7 +370,11 @@ def distill(brain: Brain, *, min_size: int = DREAM_MIN_COMMUNITY,
+     evidence the extractive path uses.
+ 
+     Idempotent: the summary id is derived from the member set, so a second pass
+-    over an unchanged community finds the node and skips it. Summary nodes are
++    over an unchanged community finds the node (including tombstones) and skips
++    it. Forgotten summaries also suppress any community sharing their recorded
++    members; a changed partition cannot undo forgetting. Only an explicit
++    operator restore clears this lineage suppression. Saved link decisions and
++    provenance are never replaced with fresh accepted links. Summary nodes are
+     `status="active"` (a distillation is a deliberate consolidation act) and
+     carry the `community-summary` tag; their edges are `origin="consolidator"`.
+     """
+@@ -360,8 +382,12 @@ def distill(brain: Brain, *, min_size: int = DREAM_MIN_COMMUNITY,
+     if not dry_run and commit:
+         brain.ensure_ready()
+         brain.pull()
+-    nodes = {n.id: n for n in brain.read_nodes() if n.status != "tombstone"}
+-    edges = [e for e in brain.read_edges(include_rejected=True)
++    saved_nodes = {n.id: n for n in brain.read_nodes()}
++    nodes = {nid: n for nid, n in saved_nodes.items() if n.status != "tombstone"}
++    saved_edges = brain.read_edges(include_rejected=True)
++    suppressed_members = _suppressed_summary_members(saved_nodes, saved_edges)
++    saved_links = {(e.source, e.target, e.kind) for e in saved_edges}
++    edges = [e for e in saved_edges
+              if not e.pending and not e.rejected and e.is_current]
+     degree: collections.Counter = collections.Counter()
+     for e in edges:
+@@ -379,25 +405,29 @@ def distill(brain: Brain, *, min_size: int = DREAM_MIN_COMMUNITY,
+         if not members:
+             continue
+         summary_id = _summary_id(members)
+-        if summary_id in nodes:
+-            continue  # already distilled (idempotent)
++        if summary_id in saved_nodes or suppressed_members.intersection(members):
++            continue  # Existing identity or explicitly suppressed source lineage.
+         digest = _community_digest(brain, members, nodes, degree, edges, community.label)
+         text = summarizer(digest) if summarizer is not None else digest
+         summaries += 1
+         if dry_run:
+             continue
+-        brain.write_node(Node(id=summary_id, text=text, source="consolidator",
+-                              tags=[SUMMARY_TAG], ntype="semantic", status="active",
+-                              derived_from=members))
+-        nodes[summary_id] = Node(id=summary_id, text=text)
++        summary = Node(id=summary_id, text=text, source="consolidator",
++                       tags=[SUMMARY_TAG], ntype="semantic", status="active",
++                       derived_from=members)
++        brain.write_node(summary)
++        saved_nodes[summary_id] = summary
++        nodes[summary_id] = summary
+         strongest = sorted(members, key=lambda m: (-degree.get(m, 0), m))[:members_per_summary]
+         for member in strongest:
++            if (summary_id, member, "extends") in saved_links:
++                continue  # Preserve even pending/rejected/invalidated history.
+             new_edges.append(Edge(source=summary_id, target=member, kind="extends",
+                                   pending=False, origin="consolidator"))
+ 
+-    if new_edges and not dry_run:
+-        all_edges = brain.read_edges(include_rejected=True) + new_edges
+-        brain.write_edges(all_edges)
++    if summaries and not dry_run:
++        if new_edges:
++            brain.write_edges(saved_edges + new_edges)
+         brain.rebuild_index()
+         if commit:
+             brain.commit_and_push(

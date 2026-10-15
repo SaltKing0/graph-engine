@@ -35,10 +35,16 @@ jobs:
         run: >-
           python -m tools.memory_benchmark --smoke --check
           --output "${{ runner.temp }}/memory-smoke.json"
+      - name: Offline Decision Memory harness integrity
+        run: >-
+          python -m tools.decision_benchmark --split all --check
+          --output "${{ runner.temp }}/decision-controls.json"
       - uses: actions/upload-artifact@v4
         with:
           name: memory-smoke-${{ matrix.python-version }}
-          path: ${{ runner.temp }}/memory-smoke.json
+          path: |
+            ${{ runner.temp }}/memory-smoke.json
+            ${{ runner.temp }}/decision-controls.json
 
   # The [st] extra path: real sentence-transformers embedder. Keeps the
   # embedder-dependent tests (model override, demo near-dup measurement)

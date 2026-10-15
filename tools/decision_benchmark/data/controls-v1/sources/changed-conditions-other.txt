@@ -1,0 +1,1 @@
+SYNTHETIC: Choose UI color blue based on the palette source. No dependency on mode A.

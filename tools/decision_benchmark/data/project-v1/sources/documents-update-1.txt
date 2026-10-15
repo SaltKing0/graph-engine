@@ -1,0 +1,45 @@
+diff --git a/graph_engine/document_import.py b/graph_engine/document_import.py
+index 14ae6b1..90b91c2 100644
+--- a/graph_engine/document_import.py
++++ b/graph_engine/document_import.py
+@@ -261,6 +261,7 @@ def import_documents(brain: Brain, paths: Iterable[str | Path], *,
+                 if not dry_run and chunks:
+                     brain.ensure_ready()
+                     brain.pull()
++                repaired_index = False
+                 for index, chunk in enumerate(chunks, 1):
+                     provenance = dict(version=1, source_id=identifier, content_sha256=digest,
+                         chunk_index=index, chunk_count=len(chunks), chunk_chars=chunk_chars,
+@@ -275,11 +276,18 @@ def import_documents(brain: Brain, paths: Iterable[str | Path], *,
+                     stored_path = brain.node_path(nid)
+                     if existing is None and (stored_path.exists() or stored_path.is_symlink()):
+                         raise ImportProblem("receipt_unreadable", "Existing receipt cannot be read; refusing overwrite")
+-                    receipt: dict = dict(node_id=nid, provenance=provenance)
+-                    row["chunks"].append(receipt)
+                     if existing is not None:
+                         if existing.document != provenance:
+                             raise ImportProblem("receipt_conflict", "Receipt ID belongs to different metadata; refusing overwrite")
++                        capture = existing.capture
++                        if (capture is None or capture["input"] != chunk.text
++                                or capture["source"] != "document"
++                                or not capture["node_id"]
++                                or capture["duplicate"] != (capture["node_id"] != nid)):
++                            raise ImportProblem("receipt_conflict", "Capture receipt conflicts with original input or linkage; refusing reuse")
++                    receipt: dict = dict(node_id=nid, provenance=provenance)
++                    row["chunks"].append(receipt)
++                    if existing is not None:
+                         receipt.update(status="tombstone" if existing.status == "tombstone" else "reused",
+                             edited=existing.text != chunk.text.strip())
+                     elif dry_run:
+@@ -305,6 +313,11 @@ def import_documents(brain: Brain, paths: Iterable[str | Path], *,
+                             continue
+                         # Finish a prior failed commit without rewriting any note.
+                         if receipt["status"] == "reused":
++                            # The node may have landed before an index write failed.
++                            # Repair derived state once per file before syncing it.
++                            if not repaired_index:
++                                brain.rebuild_index()
++                                repaired_index = True
+                             brain.commit_and_push(f"import receipt: {nid}", sync_pending=True)
+                         if extraction:
+                             try:

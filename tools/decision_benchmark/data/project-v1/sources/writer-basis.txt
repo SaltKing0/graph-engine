@@ -1,0 +1,104 @@
+## Local writer coordination
+
+CLI, HTTP and MCP use `Brain.write_guard()` for a complete mutation, from its
+first read through filesystem writes, index/report generation, and any Git
+pull/commit/push. This is enabled in both `git` and `local` mode. The guard
+coordinates processes using **the same brain directory on the same machine**;
+it does not coordinate separate clones or remote machines.
+
+| Mutation family | Guarded boundary |
+|---|---|
+| Init/clone and demo seeding | Storage init/clone; complete CLI init command |
+| Ingest, capture, observe, extract | Engine operation; capture retains the guard across its two commits |
+| Entity/fact extraction | Complete extraction plan, validation and write |
+| Review, undo, manual links and bulk acceptance | Read/decision/write/commit chain |
+| Manual merge and engine consolidation/demotion | Complete mutation, including index/vector updates |
+| Episodic consolidation and dream refresh/distill/lifecycle | Whole pass; combined CLI dream actions also hold one outer guard |
+| Tier and feedback changes | Read/modify/write/commit chain |
+| Recall tracking | Both ledger append and aggregation/rotation; append cannot race with truncation |
+| Persisted vector fill and saved reports | Cache read/fill/write; report render/write; CLI report includes pull and commit |
+| Trusted origin/kind migrations | Entire read/rewrite (including backup and any commit) |
+
+The canonical identity resolves relative paths, `..`, `~` and symlinks.
+On macOS and Windows it also conservatively folds case and Unicode spelling.
+Do not retarget directories/symlinks while writers run. Bind-mount aliases and
+hard-linked record layouts are outside this identity contract.
+
+Lock ordering is the existing process-wide thread `RLock` first, then the
+per-brain OS lock. Calls on the same thread are reentrant, including another
+`Brain` or `SecuredBrain` for the same directory; nested calls reuse the held
+file descriptor. Nesting writes to different brains is rejected. The existing
+`BRAIN_LOCK` alias is a thread lock only: custom writers must use the shared
+guard instead. Process-wide thread serialization remains in place, so a busy
+write can also delay another brain in the same process.
+
+`IG_WRITE_LOCK_TIMEOUT` bounds acquisition of both locks, with a default of
+30 seconds and a finite allowed range of 0–3600. It does not bound the operation
+itself, model execution or Git network commands. A timeout makes no brain
+changes and asks the CLI/MCP caller to wait and retry or increase the limit.
+HTTP returns `503` and `Retry-After: 1`, without exposing the local brain path.
+
+The permanent `.graph-engine-write-<identity hash>.lock` file sits **beside**
+the brain, outside its working tree, so brain commits never contain it. The
+parent directory must be writable by the trusted OS account; all cooperating
+writers should run as that account. Do not remove the file: deletion can split
+writers across different lock inodes. Kernel locks release on normal exit or
+process death; an existing file does not mean a writer is active. On POSIX,
+Git children inherit the held descriptor so killing their Python parent does
+not admit another writer while Git is still changing the repository. Other
+subprocesses do not inherit it; forked Python children discard inherited guard
+state and acquire their own lock.
+
+**Platforms/filesystems:** local Linux/macOS filesystems with working advisory
+`flock` are supported and covered by separate-process tests. Windows uses
+stdlib byte-range locks, but parent-death coordination with a surviving Git
+child is not provided there; use one writer and allow Git to finish before
+recovery on Windows. Windows paths are not exercised by the Linux/macOS test
+suite. Do not rely on this guard for NFS/SMB/cloud-synced folders or other
+filesystems whose locking/atomic replacement semantics differ. Use one writer
+where filesystem locking is unsupported, for older engine versions, external
+editors/Git commands, or custom scripts that bypass the contract.
+
+**Crashes and sync failures:** this is serialization, not rollback or a
+multi-file transaction. A crash can leave complete atomic files from an
+unfinished operation on disk; inspect `git status`/`git log`, rebuild derived
+artifacts and commit or repair before resuming. If an abruptly killed Git
+command leaves its own `index.lock`, inspect for live Git processes before
+repairing that Git artifact; it is separate from the writer guard. A failed
+pull stops the operation before mutation. A failed push leaves the successful
+local commit intact; retry sync after fixing credentials/connectivity or
+resolving a real remote conflict. Local edits/commits are never silently reset.
+Separate machines can still conflict on JSONL or node edits, and the guard
+makes no promise of automatic distributed merging.
+
+**Reads:** ordinary graph/search/report reads stay unlocked and can observe
+pieces of different points in a multi-file batch. Strictly read-only MCP paths
+still do not fill vectors, record recalls or acquire/create writer artifacts.
+For a consistent local read/copy, a trusted caller can hold the same guard
+while reading or copying all relevant files; a versioned Git snapshot or an
+offline copy is needed for independent stable reads. Advisory write locking
+alone does not turn live reads into snapshots.
+
+Custom Python batches must hold the guard from the first read through their
+final sync. Low-level `write_node`/`write_edges`/`write_vectors` guard their own
+writes, but cannot repair a stale object read before acquisition. Likewise,
+`commit=False` calls release at return; callers batching them must add an outer
+guard:
+
+```python
+with brain.write_guard():
+    brain.ensure_ready()
+    brain.pull()
+    node = brain.read_node(node_id)
+    node.tags.append("reviewed")
+    brain.write_node(node)
+    brain.rebuild_index()
+    brain.commit_and_push("tag: reviewed")
+```
+
+Source-checkout cycle scripts invoke guarded CLI operations one at a time.
+Their preflight copies and external metrics are not one guarded transaction;
+run one cycle when its decision must use a stable copy, or coordinate the copy
+explicitly. Access-policy/audit files and persisted namespace selection are
+also outside the brain storage guard.
+

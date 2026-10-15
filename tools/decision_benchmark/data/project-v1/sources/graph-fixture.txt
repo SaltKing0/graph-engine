@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "version": "graph-expansion-de-en-v1.0.0",
+  "provenance": {
+    "description": "Synthetic source-declared relationships for graph on/off diagnostics; no extraction or entailment evaluation."
+  },
+  "conversations": [
+    {
+      "id": "en",
+      "turns": [
+        {
+          "id": "en-0",
+          "date": "2026-01-01T00:00:00Z",
+          "role": "user",
+          "text": "launch schedule belongs to project Cedar"
+        },
+        {
+          "id": "en-1",
+          "date": "2026-01-01T00:00:00Z",
+          "role": "user",
+          "text": "launch distraction about an unrelated delivery"
+        },
+        {
+          "id": "en-2",
+          "date": "2026-01-01T00:00:00Z",
+          "role": "user",
+          "text": "Cedar is the Oslo office project"
+        },
+        {
+          "id": "en-3",
+          "date": "2026-01-01T00:00:00Z",
+          "role": "user",
+          "text": "Oslo office opens on Tuesday"
+        },
+        {
+          "id": "en-4",
+          "date": "2026-01-01T00:00:00Z",
+          "role": "user",
+          "text": "Saffron is an unrelated grocery item"
+        }
+      ],
+      "relationships": [
+        {
+          "id": "en-seed-project",
+          "source": "en-0",
+          "target": "en-2",
+          "kind": "linked",
+          "evidence_ids": [
+            "en-0"
+          ]
+        },
+        {
+          "id": "en-project-office",
+          "source": "en-2",
+          "target": "en-3",
+          "kind": "linked",
+          "evidence_ids": [
+            "en-2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "de",
+      "turns": [
+        {
+          "id": "de-0",
+          "date": "2026-01-01T00:00:00Z",
+          "role": "user",
+          "text": "startsignal gehört zum Projekt Zeder"
+        },
+        {
+          "id": "de-1",
+          "date": "2026-01-01T00:00:00Z",
+          "role": "user",
+          "text": "startsignal betrifft auch eine andere Lieferung"
+        },
+        {
+          "id": "de-2",
+          "date": "2026-01-01T00:00:00Z",
+          "role": "user",
+          "text": "Zeder gehört zum Oslo Büro"
+        },
+        {
+          "id": "de-3",
+          "date": "2026-01-01T00:00:00Z",
+          "role": "user",
+          "text": "Oslo Büro öffnet am Dienstag"
+        },
+        {
+          "id": "de-4",
+          "date": "2026-01-01T00:00:00Z",
+          "role": "user",
+          "text": "Saffron is an unrelated grocery item"
+        }
+      ],
+      "relationships": [
+        {
+          "id": "de-seed-project",
+          "source": "de-0",
+          "target": "de-2",
+          "kind": "linked",
+          "evidence_ids": [
+            "de-0"
+          ]
+        },
+        {
+          "id": "de-project-office",
+          "source": "de-2",
+          "target": "de-3",
+          "kind": "linked",
+          "evidence_ids": [
+            "de-2"
+          ]
+        }
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": "en-two-hop",
+      "conversation_id": "en",
+      "language": "en",
+      "category": "multi-hop",
+      "question": "launch",
+      "answers": [
+        "Tuesday"
+      ],
+      "evidence_ids": [
+        "en-2",
+        "en-3"
+      ],
+      "unanswerable": false
+    },
+    {
+      "id": "en-unanswerable",
+      "conversation_id": "en",
+      "language": "en",
+      "category": "unanswerable",
+      "question": "zxqvnonexistent",
+      "answers": [],
+      "evidence_ids": [],
+      "unanswerable": true
+    },
+    {
+      "id": "de-two-hop",
+      "conversation_id": "de",
+      "language": "de",
+      "category": "multi-hop",
+      "question": "startsignal",
+      "answers": [
+        "Dienstag"
+      ],
+      "evidence_ids": [
+        "de-2",
+        "de-3"
+      ],
+      "unanswerable": false
+    },
+    {
+      "id": "de-unanswerable",
+      "conversation_id": "de",
+      "language": "de",
+      "category": "unanswerable",
+      "question": "zxqvnonexistent",
+      "answers": [],
+      "evidence_ids": [],
+      "unanswerable": true
+    }
+  ]
+}

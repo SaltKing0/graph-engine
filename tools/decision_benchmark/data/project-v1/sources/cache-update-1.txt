@@ -1,0 +1,139 @@
+diff --git a/graph_engine/brain.py b/graph_engine/brain.py
+index 0cfb760..e98be79 100644
+--- a/graph_engine/brain.py
++++ b/graph_engine/brain.py
+@@ -639,10 +639,10 @@ class Brain:
+     def vectors_file(self) -> Path:
+         return self.path / "vectors.jsonl"
+ 
+-    def read_vectors(self) -> dict[str, list[float]]:
++    def _read_vector_records(self) -> dict[str, dict]:
+         if not self.vectors_file.exists():
+             return {}
+-        out: dict[str, list[float]] = {}
++        out: dict[str, dict] = {}
+         for line in self.vectors_file.read_text(encoding="utf-8").splitlines():
+             if not line.strip():
+                 continue
+@@ -655,69 +655,72 @@ class Brain:
+                         or any(not isinstance(value, (int, float)) or isinstance(value, bool)
+                                or not math.isfinite(value) for value in vector)):
+                     continue
+-                out[nid] = vector
++                out[nid] = d
+             except (json.JSONDecodeError, KeyError, TypeError, OverflowError):
+                 continue
+         return out
+ 
++    def read_vectors(self) -> dict[str, list[float]]:
++        """Raw values for maintenance/legacy callers; not a freshness check."""
++        return {nid: entry["vec"] for nid, entry in self._read_vector_records().items()}
++
+     @write_operation
+-    def write_vectors(self, vectors: dict[str, list[float]]) -> None:
+-        content = "".join(
+-            _jsonl_dumps({"id": nid, "vec": vec}) + "\n"
+-            for nid, vec in sorted(vectors.items()))
++    def _write_vector_records(self, records: dict[str, dict]) -> None:
++        content = "".join(_jsonl_dumps(entry) + "\n"
++                          for nid, entry in sorted(records.items()))
+         _atomic_write(self.vectors_file, content)
+ 
+-    # Read-only computed vectors remain in memory across Brain instances.
+-    # Fingerprint node files as well as vectors so new/missing/edited nodes
+-    # cannot be hidden by a previous partial memo. Retrieval supplies the
+-    # model identity; persist modes are separate to preserve writer opt-in.
+-    # At most eight corpora/model combinations are retained.
++    @write_operation
++    def write_vectors(self, vectors: dict[str, list[float]]) -> None:
++        """Legacy bulk rewrite: retain provenance only for unchanged vectors.
++
++        New/changed values without an embedding identity remain legacy entries
++        and will be recomputed by semantic consumers.
++        """
++        old = self._read_vector_records()
++        self._write_vector_records({nid: old[nid] if nid in old and old[nid]["vec"] == vec
++                                    else {"id": nid, "vec": vec}
++                                    for nid, vec in vectors.items()})
++
++    @write_operation
++    def cache_vectors(self, vectors: dict[str, list[float]], *, embedder_key: tuple) -> None:
++        """Save newly computed normalized embeddings, preserving other records."""
++        from .vector_cache import model_key, record
++        key = model_key(None, embedder_key)
++        nodes = {n.id: n for n in self.read_nodes()}
++        entries = self._read_vector_records()
++        entries.update((nid, record(nid, nodes[nid].text, vec, key))
++                       for nid, vec in vectors.items() if nid in nodes)
++        self._write_vector_records(entries)
++
++    # Only validated requested records enter the process-local memo. Protected
++    # stores use the same compatibility check without this unscoped memo.
+     _VECTOR_MEMO: dict = {}
+ 
+     def vectors_for(self, node_ids: set[str], embed_fn, batch_fn=None,
+                     persist: bool = True, *, embedder_key: tuple | None = None) -> dict[str, list[float]]:
+-        """Vectors from cache; missing ones are computed and — unless
+-        `persist=False` — stored. Audit #4: reads nodes/vectors ONCE up front
+-        instead of per missing ID. Audit #60: when batch_fn is provided, all
+-        missing nodes are embedded in ONE batch call instead of N sequential
+-        embed_fn calls (sentence-transformers encodes lists natively).
+-        `persist=False` (report #1) is the strictly read-only path for the MCP
+-        server: nothing is written to vectors.jsonl (a cold-cache write into
+-        the private repo would dirty it and churn the cron rebase); results
+-        are memoized in-process instead so the NEXT search is warm."""
++        """Recompute legacy/stale vectors; read-only calls never change files."""
++        from .search_index import corpus_stamp
++        from .vector_cache import model_key, refresh
+         with self.write_guard() if persist else nullcontext():
+-            from .search_index import corpus_stamp
+-            memo_key = (str(self.path), corpus_stamp(self.path), embedder_key, persist)
+-            memo = Brain._VECTOR_MEMO.get(memo_key)
+-            if memo is not None and node_ids <= memo.keys():
+-                return {nid: v for nid, v in memo.items() if nid in node_ids}
++            key = model_key(embed_fn, embedder_key)
++            initial_stamp = corpus_stamp(self.path)
++            memo_key = (str(self.path), initial_stamp, key, persist)
++            memo = Brain._VECTOR_MEMO.get(memo_key, {})
++            if node_ids <= memo.keys():
++                return {nid: memo[nid]["vec"] for nid in node_ids}
+             nodes = {n.id: n for n in self.read_nodes()}
+-            cached = self.read_vectors()
+-            missing = [nid for nid in node_ids if nid not in cached and nid in nodes]
+-            if missing and batch_fn is not None:
+-                vecs = batch_fn([nodes[nid].text for nid in missing])
+-                for nid, vec in zip(missing, vecs):
+-                    cached[nid] = vec
+-                dirty = True
+-            else:
+-                dirty = False
+-                for nid in node_ids:
+-                    if nid not in cached:
+-                        node = nodes.get(nid)
+-                        if node is None:
+-                            continue
+-                        cached[nid] = embed_fn(node.text)
+-                        dirty = True
+-            if dirty and persist:
+-                self.write_vectors(cached)
+-                # The vector stamp changed; memoize under the new writer key.
+-                Brain._VECTOR_MEMO[(str(self.path), corpus_stamp(self.path), embedder_key, persist)] = dict(cached)
+-            elif not persist:
+-                Brain._VECTOR_MEMO[memo_key] = dict(cached)
+-            # Bound retained corpora in a process serving many brains/models.
++            stored = self._read_vector_records()
++            current = refresh({**stored, **memo}, nodes, node_ids, embed_fn, batch_fn, key)
++            if persist and any(stored.get(nid) != entry for nid, entry in current.items()):
++                self._write_vector_records({**stored, **current})
++            final_stamp = corpus_stamp(self.path)
++            if initial_stamp[:2] == final_stamp[:2] and (persist or initial_stamp == final_stamp):
++                memo_key = (str(self.path), final_stamp, key, persist)
++                Brain._VECTOR_MEMO[memo_key] = {**memo, **current}
+             while len(Brain._VECTOR_MEMO) > 8:
+-                Brain._VECTOR_MEMO.pop(next(iter(Brain._VECTOR_MEMO), None), None)
+-            return {nid: v for nid, v in cached.items() if nid in node_ids}
++                Brain._VECTOR_MEMO.pop(next(iter(Brain._VECTOR_MEMO)))
++            return {nid: entry["vec"] for nid, entry in current.items()}
+ 
+     # ---------- Edges ----------
+ 

@@ -1,0 +1,1250 @@
+{
+  "schema": "dm.eval.labels/1",
+  "author": "Codex contract fixture author",
+  "reviewer": null,
+  "disagreements": null,
+  "pairs": {
+    "event-comparable/decision-comparable-basis": {
+      "outcome": "positive",
+      "rationale": "The declared same workload, code, environment and metric now has a contrary result. Review the basis; do not reverse the decision automatically.",
+      "valid_paths": [
+        [
+          "comparable-update",
+          "comparable-basis",
+          "link-comparable-basis",
+          "decision-comparable-basis"
+        ]
+      ],
+      "control": "comparable",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-comparable/decision-comparable-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-comparable/decision-changed-conditions-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-comparable/decision-changed-conditions-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-comparable/decision-time-only-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-comparable/decision-time-only-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-comparable/decision-duplicate-citation-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-comparable/decision-duplicate-citation-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-comparable/decision-surviving-support-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-comparable/decision-surviving-support-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-changed-conditions/decision-comparable-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-changed-conditions/decision-comparable-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-changed-conditions/decision-changed-conditions-basis": {
+      "outcome": "negative",
+      "rationale": "The workload is different and known disjoint. This result cannot oppose the original claim.",
+      "valid_paths": [],
+      "control": "changed-conditions",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-changed-conditions/decision-changed-conditions-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-changed-conditions/decision-time-only-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-changed-conditions/decision-time-only-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-changed-conditions/decision-duplicate-citation-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-changed-conditions/decision-duplicate-citation-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-changed-conditions/decision-surviving-support-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-changed-conditions/decision-surviving-support-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-time-only/decision-comparable-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-time-only/decision-comparable-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-time-only/decision-changed-conditions-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-time-only/decision-changed-conditions-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-time-only/decision-time-only-basis": {
+      "outcome": "negative",
+      "rationale": "A later observation repeats the same value. Time passing alone is not contradictory evidence.",
+      "valid_paths": [],
+      "control": "time-only",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-time-only/decision-time-only-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-time-only/decision-duplicate-citation-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-time-only/decision-duplicate-citation-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-time-only/decision-surviving-support-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-time-only/decision-surviving-support-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-duplicate-citation/decision-comparable-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-duplicate-citation/decision-comparable-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-duplicate-citation/decision-changed-conditions-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-duplicate-citation/decision-changed-conditions-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-duplicate-citation/decision-time-only-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-duplicate-citation/decision-time-only-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-duplicate-citation/decision-duplicate-citation-basis": {
+      "outcome": "negative",
+      "rationale": "The new citation is a copy of the same measurement lineage, not independent support or opposition.",
+      "valid_paths": [],
+      "control": "duplicate-citation",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-duplicate-citation/decision-duplicate-citation-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-duplicate-citation/decision-surviving-support-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-duplicate-citation/decision-surviving-support-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-surviving-support/decision-comparable-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-surviving-support/decision-comparable-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-surviving-support/decision-changed-conditions-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-surviving-support/decision-changed-conditions-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-surviving-support/decision-time-only-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-surviving-support/decision-time-only-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-surviving-support/decision-duplicate-citation-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-surviving-support/decision-duplicate-citation-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-surviving-support/decision-surviving-support-basis": {
+      "outcome": "positive",
+      "rationale": "One support is withdrawn, while a separately recorded independent support survives. Review the changed basis without rejecting the claim.",
+      "valid_paths": [
+        [
+          "surviving-support-update",
+          "surviving-support-basis",
+          "link-surviving-support-basis",
+          "decision-surviving-support-basis"
+        ]
+      ],
+      "control": "surviving-support",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-surviving-support/decision-surviving-support-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-withdrawn/decision-withdrawn-basis": {
+      "outcome": "positive",
+      "rationale": "The sole evidence source was withdrawn. Review the lost basis; withdrawal does not establish falsehood.",
+      "valid_paths": [
+        [
+          "withdrawn-update",
+          "withdrawn-basis",
+          "link-withdrawn-basis",
+          "decision-withdrawn-basis"
+        ]
+      ],
+      "control": "withdrawn",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-withdrawn/decision-withdrawn-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-withdrawn/decision-unknown-comparability-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-withdrawn/decision-unknown-comparability-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-withdrawn/decision-unrelated-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-withdrawn/decision-unrelated-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-withdrawn/decision-no-review-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-withdrawn/decision-no-review-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-withdrawn/decision-unanswerable-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-withdrawn/decision-unanswerable-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unknown-comparability/decision-withdrawn-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unknown-comparability/decision-withdrawn-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unknown-comparability/decision-unknown-comparability-basis": {
+      "outcome": "inconclusive",
+      "rationale": "The update omits the environment and corpus hash. Explicitly report unknown comparability; no opposition is established.",
+      "valid_paths": [
+        [
+          "unknown-comparability-update",
+          "unknown-comparability-basis",
+          "link-unknown-comparability-basis",
+          "decision-unknown-comparability-basis"
+        ]
+      ],
+      "control": "unknown-comparability",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unknown-comparability/decision-unknown-comparability-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unknown-comparability/decision-unrelated-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unknown-comparability/decision-unrelated-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unknown-comparability/decision-no-review-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unknown-comparability/decision-no-review-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unknown-comparability/decision-unanswerable-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unknown-comparability/decision-unanswerable-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unrelated/decision-withdrawn-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unrelated/decision-withdrawn-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unrelated/decision-unknown-comparability-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unrelated/decision-unknown-comparability-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unrelated/decision-unrelated-basis": {
+      "outcome": "negative",
+      "rationale": "The update changes label spacing in a different source with no dependency on this decision.",
+      "valid_paths": [],
+      "control": "unrelated",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unrelated/decision-unrelated-other": {
+      "outcome": "positive",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [
+        [
+          "unrelated-update",
+          "unrelated-other",
+          "link-unrelated-other",
+          "decision-unrelated-other"
+        ]
+      ],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unrelated/decision-no-review-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unrelated/decision-no-review-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unrelated/decision-unanswerable-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unrelated/decision-unanswerable-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-no-review/decision-withdrawn-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-no-review/decision-withdrawn-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-no-review/decision-unknown-comparability-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-no-review/decision-unknown-comparability-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-no-review/decision-unrelated-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-no-review/decision-unrelated-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-no-review/decision-no-review-basis": {
+      "outcome": "negative",
+      "rationale": "A formatting-only source change leaves the exact proposition and conditions unchanged.",
+      "valid_paths": [],
+      "control": "no-review",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-no-review/decision-no-review-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-no-review/decision-unanswerable-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-no-review/decision-unanswerable-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unanswerable/decision-withdrawn-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unanswerable/decision-withdrawn-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unanswerable/decision-unknown-comparability-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unanswerable/decision-unknown-comparability-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unanswerable/decision-unrelated-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unanswerable/decision-unrelated-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unanswerable/decision-no-review-basis": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unanswerable/decision-no-review-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unanswerable/decision-unanswerable-basis": {
+      "outcome": "unanswerable",
+      "rationale": "The artifact contains no result and no recoverable measurement. A review outcome cannot be determined.",
+      "valid_paths": [
+        [
+          "unanswerable-update",
+          "unanswerable-basis",
+          "link-unanswerable-basis",
+          "decision-unanswerable-basis"
+        ]
+      ],
+      "control": "unanswerable",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    },
+    "event-unanswerable/decision-unanswerable-other": {
+      "outcome": "negative",
+      "rationale": "Separate source dependency.",
+      "valid_paths": [],
+      "control": "unrelated-pair",
+      "annotation": {
+        "status": "synthetic-authored",
+        "annotator": "Codex",
+        "reviewer": null,
+        "disagreements": null
+      }
+    }
+  }
+}
