@@ -12,6 +12,22 @@ import hashlib
 from importlib.metadata import PackageNotFoundError, version
 import re
 from pathlib import Path
+from threading import RLock
+from typing import Any
+
+
+def local_model_digest(model_name: str) -> str | None:
+    """Content identity for local weights, tokenizer and module configuration."""
+    path = Path(model_name)
+    if not path.is_dir():
+        return None
+    digest = hashlib.sha256()
+    for file in sorted(p for p in path.rglob("*") if p.is_file()):
+        digest.update(str(file.relative_to(path)).encode())
+        digest.update(b"\0")
+        with file.open("rb") as stream:
+            digest.update(hashlib.file_digest(stream, "sha256").digest())
+    return digest.hexdigest()
 
 
 class Embedder:
@@ -21,25 +37,23 @@ class Embedder:
         self.model_name = model_name
         self.revision = revision
         self._model = None
+        self._model_lock = RLock()
 
-    def _ensure_model(self):
+    def _ensure_model(self) -> Any:
+        with self._model_lock:
+            return self._load_model()
+
+    def _load_model(self) -> Any:
         requested = (self.model_name, self.revision)
         if self._model is None or getattr(self, "_loaded_source", requested) != requested:
             from sentence_transformers import SentenceTransformer
             # Capture local source identity at load time, rather than blessing
             # already-loaded weights with files replaced after loading.
-            path = Path(self.model_name)
-            digest = hashlib.sha256() if path.is_dir() else None
-            if digest is not None:
-                for file in sorted(p for p in path.rglob("*") if p.is_file()):
-                    digest.update(str(file.relative_to(path)).encode())
-                    digest.update(b"\0")
-                    with file.open("rb") as stream:
-                        digest.update(hashlib.file_digest(stream, "sha256").digest())
+            digest = local_model_digest(self.model_name)
             options = {"revision": self.revision} if self.revision is not None else {}
             self._model = SentenceTransformer(self.model_name, trust_remote_code=False, **options)
             self._loaded_source = requested
-            self._loaded_digest = digest.hexdigest() if digest is not None else None
+            self._loaded_digest = digest
         return self._model
 
     def vector_cache_key(self) -> dict:
@@ -73,12 +87,14 @@ class Embedder:
                     truncate_dim=getattr(model, "truncate_dim", None), normalization=1)
 
     def embed(self, text: str) -> list[float]:
-        model = self._ensure_model()
-        return model.encode(text).tolist()
+        with self._model_lock:
+            model = self._ensure_model()
+            return model.encode(text).tolist()
 
     def embed_batch(self, texts: list[str]) -> list[list[float]]:
-        model = self._ensure_model()
-        return model.encode(texts).tolist()
+        with self._model_lock:
+            model = self._ensure_model()
+            return model.encode(texts).tolist()
 
 
 class HashEmbedder:
@@ -106,7 +122,8 @@ class HashEmbedder:
         return [self.embed(t) for t in texts]
 
 
-def get_embedder(name: str = "st", model: str | None = None) -> Embedder | HashEmbedder:
+def get_embedder(name: str = "st", model: str | None = None, *,
+                 revision: str | None = None) -> Embedder | HashEmbedder:
     """Audit #60: model override is honored (default: all-MiniLM-L6-v2).
 
     'st' degrades gracefully when sentence-transformers is not installed
@@ -129,4 +146,4 @@ def get_embedder(name: str = "st", model: str | None = None) -> Embedder | HashE
             file=sys.stderr,
         )
         return HashEmbedder()
-    return Embedder(model or "all-MiniLM-L6-v2")
+    return Embedder(model or "all-MiniLM-L6-v2", revision=revision)

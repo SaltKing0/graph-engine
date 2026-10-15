@@ -7,6 +7,10 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Fixed
+- Reuse embedding and reranking model adapters across protected requests while
+  keeping each authorized brain and corpus view fresh. Bound process caches,
+  serialize model loading/inference, and include model revisions and local
+  file contents in resource identity (issue #55).
 - Filter `when` queries by creation time before hybrid scoring and candidate
   limits, so newer matches cannot crowd out eligible memories. Keep temporal
   retrieval read-only with no vector persistence or recall tracking, while

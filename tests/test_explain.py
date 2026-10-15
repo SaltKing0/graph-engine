@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from unittest.mock import Mock
+from threading import Lock
 
 import numpy as np
 import pytest
@@ -103,6 +104,7 @@ def test_negative_dense_score_keeps_actual_fusion_rank_for_bm25_match(engine):
 def cross_encoder(engine):
     # Exercise the production class without importing ST or loading a model.
     reranker = CrossEncoderReranker.__new__(CrossEncoderReranker)
+    reranker._model_lock = Lock()
     reranker.model = Mock()
     reranker.model.predict.side_effect = lambda pairs, **kwargs: np.array(
         [9.5 if text == "alpha beta" else -3.0 for _, text in pairs], dtype=np.float32)

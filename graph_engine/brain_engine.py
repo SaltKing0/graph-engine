@@ -62,6 +62,14 @@ GRAPH_HOME_ENV = "IG_GRAPH_HOME"
 GRAPH_ENV = "IG_GRAPH"
 ACCESS_POLICY_ENV = "IG_ACCESS_POLICY"
 PRINCIPAL_ENV = "IG_PRINCIPAL"
+EMBEDDER_REVISION_ENV = "IDEAGRAPH_EMBEDDER_REVISION"
+RERANKER_REVISION_ENV = "IDEAGRAPH_RERANKER_REVISION"
+
+
+def model_revisions_from_env() -> tuple[str | None, str | None]:
+    """Optional repository revisions; pin immutable commits for reproducibility."""
+    return (os.environ.get(EMBEDDER_REVISION_ENV) or None,
+            os.environ.get(RERANKER_REVISION_ENV) or None)
 
 
 def graph_access_config_from_env() -> dict[str, str]:
@@ -166,7 +174,8 @@ class BrainEngine:
         self.dedupe_threshold = dedupe_threshold
         self.search_cache_enabled = search_cache_enabled
         # V2#1: optional cross-encoder rerank pass; None/default → no rerank.
-        self.reranker = reranker if reranker is not None else get_reranker()
+        self.reranker = (None if reranker is False else
+                         reranker if reranker is not None else get_reranker())
 
     def clear_search_cache(self) -> None:
         """Discard this engine's disposable parsed/lexical/dense snapshot."""

@@ -37,6 +37,11 @@ no model download. For semantic search, install `python -m pip install -e ".[st]
 and set `IDEAGRAPH_EMBEDDER=st` before starting a fresh brain.
 Embedding and reranker models must use built-in modules: custom Python model
 code is disabled, including for local model directories.
+Long-running processes reuse embedding and reranker models across requests,
+including protected requests; authorized brains and corpus reads stay separate.
+Use `IDEAGRAPH_EMBEDDER_REVISION` and `IDEAGRAPH_RERANKER_REVISION` to pin model
+repository revisions (prefer immutable commit SHAs). See the
+[environment reference](docs/guide.md#configuration) for model options.
 
 Browser realtime connections use a same-origin policy: `/ws` checks the page's
 scheme, hostname and port before accepting. Native clients may omit `Origin`;
