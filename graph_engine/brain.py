@@ -73,9 +73,10 @@ class Node:
             validate_provenance(document)
         self.document = document
         if capture is not None and (not isinstance(capture, dict)
-                or set(capture) != {"input", "node_id", "duplicate", "source"}
+                or set(capture) - {"ingest_incomplete"} != {"input", "node_id", "duplicate", "source"}
                 or not all(isinstance(capture[k], str) for k in ("input", "node_id", "source"))
-                or not isinstance(capture["duplicate"], bool)):
+                or not isinstance(capture["duplicate"], bool)
+                or not isinstance(capture.get("ingest_incomplete", False), bool)):
             raise ValueError("Invalid capture receipt")
         self.capture = capture
         if storage_tier not in STORAGE_TIERS:

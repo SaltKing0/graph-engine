@@ -59,6 +59,25 @@ def test_unicode_locations_and_metadata_roundtrip(brain, tmp_path):
     assert file["source_id"] == 'custom, [source]\n---\nid: hostile\u2028'
 
 
+def test_import_retry_cannot_skip_unfinished_engine_ingest(brain, tmp_path, monkeypatch):
+    path = write(tmp_path)
+    engine = BrainEngine(brain, HashEmbedder())
+    def fail(*args, **kwargs):
+        raise RuntimeError('vector storage unavailable')
+    with monkeypatch.context() as failed:
+        failed.setattr(brain, 'write_vectors', fail)
+        result = import_documents(brain, [path], engine=engine, extraction='rules')
+    assert result['files'][0]['status'] == 'partial'
+    receipt_id = result['files'][0]['chunks'][0]['node_id']
+    assert brain.read_node(receipt_id).capture['ingest_incomplete']
+    before = snapshot(brain)
+    retry = import_documents(brain, [path], engine=engine, extraction='rules')
+    assert retry['files'][0]['status'] == 'partial'
+    assert retry['files'][0]['error'] == 'ingest_incomplete'
+    assert snapshot(brain) == before
+    assert not any(n.ntype == 'entity' for n in brain.read_nodes())
+
+
 @pytest.mark.parametrize("limit", [1, 2, 10, 40, 100])
 def test_chunk_hard_bound_and_complete_non_whitespace(limit):
     text = "# Heading\n\n" + "abc世界" * 40 + "\n\n## Next\n" + "sentence words. " * 20

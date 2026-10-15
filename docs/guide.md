@@ -612,9 +612,15 @@ Unexpected failures after saving a note raise Python `IngestPartialError`
 HTTP returns these fields with 502; CLI exits 1 and includes them with `--json`;
 MCP returns them with `ok: false` and error code `ingest_incomplete`.
 Backend diagnostics are omitted from these responses. A non-null
-`source_node_id` identifies an exact-input receipt: retry the identical input
-with extraction enabled to resume. Without a receipt, `retryable` is false;
-inspect the stored note and local Git state before deciding how to finish.
+`source_node_id` identifies an exact-input receipt. When `retryable` is true,
+retry the identical input with extraction enabled to resume. A receipt saved
+before ingest finishes carries `capture.ingest_incomplete: true`; failures in
+vectors, relations, evolution or index writes require manual recovery and
+return `retryable: false`, even with a receipt. Capture and document-import
+retries refuse to skip that unfinished ingest. Inspect and repair the stored
+note, relations, vectors, index and local Git state before removing that marker.
+Without a receipt, `retryable` is also false. Commit or push failures after
+ingest finishes remain retryable.
 This reports saved data explicitly; it does not roll back storage or Git sync.
 
 Capture and extraction use **two commits**, under one shared local writer guard:

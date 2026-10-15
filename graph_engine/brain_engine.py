@@ -127,19 +127,21 @@ class IngestPartialError(RuntimeError):
     """Ingest failed after saving a note; never represent this as rejection."""
 
     def __init__(self, node_id: str, source_node_id: str | None, duplicate: bool,
-                 cause: Exception):
+                 cause: Exception, *, retryable: bool = False):
         self.node_id = node_id
         self.source_node_id = source_node_id
         self.duplicate = duplicate
+        self.retryable = retryable
         super().__init__(f"Note {node_id} was saved, but ingest did not finish: {cause}")
 
     def to_dict(self) -> dict:
         # Do not expose backend exceptions (which may contain private paths/text).
         return dict(error="ingest_incomplete", captured=True, node_id=self.node_id,
                     source_node_id=self.source_node_id, duplicate=self.duplicate,
-                    retryable=self.source_node_id is not None,
+                    retryable=self.retryable,
                     message="Note saved; ingest incomplete. Inspect local state and Git sync. "
-                            "With a capture receipt, retry identical input to resume extraction.")
+                            + ("Retry identical input to resume extraction." if self.retryable else
+                               "Manual recovery is required before retrying extraction."))
 
 
 def auto_accept_from_env() -> bool:
@@ -306,9 +308,21 @@ class BrainEngine:
             if not isinstance(_capture_input, str):
                 raise ValueError("capture input must be a string")
             node.capture = dict(input=_capture_input, node_id=node.id,
-                                duplicate=False, source=source)
+                                duplicate=False, source=source, ingest_incomplete=True)
         node.to_markdown().encode("utf-8")  # Validate metadata and on-disk encoding.
         return node, floor, intent_cap
+
+    def _complete_capture_ingest(self, receipt: Node | None) -> None:
+        """Only a fully written ingest may be skipped by an extraction retry."""
+        if receipt is None:
+            return
+        incomplete = receipt.capture
+        receipt.capture = {k: v for k, v in incomplete.items() if k != "ingest_incomplete"}
+        try:
+            self.brain.write_node(receipt)
+        except Exception:
+            receipt.capture = incomplete
+            raise
 
     @contextmanager
     def _after_capture(self, node: Node, receipt: Node | None = None,
@@ -321,7 +335,8 @@ class BrainEngine:
             receipt_id = (receipt.id if receipt is not None
                           and self.brain.node_path(receipt.id).is_file() else None)
             raise IngestPartialError(node.id, receipt_id,
-                                     duplicate, exc) from exc
+                                     duplicate, exc, retryable=receipt_id is not None
+                                     and not receipt.capture.get("ingest_incomplete", False)) from exc
 
     def ingest(self, text: str, source: str = "human", tags: list[str] | None = None,
                allow_duplicates: bool = False, ntype: str = "semantic",
@@ -382,6 +397,7 @@ class BrainEngine:
                         if receipt is not None:
                             self.brain.write_node(receipt)
                         self.brain.rebuild_index()
+                        self._complete_capture_ingest(receipt)
                         self.brain.commit_and_push(
                             f"ingest dup of {dup.id[:8]}: {_normalize(text)[:50]}…")
                         return dup, [], True
@@ -484,6 +500,7 @@ class BrainEngine:
                                 self.brain.write_node(target_node)
                                 evolved += 1
                 self.brain.rebuild_index()
+                self._complete_capture_ingest(node if node.capture else None)
                 suffix = f", {evolved} nodes evolved" if evolved else ""
                 self.brain.commit_and_push(
                     f"ingest: {text[:50]}{'…' if len(text) > 50 else ''} (+{len(new_edges)} suggestions{suffix})")
@@ -539,6 +556,9 @@ class BrainEngine:
                 if node is None or node.status == "tombstone":
                     raise ValueError("Captured note is no longer live; retry cannot revive it")
                 self.brain.authorize("write", node.id)
+                if evidence.capture.get("ingest_incomplete", False):
+                    raise IngestPartialError(node.id, evidence.id, evidence.capture["duplicate"],
+                        RuntimeError("Capture ingest requires manual recovery"))
                 edges, duplicate = [], evidence.capture["duplicate"]
             summary = dict(mode=extraction, source_node_id=evidence.id,
                            captured=True, retried=retried)

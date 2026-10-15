@@ -114,17 +114,19 @@ def test_cli_rejected_config_leaves_no_note(engine, monkeypatch, extract):
 
 
 @pytest.mark.parametrize('extraction', [None, 'rules'])
-def test_http_post_capture_failure_has_explicit_receipt(engine, monkeypatch, extraction):
+@pytest.mark.parametrize('stage', ['commit_and_push', 'vectors_for'])
+def test_http_post_capture_failure_has_explicit_receipt(engine, monkeypatch, extraction, stage):
     def fail(*args, **kwargs):
         raise ValueError('private backend diagnostic')
-    monkeypatch.setattr(engine.brain, 'commit_and_push', fail)
+    monkeypatch.setattr(engine.brain, stage, fail)
     with TestClient(app) as client:
-        response = client.post('/api/ingest', json={'text': 'Alice works at Acme.', 'extraction': extraction})
+        response = client.post('/api/ingest', json={'text': 'Alice works at Acme.',
+            'extraction': extraction, 'allow_duplicates': True})
     assert response.status_code == 502
     result = response.json()
     assert result['captured'] and result['error'] == 'ingest_incomplete'
     assert engine.brain.read_node(result['node_id']).text == 'Alice works at Acme.'
-    assert result['retryable'] is (extraction is not None)
+    assert result['retryable'] is (extraction is not None and stage == 'commit_and_push')
     if extraction:
         assert engine.brain.read_node(result['source_node_id']).capture['input'] == 'Alice works at Acme.'
     assert 'private backend' not in response.text
@@ -202,6 +204,69 @@ def test_late_backend_value_error_is_partial_success(engine, monkeypatch):
     with pytest.raises(IngestPartialError) as exc:
         engine.ingest('A saved note', allow_duplicates=True)
     assert engine.brain.read_node(exc.value.node_id).text == 'A saved note'
+
+
+@pytest.mark.parametrize('stage', ['vectors_for', 'add_edge', 'write_vectors',
+                                  'rebuild_index', 'complete_receipt'])
+def test_unfinished_ingest_requires_manual_recovery_on_fresh_engine(engine, monkeypatch, stage):
+    from graph_engine.brain_engine import IngestPartialError
+
+    text = 'Alice works at Acme.'
+    options = dict(extraction='rules', allow_duplicates=True, relations=[('alpha', 'extends')])
+    write_node = engine.brain.write_node
+
+    def fail(*args, **kwargs):
+        raise RuntimeError('private backend diagnostic')
+
+    def fail_complete_receipt(node):
+        if node.capture and not node.capture.get('ingest_incomplete', False):
+            fail()
+        write_node(node)
+
+    with monkeypatch.context() as failed:
+        failed.setattr(engine.brain, 'write_node' if stage == 'complete_receipt' else stage,
+                       fail_complete_receipt if stage == 'complete_receipt' else fail)
+        with pytest.raises(IngestPartialError) as exc:
+            engine.capture(text, **options)
+    receipt = exc.value.to_dict()
+    assert receipt['captured'] and receipt['source_node_id'] and not receipt['retryable']
+    assert 'Manual recovery' in receipt['message'] and 'private backend' not in json.dumps(receipt)
+    saved = engine.brain.read_node(receipt['source_node_id'])
+    assert saved.capture['ingest_incomplete'] is True
+    if stage == 'vectors_for':
+        assert saved.id not in engine.brain.read_vectors()
+        assert not any(e.source == saved.id for e in engine.brain.read_edges())
+
+    # Restoring the backend or restarting cannot turn a receipt into proof
+    # that ingest finished: retry must not skip missing relations/vectors.
+    restarted = BrainEngine(Brain(engine.brain.path), HashEmbedder())
+    commit = Mock(side_effect=AssertionError('must not sync incomplete ingest'))
+    monkeypatch.setattr(restarted.brain, 'commit_and_push', commit)
+    before = snapshot(restarted.brain)
+    with pytest.raises(IngestPartialError) as repeated:
+        restarted.capture(text, **options)
+    assert repeated.value.to_dict() == receipt
+    assert snapshot(restarted.brain) == before
+    assert not any(n.ntype == 'entity' for n in restarted.brain.read_nodes())
+    commit.assert_not_called()
+
+
+def test_duplicate_receipt_index_failure_requires_manual_recovery(engine, monkeypatch):
+    from graph_engine.brain_engine import IngestPartialError
+
+    text = 'Existing alpha note'
+    def fail(*args, **kwargs):
+        raise RuntimeError('index unavailable')
+    with monkeypatch.context() as failed:
+        failed.setattr(engine.brain, 'rebuild_index', fail)
+        with pytest.raises(IngestPartialError) as exc:
+            engine.capture(text, extraction='rules')
+    receipt = exc.value.to_dict()
+    assert receipt['duplicate'] and not receipt['retryable']
+    assert receipt['node_id'] == 'alpha' and receipt['source_node_id'] != 'alpha'
+    assert engine.brain.read_node(receipt['source_node_id']).capture['ingest_incomplete']
+    with pytest.raises(IngestPartialError):
+        engine.capture(text, extraction='rules')
 
 
 def test_mcp_validation_and_post_capture_receipt(engine, monkeypatch):
