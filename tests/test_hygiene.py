@@ -60,11 +60,14 @@ def test_consolidate_promotes_distinct_probation(tmp_path):
     assert {n.status for n in eng.brain.read_nodes()} == {"active"}
 
 
-def test_consolidate_dedups_cross_probation(tmp_path):
+def test_consolidate_dedups_cross_probation(tmp_path, monkeypatch):
     # Two nearly identical nodes coexist (allow_duplicates) → both probation.
     # Consolidate must DEDUPE them (not merge): one promoted,
     # the duplicate becomes tombstoned.
     eng = make_engine(tmp_path)
+    # Keep identical source text: accepted similarity annotations would change
+    # the first node's content and correctly invalidate its vector.
+    monkeypatch.setattr("graph_engine.brain_engine.suggest", lambda *args: [])
     eng.ingest("katze hund tier futter", source="a")
     eng.ingest("katze hund tier futter", source="b", allow_duplicates=True)
     assert len(eng.brain.read_nodes()) == 2

@@ -206,7 +206,7 @@ def test_late_backend_value_error_is_partial_success(engine, monkeypatch):
     assert engine.brain.read_node(exc.value.node_id).text == 'A saved note'
 
 
-@pytest.mark.parametrize('stage', ['vectors_for', 'add_edge', 'write_vectors',
+@pytest.mark.parametrize('stage', ['vectors_for', 'add_edge', 'cache_vectors',
                                   'rebuild_index', 'complete_receipt'])
 def test_unfinished_ingest_requires_manual_recovery_on_fresh_engine(engine, monkeypatch, stage):
     from graph_engine.brain_engine import IngestPartialError

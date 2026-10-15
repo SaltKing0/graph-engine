@@ -11,6 +11,7 @@ import sys
 import math
 from contextlib import contextmanager
 from collections.abc import Iterator
+from .vector_cache import model_identity
 from .write_guard import THREAD_LOCK
 from typing import TYPE_CHECKING
 
@@ -180,8 +181,9 @@ class BrainEngine:
                     and self.brain.can_access("write", n.id)}
         vectors = self.brain.vectors_for(
             node_ids,
-            lambda t: self.embedder.embed(_normalize(t)),
-            batch_fn=lambda ts: self.embedder.embed_batch([_normalize(t) for t in ts]),
+            self.embedder.embed,
+            batch_fn=getattr(self.embedder, "embed_batch", None),
+            embedder_key=model_identity(self.embedder),
         )
         best: tuple[float, str] | None = None
         for nid, v in vectors.items():
@@ -220,7 +222,7 @@ class BrainEngine:
                         or "consolidation-proposal" in pn.tags):
                     continue
                 pvec = self.brain.vectors_for(
-                    {pn.id}, lambda t: self.embedder.embed(_normalize(t))
+                    {pn.id}, self.embedder.embed, embedder_key=model_identity(self.embedder)
                 ).get(pn.id)
                 dup = self._find_duplicate(pvec, exclude_id=pn.id) if pvec and pn.id not in protected else None
                 if dup is not None and dup.status != "tombstone":
@@ -403,14 +405,15 @@ class BrainEngine:
                         return dup, [], True
             self.brain.write_node(node)
             with self._after_capture(node, node if node.capture else None):
-                # Embedding cache: only new nodes get embedded, the rest comes from vectors.jsonl
+                # Reuse compatible vectors and refresh changed text/models.
                 others = {n.id for n in self.brain.read_nodes()
                           if n.id != node.id and n.ntype != "entity"
                           and self.brain.can_access("write", n.id)}
                 candidates = self.brain.vectors_for(
                     others,
-                    lambda t: self.embedder.embed(_normalize(t)),
-                    batch_fn=lambda ts: self.embedder.embed_batch([_normalize(t) for t in ts]),
+                    self.embedder.embed,
+                    batch_fn=getattr(self.embedder, "embed_batch", None),
+                    embedder_key=model_identity(self.embedder),
                 )
                 # V2#3 intent edges + admit rule: the new node enters with its relations.
                 # Intent edges are pending=False (auto-accepted), so they must
@@ -465,9 +468,7 @@ class BrainEngine:
                 for e in new_edges:
                     self.brain.add_edge(e)
                 # Cache the new node's vector
-                cached = self.brain.read_vectors()
-                cached[node.id] = vec
-                self.brain.write_vectors(cached)
+                self.brain.cache_vectors({node.id: vec}, embedder_key=model_identity(self.embedder))
                 # Memory evolution (A-Mem lesson): strong new connection (similar,
                 # auto-accepted via confidence band OR env) → enrich related old
                 # nodes with a cross-reference.

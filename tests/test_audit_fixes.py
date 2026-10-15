@@ -865,3 +865,45 @@ def test_get_embedder_fallback_notice_goes_to_stderr_not_stdout(monkeypatch, cap
     captured = capsys.readouterr()
     assert "sentence-transformers is not installed" in captured.err
     assert captured.out == ""
+
+
+def test_ingest_dedup_recomputes_persisted_vector_after_external_edit(tmp_path):
+    engine = make_engine(tmp_path)
+    old, _, _ = engine.ingest('alpha', source='test')
+    path = engine.brain.node_path(old.id)
+    path.write_text(path.read_text().replace('alpha', 'omega'))
+    # Reusing the alpha vector here would merge into an unrelated omega note.
+    new, _, duplicate = engine.ingest('alpha', source='test')
+    assert not duplicate and new.id != old.id
+    assert engine.brain.read_vectors()[old.id] == engine.embedder.embed('omega')
+
+
+def test_enrichment_and_merge_vectors_follow_current_text(tmp_path):
+    from graph_engine.merge import merge_nodes
+    from graph_engine.vector_cache import normalize_text, model_identity, compatible, model_key
+    engine = make_engine(tmp_path)
+    first, _, _ = engine.ingest('alpha beta', source='test')
+    engine.ingest('alpha beta', source='test', allow_duplicates=True, auto_accept=True)
+    enriched = engine.brain.read_node(first.id)
+    assert '[evolved ' in enriched.text
+    before = engine.brain.vectors_file.read_bytes()
+    assert engine.brain.vectors_for({first.id}, engine.embedder.embed, persist=False)[first.id] == engine.embedder.embed(normalize_text(enriched.text))
+    assert engine.brain.vectors_file.read_bytes() == before
+    # Merge without an embedder leaves incompatible metadata for lazy repair.
+    other = next(n for n in engine.brain.read_nodes() if n.id != first.id)
+    merge_nodes(engine.brain, first.id, other.id, commit=False)
+    merged = engine.brain.read_node(first.id)
+    key = model_key(None, model_identity(engine.embedder))
+    assert not compatible(engine.brain._read_vector_records()[first.id], merged.text, key)
+    expected = engine.embedder.embed(normalize_text(merged.text))
+    assert engine.brain.vectors_for({first.id}, engine.embedder.embed, persist=False)[first.id] == expected
+    # Writer repair must persist provenance, which survives another merge.
+    engine.brain.vectors_for({first.id}, engine.embedder.embed)
+    assert compatible(engine.brain._read_vector_records()[first.id], merged.text, key)
+    extra, _, _ = engine.ingest('delta epsilon', allow_duplicates=True)
+    merge_nodes(engine.brain, first.id, extra.id, commit=False, embedder=engine.embedder)
+    merged = engine.brain.read_node(first.id)
+    entry = engine.brain._read_vector_records()[first.id]
+    assert compatible(entry, merged.text, key)
+    assert entry['vec'] == engine.embedder.embed(normalize_text(merged.text))
+    assert extra.id not in engine.brain.read_vectors()

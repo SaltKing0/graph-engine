@@ -857,3 +857,86 @@ def test_search_index_never_reuses_unprotected_or_other_principal_cache(protecte
     path.write_text(json.dumps(policy))
     with pytest.raises(PermissionError):
         retrieve(secured, "knowledge", persist=False)
+
+
+def test_protected_vector_freshness_and_principal_isolation(protected):
+    raw, policy_file, policy = protected
+    emb = HashEmbedder()
+    raw.vectors_for({"public", "private", "readonly"}, emb.embed)
+    original = raw._read_vector_records()
+    raw.write_node(Node(id="public", text="omega", status="active"))
+    raw.write_node(Node(id="private", text="secret changed", status="active"))
+    # Prime the unscoped memo with private text before the viewer reads.
+    raw.vectors_for({"private", "public"}, emb.embed, persist=False)
+    viewer = access.SecuredBrain(str(raw.path), graph_name="default", identity="bob")
+    before = raw.vectors_file.read_bytes()
+    for persist in (False, True):
+        assert viewer.vectors_for({"public", "private"}, emb.embed, persist=persist) == {
+            "public": emb.embed("omega")}
+    assert raw.vectors_file.read_bytes() == before
+    policy["graphs"]["default"]["nodes"]["public"] = {"read": ["owner"]}
+    policy_file.write_text(json.dumps(policy))
+    assert viewer.vectors_for({"public"}, emb.embed) == {}
+    editor = access.SecuredBrain(str(raw.path), graph_name="default", identity="alice")
+    # Explicit writes cannot update a node the editor only reads.
+    from graph_engine.vector_cache import model_identity
+    with pytest.raises(PermissionError):
+        editor.cache_vectors({"readonly": emb.embed("replacement")}, embedder_key=model_identity(emb))
+    assert raw._read_vector_records() == original
+
+
+def test_protected_writer_keeps_hidden_vector_metadata(protected):
+    from graph_engine.vector_cache import model_identity
+    raw, _, _ = protected
+    emb = HashEmbedder()
+    raw.vectors_for({"public", "private", "readonly"}, emb.embed)
+    original = raw._read_vector_records()
+    editor = runtime.make_brain()
+    editor.write_node(Node(id="public", text="omega"))
+    editor.cache_vectors({"public": emb.embed("omega")}, embedder_key=model_identity(emb))
+    updated = raw._read_vector_records()
+    assert updated["private"] == original["private"]
+    assert updated["readonly"] == original["readonly"]
+    assert updated["public"]["text_hash"] != original["public"]["text_hash"]
+    assert editor.vectors_for({"public"}, emb.embed, persist=False) == {"public": emb.embed("omega")}
+
+
+def test_protected_retrieval_recomputes_same_dimension_model_revision(protected):
+    from graph_engine.retrieval import explain
+    raw, _, _ = protected
+    class Model:
+        model_name = 'test-model'
+        revision = 'first'
+        def embed(self, text):
+            return [1., 0.] if text == 'query' or self.revision == 'first' else [0., 1.]
+    model = Model()
+    raw.vectors_for({'public', 'private', 'readonly'}, model.embed)
+    viewer = access.SecuredBrain(str(raw.path), graph_name='default', identity='bob')
+    engine = BrainEngine(viewer, model, reranker=False)
+    engine.reranker = None
+    before = raw.vectors_file.read_bytes()
+    assert explain(engine, 'public', 'query')['dense']['score'] == pytest.approx(1)
+    model.revision = 'second'
+    assert explain(engine, 'public', 'query')['dense']['score'] == pytest.approx(0)
+    assert raw.vectors_file.read_bytes() == before
+    assert not hasattr(engine, '_search_index')
+
+
+def test_protected_cased_query_matches_normalized_text_without_writing(protected):
+    from graph_engine.retrieval import explain, retrieve
+
+    class CasedAdapter:
+        def embed(self, text):
+            return [1., 0.] if text in {"nasa launched a satellite", "space agency"} else [0., 1.]
+
+    raw, _, _ = protected
+    raw.write_node(Node("NASA launched a satellite", id="public", status="active"))
+    raw.write_node(Node("Space agency", id="private", status="active"))
+    viewer = access.SecuredBrain(str(raw.path), graph_name="default", identity="bob")
+    engine = BrainEngine(viewer, CasedAdapter(), reranker=False)
+    engine.reranker = None
+    before = raw.vectors_file.read_bytes()
+    assert explain(engine, "public", "Space   agency")["dense"]["score"] == pytest.approx(1.)
+    assert [nid for nid, _ in retrieve(engine, "Space   agency", persist=True)] == ["public"]
+    assert raw.vectors_file.read_bytes() == before
+    assert not hasattr(engine, "_search_index")

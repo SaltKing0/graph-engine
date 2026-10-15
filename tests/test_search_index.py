@@ -224,3 +224,163 @@ def test_oversized_orphan_vector_preserves_valid_records_and_search(engine):
     assert hits(engine) == expected  # Warm snapshot must also recover.
     assert hits(engine, cached=False) == expected
     assert brain.vectors_file.read_bytes() == before
+
+
+def test_populated_vectors_follow_external_text_edits_and_dense_scores(engine):
+    from graph_engine.retrieval import explain
+    brain = engine.brain
+    brain.vectors_for({"c"}, engine.embedder.embed, persist=True)
+    before = brain.vectors_file.read_bytes()
+    assert explain(engine, "c", "omega")["dense"]["score"] == pytest.approx(1)
+    path = brain.node_path("c")
+    path.write_text(path.read_text().replace("omega", "alpha"))
+    for cached in (True, False):
+        engine.search_cache_enabled = cached
+        assert explain(engine, "c", "omega")["dense"]["score"] == pytest.approx(0)
+        assert explain(engine, "c", "alpha")["dense"]["score"] == pytest.approx(1)
+    assert brain.vectors_file.read_bytes() == before
+    brain.vectors_for({"c"}, engine.embedder.embed, persist=True)
+    assert brain.read_vectors()["c"] == engine.embedder.embed("alpha")
+
+
+def test_populated_vectors_follow_same_dimension_model_revision(engine):
+    from graph_engine.retrieval import explain
+    class Model:
+        model_name = "test-model"
+        revision = "first"
+        def embed(self, text):
+            return [1., 0.] if text == "omega" or self.revision == "first" else [0., 1.]
+    model = Model()
+    engine.embedder = model
+    engine.brain.vectors_for({"a"}, model.embed, persist=True)
+    before = engine.brain.vectors_file.read_bytes()
+    assert explain(engine, "a", "omega")["dense"]["score"] == pytest.approx(1)
+    model.revision = "second"
+    for cached in (True, False):
+        engine.search_cache_enabled = cached
+        assert explain(engine, "a", "omega")["dense"]["score"] == pytest.approx(0)
+    assert engine.brain.vectors_file.read_bytes() == before
+
+
+def test_legacy_vectors_are_recomputed_without_read_side_effects(engine):
+    brain = engine.brain
+    brain.write_vectors({"c": engine.embedder.embed("alpha")})
+    before = brain.vectors_file.read_bytes()
+    assert brain.vectors_for({"c"}, engine.embedder.embed, persist=False)["c"] == engine.embedder.embed("omega")
+    assert brain.vectors_file.read_bytes() == before
+
+
+def test_versioned_vectors_survive_new_instances_and_preserve_normalization(engine):
+    import json
+    from graph_engine.vector_cache import text_hash
+    brain = engine.brain
+    expected = brain.vectors_for({"a", "b"}, engine.embedder.embed)
+    entries = {row["id"]: row for row in map(json.loads, brain.vectors_file.read_text().splitlines())}
+    assert entries["a"]["version"] == 1
+    assert entries["a"]["text_hash"] == text_hash(" ALPHA\n beta ")
+    assert "HashEmbedder" in entries["a"]["model_key"]
+    Brain._VECTOR_MEMO.clear()
+    fresh = Brain(brain.path)
+    embedder = HashEmbedder()
+    embedder.embed = Mock(side_effect=AssertionError("valid vector was re-embedded"))
+    # Supply a stable model identity while wrapping the bound method.
+    from graph_engine.vector_cache import model_identity
+    assert fresh.vectors_for({"a", "b"}, embedder.embed, persist=False,
+                             embedder_key=model_identity(embedder)) == expected
+    node = brain.read_node("a")
+    node.text = " ALPHA\n beta "
+    brain.write_node(node)
+    assert fresh.vectors_for({"a"}, embedder.embed, persist=False,
+                             embedder_key=model_identity(embedder)) == {"a": expected["a"]}
+    # Legacy maintenance rewrites must retain other records' provenance.
+    brain.write_vectors({"a": expected["a"]})
+    assert json.loads(brain.vectors_file.read_text()) == entries["a"]
+
+
+@pytest.mark.parametrize("field,value", [("version", 0), ("version", True),
+                                       ("text_hash", "stale"), ("model_key", "old")])
+def test_incompatible_metadata_recomputes_in_memory(engine, field, value):
+    import json
+    brain = engine.brain
+    brain.vectors_for({"c"}, engine.embedder.embed)
+    entry = json.loads(brain.vectors_file.read_text())
+    entry[field] = value
+    entry["vec"] = engine.embedder.embed("alpha")
+    brain.vectors_file.write_text(json.dumps(entry) + "\n")
+    before = brain.vectors_file.read_bytes()
+    assert brain.vectors_for({"c"}, engine.embedder.embed, persist=False)["c"] == engine.embedder.embed("omega")
+    assert brain.vectors_file.read_bytes() == before
+
+
+def test_same_dimension_model_name_change_and_partial_memo(engine):
+    class Model:
+        model_name = "first"
+        def embed(self, text):
+            return [1., 0.] if self.model_name == "first" else [0., 1.]
+    brain, model = engine.brain, Model()
+    brain.vectors_for({"a", "b"}, model.embed)
+    model.model_name = "second"
+    assert brain.vectors_for({"a"}, model.embed, persist=False) == {"a": [0., 1.]}
+    assert brain.vectors_for({"a", "b"}, model.embed, persist=False) == {"a": [0., 1.], "b": [0., 1.]}
+    brain.vectors_for({"a"}, model.embed)
+    # An unrequested old-model record must not enter the new-model memo.
+    assert brain.vectors_for({"b"}, model.embed, persist=False) == {"b": [0., 1.]}
+
+
+def test_anonymous_adapters_do_not_share_vector_provenance(engine):
+    brain = engine.brain
+    first, second = lambda _: [1., 0.], lambda _: [0., 1.]
+    brain.vectors_for({"a"}, first)
+    assert brain.vectors_for({"a"}, second, persist=False) == {"a": [0., 1.]}
+
+
+def test_persisted_model_identity_is_reusable_across_processes(engine):
+    import subprocess
+    import sys
+    engine.brain.vectors_for({'a'}, engine.embedder.embed)
+    script = '''
+import sys
+from graph_engine.brain import Brain
+from graph_engine.embedder import HashEmbedder
+from graph_engine.vector_cache import model_identity
+brain = Brain(sys.argv[1], mode="local")
+def unexpected(text):
+    raise AssertionError("compatible persisted vector was recomputed")
+assert brain.vectors_for({"a"}, unexpected, persist=False,
+                         embedder_key=model_identity(HashEmbedder()))["a"] == HashEmbedder().embed("alpha beta")
+'''
+    subprocess.run([sys.executable, '-c', script, str(engine.brain.path)], check=True)
+
+
+@pytest.mark.parametrize("cached", [False, True])
+def test_cased_queries_match_normalized_vectors_on_cold_and_warm_search(engine, cached):
+    from graph_engine.retrieval import explain
+
+    class CasedAdapter:
+        def embed(self, text):
+            return [1., 0.] if text == "nasa launched a satellite" else [0., 1.]
+
+    engine.brain.write_node(Node("NASA launched a satellite", id="nasa", status="active"))
+    engine.embedder = CasedAdapter()
+    engine.search_cache_enabled = cached
+    for query in ("NASA launched a satellite", "  NASA\n launched  a satellite "):
+        assert explain(engine, "nasa", query)["dense"]["score"] == pytest.approx(1.)
+
+
+@pytest.mark.parametrize("cached", [False, True])
+@pytest.mark.parametrize("corpus", ["empty", "tombstones", "blank-per-tier"])
+def test_search_without_eligible_nodes_does_not_load_model(tmp_path, monkeypatch, cached, corpus):
+    from graph_engine.embedder import Embedder
+
+    brain = Brain(str(tmp_path / "brain"))
+    brain.init()
+    if corpus == "tombstones":
+        brain.write_node(Node("forgotten", id="note", status="tombstone"))
+    elif corpus == "blank-per-tier":
+        brain.write_node(Node("  ", id="note", status="active"))
+    embedder = Embedder("unavailable-offline")
+    load = Mock(side_effect=OSError("model unavailable offline"))
+    monkeypatch.setattr(embedder, "_ensure_model", load)
+    engine = BrainEngine(brain, embedder, reranker=False, search_cache_enabled=cached)
+    assert retrieve(engine, "query", persist=False, per_tier=corpus == "blank-per-tier") == []
+    load.assert_not_called()

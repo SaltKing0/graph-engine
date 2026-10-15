@@ -82,7 +82,8 @@ def test_non_hit_and_candidate_cutoff_are_distinct(engine):
 
 
 def test_foreign_dimension_is_unavailable_not_zero(engine):
-    engine.brain.write_vectors({"a": [1.0, 0.0, 0.0], "b": [1.0, 0.0], "c": [0.0, 1.0]})
+    embed = engine.embedder.embed
+    engine.embedder.embed = lambda text: [1., 0., 0.] if text == "alpha beta" else embed(text)
     result = explain(engine, "a", "alpha")
     assert result["retrieved"]  # BM25 still contributes
     assert result["dense"] == {"score": None, "rank": None, "rrf_contribution": 0.0}
@@ -90,7 +91,8 @@ def test_foreign_dimension_is_unavailable_not_zero(engine):
 
 
 def test_negative_dense_score_keeps_actual_fusion_rank_for_bm25_match(engine):
-    engine.brain.write_vectors({"a": [-1.0, 0.0], "b": [1.0, 0.0], "c": [0.0, 1.0]})
+    embed = engine.embedder.embed
+    engine.embedder.embed = lambda text: [-1., 0.] if text == "alpha beta" else embed(text)
     result = explain(engine, "a", "alpha")
     assert result["dense"]["score"] == pytest.approx(-1.0)
     assert result["dense"]["rank"] == 2

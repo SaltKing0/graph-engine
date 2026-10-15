@@ -275,7 +275,9 @@ class _SnapshotStore:
 
     def vectors_for(self, node_ids: set[str], embed_fn: Callable[[str], list[float]],
                     **kwargs: object) -> dict[str, list[float]]:
-        return {node.id: embed_fn(node.text) for node in self.nodes if node.id in node_ids}
+        from .vector_cache import normalize_text
+        return {node.id: embed_fn(normalize_text(node.text))
+                for node in self.nodes if node.id in node_ids}
 
 
 def snapshot_query(engine: BrainEngine, revision: str, query: str, *, k: int = 5,
