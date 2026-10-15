@@ -73,3 +73,20 @@ def test_malformed_json_rejected(client):
     r = client.post("/api/ingest", content=b"{not json",
                     headers={"Content-Type": "application/json"})
     assert r.status_code in (400, 422)
+
+
+def test_report_recovers_from_vector_damage(client, monkeypatch, tmp_path, damaged_vector_cache):
+    brain = Brain(str(tmp_path / "brain"), mode="local")
+    for nid in ("a", "b"):
+        brain.write_node(Node(id=nid, text=nid))
+    brain.vectors_file.write_text(damaged_vector_cache, encoding="utf-8")
+    before = {p.relative_to(brain.path): p.read_bytes()
+              for p in brain.path.rglob("*") if p.is_file()}
+    # Reporting must not repair the cache by loading a model.
+    monkeypatch.setenv("IDEAGRAPH_EMBEDDER", "unavailable")
+    response = client.get("/api/report")
+    assert response.status_code == 200
+    assert response.json()["nodes"] == 4
+    assert "## Hygiene" in response.json()["markdown"]
+    assert before == {p.relative_to(brain.path): p.read_bytes()
+                      for p in brain.path.rglob("*") if p.is_file()}

@@ -1160,6 +1160,16 @@ accept/reject/forget decisions survive retries. The worker never accepts pending
 assertions, merges or deletes knowledge. Community distillation and legacy
 free-text model commands are intentionally absent from its action list.
 
+Reports (`ig report`, `/api/report`) and strict worker refresh share the storage
+reader's vector validation. They skip malformed JSON lines, missing/wrong fields
+and non-finite or overflowing numbers. Near-duplicate analysis uses the most
+common non-empty vector dimension; other dimensions are omitted. With no usable
+vectors, it returns no near-duplicate pairs while the rest of the report remains
+available. Reports and refresh do not load a model or rewrite `vectors.jsonl`;
+normal semantic search rebuilds missing or incompatible requested embeddings
+under the existing cache-write policy. Protected reports filter vectors through
+the current access policy and never reuse the unprotected matrix cache.
+
 | Flag | Default | Bound/behavior |
 |---|---|---|
 | `--interval` | `900` seconds | 0.01–604800; fixed delay after the previous cycle finishes, first cycle immediately |

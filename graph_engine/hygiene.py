@@ -12,7 +12,6 @@ Everything is read-only — nothing on the brain is modified.
 """
 from __future__ import annotations
 
-import json
 from collections import Counter
 from dataclasses import dataclass
 
@@ -35,54 +34,46 @@ class NearDup:
     b_text: str
 
 
-_VEC_CACHE: dict[tuple[str, float, int], tuple[list[str], np.ndarray]] = {}
+_VEC_CACHE: dict[tuple[str, int, int], tuple[list[str], np.ndarray]] = {}
 
 
 def _load_vectors(brain: Brain) -> tuple[list[str], np.ndarray]:
-    """Reads vectors.jsonl; uses the dominant dimension (384 real vs 64 hash).
+    """Read validated vectors; use the dominant dimension (384 real vs 64 hash).
 
     Audit #38: float32 rounds band-boundary cases wrong (0.9199999990 float64
     -> 0.9200000167 float32 — the pair falls through BOTH mechanisms: no dup
     in the engine, but not in the review band either). Hence float64.
     Audit #60: results are cached keyed by (path, mtime, size) — repeated
     report calls within one process skip the re-parse; any write to the file
-    invalidates the entry automatically."""
-    if hasattr(brain, "identity"):
-        vecs = brain.read_vectors()
-        if not vecs:
-            return [], np.zeros((0, 0), dtype=np.float64)
-        lens = Counter(len(v) for v in vecs.values())
-        dom = max(lens, key=lens.get)
-        ids = [nid for nid, v in vecs.items() if len(v) == dom]
-        values = np.array([vecs[nid] for nid in ids], dtype=np.float64)
-        return ids, values / (np.linalg.norm(values, axis=1, keepdims=True) + 1e-12)
-    vec_file = brain.path / "vectors.jsonl"
-    if not vec_file.exists():
-        return [], np.zeros((0, 0), dtype=np.float64)
-    try:
-        st = vec_file.stat()
-        key = (str(vec_file), st.st_mtime_ns, st.st_size)
-    except OSError:
-        key = None
+    invalidates the entry automatically. Protected reads always go through the
+    secured loader and never share the unscoped matrix cache. Reports remain
+    read-only: skipped cache damage is not repaired or re-embedded here."""
+    key = None
+    if not hasattr(brain, "identity"):
+        try:
+            vec_file = brain.vectors_file
+            st = vec_file.stat()
+            key = (str(vec_file), st.st_mtime_ns, st.st_size)
+        except OSError:
+            pass
     if key is not None and key in _VEC_CACHE:
         return _VEC_CACHE[key]
-    vecs: dict[str, list[float]] = {}
-    lens: Counter = Counter()
-    for l in vec_file.read_text(encoding="utf-8").splitlines():
-        if not l.strip():
-            continue
-        try:
-            o = json.loads(l)
-        except json.JSONDecodeError:
-            continue  # Audit #17 family: a corrupt line does not kill the report
-        vecs[o["id"]] = o["vec"]
-        lens[len(o["vec"])] += 1
+    # Share schema/finite-value validation with retrieval, including the secured
+    # brain's current ACL filtering. Count only final records for each ID.
+    vecs = brain.read_vectors()
     if not vecs:
         return [], np.zeros((0, 0), dtype=np.float64)
-    dom = max(lens, key=lambda k: lens[k])
+    lens = Counter(len(v) for v in vecs.values() if v)
+    if not lens:
+        return [], np.zeros((0, 0), dtype=np.float64)
+    dom = max(lens, key=lens.get)
     ids = [n for n, v in vecs.items() if len(v) == dom]
     V = np.array([vecs[n] for n in ids], dtype=np.float64)
-    V = V / (np.linalg.norm(V, axis=1, keepdims=True) + 1e-12)
+    # Even finite values can overflow when squared by the norm. Scale first,
+    # preserving the existing epsilon and float64 boundary behavior.
+    scale = np.maximum(np.max(np.abs(V), axis=1, keepdims=True), 1.0)
+    V = V / scale
+    V = V / (np.linalg.norm(V, axis=1, keepdims=True) + 1e-12 / scale)
     if key is not None:
         _VEC_CACHE[key] = (ids, V)
     return ids, V

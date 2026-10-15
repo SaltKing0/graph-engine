@@ -7,6 +7,8 @@ import json
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from graph_engine.brain import Brain, Node, Edge
@@ -157,3 +159,29 @@ def test_near_dup_all_tombstones_returns_empty(tmp_path):
     b.write_node(Node(id="b", text="Thema A Variante", status="tombstone"))
     _write_vecs(b, {"a": [1, 0, 0], "b": [0.8, 0.6, 0]})
     assert near_dup_pairs(b, lo=0.78, hi=0.92) == []
+
+
+def test_near_dup_tolerates_disposable_vector_damage(tmp_path, damaged_vector_cache):
+    import numpy as np
+    b = _brain(tmp_path)
+    for nid in ("a", "b"):
+        b.write_node(Node(id=nid, text=nid))
+    b.vectors_file.write_text(damaged_vector_cache, encoding="utf-8")
+    with np.errstate(over="raise", invalid="raise"):
+        pairs = near_dup_pairs(b)
+    assert len(pairs) == 1
+    assert {pairs[0].a, pairs[0].b} == {"a", "b"}
+    assert pairs[0].score == pytest.approx(0.8)
+    assert b.vectors_file.read_text(encoding="utf-8") == damaged_vector_cache
+
+
+def test_near_dup_handles_large_finite_vectors(tmp_path):
+    import numpy as np
+    b = _brain(tmp_path)
+    for nid in ("a", "b"):
+        b.write_node(Node(id=nid, text=nid))
+    _write_vecs(b, {"a": [1e308, 0], "b": [8e307, 6e307]})
+    with np.errstate(over="raise", invalid="raise"):
+        pairs = near_dup_pairs(b)
+    assert len(pairs) == 1
+    assert pairs[0].score == pytest.approx(0.8)

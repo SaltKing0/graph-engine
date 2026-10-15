@@ -55,6 +55,34 @@ def test_nodes_edges_vectors_and_shared_memo_do_not_leak(protected):
     assert raw.read_node("readonly").text == "readonly knowledge"
 
 
+def test_hygiene_corruption_recovery_keeps_current_acl_and_cache_isolation(protected):
+    from graph_engine.hygiene import near_dup_pairs
+    from graph_engine.report import report_data
+    raw, policy_path, policy = protected
+    raw.write_vectors({"public": [1., 0.], "private": [0.8, 0.6], "readonly": [0., 1.]})
+    with raw.vectors_file.open("a", encoding="utf-8") as handle:
+        handle.write('{}\n{"id": "private", "vec": [NaN, 0]}\n')
+    before = raw.vectors_file.read_bytes()
+    # Warm the unprotected cache, then an admin view, before the viewer reads.
+    assert len(near_dup_pairs(raw)) == 1
+    owner = access.SecuredBrain(str(raw.path), graph_name="default", identity="owner")
+    viewer = access.SecuredBrain(str(raw.path), graph_name="default", identity="bob")
+    assert report_data(owner, full_near_dup=True)["hygiene"]["near_dup_pairs"] == 1
+    assert near_dup_pairs(viewer) == []
+    assert report_data(viewer, full_near_dup=True)["hygiene"]["near_dup_pairs"] == 0
+    policy["graphs"]["default"]["roles"]["bob"] = "admin"
+    policy_path.write_text(json.dumps(policy))
+    assert len(near_dup_pairs(viewer)) == 1
+    policy["graphs"]["default"]["roles"]["bob"] = "viewer"
+    policy_path.write_text(json.dumps(policy))
+    assert near_dup_pairs(viewer) == []
+    policy["graphs"]["default"]["roles"].pop("bob")
+    policy_path.write_text(json.dumps(policy))
+    with pytest.raises(PermissionError):
+        near_dup_pairs(viewer)
+    assert raw.vectors_file.read_bytes() == before
+
+
 @pytest.mark.parametrize("mode", ["extract", "copy", "legacy", "structured", "distill", "entities", "merge"])
 def test_derived_memories_inherit_source_acl_on_every_read_surface(protected, monkeypatch, mode):
     from graph_engine.consolidation import consolidate, ConsolidationConfig
