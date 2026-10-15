@@ -159,3 +159,30 @@ def test_search_snapshot_invalidates_after_git_pull(remote, tmp_path):
     assert "new" in dict(retrieve(engine, "alpha", k=10, persist=False))
     assert engine._search_index is not old
     assert _git("status", "--porcelain", cwd=str(reader.path)).stdout == ""
+
+
+@pytest.mark.parametrize('raw', ['invalid', 'nan', 'inf', '-0.01', '1.01'])
+@pytest.mark.parametrize('extraction', [None, 'rules'])
+def test_rejected_ingest_config_preserves_git_and_all_records(remote, monkeypatch, raw, extraction):
+    """Issue #56: rejection cannot leave a note for an unrelated later commit."""
+    bare, brain = remote
+    brain.write_node(Node('Existing alpha note', id='alpha'))
+    brain.write_node(Node('Existing beta note', id='beta'))
+    brain.add_edge(Edge('alpha', 'beta', 'similar'))
+    brain.rebuild_index()
+    brain.commit_and_push('seed notes without vectors')
+    (brain.path / 'recalls.jsonl').write_text('{"sentinel": true}\n')
+    # A rejected operation must also preserve unrelated, already-dirty files.
+    (brain.path / 'unrelated.txt').write_text('uncommitted work')
+    engine = BrainEngine(brain, HashEmbedder())
+    def state():
+        records = {str(p.relative_to(brain.path)): p.read_bytes()
+                   for p in brain.path.rglob('*') if p.is_file() and '.git' not in p.parts}
+        return (records, _git('status', '--porcelain', cwd=str(brain.path)).stdout,
+                _git('rev-parse', 'HEAD', cwd=str(brain.path)).stdout,
+                _git('rev-parse', 'main', cwd=str(bare)).stdout)
+    before = state()
+    monkeypatch.setenv('IG_EDGE_CONF_FLOOR', raw)
+    with pytest.raises(ValueError, match='IG_EDGE_CONF_FLOOR'):
+        engine.capture('Existing alpha note', source='new source', extraction=extraction)
+    assert state() == before

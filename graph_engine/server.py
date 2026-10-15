@@ -21,6 +21,7 @@ from pydantic import BaseModel
 
 from . import runtime, access, namespaces
 from .write_guard import BrainWriteTimeout
+from .brain_engine import IngestPartialError
 
 # Shipped UI assets live INSIDE the package so a pip install serves them too
 # (repo-root docs/ would not exist in site-packages).
@@ -224,6 +225,11 @@ async def value_error_handler(_req, exc: ValueError):
     not 500s — return a clean 400 with the message."""
     from fastapi.responses import JSONResponse
     return JSONResponse({"error": str(exc)}, status_code=400)
+
+
+@app.exception_handler(IngestPartialError)
+async def ingest_partial_handler(_req, exc: IngestPartialError):
+    return JSONResponse(exc.to_dict(), status_code=502)
 
 
 @app.post("/api/ingest")

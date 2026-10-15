@@ -28,6 +28,7 @@ from mcp.types import ToolAnnotations
 
 from . import format as fmt
 from ..runtime import brain_path, make_engine, reset_engine_cache
+from ..brain_engine import IngestPartialError
 
 _INSTRUCTIONS_READ = (
     "Consult the brain before starting non-trivial design or research work; "
@@ -401,6 +402,9 @@ def remember(text: str, tags: list[str] | None = None,
     try:
         res = _remember(make_engine(), text, tags=tags,
                         extraction=extraction, accept_facts=accept_facts)
+    except IngestPartialError as exc:
+        receipt = exc.to_dict()
+        return {**receipt, **fmt.err("ingest_incomplete", receipt["message"])}
     except ValueError as exc:
         return fmt.invalid(str(exc)[-200:])
     except Exception as exc:          # noqa: BLE001 — envelope contract

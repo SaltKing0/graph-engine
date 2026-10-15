@@ -597,6 +597,26 @@ extraction="rules")`; `agent_memory.remember(engine, text, extraction="rules")`
 returns its usual dictionary plus `extraction`. `engine.ingest()` remains the
 compatible three-value API without extraction.
 
+Ingest validates options, metadata and configuration before initializing or
+pulling the brain, embedding candidates or writing records. `IG_EDGE_CONF_FLOOR`
+must be finite and between 0 and 1 inclusive; malformed, NaN, infinite and
+out-of-range values are rejected. Python per-call `env` overrides process
+configuration. Invalid configuration leaves notes, edges, vectors, index,
+recall ledger and Git state unchanged, including on duplicate/capture retries.
+CLI exits 1 with a validation message, HTTP returns 400, and MCP reports
+`invalid_params`.
+
+Unexpected failures after saving a note raise Python `IngestPartialError`
+(a `RuntimeError`) with `to_dict()` returning `error: "ingest_incomplete"`,
+`captured: true`, `node_id`, `duplicate`, `source_node_id` and `retryable`.
+HTTP returns these fields with 502; CLI exits 1 and includes them with `--json`;
+MCP returns them with `ok: false` and error code `ingest_incomplete`.
+Backend diagnostics are omitted from these responses. A non-null
+`source_node_id` identifies an exact-input receipt: retry the identical input
+with extraction enabled to resume. Without a receipt, `retryable` is false;
+inspect the stored note and local Git state before deciding how to finish.
+This reports saved data explicitly; it does not roll back storage or Git sync.
+
 Capture and extraction use **two commits**, under one shared local writer guard:
 
 1. Capture performs ordinary ingestion and stores an exact input receipt.
@@ -1264,7 +1284,7 @@ environment, log paths and a shutdown grace longer than `--pass-timeout`.
 | `IDEAGRAPH_EMBEDDER` | `st` | `hash` = deterministic test embedder |
 | `IDEAGRAPH_EMBEDDER_MODEL` | `all-MiniLM-L6-v2` | sentence-transformers model override |
 | `IDEAGRAPH_AUTO_ACCEPT` | off | `1` = auto-accept similarity suggestions; intent and entity-fact review have separate controls |
-| `IG_EDGE_CONF_FLOOR` | `0.0` | discard similarity suggestions below this confidence |
+| `IG_EDGE_CONF_FLOOR` | `0.0` | discard similarity suggestions below this confidence; finite 0–1 inclusive, validated before ingest mutations |
 | `IG_INTENT_AUTO_ACCEPT_MAX` | `2` | maximum accepted intent edges per source during ingest and bulk review |
 | `IG_NO_RECALL_TRACKING` | off | `1` = disable recording retrieval usage |
 | `IG_MCP_WRITE` | `0` | `1` = enable MCP remember/recall/forget tools |
