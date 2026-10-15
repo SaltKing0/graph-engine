@@ -1474,6 +1474,24 @@ recalled. A newly recalled archival memory returns to recall, or main if it
 meets the promotion gate. Manual choices remain pinned until `auto`; tombstones
 are excluded. Searches and read-only explanations never rebalance or write tiers.
 
+Recall aggregation recovers interrupted local passes automatically on the next
+`ig recall --aggregate` or `ig dream --refresh`. It rotates the current ledger
+into `.recall/pending.jsonl` and saves absolute counter targets in
+`.recall/projection.json` before writing any node. Retries finish that generation
+before consuming new events, so partial node writes cannot inflate recall counts,
+query diversity or promotion signals. The original ledger bytes are retained in
+`recalls.jsonl.processed`; even an interrupted archive append resumes without
+duplicating audit records. Legacy ledger lines need no migration.
+
+The `.recall/` directory ignores its own recovery files in Git. Preserve it with
+the brain when copying or backing up an interrupted pass; do not delete it to
+clear an error. A direct aggregate keeps its journal until optional commit/push
+succeeds and retries a failed push even when the commit already exists locally.
+With `commit=False`, the caller owns the later batch commit/sync. Dry runs never
+rotate the ledger, replay a journal, or write counters. This recovery covers
+cooperating local writers on the supported filesystems described below;
+independent machines and external edits can still require Git conflict repair.
+
 Explicit relevance judgments are persisted in tracked `feedback.json` and sync
 with the brain. The latest judgment for each case/whitespace-normalized query
 and node replaces earlier judgments, so repeated votes do not amplify learning.

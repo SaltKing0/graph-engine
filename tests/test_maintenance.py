@@ -184,7 +184,10 @@ def test_strict_worker_refresh_tolerates_vector_damage(brain, damaged_vector_cac
         assert {n.id for n in brain.read_nodes()} == {"a", "b"}
 
 
-@pytest.mark.parametrize("family", ["nodes", "edges.jsonl", "vectors.jsonl", "recalls.jsonl", "bytes"])
+@pytest.mark.parametrize("family", [
+    "nodes", "edges.jsonl", "vectors.jsonl", "recalls.jsonl", "bytes",
+    ".recall/pending.jsonl", ".recall/projection.json",
+])
 def test_input_limits_fail_before_mutation(brain, family):
     config = MaintenanceConfig(max_records=1)
     if family in ("nodes", "bytes"):
@@ -193,6 +196,7 @@ def test_input_limits_fail_before_mutation(brain, family):
         if family == "bytes":
             config = replace(config, max_records=10, max_input_bytes=1)
     else:
+        (brain.path / family).parent.mkdir(parents=True, exist_ok=True)
         (brain.path / family).write_text("{}\n{}\n")
     before = {p.relative_to(brain.path): p.read_bytes() for p in brain.path.rglob("*") if p.is_file()}
     with pytest.raises(PassFailure, match="input_limit") as caught:
