@@ -182,3 +182,56 @@ def test_real_cross_encoder_override_preserves_scores(local_models, monkeypatch)
     assert reranker.rerank("hello query", candidates, k=2) == sorted(
         candidates, key=lambda cand: scores[cand[0]], reverse=True)
     assert reranker.rerank_with_scores("hello", [], k=2) == ([], {})
+
+
+def test_vector_model_identity_tracks_local_files_and_loaded_snapshot(tmp_path, monkeypatch):
+    from graph_engine.vector_cache import model_identity, model_key
+    path = tmp_path / 'local-model'
+    path.mkdir()
+    weights = path / 'weights.bin'
+    weights.write_bytes(b'first weights')
+    calls = []
+    def load(name, **options):
+        calls.append(options)
+        return SimpleNamespace(max_seq_length=32, truncate_dim=None)
+    monkeypatch.setitem(sys.modules, 'sentence_transformers', SimpleNamespace(SentenceTransformer=load))
+    first = Embedder(str(path))
+    original = model_key(None, model_identity(first))
+    assert model_key(None, model_identity(Embedder(str(path)))) == original
+    weights.write_bytes(b'other weights')  # same dimensions and file size
+    assert model_key(None, model_identity(first)) == original  # still loaded old weights
+    assert model_key(None, model_identity(Embedder(str(path)))) != original
+    assert all(options == {'trust_remote_code': False} for options in calls)
+
+
+def test_vector_remote_revision_identity_is_complete_or_instance_scoped(monkeypatch):
+    from graph_engine.vector_cache import model_identity, model_key
+    calls = []
+    def load(name, **options):
+        calls.append(options)
+        return SimpleNamespace(max_seq_length=32, truncate_dim=None)
+    monkeypatch.setitem(sys.modules, 'sentence_transformers', SimpleNamespace(SentenceTransformer=load))
+    def key(adapter):
+        return model_key(None, model_identity(adapter))
+    # An unpinned model name alone cannot prove identical repository contents.
+    assert key(Embedder('model')) != key(Embedder('model'))
+    revision = 'a' * 40
+    first = Embedder('model', revision=revision)
+    assert key(first) == key(Embedder('model', revision=revision))
+    original = key(first)
+    first.revision = 'b' * 40
+    assert key(first) != original
+    assert calls[-1] == {'trust_remote_code': False, 'revision': 'b' * 40}
+
+
+def test_vector_identity_uses_resolved_st_repository_revision(monkeypatch):
+    from graph_engine.vector_cache import model_identity, model_key
+    revision = 'c' * 40
+    def load(name, **options):
+        return SimpleNamespace(model_card_data=SimpleNamespace(
+            base_model='sentence-transformers/model', base_model_revision=revision))
+    monkeypatch.setitem(sys.modules, 'sentence_transformers', SimpleNamespace(SentenceTransformer=load))
+    first = model_key(None, model_identity(Embedder('model')))
+    assert model_key(None, model_identity(Embedder('model'))) == first
+    revision = 'd' * 40
+    assert model_key(None, model_identity(Embedder('model'))) != first

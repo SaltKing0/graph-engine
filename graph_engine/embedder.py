@@ -9,20 +9,68 @@ encode() accepts lists natively).
 from __future__ import annotations
 
 import hashlib
+from importlib.metadata import PackageNotFoundError, version
+import re
+from pathlib import Path
 
 
 class Embedder:
     """Loads sentence-transformers lazily — only on the first real embedding."""
 
-    def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
+    def __init__(self, model_name: str = "all-MiniLM-L6-v2", *, revision: str | None = None):
         self.model_name = model_name
+        self.revision = revision
         self._model = None
 
     def _ensure_model(self):
-        if self._model is None:
+        requested = (self.model_name, self.revision)
+        if self._model is None or getattr(self, "_loaded_source", requested) != requested:
             from sentence_transformers import SentenceTransformer
-            self._model = SentenceTransformer(self.model_name, trust_remote_code=False)
+            # Capture local source identity at load time, rather than blessing
+            # already-loaded weights with files replaced after loading.
+            path = Path(self.model_name)
+            digest = hashlib.sha256() if path.is_dir() else None
+            if digest is not None:
+                for file in sorted(p for p in path.rglob("*") if p.is_file()):
+                    digest.update(str(file.relative_to(path)).encode())
+                    digest.update(b"\0")
+                    with file.open("rb") as stream:
+                        digest.update(hashlib.file_digest(stream, "sha256").digest())
+            options = {"revision": self.revision} if self.revision is not None else {}
+            self._model = SentenceTransformer(self.model_name, trust_remote_code=False, **options)
+            self._loaded_source = requested
+            self._loaded_digest = digest.hexdigest() if digest is not None else None
         return self._model
+
+    def vector_cache_key(self) -> dict:
+        """Identify loaded local files or the complete ST repository revision.
+
+        A base transformer's commit need not identify ST pooling/tokenizers.
+        Models without a resolved root revision fail closed to the instance.
+        Model loading retains the trust_remote_code=False encode policy.
+        """
+        from .vector_cache import opaque_identity
+        model = self._ensure_model()
+        digest = getattr(self, "_loaded_digest", None)
+        card = getattr(model, "model_card_data", None)
+        repository = getattr(card, "base_model", None)
+        revision = self.revision
+        if revision is None and repository in {self.model_name, f"sentence-transformers/{self.model_name}"}:
+            # ST records the revision inferred from its root modules.json
+            # snapshot, which covers pooling and tokenizers as well as weights.
+            revision = getattr(card, "base_model_revision", None)
+        immutable = revision and re.fullmatch(r"[0-9a-fA-F]{40,64}", revision)
+        resolved = digest or (revision if immutable else opaque_identity(model))
+        try:
+            library_version = version("sentence-transformers")
+        except PackageNotFoundError:
+            library_version = None
+        return dict(model=self.model_name, revision=self.revision, resolved=resolved,
+                    library_version=library_version,
+                    prompts=getattr(model, "prompts", None),
+                    default_prompt_name=getattr(model, "default_prompt_name", None),
+                    max_seq_length=getattr(model, "max_seq_length", None),
+                    truncate_dim=getattr(model, "truncate_dim", None), normalization=1)
 
     def embed(self, text: str) -> list[float]:
         model = self._ensure_model()

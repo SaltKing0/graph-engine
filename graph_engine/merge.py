@@ -37,7 +37,6 @@ import json
 from copy import deepcopy
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from pathlib import Path
 
 from .brain import Brain, Edge
 
@@ -137,12 +136,10 @@ def _redirect_edges(edges: list[Edge], survivor: str, deletee: str,
 
 
 def _drop_vector(brain: Brain, deletee: str) -> None:
-    vec_file: Path = brain.path / "vectors.jsonl"
-    if not vec_file.exists():
-        return
-    lines = [l for l in vec_file.read_text(encoding="utf-8").splitlines() if l.strip()]
-    keep = [l for l in lines if json.loads(l).get("id") != deletee]
-    brain.write_vectors({json.loads(l)["id"]: json.loads(l)["vec"] for l in keep})
+    vectors = brain.read_vectors()
+    if deletee in vectors:
+        del vectors[deletee]
+        brain.write_vectors(vectors)
 
 
 @write_operation
@@ -239,9 +236,9 @@ def merge_nodes(
     # represents the pre-merge text (audit finding: "survivor vector stale").
     if embedder is not None:
         normalized = " ".join(survivor.text.lower().split())
-        vecs = brain.read_vectors()
-        vecs[survivor_id] = list(embedder.embed(normalized))
-        brain.write_vectors(vecs)
+        from .vector_cache import model_identity
+        brain.cache_vectors({survivor_id: list(embedder.embed(normalized))},
+                            embedder_key=model_identity(embedder))
 
     # Rebuild INDEX
     brain.rebuild_index()

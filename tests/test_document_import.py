@@ -65,7 +65,7 @@ def test_import_retry_cannot_skip_unfinished_engine_ingest(brain, tmp_path, monk
     def fail(*args, **kwargs):
         raise RuntimeError('vector storage unavailable')
     with monkeypatch.context() as failed:
-        failed.setattr(brain, 'write_vectors', fail)
+        failed.setattr(brain, 'cache_vectors', fail)
         result = import_documents(brain, [path], engine=engine, extraction='rules')
     assert result['files'][0]['status'] == 'partial'
     receipt_id = result['files'][0]['chunks'][0]['node_id']

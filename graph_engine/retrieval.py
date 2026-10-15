@@ -18,6 +18,7 @@ from datetime import datetime, timezone
 import numpy as np
 
 from .brain_engine import BrainEngine
+from .vector_cache import model_identity
 from .brain import Brain
 from .search_index import SearchIndex, corpus_stamp, embedder_stamp
 from .feedback import LearningProfile, learning_profile
@@ -171,13 +172,13 @@ def _retrieve_trace(engine: BrainEngine, query: str, rerank_k: int,
         index = None
     with _stage(engine, "vector_loading_embedding"):
         vecs = ({} if index is not None else engine.brain.vectors_for(
-            set(node_ids), lambda t: engine.embedder.embed(t), persist=persist,
-            **({"embedder_key": embedder_stamp(engine.embedder)} if type(engine.brain) is Brain else {})))
+            set(node_ids), engine.embedder.embed, persist=persist,
+            **({"embedder_key": model_identity(engine.embedder)}
+               if isinstance(engine.brain, Brain) else {})))
     # Audit #8 (follow-up fix): vectors with a foreign dimension are not
-    # comparable with the query (different embedder in the same brain, e.g.
-    # demo seed with precomputed ST vectors + HashEmbedder engine). Instead of
-    # silently truncating (old cosine bug) they are skipped — the dense stage
-    # degrades, BM25 stays fully effective.
+    # comparable with the query. Legacy/model-mismatched disk vectors have
+    # already been recomputed; malformed adapters may still return a foreign
+    # dimension, which is excluded while BM25 remains effective.
     # Audit #60: the dense stage runs as a numpy matmul over L2-normalized
     # vectors instead of a pure-Python cosine loop (0.150 s/query @2k×384-dim →
     # sub-2 ms). Foreign-dimension/empty vectors remain excluded.

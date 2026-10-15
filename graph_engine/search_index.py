@@ -45,9 +45,9 @@ def embedder_stamp(embedder: Any) -> tuple:
 
     Custom mutable adapters must change cache_key when their model changes.
     """
-    return (_Identity(embedder), getattr(embedder, "model_name", None),
-            getattr(embedder, "DIM", None), _Identity(getattr(embedder, "_model", None)),
-            repr(getattr(embedder, "cache_key", None)))
+    from .vector_cache import model_identity, model_key
+    return (_Identity(embedder), model_key(None, model_identity(embedder)),
+            _Identity(getattr(embedder, "_model", None)))
 
 
 @dataclass(frozen=True)

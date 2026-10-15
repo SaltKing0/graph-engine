@@ -105,8 +105,10 @@ def measure(size: int, samples: int, root: Path, *, model_path: Path | None = No
     start = time.perf_counter()
     for i, text in enumerate(texts):
         brain.write_node(Node(text, id=f"record-{i:07}", status="active"))
-    brain.write_vectors(dict(zip([f"record-{i:07}" for i in range(size)],
-                                 embedder.embed_batch(texts))))
+    from graph_engine.vector_cache import model_identity, normalize_text
+    brain.cache_vectors(dict(zip([f"record-{i:07}" for i in range(size)],
+                                 embedder.embed_batch([normalize_text(t) for t in texts]))),
+                        embedder_key=model_identity(embedder))
     brain.commit_and_push("Seed performance fixture", push=False)
     setup_ms = (time.perf_counter() - start) * 1000
     engine = BrainEngine(brain, embedder, dedupe_threshold=1.1, reranker=False)

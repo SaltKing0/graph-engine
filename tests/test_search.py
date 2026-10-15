@@ -12,8 +12,8 @@ from graph_engine.server import app
 class ParaphraseEmbedder:
     """Different words, same vector; no model download or lexical overlap."""
     def embed(self, text: str) -> list[float]:
-        return [1., 0.] if text in {
-            "How can I recover forgotten memories?", "Restore archived notes"} else [0., 1.]
+        return [1., 0.] if text.lower() in {
+            "how can i recover forgotten memories?", "restore archived notes"} else [0., 1.]
 
 
 @pytest.fixture

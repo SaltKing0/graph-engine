@@ -153,9 +153,10 @@ def build_demo_brain(path: str, commit: bool = True) -> dict:
     # to the HashEmbedder instead of crashing the demo seed.
     from .embedder import get_embedder
     emb = get_embedder()
-    vectors = emb.embed_batch([n.text for n in nodes])
+    from .vector_cache import model_identity, normalize_text
+    vectors = emb.embed_batch([normalize_text(n.text) for n in nodes])
     vectors = {n.id: v for n, v in zip(nodes, vectors)}
-    brain.write_vectors(vectors)
+    brain.cache_vectors(vectors, embedder_key=model_identity(emb))
 
     brain.rebuild_index()
     if commit:

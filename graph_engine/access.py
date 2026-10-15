@@ -272,35 +272,48 @@ class SecuredBrain(Brain):
                     self.write_node(node)
             self._raw.write_edges(list(new.values()))
 
-    def read_vectors(self) -> dict[str, list[float]]:
+    def _read_vector_records(self) -> dict[str, dict]:
         self.authorize("read")
         view = self._access_view()
-        return {nid: v for nid, v in self._raw.read_vectors().items()
+        return {nid: entry for nid, entry in self._raw._read_vector_records().items()
                 if nid in view[0] and self.can_access("read", nid, _view=view)}
 
     @write_operation
-    def write_vectors(self, vectors: dict[str, list[float]]) -> None:
+    def _write_vector_records(self, records: dict[str, dict]) -> None:
         self.authorize("write")
-        old = self._raw.read_vectors()
+        old = self._raw._read_vector_records()
         view = self._access_view()
-        for nid, vector in vectors.items():
-            if old.get(nid) != vector:
+        for nid, entry in records.items():
+            if old.get(nid) != entry:
                 self.authorize("write", nid)
-        # Preserve vectors outside the caller's view, including node ACLs.
-        preserved = {nid: v for nid, v in old.items() if not self.can_access("read", nid, _view=view)}
-        for nid in old.keys() - vectors.keys() - preserved.keys():
+        preserved = {nid: entry for nid, entry in old.items()
+                     if not self.can_access("read", nid, _view=view)}
+        for nid in old.keys() - records.keys() - preserved.keys():
             self.authorize("write", nid)
-        self._raw.write_vectors({**preserved, **vectors})
+        self._raw._write_vector_records({**preserved, **records})
+
+    def read_vectors(self) -> dict[str, list[float]]:
+        return Brain.read_vectors(self)
+
+    @write_operation
+    def write_vectors(self, vectors: dict[str, list[float]]) -> None:
+        Brain.write_vectors(self, vectors)
+
+    @write_operation
+    def cache_vectors(self, vectors: dict[str, list[float]], *, embedder_key: tuple) -> None:
+        for nid in vectors:
+            self.authorize("write", nid)
+        Brain.cache_vectors(self, vectors, embedder_key=embedder_key)
 
     def vectors_for(self, node_ids: set[str], embed_fn, batch_fn=None,
-                    persist: bool = True) -> dict[str, list[float]]:
-        # Do not use the global unscoped memo or persist search side effects.
+                    persist: bool = True, *, embedder_key: tuple | None = None) -> dict[str, list[float]]:
+        # Preserve the protected-store contract: search never persists or uses
+        # the shared memo, even for callers passing persist=True.
+        from .vector_cache import model_key, refresh
         nodes = {n.id: n for n in self.read_nodes() if n.id in node_ids}
-        cached = self.read_vectors()
-        missing = sorted(nodes.keys() - cached.keys())
-        values = batch_fn([nodes[n].text for n in missing]) if batch_fn and missing else [embed_fn(nodes[n].text) for n in missing]
-        cached.update(zip(missing, values))
-        return {nid: cached[nid] for nid in nodes if nid in cached}
+        current = refresh(self._read_vector_records(), nodes, set(nodes),
+                          embed_fn, batch_fn, model_key(embed_fn, embedder_key))
+        return {nid: entry["vec"] for nid, entry in current.items()}
 
     @write_operation
     def ensure_ready(self) -> None:

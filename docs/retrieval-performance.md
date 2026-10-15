@@ -129,14 +129,33 @@ The existing vector memo also fingerprints node files, separates writer/read-onl
 modes and completes missing IDs in partial memos; it retains at most eight
 entries. The runtime retains at most eight engines, each with one snapshot.
 
-The index uses the existing `vectors.jsonl` contract: persisted vectors remain
-preferred and foreign-dimensional vectors remain excluded from dense scoring.
-This change does not infer provenance for legacy stored vectors or rewrite
-stored embeddings when a user edits text or changes models. Regenerate that
-existing disposable vector file when changing the embedding model or when
-stored embeddings no longer describe edited text. Clearing only a search
-snapshot rebuilds from the current node/vector files, exactly like uncached
-retrieval.
+`vectors.jsonl` records carry a schema `version`, a SHA-256 `text_hash` of
+lowercased, whitespace-normalized node text, and a serialized `model_key`.
+Vectors are computed from that same normalized text. Retrieval and ingest
+cosine deduplication validate all three fields before reuse, including when
+loading a populated file after an editor save, enrichment, merge or model
+change. Legacy entries without provenance are recomputed; clearing the search
+snapshot alone is no longer necessary to repair stale persisted embeddings.
+
+The hash embedder has a stable implementation/dimension identity. The semantic
+embedder includes its model name, requested revision, resolved or explicitly
+pinned Hub commit or local model-file digest, and encoding configuration. If an immutable model
+revision cannot be established, reuse is confined to the loaded instance.
+Custom adapters can declare JSON-compatible `model_name`, `revision` and/or
+`cache_key`; they must change that identity whenever weights, tokenization or
+encoding behavior changes. Undeclared adapters use an opaque lifetime identity.
+Explicit `embedder_key` values on `vectors_for` must also identify the complete
+model and preprocessing contract.
+
+Read-only calls recompute incompatible entries in memory without touching disk.
+Authorized raw writers persist replacements. Protected search stays read-only
+and checks current permissions on every call; explicit protected cache writes
+preserve hidden records and their provenance. `read_vectors` remains a raw
+maintenance API; `write_vectors` retains provenance for unchanged values and
+leaves unlabelled replacements as legacy entries. Writers of freshly computed
+normalized vectors can use `cache_vectors(..., embedder_key=...)` to record their
+identity. Foreign-dimensional results from a malformed adapter remain excluded
+from dense scoring.
 
 Metadata freshness relies on the local filesystem reporting changes. A writer
 that deliberately preserves every metadata field, or a filesystem with stale
