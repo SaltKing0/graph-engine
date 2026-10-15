@@ -2,6 +2,11 @@
 
 [Back to the README](../README.md)
 
+For the planned evidence/decision workflow, see the
+[Decision Memory v1 contract](decision-memory-v1.md) and
+[worked example](decision-memory-example.md). These specify future behavior;
+the commands and APIs in this guide retain their current semantics.
+
 ## Quickstart
 
 Requires **Python 3.11+** and **Git**. This README describes the current source
