@@ -100,7 +100,8 @@ def _check_input(brain: Brain, config: MaintenanceConfig) -> None:
         total += path.stat().st_size
         if count > config.max_records or total > config.max_input_bytes:
             raise PassFailure("input_limit")
-    for name in ("edges.jsonl", "vectors.jsonl", "recalls.jsonl"):
+    for name in ("edges.jsonl", "vectors.jsonl", "recalls.jsonl",
+                 ".recall/pending.jsonl", ".recall/projection.json"):
         path = brain.path / name
         if not path.exists():
             continue
