@@ -1801,3 +1801,15 @@ memory and check file metadata on every query. Protected reads continue to
 apply current authorization on every call. See [retrieval performance](retrieval-performance.md)
 for reproducible 1k/10k-node measurements, cache freshness/recovery, read-only
 behavior, and the optional larger/local-model runs.
+
+
+## Decision Memory workflow and readiness
+
+Decision Memory is an experimental opt-in path for developers and agents who
+need exact source versions and explicit review behind technical choices. Start
+with the [complete offline workflow](decision-workflow.md), including CLI, HTTP,
+MCP and UI instructions, explicit activation, recovery and current authorization
+on historical reads. Existing unstructured brains require no migration. The
+[readiness assessment](decision-release-readiness.md) keeps missing quality and
+human-review measurements visible; the feature is not promoted as a validated
+improvement.

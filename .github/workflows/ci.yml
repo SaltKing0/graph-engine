@@ -87,7 +87,7 @@ jobs:
         run: >-
           python -m pytest tests/test_mcp.py tests/test_access_namespaces.py
           tests/test_entities.py tests/test_fact_validity.py tests/test_graph_retrieval.py
-          tests/test_decision_brief.py
+          tests/test_decision_brief.py tests/test_decision_review.py
           --fail-on-skip -q
 
   test-browser:

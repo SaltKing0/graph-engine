@@ -224,3 +224,15 @@ dependency review and disagreements remain missing. No real positive/negative/
 inconclusive release stratum is established; extraction, answer and user-time
 outcomes are unmeasured. Synthetic controls establish harness coverage only.
 Freeze an independently reviewed successor before #78 tuning/#81 evaluation.
+
+
+## Production workflow audit (#81)
+
+The [workflow and reproduction guide](decision-workflow.md) adds a production
+source-change diagnostic alongside these unchanged baselines. The mapping is
+explicitly conservative: no independent structured semantic annotations exist
+in the frozen bundle, so no automatic opposition, comparability or withdrawal
+interpretation is manufactured from its prose. Raw production results and
+baseline-input/saved-prompt comparisons are retained. The [release report](decision-release-readiness.md)
+assesses the original gates, including absent observations, and keeps v1
+experimental. Scripted review wall time cannot establish human time savings.

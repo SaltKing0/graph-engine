@@ -1,0 +1,7 @@
+core 0 ['WARNING:pip_audit._cli:Consider using a tool like `pip-compile`: https://pip-tools.readthedocs.io/en/latest/#using-hashes', 'No known vulnerabilities found', 'Unique advisories: 0']
+dev 0 ['WARNING:pip_audit._cli:Consider using a tool like `pip-compile`: https://pip-tools.readthedocs.io/en/latest/#using-hashes', 'No known vulnerabilities found', 'Unique advisories: 0']
+mcp 0 ['WARNING:pip_audit._cli:Consider using a tool like `pip-compile`: https://pip-tools.readthedocs.io/en/latest/#using-hashes', 'No known vulnerabilities found', 'Unique advisories: 0']
+pdf 0 ['WARNING:pip_audit._cli:Consider using a tool like `pip-compile`: https://pip-tools.readthedocs.io/en/latest/#using-hashes', 'No known vulnerabilities found', 'Unique advisories: 0']
+core-3.14 0 ['WARNING:pip_audit._cli:Consider using a tool like `pip-compile`: https://pip-tools.readthedocs.io/en/latest/#using-hashes', 'No known vulnerabilities found', 'Unique advisories: 0']
+st 0 ['WARNING:pip_audit._cli:Consider using a tool like `pip-compile`: https://pip-tools.readthedocs.io/en/latest/#using-hashes', 'No known vulnerabilities found', 'Unique advisories: 0']
+legacy 0 ['WARNING:pip_audit._cli:Consider using a tool like `pip-compile`: https://pip-tools.readthedocs.io/en/latest/#using-hashes', 'No known vulnerabilities found', 'Unique advisories: 0']

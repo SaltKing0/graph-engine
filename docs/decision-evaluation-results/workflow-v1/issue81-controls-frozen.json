@@ -1,0 +1,2265 @@
+{
+  "schema": "dm.eval.report/1",
+  "status": "complete",
+  "metadata": {
+    "source_commit": "1d9581416cba60aa991a9d626f563d8203f34025",
+    "source_dirty": false,
+    "code_sha256": "ad8ca150a8e103f81e6af4c1b7a73d3040dc095aafe03bc583d60df61cdd222c",
+    "code_manifest": {
+      "graph_engine/__init__.py": "8a8d8c7b6d82373e8288533d448f7809f1d7402ae942b8e39238050f6b3904cd",
+      "graph_engine/__main__.py": "422df2f2ca3ab4e2da0567c7c50045d6c445249619cdc138f38ed44baf464ed8",
+      "graph_engine/access.py": "3f517bad19590d5e2a237c0c8faa3f0fcdd3e6bf46f03fe7067373fb33c172b2",
+      "graph_engine/agent_memory.py": "5371149e2eefd7a89b48d11834b11dc8f6a82cf5b44cd96b95046d6acf790240",
+      "graph_engine/brain.py": "daed44ddfbc070a6b7d801af740fe3c797f4969cf70664321170744029a3e992",
+      "graph_engine/brain_engine.py": "dd05cec10d0e06b3dc8b58fc4638ead70d91f8b565190f9570798b88209f108f",
+      "graph_engine/communities.py": "85eb3e66b3c0e0385e108f6ccadc16646bbc38f2f0acee379eaaef7d9547e958",
+      "graph_engine/consolidation.py": "9ee178a7f5ca2d7aa218e05d1f1e6d93eadefeeccb0b6b57bf7e6ae25dbf276b",
+      "graph_engine/consolidation_protocol.py": "015ef7cccd4b4d53aa5d76463a926c26513124abfb1892400718f0875f6aea0d",
+      "graph_engine/context.py": "def373d0bace62e2b59bff048b0df66c69635c6f5dd90a935442fe944962f133",
+      "graph_engine/decay.py": "4f8d18e6193120b8a6c8696bf7bc6448f2578ffd4a3acfbcecf903bebf3a0822",
+      "graph_engine/decision_brief.py": "8208b4612b6807040687ed5dc1f92b5954d3c25d73506b128203d417be309256",
+      "graph_engine/decision_impact.py": "a9bd04a342c9a418333ae54bc91ba316eeb58d58bfc9b6782f382744fa4d27c7",
+      "graph_engine/decision_memory.py": "4f859f750e393fdffb1dee9150bceb7cd7715824c19cc16ebb031e50a695984a",
+      "graph_engine/decision_review.py": "68c270c137a40daadfba53714879b4fa74dffb29f1a7370df5b949b9dab84c70",
+      "graph_engine/decision_schema.py": "81ab5831b2165006910fc78f014ed3ac9913e662c327c07979751727e049b291",
+      "graph_engine/decision_service.py": "ff77fa33e7d99e25ada4d0650d229abbf04f3c0d57ef665233b581e6cbebd123",
+      "graph_engine/demo.py": "5f433788e7b7e37f511a8dd4976e37a70844c8be39e2d7449e9213dc9b964333",
+      "graph_engine/document_import.py": "df9788af1e0cfd26c79f5a73ecea79dec0cc78b93b81c19c493c093290afa66d",
+      "graph_engine/dream.py": "d542521b417321e3ec7b16a4dfad96e4b201bdd3a133f10fde6758d59137d487",
+      "graph_engine/embedder.py": "249b80e4f1eee10c6a684515a88f515a1a46f757c4290fc6af0f5e8cecfe0262",
+      "graph_engine/engine.py": "afd83939e362af9ca9f6fcbfce76c7b964a8ac74a5dca497af248b3ebe11b071",
+      "graph_engine/entities.py": "a2f522a9261daa98f0e55fcb321f759a977cba3481acbc0e9b7111267ae9bf77",
+      "graph_engine/evals.py": "89707e51401bb893b91d3209a2fd63b9b7d21b0ac1241b5d64718d9881b76d96",
+      "graph_engine/feedback.py": "1e4962e08365449ac7ad2b43c4f36fb43f0f03340b984bb9b2d8ea366fd20935",
+      "graph_engine/gaps.py": "55157c66838aa66383aee65a06c6c4ee8aafdf308146335cc7a31cbdefa624a8",
+      "graph_engine/graph.py": "05ef8ae744842ccff02c523cc620c91b1a4f905c394a897520461d5127a2f40d",
+      "graph_engine/graph_retrieval.py": "2a4b2d5dce255054fb83816a3478dc9aac6c919682c3aa0ae9b537485989c769",
+      "graph_engine/hygiene.py": "9bf533e606cb6cd7abe6e5e2791b6ad312d96fba88fe90b43a9e3c70ffa4d812",
+      "graph_engine/inference.py": "547494fcd8060ca94188d0de032952bc04a032e6b1dace72c5eb943616081269",
+      "graph_engine/intent.py": "42bcd85e156ee3433135b3f9286fbd47036649f25022d5fa93b54636c6b772a5",
+      "graph_engine/maintenance.py": "8f3ff8701b6994ab2e30b42f9cdb73891de47f5ca869aa0d0be4dfdef05b0d62",
+      "graph_engine/mcp/__init__.py": "8d44f4694966bc465fae60344c86a8d7436e2c6de9faaa7119694c9cb67ac649",
+      "graph_engine/mcp/format.py": "c89cfeedc39fbb4adb20c897590123084b94411ce04ee964c295117d8b8cb937",
+      "graph_engine/mcp/server.py": "d3c15481bc184710a39cc9a193a4f36f60e86d4f1c75c80ad3a00850074811b0",
+      "graph_engine/merge.py": "28adf9621bcb1d95c07619904a9e3d85a7d51b8495776d84b25efd066e094fd1",
+      "graph_engine/model.py": "ff001150b344b9207552180d873c2c2dad492b11fc8e8a23d856c12ba97af60b",
+      "graph_engine/namespaces.py": "04117225ed38c2d4dfa466aff6014af681e9336d07ae8aeacdfaace6528c8dcb",
+      "graph_engine/recall.py": "af8d139631e2d1d87fdf0449ec3e7413d8597916e1c673d74aa289d6a0b9c6fd",
+      "graph_engine/replacements.py": "4401a4bb6ea06c6f9409dd5109c52011cbadb8b39aca55dbd01eb6ae9282fdb9",
+      "graph_engine/report.py": "3f1ee4be9ecc1bd43f981fc7960dd00d6875d5221a11d49651989c8bde63253f",
+      "graph_engine/reranker.py": "c2139f2fef02d3818cec7555ebcdb28781f7c1441977fd12b7a44621c1456dc7",
+      "graph_engine/retrieval.py": "aeefb80f9818247a2879263d438fda755802622a1bb0ca87919651fa96ad177d",
+      "graph_engine/review.py": "866475018dea7babdd1c160703139e71444facf0026af99e4b91f495fca88f1f",
+      "graph_engine/runtime.py": "63ba83979a6b7990c27dbddd387a3eee338376895f24c9584837d9c027b80f3b",
+      "graph_engine/search_index.py": "2910dd74fb065d205bcb5c5c1233c4c4bfd99a82ee0359c5d2e574ccb815884e",
+      "graph_engine/server.py": "7a93d128846768a184c78be3c29a212db4c5c45b658d83c21a795796c00ea577",
+      "graph_engine/similarity.py": "9ffd20d70bdc45b7358858ae34d7d31977db02b72a153d1034195cf7b2b1f82f",
+      "graph_engine/snapshots.py": "8199a5032a70e0d6fb777eaf8bab3a234cb18eed45445efb455681302b6cdfbe",
+      "graph_engine/store.py": "e9b478a3ccea228d76c9867d297e9632866865f2fd9b14d39f74b9a26b0f078e",
+      "graph_engine/suggester.py": "39043e874b0fd9d3e8ff51f4815a6f99bf00430038b6ec632344dcaa94c94808",
+      "graph_engine/temporal.py": "83002c390232dcc45983588138c4354b043474fd4e582c5e3f7aeef16d0d44e9",
+      "graph_engine/tiers.py": "96fab08fc6a2358587e0deff0d5541a602387ae2b385dc91ac12f339c8f177f8",
+      "graph_engine/timestamps.py": "18a83710d2d5219941b55e7c7c765c8d51f2e81eed4b5e7222f6c3ba2d73423e",
+      "graph_engine/vector_cache.py": "c5d8139848d88e8b552343fb060b7f082fa6036ae2f6526353f93c6694c27d96",
+      "graph_engine/write_guard.py": "9b589bd35ca3a97db4f9432dcfbe8cdb5d82aa3c5b349cb136bb3b4ea7ab2e3f",
+      "tools/decision_benchmark/__init__.py": "b4fe842811829eb9c9966c8707bb1af33a4cf382d31cab1c91bbc2728a8e7b78",
+      "tools/decision_benchmark/__main__.py": "2bac4fa31396aaf4324368f82acd8fa1b3c35a76597d7afb9929b95470790b97",
+      "tools/decision_benchmark/corpus.py": "46f1cef375c0ada4b18ffbdeec300c648b68af59adf7ed44ade358fdace58d8a",
+      "tools/decision_benchmark/freeze_sources.py": "6177bfc0d0cae4f6127c585f365bb1863a3fae9b562cf1cd9f20a1a460804166",
+      "tools/decision_benchmark/production.py": "da3e97e1a16c18f2c4d6c4e312154c3ed2a7055dba1e6650c88d10a747958d44",
+      "tools/decision_benchmark/readiness.py": "0629caa2a3cfa0399d32a752d3c201f6012ab465ffecf5977d32d1c1bbd075e2",
+      "tools/decision_benchmark/runner.py": "13d65a992eec0d4168e65172ad5ea4bb47fc9b176980f8f9c7c09e9aaf20da71",
+      "tools/decision_benchmark/scoring.py": "7d13a59d21202dac2b9fe2bb21f9e97ee7b9ca0bf9774f28c3b51e72f5c6366f",
+      "tools/decision_benchmark/synthetic.py": "96f0b1db91b05de5be9c49c9e238b64c0e2202a54259c89c302c183142d7df82",
+      "tools/memory_benchmark/__init__.py": "4697afa15d32363557e9e5a66f6625a291d33a04eadca592c682b3b747ecb17f",
+      "tools/memory_benchmark/__main__.py": "6e90c6a8f91b02854c6068a68cc39c6f1718aab4cf24c8067cf0ae252c930d84",
+      "tools/memory_benchmark/adapters.py": "146b187e10dc96409facc39f99e8dc8f092c5014b7b8982c42be3445204d2be4",
+      "tools/memory_benchmark/answers.py": "7334a046def3dc42ebe38cc2e96b47c2f4c3fa7921318a6d58f1a19d39bff3bf",
+      "tools/memory_benchmark/dataset.py": "bfe01cede6465347dfd569ef950a614cbe39317e09d988c9aeded3e7685af122",
+      "tools/memory_benchmark/embeddings.py": "bfdc69edc0ee75f9845b5338a7adc6545a38ed69fa117485f3861142bf217be8",
+      "tools/memory_benchmark/runner.py": "c09feaffc9b8c2d2e3b5f27246ba98f0c03992c51b04ae1069ecd5d55dfd3eb5",
+      "tools/memory_benchmark/scoring.py": "a2e53fb042c443a0a8e15a393c10624734596cb99e77fe26d4f799b5ecfc539e"
+    },
+    "python": "3.12.14",
+    "platform": "macOS-26.7.1-arm64-arm-64bit",
+    "dependencies": {
+      "graph-engine-memory": "0.7.0",
+      "numpy": "2.3.1",
+      "httpx": "0.28.1"
+    },
+    "captured_at": "2026-10-16T18:40:13.908470+00:00",
+    "corpus_version": "controls-v2.0.0",
+    "kind": "synthetic",
+    "freeze_sha256": "3e28ca22c7a3e3a415ed300555ec7edf38ecaf033c0f5af667f944ddd36f3dd0",
+    "frozen_files": {
+      "contract.md": "5f2dbaeabd5586794df8d3be88587c8a025dc8581fae1cbd15f09f21bd47530b",
+      "inputs.json": "0715f90bd8648a1fbd0b168f42307ffef16f22b8c071eb6dbb49b3fec8e746cb",
+      "labels.json": "f2847626758618df9e013b725d9357aacd06c13dfa5edba4e6474f456457b075",
+      "sources/changed-conditions-basis.txt": "94fadfaa18438c6ba805547241c1e7f7058d44c1c0cab06d5c527faee6978861",
+      "sources/changed-conditions-other.txt": "6e8f103561f6bc62a3f3daa00156b8e21bbc18804e0d3660879f60ed1e4c59d4",
+      "sources/changed-conditions-update.txt": "882cb0f2977885a517aea285f0103e8d7185664a44ebee011a0f3917294656df",
+      "sources/comparable-basis.txt": "94fadfaa18438c6ba805547241c1e7f7058d44c1c0cab06d5c527faee6978861",
+      "sources/comparable-other.txt": "6e8f103561f6bc62a3f3daa00156b8e21bbc18804e0d3660879f60ed1e4c59d4",
+      "sources/comparable-update.txt": "d1bea7e35548f395cbb22bc1830a084da139468296b40e2fbb73a3d4ca16c4b3",
+      "sources/duplicate-citation-basis.txt": "94fadfaa18438c6ba805547241c1e7f7058d44c1c0cab06d5c527faee6978861",
+      "sources/duplicate-citation-other.txt": "6e8f103561f6bc62a3f3daa00156b8e21bbc18804e0d3660879f60ed1e4c59d4",
+      "sources/duplicate-citation-update.txt": "83ee61623b51412c9759abf92f65491e9b30f7776487f5a83653c22bf2a4a629",
+      "sources/no-review-basis.txt": "94fadfaa18438c6ba805547241c1e7f7058d44c1c0cab06d5c527faee6978861",
+      "sources/no-review-other.txt": "6e8f103561f6bc62a3f3daa00156b8e21bbc18804e0d3660879f60ed1e4c59d4",
+      "sources/no-review-update.txt": "3f9c1d64d9385e7c55c0ba3b7317b63773a2f525f8145777802a4b32e3710e21",
+      "sources/surviving-support-basis.txt": "079b7acb941c5992583093e0c6d6a4d5d81ad217bea51fcd535dcb0f0330b031",
+      "sources/surviving-support-other.txt": "6e8f103561f6bc62a3f3daa00156b8e21bbc18804e0d3660879f60ed1e4c59d4",
+      "sources/surviving-support-update.txt": "bbfdc5e54a02a1dce66d5364fdfb152450e6dd1d320c1f2245ba1385fae22379",
+      "sources/time-only-basis.txt": "94fadfaa18438c6ba805547241c1e7f7058d44c1c0cab06d5c527faee6978861",
+      "sources/time-only-other.txt": "6e8f103561f6bc62a3f3daa00156b8e21bbc18804e0d3660879f60ed1e4c59d4",
+      "sources/time-only-update.txt": "db3de59cbd11651ec0933f9fe46c91076a49470d6f4ec69451a937cc3b9a5fe5",
+      "sources/unanswerable-basis.txt": "94fadfaa18438c6ba805547241c1e7f7058d44c1c0cab06d5c527faee6978861",
+      "sources/unanswerable-other.txt": "6e8f103561f6bc62a3f3daa00156b8e21bbc18804e0d3660879f60ed1e4c59d4",
+      "sources/unanswerable-update.txt": "9f80ce571bc5addf68fe3fe581718ed0e1b7ca8c130e0570c29eec7468c81adf",
+      "sources/unknown-comparability-basis.txt": "94fadfaa18438c6ba805547241c1e7f7058d44c1c0cab06d5c527faee6978861",
+      "sources/unknown-comparability-other.txt": "6e8f103561f6bc62a3f3daa00156b8e21bbc18804e0d3660879f60ed1e4c59d4",
+      "sources/unknown-comparability-update.txt": "cfec4e48bc2685023954e1a7f657dcba00438cfe7b967727ef9255d06daf5635",
+      "sources/unrelated-basis.txt": "94fadfaa18438c6ba805547241c1e7f7058d44c1c0cab06d5c527faee6978861",
+      "sources/unrelated-other.txt": "6e8f103561f6bc62a3f3daa00156b8e21bbc18804e0d3660879f60ed1e4c59d4",
+      "sources/unrelated-update.txt": "cec18867a91c4dbbc8c8b204758de216b23e4b84bbf3f1b493f7a0bbdf4282cd",
+      "sources/withdrawn-basis.txt": "94fadfaa18438c6ba805547241c1e7f7058d44c1c0cab06d5c527faee6978861",
+      "sources/withdrawn-other.txt": "6e8f103561f6bc62a3f3daa00156b8e21bbc18804e0d3660879f60ed1e4c59d4",
+      "sources/withdrawn-update.txt": "045963115041cb70ac3252b70fbdf3b8762c9de7d79e34f899bffd0767f574a9"
+    },
+    "configuration": {
+      "k": 5,
+      "context_budget_estimated_tokens": 4000,
+      "task_version": "decision-review-offline/2",
+      "corpus_task_version": "decision-review-offline/2",
+      "task_template": "Which documented decisions need review after this update to {path}? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.",
+      "update_input": "all visible chunks of the current update source",
+      "context_budget_excludes": [
+        "system/task text",
+        "decision inventory",
+        "current update"
+      ],
+      "system_prompt": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources.",
+      "graph_expansion": false,
+      "context_assembly": "graph_engine.context.build_context",
+      "source_chunk_chars": 800,
+      "split": "all",
+      "embedder": "HashEmbedder",
+      "embedder_dimension": 64,
+      "reranker": null,
+      "provider_calls": false,
+      "answer_model": null,
+      "dependency_profiles": [
+        "curated",
+        "proposed"
+      ],
+      "extraction_quality_measured": false
+    }
+  },
+  "results": [
+    {
+      "event_id": "event-comparable",
+      "split": "development",
+      "eligible_decisions": [
+        "decision-comparable-basis",
+        "decision-comparable-other",
+        "decision-changed-conditions-basis",
+        "decision-changed-conditions-other",
+        "decision-time-only-basis",
+        "decision-time-only-other",
+        "decision-duplicate-citation-basis",
+        "decision-duplicate-citation-other",
+        "decision-surviving-support-basis",
+        "decision-surviving-support-other"
+      ],
+      "available_source_ids": [
+        "changed-conditions-basis",
+        "changed-conditions-other",
+        "comparable-basis",
+        "comparable-other",
+        "comparable-update",
+        "duplicate-citation-basis",
+        "duplicate-citation-other",
+        "surviving-support-basis",
+        "surviving-support-other",
+        "time-only-basis",
+        "time-only-other"
+      ],
+      "visible_inputs_sha256": "1446cd5d09db2608a799eb20910e32434b1b5047863a0a2728835892dd75c780",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "changed-conditions-basis-c000",
+            "score": 0.03252247488101534
+          },
+          {
+            "id": "comparable-basis-c000",
+            "score": 0.03200204813108039
+          },
+          {
+            "id": "surviving-support-basis-c000",
+            "score": 0.03177805800756621
+          },
+          {
+            "id": "duplicate-citation-basis-c000",
+            "score": 0.03149801587301587
+          },
+          {
+            "id": "time-only-basis-c000",
+            "score": 0.031009615384615385
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:changed-conditions-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:comparable-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:surviving-support-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. Separate support Y1: recall=0.8 under the same… [truncated]\n\n[memory:duplicate-citation-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:time-only-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.",
+          "tokens": 335,
+          "nodes": [
+            "changed-conditions-basis-c000",
+            "comparable-basis-c000",
+            "surviving-support-basis-c000",
+            "duplicate-citation-basis-c000",
+            "time-only-basis-c000"
+          ],
+          "budget": 4000,
+          "truncated": true,
+          "memories": [
+            {
+              "id": "changed-conditions-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "comparable-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "surviving-support-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "duplicate-citation-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "time-only-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "changed-conditions-basis-c000",
+                "comparable-basis-c000",
+                "surviving-support-basis-c000",
+                "duplicate-citation-basis-c000",
+                "time-only-basis-c000"
+              ],
+              "tokens": 335
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to fictional/comparable.txt? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-comparable-basis\", \"source_id\": \"comparable-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-comparable-other\", \"source_id\": \"comparable-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-changed-conditions-basis\", \"source_id\": \"changed-conditions-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-changed-conditions-other\", \"source_id\": \"changed-conditions-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-time-only-basis\", \"source_id\": \"time-only-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-time-only-other\", \"source_id\": \"time-only-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-duplicate-citation-basis\", \"source_id\": \"duplicate-citation-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-duplicate-citation-other\", \"source_id\": \"duplicate-citation-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-surviving-support-basis\", \"source_id\": \"surviving-support-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-surviving-support-other\", \"source_id\": \"surviving-support-other\"}]\nUpdate source: comparable-update\nUpdate documents (complete task input):\n[{\"id\": \"comparable-update-c000\", \"source_id\": \"comparable-update\", \"text\": \"SYNTHETIC UPDATE: Observation X2: recall=0.2 fraction; workload W; environment E; code C; corpus H; replaces X1 recall=0.8. Both observations use the same protocol P.\\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:changed-conditions-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:comparable-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:surviving-support-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. Separate support Y1: recall=0.8 under the same… [truncated]\n\n[memory:duplicate-citation-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:time-only-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded."
+          }
+        ],
+        "prompt_sha256": "26c6aabaaf66475718f4e5a719ac46fa570be5398c1c6c9e4d624359f3fb0caf",
+        "update_node_ids": [
+          "comparable-update-c000"
+        ],
+        "prompt_estimated_tokens": 820,
+        "latency_ms": {
+          "retrieval": 5.963042029179633,
+          "context": 3.354499989654869
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-comparable-basis",
+            "path": [
+              "comparable-update",
+              "comparable-basis",
+              "link-comparable-basis",
+              "decision-comparable-basis"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 17.123374971561134,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    },
+    {
+      "event_id": "event-changed-conditions",
+      "split": "development",
+      "eligible_decisions": [
+        "decision-comparable-basis",
+        "decision-comparable-other",
+        "decision-changed-conditions-basis",
+        "decision-changed-conditions-other",
+        "decision-time-only-basis",
+        "decision-time-only-other",
+        "decision-duplicate-citation-basis",
+        "decision-duplicate-citation-other",
+        "decision-surviving-support-basis",
+        "decision-surviving-support-other"
+      ],
+      "available_source_ids": [
+        "changed-conditions-basis",
+        "changed-conditions-other",
+        "changed-conditions-update",
+        "comparable-basis",
+        "comparable-other",
+        "comparable-update",
+        "duplicate-citation-basis",
+        "duplicate-citation-other",
+        "surviving-support-basis",
+        "surviving-support-other",
+        "time-only-basis",
+        "time-only-other"
+      ],
+      "visible_inputs_sha256": "bf45126570f4e28f75d4118df8b4d2ded7403200e285563f191558fa8c33e2e8",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "changed-conditions-basis-c000",
+            "score": 0.032266458495966696
+          },
+          {
+            "id": "surviving-support-basis-c000",
+            "score": 0.03177805800756621
+          },
+          {
+            "id": "comparable-basis-c000",
+            "score": 0.031754032258064516
+          },
+          {
+            "id": "changed-conditions-update-c000",
+            "score": 0.03128054740957967
+          },
+          {
+            "id": "duplicate-citation-basis-c000",
+            "score": 0.03125763125763126
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:changed-conditions-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:surviving-support-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. Separate support Y1: recall=0.8 under the same… [truncated]\n\n[memory:comparable-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:changed-conditions-update-c000] [semantic, active] source: benchmark\nSYNTHETIC UPDATE: Observation X2: recall=0.2 fraction; workload W2; environment E; code C; corpus H2; protocol P. Original observation X1 used workload W and corpus H.\n\n[memory:duplicate-citation-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.",
+          "tokens": 333,
+          "nodes": [
+            "changed-conditions-basis-c000",
+            "surviving-support-basis-c000",
+            "comparable-basis-c000",
+            "changed-conditions-update-c000",
+            "duplicate-citation-basis-c000"
+          ],
+          "budget": 4000,
+          "truncated": true,
+          "memories": [
+            {
+              "id": "changed-conditions-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "surviving-support-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "comparable-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "changed-conditions-update-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "duplicate-citation-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "changed-conditions-basis-c000",
+                "surviving-support-basis-c000",
+                "comparable-basis-c000",
+                "changed-conditions-update-c000",
+                "duplicate-citation-basis-c000"
+              ],
+              "tokens": 333
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to fictional/changed-conditions.txt? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-comparable-basis\", \"source_id\": \"comparable-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-comparable-other\", \"source_id\": \"comparable-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-changed-conditions-basis\", \"source_id\": \"changed-conditions-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-changed-conditions-other\", \"source_id\": \"changed-conditions-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-time-only-basis\", \"source_id\": \"time-only-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-time-only-other\", \"source_id\": \"time-only-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-duplicate-citation-basis\", \"source_id\": \"duplicate-citation-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-duplicate-citation-other\", \"source_id\": \"duplicate-citation-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-surviving-support-basis\", \"source_id\": \"surviving-support-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-surviving-support-other\", \"source_id\": \"surviving-support-other\"}]\nUpdate source: changed-conditions-update\nUpdate documents (complete task input):\n[{\"id\": \"changed-conditions-update-c000\", \"source_id\": \"changed-conditions-update\", \"text\": \"SYNTHETIC UPDATE: Observation X2: recall=0.2 fraction; workload W2; environment E; code C; corpus H2; protocol P. Original observation X1 used workload W and corpus H.\\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:changed-conditions-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:surviving-support-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. Separate support Y1: recall=0.8 under the same… [truncated]\n\n[memory:comparable-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:changed-conditions-update-c000] [semantic, active] source: benchmark\nSYNTHETIC UPDATE: Observation X2: recall=0.2 fraction; workload W2; environment E; code C; corpus H2; protocol P. Original observation X1 used workload W and corpus H.\n\n[memory:duplicate-citation-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded."
+          }
+        ],
+        "prompt_sha256": "3ef04e18a308f0be121936012428a49d71ae65fd9af1decb09194e628f410e1e",
+        "update_node_ids": [
+          "changed-conditions-update-c000"
+        ],
+        "prompt_estimated_tokens": 826,
+        "latency_ms": {
+          "retrieval": 3.0518340063281357,
+          "context": 2.684667007997632
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-changed-conditions-basis",
+            "path": [
+              "changed-conditions-update",
+              "changed-conditions-basis",
+              "link-changed-conditions-basis",
+              "decision-changed-conditions-basis"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 12.964709021616727,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    },
+    {
+      "event_id": "event-time-only",
+      "split": "development",
+      "eligible_decisions": [
+        "decision-comparable-basis",
+        "decision-comparable-other",
+        "decision-changed-conditions-basis",
+        "decision-changed-conditions-other",
+        "decision-time-only-basis",
+        "decision-time-only-other",
+        "decision-duplicate-citation-basis",
+        "decision-duplicate-citation-other",
+        "decision-surviving-support-basis",
+        "decision-surviving-support-other"
+      ],
+      "available_source_ids": [
+        "changed-conditions-basis",
+        "changed-conditions-other",
+        "changed-conditions-update",
+        "comparable-basis",
+        "comparable-other",
+        "comparable-update",
+        "duplicate-citation-basis",
+        "duplicate-citation-other",
+        "surviving-support-basis",
+        "surviving-support-other",
+        "time-only-basis",
+        "time-only-other",
+        "time-only-update"
+      ],
+      "visible_inputs_sha256": "1e5e5569605e16a939fb027a4f49499160f7ff4a149035b4a22c13c24ecd5c7a",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "changed-conditions-basis-c000",
+            "score": 0.03252247488101534
+          },
+          {
+            "id": "comparable-basis-c000",
+            "score": 0.03200204813108039
+          },
+          {
+            "id": "surviving-support-basis-c000",
+            "score": 0.03177805800756621
+          },
+          {
+            "id": "duplicate-citation-basis-c000",
+            "score": 0.03149801587301587
+          },
+          {
+            "id": "time-only-basis-c000",
+            "score": 0.031009615384615385
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:changed-conditions-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:comparable-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:surviving-support-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. Separate support Y1: recall=0.8 under the same… [truncated]\n\n[memory:duplicate-citation-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:time-only-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.",
+          "tokens": 335,
+          "nodes": [
+            "changed-conditions-basis-c000",
+            "comparable-basis-c000",
+            "surviving-support-basis-c000",
+            "duplicate-citation-basis-c000",
+            "time-only-basis-c000"
+          ],
+          "budget": 4000,
+          "truncated": true,
+          "memories": [
+            {
+              "id": "changed-conditions-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "comparable-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "surviving-support-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "duplicate-citation-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "time-only-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "changed-conditions-basis-c000",
+                "comparable-basis-c000",
+                "surviving-support-basis-c000",
+                "duplicate-citation-basis-c000",
+                "time-only-basis-c000"
+              ],
+              "tokens": 335
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to fictional/time-only.txt? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-comparable-basis\", \"source_id\": \"comparable-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-comparable-other\", \"source_id\": \"comparable-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-changed-conditions-basis\", \"source_id\": \"changed-conditions-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-changed-conditions-other\", \"source_id\": \"changed-conditions-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-time-only-basis\", \"source_id\": \"time-only-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-time-only-other\", \"source_id\": \"time-only-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-duplicate-citation-basis\", \"source_id\": \"duplicate-citation-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-duplicate-citation-other\", \"source_id\": \"duplicate-citation-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-surviving-support-basis\", \"source_id\": \"surviving-support-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-surviving-support-other\", \"source_id\": \"surviving-support-other\"}]\nUpdate source: time-only-update\nUpdate documents (complete task input):\n[{\"id\": \"time-only-update-c000\", \"source_id\": \"time-only-update\", \"text\": \"SYNTHETIC UPDATE: Observation X2 at 2026-01-04: recall=0.8 fraction; workload W; environment E; code C; corpus H; protocol P. Observation X1 at 2026-01-01 had the same value and conditions.\\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:changed-conditions-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:comparable-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:surviving-support-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. Separate support Y1: recall=0.8 under the same… [truncated]\n\n[memory:duplicate-citation-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:time-only-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded."
+          }
+        ],
+        "prompt_sha256": "3f882b9a7932191c6154a6607e0df8ab6af4254f2298fcf07f32c68f82a867ab",
+        "update_node_ids": [
+          "time-only-update-c000"
+        ],
+        "prompt_estimated_tokens": 824,
+        "latency_ms": {
+          "retrieval": 3.1813749810680747,
+          "context": 3.1973750446923077
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-time-only-basis",
+            "path": [
+              "time-only-update",
+              "time-only-basis",
+              "link-time-only-basis",
+              "decision-time-only-basis"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 13.820124964695424,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    },
+    {
+      "event_id": "event-duplicate-citation",
+      "split": "development",
+      "eligible_decisions": [
+        "decision-comparable-basis",
+        "decision-comparable-other",
+        "decision-changed-conditions-basis",
+        "decision-changed-conditions-other",
+        "decision-time-only-basis",
+        "decision-time-only-other",
+        "decision-duplicate-citation-basis",
+        "decision-duplicate-citation-other",
+        "decision-surviving-support-basis",
+        "decision-surviving-support-other"
+      ],
+      "available_source_ids": [
+        "changed-conditions-basis",
+        "changed-conditions-other",
+        "changed-conditions-update",
+        "comparable-basis",
+        "comparable-other",
+        "comparable-update",
+        "duplicate-citation-basis",
+        "duplicate-citation-other",
+        "duplicate-citation-update",
+        "surviving-support-basis",
+        "surviving-support-other",
+        "time-only-basis",
+        "time-only-other",
+        "time-only-update"
+      ],
+      "visible_inputs_sha256": "645a87be29142c120637cc32e9f30783e4b8372c75551ca94bb407386b8d3773",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "changed-conditions-basis-c000",
+            "score": 0.03252247488101534
+          },
+          {
+            "id": "comparable-basis-c000",
+            "score": 0.03200204813108039
+          },
+          {
+            "id": "surviving-support-basis-c000",
+            "score": 0.03177805800756621
+          },
+          {
+            "id": "duplicate-citation-basis-c000",
+            "score": 0.03149801587301587
+          },
+          {
+            "id": "time-only-basis-c000",
+            "score": 0.031009615384615385
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:changed-conditions-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:comparable-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:surviving-support-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. Separate support Y1: recall=0.8 under the same… [truncated]\n\n[memory:duplicate-citation-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:time-only-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.",
+          "tokens": 335,
+          "nodes": [
+            "changed-conditions-basis-c000",
+            "comparable-basis-c000",
+            "surviving-support-basis-c000",
+            "duplicate-citation-basis-c000",
+            "time-only-basis-c000"
+          ],
+          "budget": 4000,
+          "truncated": true,
+          "memories": [
+            {
+              "id": "changed-conditions-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "comparable-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "surviving-support-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "duplicate-citation-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "time-only-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "changed-conditions-basis-c000",
+                "comparable-basis-c000",
+                "surviving-support-basis-c000",
+                "duplicate-citation-basis-c000",
+                "time-only-basis-c000"
+              ],
+              "tokens": 335
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to fictional/duplicate-citation.txt? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-comparable-basis\", \"source_id\": \"comparable-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-comparable-other\", \"source_id\": \"comparable-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-changed-conditions-basis\", \"source_id\": \"changed-conditions-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-changed-conditions-other\", \"source_id\": \"changed-conditions-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-time-only-basis\", \"source_id\": \"time-only-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-time-only-other\", \"source_id\": \"time-only-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-duplicate-citation-basis\", \"source_id\": \"duplicate-citation-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-duplicate-citation-other\", \"source_id\": \"duplicate-citation-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-surviving-support-basis\", \"source_id\": \"surviving-support-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-surviving-support-other\", \"source_id\": \"surviving-support-other\"}]\nUpdate source: duplicate-citation-update\nUpdate documents (complete task input):\n[{\"id\": \"duplicate-citation-update-c000\", \"source_id\": \"duplicate-citation-update\", \"text\": \"SYNTHETIC UPDATE: Artifact X-copy quotes measurement X1 verbatim; lineage_id=run-X1. No new measurement was performed.\\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:changed-conditions-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:comparable-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:surviving-support-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. Separate support Y1: recall=0.8 under the same… [truncated]\n\n[memory:duplicate-citation-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:time-only-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded."
+          }
+        ],
+        "prompt_sha256": "86e4a91cafaa037860f89a0cab3541d49097e6611e6ca9e77f03f4c2f7971d9d",
+        "update_node_ids": [
+          "duplicate-citation-update-c000"
+        ],
+        "prompt_estimated_tokens": 816,
+        "latency_ms": {
+          "retrieval": 4.197208967525512,
+          "context": 4.3706250144168735
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-duplicate-citation-basis",
+            "path": [
+              "duplicate-citation-update",
+              "duplicate-citation-basis",
+              "link-duplicate-citation-basis",
+              "decision-duplicate-citation-basis"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 16.855333000421524,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    },
+    {
+      "event_id": "event-surviving-support",
+      "split": "development",
+      "eligible_decisions": [
+        "decision-comparable-basis",
+        "decision-comparable-other",
+        "decision-changed-conditions-basis",
+        "decision-changed-conditions-other",
+        "decision-time-only-basis",
+        "decision-time-only-other",
+        "decision-duplicate-citation-basis",
+        "decision-duplicate-citation-other",
+        "decision-surviving-support-basis",
+        "decision-surviving-support-other"
+      ],
+      "available_source_ids": [
+        "changed-conditions-basis",
+        "changed-conditions-other",
+        "changed-conditions-update",
+        "comparable-basis",
+        "comparable-other",
+        "comparable-update",
+        "duplicate-citation-basis",
+        "duplicate-citation-other",
+        "duplicate-citation-update",
+        "surviving-support-basis",
+        "surviving-support-other",
+        "surviving-support-update",
+        "time-only-basis",
+        "time-only-other",
+        "time-only-update"
+      ],
+      "visible_inputs_sha256": "11df99a28958321095236b8c189f288941b24cd56999bc84ecdeeb84e46210c3",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "surviving-support-basis-c000",
+            "score": 0.03252247488101534
+          },
+          {
+            "id": "changed-conditions-basis-c000",
+            "score": 0.03200204813108039
+          },
+          {
+            "id": "surviving-support-update-c000",
+            "score": 0.031544957774465976
+          },
+          {
+            "id": "comparable-basis-c000",
+            "score": 0.03149801587301587
+          },
+          {
+            "id": "duplicate-citation-basis-c000",
+            "score": 0.031009615384615385
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:surviving-support-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. Separate support Y1: recall=0.8 under the same… [truncated]\n\n[memory:changed-conditions-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:surviving-support-update-c000] [semantic, active] source: benchmark\nSYNTHETIC UPDATE: Availability update: support X1 withdrawn by its author. Independent support Y1 remains available; Y1 was a separate run with known protocol and dataset provenance.\n\n[memory:comparable-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:duplicate-citation-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.",
+          "tokens": 337,
+          "nodes": [
+            "surviving-support-basis-c000",
+            "changed-conditions-basis-c000",
+            "surviving-support-update-c000",
+            "comparable-basis-c000",
+            "duplicate-citation-basis-c000"
+          ],
+          "budget": 4000,
+          "truncated": true,
+          "memories": [
+            {
+              "id": "surviving-support-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "changed-conditions-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "surviving-support-update-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "comparable-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "duplicate-citation-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "surviving-support-basis-c000",
+                "changed-conditions-basis-c000",
+                "surviving-support-update-c000",
+                "comparable-basis-c000",
+                "duplicate-citation-basis-c000"
+              ],
+              "tokens": 337
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to fictional/surviving-support.txt? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-comparable-basis\", \"source_id\": \"comparable-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-comparable-other\", \"source_id\": \"comparable-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-changed-conditions-basis\", \"source_id\": \"changed-conditions-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-changed-conditions-other\", \"source_id\": \"changed-conditions-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-time-only-basis\", \"source_id\": \"time-only-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-time-only-other\", \"source_id\": \"time-only-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-duplicate-citation-basis\", \"source_id\": \"duplicate-citation-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-duplicate-citation-other\", \"source_id\": \"duplicate-citation-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-surviving-support-basis\", \"source_id\": \"surviving-support-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-surviving-support-other\", \"source_id\": \"surviving-support-other\"}]\nUpdate source: surviving-support-update\nUpdate documents (complete task input):\n[{\"id\": \"surviving-support-update-c000\", \"source_id\": \"surviving-support-update\", \"text\": \"SYNTHETIC UPDATE: Availability update: support X1 withdrawn by its author. Independent support Y1 remains available; Y1 was a separate run with known protocol and dataset provenance.\\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:surviving-support-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. Separate support Y1: recall=0.8 under the same… [truncated]\n\n[memory:changed-conditions-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:surviving-support-update-c000] [semantic, active] source: benchmark\nSYNTHETIC UPDATE: Availability update: support X1 withdrawn by its author. Independent support Y1 remains available; Y1 was a separate run with known protocol and dataset provenance.\n\n[memory:comparable-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:duplicate-citation-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded."
+          }
+        ],
+        "prompt_sha256": "1686acc56176d18dfe1da4d9ee707b2b8489dd6e7492cd0490a61198734798c9",
+        "update_node_ids": [
+          "surviving-support-update-c000"
+        ],
+        "prompt_estimated_tokens": 832,
+        "latency_ms": {
+          "retrieval": 3.445749985985458,
+          "context": 2.5104169617407024
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-surviving-support-basis",
+            "path": [
+              "surviving-support-update",
+              "surviving-support-basis",
+              "link-surviving-support-basis",
+              "decision-surviving-support-basis"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 18.26129201799631,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    },
+    {
+      "event_id": "event-withdrawn",
+      "split": "evaluation",
+      "eligible_decisions": [
+        "decision-withdrawn-basis",
+        "decision-withdrawn-other",
+        "decision-unknown-comparability-basis",
+        "decision-unknown-comparability-other",
+        "decision-unrelated-basis",
+        "decision-unrelated-other",
+        "decision-no-review-basis",
+        "decision-no-review-other",
+        "decision-unanswerable-basis",
+        "decision-unanswerable-other"
+      ],
+      "available_source_ids": [
+        "no-review-basis",
+        "no-review-other",
+        "unanswerable-basis",
+        "unanswerable-other",
+        "unknown-comparability-basis",
+        "unknown-comparability-other",
+        "unrelated-basis",
+        "unrelated-other",
+        "withdrawn-basis",
+        "withdrawn-other",
+        "withdrawn-update"
+      ],
+      "visible_inputs_sha256": "0af11f9835195e175a38fd5963c23e821eefa94e50a3e69354ec3f8825c6dc43",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "no-review-basis-c000",
+            "score": 0.03278688524590164
+          },
+          {
+            "id": "unanswerable-basis-c000",
+            "score": 0.03225806451612903
+          },
+          {
+            "id": "unknown-comparability-basis-c000",
+            "score": 0.031746031746031744
+          },
+          {
+            "id": "unrelated-basis-c000",
+            "score": 0.03125
+          },
+          {
+            "id": "withdrawn-basis-c000",
+            "score": 0.03076923076923077
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:no-review-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unanswerable-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unknown-comparability-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unrelated-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:withdrawn-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.",
+          "tokens": 325,
+          "nodes": [
+            "no-review-basis-c000",
+            "unanswerable-basis-c000",
+            "unknown-comparability-basis-c000",
+            "unrelated-basis-c000",
+            "withdrawn-basis-c000"
+          ],
+          "budget": 4000,
+          "truncated": false,
+          "memories": [
+            {
+              "id": "no-review-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "unanswerable-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "unknown-comparability-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "unrelated-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "withdrawn-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "no-review-basis-c000",
+                "unanswerable-basis-c000",
+                "unknown-comparability-basis-c000",
+                "unrelated-basis-c000",
+                "withdrawn-basis-c000"
+              ],
+              "tokens": 325
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to fictional/withdrawn.txt? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-withdrawn-basis\", \"source_id\": \"withdrawn-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-withdrawn-other\", \"source_id\": \"withdrawn-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-unknown-comparability-basis\", \"source_id\": \"unknown-comparability-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-unknown-comparability-other\", \"source_id\": \"unknown-comparability-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-unrelated-basis\", \"source_id\": \"unrelated-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-unrelated-other\", \"source_id\": \"unrelated-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-no-review-basis\", \"source_id\": \"no-review-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-no-review-other\", \"source_id\": \"no-review-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-unanswerable-basis\", \"source_id\": \"unanswerable-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-unanswerable-other\", \"source_id\": \"unanswerable-other\"}]\nUpdate source: withdrawn-update\nUpdate documents (complete task input):\n[{\"id\": \"withdrawn-update-c000\", \"source_id\": \"withdrawn-update\", \"text\": \"SYNTHETIC UPDATE: Availability update: measurement X1 withdrawn by its author. This record supplies no replacement measurement.\\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:no-review-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unanswerable-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unknown-comparability-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unrelated-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:withdrawn-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded."
+          }
+        ],
+        "prompt_sha256": "0907322991dea873d3d101d86af696309e5791a929cc4f56618bada61933d6cf",
+        "update_node_ids": [
+          "withdrawn-update-c000"
+        ],
+        "prompt_estimated_tokens": 786,
+        "latency_ms": {
+          "retrieval": 2.7394999633543193,
+          "context": 2.0377080072648823
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-withdrawn-basis",
+            "path": [
+              "withdrawn-update",
+              "withdrawn-basis",
+              "link-withdrawn-basis",
+              "decision-withdrawn-basis"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 15.441166993696243,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    },
+    {
+      "event_id": "event-unknown-comparability",
+      "split": "evaluation",
+      "eligible_decisions": [
+        "decision-withdrawn-basis",
+        "decision-withdrawn-other",
+        "decision-unknown-comparability-basis",
+        "decision-unknown-comparability-other",
+        "decision-unrelated-basis",
+        "decision-unrelated-other",
+        "decision-no-review-basis",
+        "decision-no-review-other",
+        "decision-unanswerable-basis",
+        "decision-unanswerable-other"
+      ],
+      "available_source_ids": [
+        "no-review-basis",
+        "no-review-other",
+        "unanswerable-basis",
+        "unanswerable-other",
+        "unknown-comparability-basis",
+        "unknown-comparability-other",
+        "unknown-comparability-update",
+        "unrelated-basis",
+        "unrelated-other",
+        "withdrawn-basis",
+        "withdrawn-other",
+        "withdrawn-update"
+      ],
+      "visible_inputs_sha256": "d1b5110d6039678c36fd1802b61da7e5ec0bbbeb523248e43c54b2899a4ccd10",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "no-review-basis-c000",
+            "score": 0.03278688524590164
+          },
+          {
+            "id": "unanswerable-basis-c000",
+            "score": 0.03225806451612903
+          },
+          {
+            "id": "unknown-comparability-basis-c000",
+            "score": 0.031746031746031744
+          },
+          {
+            "id": "unrelated-basis-c000",
+            "score": 0.03125
+          },
+          {
+            "id": "withdrawn-basis-c000",
+            "score": 0.03076923076923077
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:no-review-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unanswerable-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unknown-comparability-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unrelated-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:withdrawn-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.",
+          "tokens": 325,
+          "nodes": [
+            "no-review-basis-c000",
+            "unanswerable-basis-c000",
+            "unknown-comparability-basis-c000",
+            "unrelated-basis-c000",
+            "withdrawn-basis-c000"
+          ],
+          "budget": 4000,
+          "truncated": false,
+          "memories": [
+            {
+              "id": "no-review-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "unanswerable-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "unknown-comparability-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "unrelated-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "withdrawn-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "no-review-basis-c000",
+                "unanswerable-basis-c000",
+                "unknown-comparability-basis-c000",
+                "unrelated-basis-c000",
+                "withdrawn-basis-c000"
+              ],
+              "tokens": 325
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to fictional/unknown-comparability.txt? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-withdrawn-basis\", \"source_id\": \"withdrawn-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-withdrawn-other\", \"source_id\": \"withdrawn-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-unknown-comparability-basis\", \"source_id\": \"unknown-comparability-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-unknown-comparability-other\", \"source_id\": \"unknown-comparability-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-unrelated-basis\", \"source_id\": \"unrelated-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-unrelated-other\", \"source_id\": \"unrelated-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-no-review-basis\", \"source_id\": \"no-review-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-no-review-other\", \"source_id\": \"no-review-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-unanswerable-basis\", \"source_id\": \"unanswerable-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-unanswerable-other\", \"source_id\": \"unanswerable-other\"}]\nUpdate source: unknown-comparability-update\nUpdate documents (complete task input):\n[{\"id\": \"unknown-comparability-update-c000\", \"source_id\": \"unknown-comparability-update\", \"text\": \"SYNTHETIC UPDATE: Observation X2: recall=0.2 fraction; workload W; code C; environment not supplied; corpus hash not supplied; protocol P.\\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:no-review-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unanswerable-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unknown-comparability-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unrelated-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:withdrawn-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded."
+          }
+        ],
+        "prompt_sha256": "740ce1032560940a63ce3144260b76fab3ef0d84be54a0d2bb83e7a39480fddd",
+        "update_node_ids": [
+          "unknown-comparability-update-c000"
+        ],
+        "prompt_estimated_tokens": 801,
+        "latency_ms": {
+          "retrieval": 4.628624999895692,
+          "context": 2.2627500002272427
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-unknown-comparability-basis",
+            "path": [
+              "unknown-comparability-update",
+              "unknown-comparability-basis",
+              "link-unknown-comparability-basis",
+              "decision-unknown-comparability-basis"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 14.32929199654609,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    },
+    {
+      "event_id": "event-unrelated",
+      "split": "evaluation",
+      "eligible_decisions": [
+        "decision-withdrawn-basis",
+        "decision-withdrawn-other",
+        "decision-unknown-comparability-basis",
+        "decision-unknown-comparability-other",
+        "decision-unrelated-basis",
+        "decision-unrelated-other",
+        "decision-no-review-basis",
+        "decision-no-review-other",
+        "decision-unanswerable-basis",
+        "decision-unanswerable-other"
+      ],
+      "available_source_ids": [
+        "no-review-basis",
+        "no-review-other",
+        "unanswerable-basis",
+        "unanswerable-other",
+        "unknown-comparability-basis",
+        "unknown-comparability-other",
+        "unknown-comparability-update",
+        "unrelated-basis",
+        "unrelated-other",
+        "unrelated-update",
+        "withdrawn-basis",
+        "withdrawn-other",
+        "withdrawn-update"
+      ],
+      "visible_inputs_sha256": "1ac573a5d8342a1f0dd8af04cc8faccb1b328c83f22af3879f66dcf32554dd49",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "no-review-basis-c000",
+            "score": 0.03278688524590164
+          },
+          {
+            "id": "unanswerable-basis-c000",
+            "score": 0.03225806451612903
+          },
+          {
+            "id": "unknown-comparability-basis-c000",
+            "score": 0.031746031746031744
+          },
+          {
+            "id": "unrelated-basis-c000",
+            "score": 0.03125
+          },
+          {
+            "id": "withdrawn-basis-c000",
+            "score": 0.03076923076923077
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:no-review-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unanswerable-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unknown-comparability-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unrelated-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:withdrawn-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.",
+          "tokens": 325,
+          "nodes": [
+            "no-review-basis-c000",
+            "unanswerable-basis-c000",
+            "unknown-comparability-basis-c000",
+            "unrelated-basis-c000",
+            "withdrawn-basis-c000"
+          ],
+          "budget": 4000,
+          "truncated": false,
+          "memories": [
+            {
+              "id": "no-review-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "unanswerable-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "unknown-comparability-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "unrelated-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "withdrawn-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "no-review-basis-c000",
+                "unanswerable-basis-c000",
+                "unknown-comparability-basis-c000",
+                "unrelated-basis-c000",
+                "withdrawn-basis-c000"
+              ],
+              "tokens": 325
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to fictional/unrelated.txt? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-withdrawn-basis\", \"source_id\": \"withdrawn-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-withdrawn-other\", \"source_id\": \"withdrawn-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-unknown-comparability-basis\", \"source_id\": \"unknown-comparability-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-unknown-comparability-other\", \"source_id\": \"unknown-comparability-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-unrelated-basis\", \"source_id\": \"unrelated-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-unrelated-other\", \"source_id\": \"unrelated-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-no-review-basis\", \"source_id\": \"no-review-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-no-review-other\", \"source_id\": \"no-review-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-unanswerable-basis\", \"source_id\": \"unanswerable-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-unanswerable-other\", \"source_id\": \"unanswerable-other\"}]\nUpdate source: unrelated-update\nUpdate documents (complete task input):\n[{\"id\": \"unrelated-update-c000\", \"source_id\": \"unrelated-update\", \"text\": \"SYNTHETIC UPDATE: Palette artifact P2: the blue label now has two spaces instead of one. No mode-A measurements occur in this artifact.\\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:no-review-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unanswerable-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unknown-comparability-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unrelated-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:withdrawn-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded."
+          }
+        ],
+        "prompt_sha256": "8b7fbf6b1eef9adcb2e281d731043b2db569622f374ddac3ee86c59c9674e56d",
+        "update_node_ids": [
+          "unrelated-update-c000"
+        ],
+        "prompt_estimated_tokens": 788,
+        "latency_ms": {
+          "retrieval": 3.1423330074176192,
+          "context": 2.3779170005582273
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-unrelated-other",
+            "path": [
+              "unrelated-update",
+              "unrelated-other",
+              "link-unrelated-other",
+              "decision-unrelated-other"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 12.388541013933718,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    },
+    {
+      "event_id": "event-no-review",
+      "split": "evaluation",
+      "eligible_decisions": [
+        "decision-withdrawn-basis",
+        "decision-withdrawn-other",
+        "decision-unknown-comparability-basis",
+        "decision-unknown-comparability-other",
+        "decision-unrelated-basis",
+        "decision-unrelated-other",
+        "decision-no-review-basis",
+        "decision-no-review-other",
+        "decision-unanswerable-basis",
+        "decision-unanswerable-other"
+      ],
+      "available_source_ids": [
+        "no-review-basis",
+        "no-review-other",
+        "no-review-update",
+        "unanswerable-basis",
+        "unanswerable-other",
+        "unknown-comparability-basis",
+        "unknown-comparability-other",
+        "unknown-comparability-update",
+        "unrelated-basis",
+        "unrelated-other",
+        "unrelated-update",
+        "withdrawn-basis",
+        "withdrawn-other",
+        "withdrawn-update"
+      ],
+      "visible_inputs_sha256": "0eca3f5fb8ab2ca8eba1304136a2913b89b13d9c7ac222bd5743de410efd5f45",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "no-review-basis-c000",
+            "score": 0.03252247488101534
+          },
+          {
+            "id": "unanswerable-basis-c000",
+            "score": 0.03200204813108039
+          },
+          {
+            "id": "no-review-update-c000",
+            "score": 0.031544957774465976
+          },
+          {
+            "id": "unknown-comparability-basis-c000",
+            "score": 0.03149801587301587
+          },
+          {
+            "id": "unrelated-basis-c000",
+            "score": 0.031009615384615385
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:no-review-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unanswerable-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:no-review-update-c000] [semantic, active] source: benchmark\nSYNTHETIC UPDATE: The source contains the same observation X1 recall=0.8, workload W, environment E, code C, corpus H and protocol P. Only blank-line formatting changed.\n\n[memory:unknown-comparability-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unrelated-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.",
+          "tokens": 321,
+          "nodes": [
+            "no-review-basis-c000",
+            "unanswerable-basis-c000",
+            "no-review-update-c000",
+            "unknown-comparability-basis-c000",
+            "unrelated-basis-c000"
+          ],
+          "budget": 4000,
+          "truncated": false,
+          "memories": [
+            {
+              "id": "no-review-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "unanswerable-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "no-review-update-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "unknown-comparability-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "unrelated-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "no-review-basis-c000",
+                "unanswerable-basis-c000",
+                "no-review-update-c000",
+                "unknown-comparability-basis-c000",
+                "unrelated-basis-c000"
+              ],
+              "tokens": 321
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to fictional/no-review.txt? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-withdrawn-basis\", \"source_id\": \"withdrawn-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-withdrawn-other\", \"source_id\": \"withdrawn-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-unknown-comparability-basis\", \"source_id\": \"unknown-comparability-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-unknown-comparability-other\", \"source_id\": \"unknown-comparability-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-unrelated-basis\", \"source_id\": \"unrelated-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-unrelated-other\", \"source_id\": \"unrelated-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-no-review-basis\", \"source_id\": \"no-review-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-no-review-other\", \"source_id\": \"no-review-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-unanswerable-basis\", \"source_id\": \"unanswerable-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-unanswerable-other\", \"source_id\": \"unanswerable-other\"}]\nUpdate source: no-review-update\nUpdate documents (complete task input):\n[{\"id\": \"no-review-update-c000\", \"source_id\": \"no-review-update\", \"text\": \"SYNTHETIC UPDATE: The source contains the same observation X1 recall=0.8, workload W, environment E, code C, corpus H and protocol P. Only blank-line formatting changed.\\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:no-review-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unanswerable-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:no-review-update-c000] [semantic, active] source: benchmark\nSYNTHETIC UPDATE: The source contains the same observation X1 recall=0.8, workload W, environment E, code C, corpus H and protocol P. Only blank-line formatting changed.\n\n[memory:unknown-comparability-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unrelated-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded."
+          }
+        ],
+        "prompt_sha256": "2f37dee049656a446d74a6e308245a93937c8a2b738f46555178abba67241e39",
+        "update_node_ids": [
+          "no-review-update-c000"
+        ],
+        "prompt_estimated_tokens": 793,
+        "latency_ms": {
+          "retrieval": 4.004291025921702,
+          "context": 2.4487500195391476
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-no-review-basis",
+            "path": [
+              "no-review-update",
+              "no-review-basis",
+              "link-no-review-basis",
+              "decision-no-review-basis"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 15.034958021715283,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    },
+    {
+      "event_id": "event-unanswerable",
+      "split": "evaluation",
+      "eligible_decisions": [
+        "decision-withdrawn-basis",
+        "decision-withdrawn-other",
+        "decision-unknown-comparability-basis",
+        "decision-unknown-comparability-other",
+        "decision-unrelated-basis",
+        "decision-unrelated-other",
+        "decision-no-review-basis",
+        "decision-no-review-other",
+        "decision-unanswerable-basis",
+        "decision-unanswerable-other"
+      ],
+      "available_source_ids": [
+        "no-review-basis",
+        "no-review-other",
+        "no-review-update",
+        "unanswerable-basis",
+        "unanswerable-other",
+        "unanswerable-update",
+        "unknown-comparability-basis",
+        "unknown-comparability-other",
+        "unknown-comparability-update",
+        "unrelated-basis",
+        "unrelated-other",
+        "unrelated-update",
+        "withdrawn-basis",
+        "withdrawn-other",
+        "withdrawn-update"
+      ],
+      "visible_inputs_sha256": "d78883325515e2c8545ecb15898dcdf800ae7845dc326925e68da03b4c3eeb5a",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "no-review-basis-c000",
+            "score": 0.03252247488101534
+          },
+          {
+            "id": "unanswerable-basis-c000",
+            "score": 0.03200204813108039
+          },
+          {
+            "id": "no-review-update-c000",
+            "score": 0.031544957774465976
+          },
+          {
+            "id": "unknown-comparability-basis-c000",
+            "score": 0.03149801587301587
+          },
+          {
+            "id": "unrelated-basis-c000",
+            "score": 0.031009615384615385
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:no-review-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unanswerable-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:no-review-update-c000] [semantic, active] source: benchmark\nSYNTHETIC UPDATE: The source contains the same observation X1 recall=0.8, workload W, environment E, code C, corpus H and protocol P. Only blank-line formatting changed.\n\n[memory:unknown-comparability-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unrelated-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.",
+          "tokens": 321,
+          "nodes": [
+            "no-review-basis-c000",
+            "unanswerable-basis-c000",
+            "no-review-update-c000",
+            "unknown-comparability-basis-c000",
+            "unrelated-basis-c000"
+          ],
+          "budget": 4000,
+          "truncated": false,
+          "memories": [
+            {
+              "id": "no-review-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "unanswerable-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "no-review-update-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "unknown-comparability-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "unrelated-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": false,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "no-review-basis-c000",
+                "unanswerable-basis-c000",
+                "no-review-update-c000",
+                "unknown-comparability-basis-c000",
+                "unrelated-basis-c000"
+              ],
+              "tokens": 321
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to fictional/unanswerable.txt? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-withdrawn-basis\", \"source_id\": \"withdrawn-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-withdrawn-other\", \"source_id\": \"withdrawn-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-unknown-comparability-basis\", \"source_id\": \"unknown-comparability-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-unknown-comparability-other\", \"source_id\": \"unknown-comparability-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-unrelated-basis\", \"source_id\": \"unrelated-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-unrelated-other\", \"source_id\": \"unrelated-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-no-review-basis\", \"source_id\": \"no-review-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-no-review-other\", \"source_id\": \"no-review-other\"}, {\"action\": \"SYNTHETIC: choose mode A\", \"id\": \"decision-unanswerable-basis\", \"source_id\": \"unanswerable-basis\"}, {\"action\": \"SYNTHETIC: choose blue\", \"id\": \"decision-unanswerable-other\", \"source_id\": \"unanswerable-other\"}]\nUpdate source: unanswerable-update\nUpdate documents (complete task input):\n[{\"id\": \"unanswerable-update-c000\", \"source_id\": \"unanswerable-update\", \"text\": \"SYNTHETIC UPDATE: The result artifact was not retained. There are no values, environment fields or measurement timestamps in this update.\\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:no-review-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unanswerable-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:no-review-update-c000] [semantic, active] source: benchmark\nSYNTHETIC UPDATE: The source contains the same observation X1 recall=0.8, workload W, environment E, code C, corpus H and protocol P. Only blank-line formatting changed.\n\n[memory:unknown-comparability-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded.\n\n[memory:unrelated-basis-c000] [semantic, active] source: benchmark\nSYNTHETIC: Choose mode A when recall \\>=0.7 fraction. Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1. No other support is recorded."
+          }
+        ],
+        "prompt_sha256": "f16318fe6882e4b6e087d26982265b3e566640e5ab8ee0ae49429b7eb0998acb",
+        "update_node_ids": [
+          "unanswerable-update-c000"
+        ],
+        "prompt_estimated_tokens": 788,
+        "latency_ms": {
+          "retrieval": 4.619749961420894,
+          "context": 4.153166024480015
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-unanswerable-basis",
+            "path": [
+              "unanswerable-update",
+              "unanswerable-basis",
+              "link-unanswerable-basis",
+              "decision-unanswerable-basis"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 24.017958028707653,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    }
+  ],
+  "scores": {
+    "curated": {
+      "counts": {
+        "raw_alerts": 10,
+        "attempted_pairs": 100,
+        "positive": 3,
+        "surfaced_pairs": 10,
+        "explicit_uncertainty_pairs": 0,
+        "error_pairs": 0,
+        "scored_surfaced_pairs": 10,
+        "true_positive": 3,
+        "missed_impacts": 0,
+        "known_pairs": 98,
+        "known_surfaced_pairs": 8,
+        "false_abstentions": 0,
+        "emitted_paths": 10,
+        "correct_paths": 5,
+        "negative": 95,
+        "false_alerts": 5,
+        "inconclusive": 1,
+        "inconclusive_explicit_uncertainty": 0,
+        "unanswerable": 1,
+        "unanswerable_explicit_uncertainty": 0,
+        "error_cases": 0
+      },
+      "precision": {
+        "value": 0.375,
+        "numerator": 3,
+        "denominator": 8
+      },
+      "recall": {
+        "value": 1.0,
+        "numerator": 3,
+        "denominator": 3
+      },
+      "false_alert_rate": {
+        "value": 0.05263157894736842,
+        "numerator": 5,
+        "denominator": 95
+      },
+      "false_discovery_fraction": {
+        "value": 0.5,
+        "numerator": 5,
+        "denominator": 10
+      },
+      "miss_rate": {
+        "value": 0.0,
+        "numerator": 0,
+        "denominator": 3
+      },
+      "path_correctness": {
+        "value": 0.5,
+        "numerator": 5,
+        "denominator": 10
+      },
+      "inconclusive_handling": {
+        "value": 0.0,
+        "numerator": 0,
+        "denominator": 1
+      },
+      "unanswerable_handling": {
+        "value": 0.0,
+        "numerator": 0,
+        "denominator": 1
+      },
+      "explicit_uncertainty_rate": {
+        "value": 0.0,
+        "numerator": 0,
+        "denominator": 100
+      },
+      "false_abstention_rate": {
+        "value": 0.0,
+        "numerator": 0,
+        "denominator": 98
+      },
+      "rationale_correctness": null,
+      "unsupported_conclusions": null,
+      "answer_quality": null,
+      "human_review_time": null
+    },
+    "proposed": {
+      "counts": {
+        "raw_alerts": 0,
+        "attempted_pairs": 100,
+        "positive": 3,
+        "surfaced_pairs": 0,
+        "explicit_uncertainty_pairs": 0,
+        "error_pairs": 0,
+        "scored_surfaced_pairs": 0,
+        "true_positive": 0,
+        "missed_impacts": 3,
+        "known_pairs": 98,
+        "known_surfaced_pairs": 0,
+        "false_abstentions": 0,
+        "negative": 95,
+        "false_alerts": 0,
+        "inconclusive": 1,
+        "inconclusive_explicit_uncertainty": 0,
+        "unanswerable": 1,
+        "unanswerable_explicit_uncertainty": 0,
+        "error_cases": 0
+      },
+      "precision": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "recall": {
+        "value": 0.0,
+        "numerator": 0,
+        "denominator": 3
+      },
+      "false_alert_rate": {
+        "value": 0.0,
+        "numerator": 0,
+        "denominator": 95
+      },
+      "false_discovery_fraction": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "miss_rate": {
+        "value": 1.0,
+        "numerator": 3,
+        "denominator": 3
+      },
+      "path_correctness": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "inconclusive_handling": {
+        "value": 0.0,
+        "numerator": 0,
+        "denominator": 1
+      },
+      "unanswerable_handling": {
+        "value": 0.0,
+        "numerator": 0,
+        "denominator": 1
+      },
+      "explicit_uncertainty_rate": {
+        "value": 0.0,
+        "numerator": 0,
+        "denominator": 100
+      },
+      "false_abstention_rate": {
+        "value": 0.0,
+        "numerator": 0,
+        "denominator": 98
+      },
+      "rationale_correctness": null,
+      "unsupported_conclusions": null,
+      "answer_quality": null,
+      "human_review_time": null
+    }
+  },
+  "limitations": [
+    "Real labels await independent annotation; draft labels are not scored.",
+    "Synthetic controls are scored separately and cannot establish product readiness.",
+    "No model, answer-quality, rationale judgment, user time or human effort measurement.",
+    "Curated/proposed dependencies are supplied inputs, not measured extraction quality."
+  ],
+  "latency_ms": {
+    "p50": 15.034958021715283,
+    "p95": 24.017958028707653,
+    "n": 10
+  },
+  "cost_effort": {
+    "provider_calls": 0,
+    "provider_cost": 0,
+    "currency": null,
+    "wall_ms": 160.2367500308901,
+    "human_annotation_minutes": null,
+    "human_review_minutes": null
+  },
+  "retrieval_scores": null,
+  "release_readiness": {
+    "passed": false,
+    "frozen_thresholds": {
+      "false_alert_rate_max": 0.05,
+      "miss_rate_max": 0.05,
+      "provenance_correctness_min": 1,
+      "inconclusive_handling_min": 1,
+      "unsupported_conclusions_max": 0,
+      "heldout_positive_min": 20,
+      "heldout_negative_min": 20,
+      "heldout_inconclusive_min": 10,
+      "integrity_pass_min": 1,
+      "median_review_time_reduction_min": 0.2
+    },
+    "reason": "Independent held-out labels, minimum strata and integrity/statement/user studies are incomplete."
+  },
+  "smoke_passed": true
+}

@@ -1,0 +1,1808 @@
+{
+  "schema": "dm.eval.report/1",
+  "status": "complete",
+  "metadata": {
+    "source_commit": "1d9581416cba60aa991a9d626f563d8203f34025",
+    "source_dirty": false,
+    "code_sha256": "ad8ca150a8e103f81e6af4c1b7a73d3040dc095aafe03bc583d60df61cdd222c",
+    "code_manifest": {
+      "graph_engine/__init__.py": "8a8d8c7b6d82373e8288533d448f7809f1d7402ae942b8e39238050f6b3904cd",
+      "graph_engine/__main__.py": "422df2f2ca3ab4e2da0567c7c50045d6c445249619cdc138f38ed44baf464ed8",
+      "graph_engine/access.py": "3f517bad19590d5e2a237c0c8faa3f0fcdd3e6bf46f03fe7067373fb33c172b2",
+      "graph_engine/agent_memory.py": "5371149e2eefd7a89b48d11834b11dc8f6a82cf5b44cd96b95046d6acf790240",
+      "graph_engine/brain.py": "daed44ddfbc070a6b7d801af740fe3c797f4969cf70664321170744029a3e992",
+      "graph_engine/brain_engine.py": "dd05cec10d0e06b3dc8b58fc4638ead70d91f8b565190f9570798b88209f108f",
+      "graph_engine/communities.py": "85eb3e66b3c0e0385e108f6ccadc16646bbc38f2f0acee379eaaef7d9547e958",
+      "graph_engine/consolidation.py": "9ee178a7f5ca2d7aa218e05d1f1e6d93eadefeeccb0b6b57bf7e6ae25dbf276b",
+      "graph_engine/consolidation_protocol.py": "015ef7cccd4b4d53aa5d76463a926c26513124abfb1892400718f0875f6aea0d",
+      "graph_engine/context.py": "def373d0bace62e2b59bff048b0df66c69635c6f5dd90a935442fe944962f133",
+      "graph_engine/decay.py": "4f8d18e6193120b8a6c8696bf7bc6448f2578ffd4a3acfbcecf903bebf3a0822",
+      "graph_engine/decision_brief.py": "8208b4612b6807040687ed5dc1f92b5954d3c25d73506b128203d417be309256",
+      "graph_engine/decision_impact.py": "a9bd04a342c9a418333ae54bc91ba316eeb58d58bfc9b6782f382744fa4d27c7",
+      "graph_engine/decision_memory.py": "4f859f750e393fdffb1dee9150bceb7cd7715824c19cc16ebb031e50a695984a",
+      "graph_engine/decision_review.py": "68c270c137a40daadfba53714879b4fa74dffb29f1a7370df5b949b9dab84c70",
+      "graph_engine/decision_schema.py": "81ab5831b2165006910fc78f014ed3ac9913e662c327c07979751727e049b291",
+      "graph_engine/decision_service.py": "ff77fa33e7d99e25ada4d0650d229abbf04f3c0d57ef665233b581e6cbebd123",
+      "graph_engine/demo.py": "5f433788e7b7e37f511a8dd4976e37a70844c8be39e2d7449e9213dc9b964333",
+      "graph_engine/document_import.py": "df9788af1e0cfd26c79f5a73ecea79dec0cc78b93b81c19c493c093290afa66d",
+      "graph_engine/dream.py": "d542521b417321e3ec7b16a4dfad96e4b201bdd3a133f10fde6758d59137d487",
+      "graph_engine/embedder.py": "249b80e4f1eee10c6a684515a88f515a1a46f757c4290fc6af0f5e8cecfe0262",
+      "graph_engine/engine.py": "afd83939e362af9ca9f6fcbfce76c7b964a8ac74a5dca497af248b3ebe11b071",
+      "graph_engine/entities.py": "a2f522a9261daa98f0e55fcb321f759a977cba3481acbc0e9b7111267ae9bf77",
+      "graph_engine/evals.py": "89707e51401bb893b91d3209a2fd63b9b7d21b0ac1241b5d64718d9881b76d96",
+      "graph_engine/feedback.py": "1e4962e08365449ac7ad2b43c4f36fb43f0f03340b984bb9b2d8ea366fd20935",
+      "graph_engine/gaps.py": "55157c66838aa66383aee65a06c6c4ee8aafdf308146335cc7a31cbdefa624a8",
+      "graph_engine/graph.py": "05ef8ae744842ccff02c523cc620c91b1a4f905c394a897520461d5127a2f40d",
+      "graph_engine/graph_retrieval.py": "2a4b2d5dce255054fb83816a3478dc9aac6c919682c3aa0ae9b537485989c769",
+      "graph_engine/hygiene.py": "9bf533e606cb6cd7abe6e5e2791b6ad312d96fba88fe90b43a9e3c70ffa4d812",
+      "graph_engine/inference.py": "547494fcd8060ca94188d0de032952bc04a032e6b1dace72c5eb943616081269",
+      "graph_engine/intent.py": "42bcd85e156ee3433135b3f9286fbd47036649f25022d5fa93b54636c6b772a5",
+      "graph_engine/maintenance.py": "8f3ff8701b6994ab2e30b42f9cdb73891de47f5ca869aa0d0be4dfdef05b0d62",
+      "graph_engine/mcp/__init__.py": "8d44f4694966bc465fae60344c86a8d7436e2c6de9faaa7119694c9cb67ac649",
+      "graph_engine/mcp/format.py": "c89cfeedc39fbb4adb20c897590123084b94411ce04ee964c295117d8b8cb937",
+      "graph_engine/mcp/server.py": "d3c15481bc184710a39cc9a193a4f36f60e86d4f1c75c80ad3a00850074811b0",
+      "graph_engine/merge.py": "28adf9621bcb1d95c07619904a9e3d85a7d51b8495776d84b25efd066e094fd1",
+      "graph_engine/model.py": "ff001150b344b9207552180d873c2c2dad492b11fc8e8a23d856c12ba97af60b",
+      "graph_engine/namespaces.py": "04117225ed38c2d4dfa466aff6014af681e9336d07ae8aeacdfaace6528c8dcb",
+      "graph_engine/recall.py": "af8d139631e2d1d87fdf0449ec3e7413d8597916e1c673d74aa289d6a0b9c6fd",
+      "graph_engine/replacements.py": "4401a4bb6ea06c6f9409dd5109c52011cbadb8b39aca55dbd01eb6ae9282fdb9",
+      "graph_engine/report.py": "3f1ee4be9ecc1bd43f981fc7960dd00d6875d5221a11d49651989c8bde63253f",
+      "graph_engine/reranker.py": "c2139f2fef02d3818cec7555ebcdb28781f7c1441977fd12b7a44621c1456dc7",
+      "graph_engine/retrieval.py": "aeefb80f9818247a2879263d438fda755802622a1bb0ca87919651fa96ad177d",
+      "graph_engine/review.py": "866475018dea7babdd1c160703139e71444facf0026af99e4b91f495fca88f1f",
+      "graph_engine/runtime.py": "63ba83979a6b7990c27dbddd387a3eee338376895f24c9584837d9c027b80f3b",
+      "graph_engine/search_index.py": "2910dd74fb065d205bcb5c5c1233c4c4bfd99a82ee0359c5d2e574ccb815884e",
+      "graph_engine/server.py": "7a93d128846768a184c78be3c29a212db4c5c45b658d83c21a795796c00ea577",
+      "graph_engine/similarity.py": "9ffd20d70bdc45b7358858ae34d7d31977db02b72a153d1034195cf7b2b1f82f",
+      "graph_engine/snapshots.py": "8199a5032a70e0d6fb777eaf8bab3a234cb18eed45445efb455681302b6cdfbe",
+      "graph_engine/store.py": "e9b478a3ccea228d76c9867d297e9632866865f2fd9b14d39f74b9a26b0f078e",
+      "graph_engine/suggester.py": "39043e874b0fd9d3e8ff51f4815a6f99bf00430038b6ec632344dcaa94c94808",
+      "graph_engine/temporal.py": "83002c390232dcc45983588138c4354b043474fd4e582c5e3f7aeef16d0d44e9",
+      "graph_engine/tiers.py": "96fab08fc6a2358587e0deff0d5541a602387ae2b385dc91ac12f339c8f177f8",
+      "graph_engine/timestamps.py": "18a83710d2d5219941b55e7c7c765c8d51f2e81eed4b5e7222f6c3ba2d73423e",
+      "graph_engine/vector_cache.py": "c5d8139848d88e8b552343fb060b7f082fa6036ae2f6526353f93c6694c27d96",
+      "graph_engine/write_guard.py": "9b589bd35ca3a97db4f9432dcfbe8cdb5d82aa3c5b349cb136bb3b4ea7ab2e3f",
+      "tools/decision_benchmark/__init__.py": "b4fe842811829eb9c9966c8707bb1af33a4cf382d31cab1c91bbc2728a8e7b78",
+      "tools/decision_benchmark/__main__.py": "2bac4fa31396aaf4324368f82acd8fa1b3c35a76597d7afb9929b95470790b97",
+      "tools/decision_benchmark/corpus.py": "46f1cef375c0ada4b18ffbdeec300c648b68af59adf7ed44ade358fdace58d8a",
+      "tools/decision_benchmark/freeze_sources.py": "6177bfc0d0cae4f6127c585f365bb1863a3fae9b562cf1cd9f20a1a460804166",
+      "tools/decision_benchmark/production.py": "da3e97e1a16c18f2c4d6c4e312154c3ed2a7055dba1e6650c88d10a747958d44",
+      "tools/decision_benchmark/readiness.py": "0629caa2a3cfa0399d32a752d3c201f6012ab465ffecf5977d32d1c1bbd075e2",
+      "tools/decision_benchmark/runner.py": "13d65a992eec0d4168e65172ad5ea4bb47fc9b176980f8f9c7c09e9aaf20da71",
+      "tools/decision_benchmark/scoring.py": "7d13a59d21202dac2b9fe2bb21f9e97ee7b9ca0bf9774f28c3b51e72f5c6366f",
+      "tools/decision_benchmark/synthetic.py": "96f0b1db91b05de5be9c49c9e238b64c0e2202a54259c89c302c183142d7df82",
+      "tools/memory_benchmark/__init__.py": "4697afa15d32363557e9e5a66f6625a291d33a04eadca592c682b3b747ecb17f",
+      "tools/memory_benchmark/__main__.py": "6e90c6a8f91b02854c6068a68cc39c6f1718aab4cf24c8067cf0ae252c930d84",
+      "tools/memory_benchmark/adapters.py": "146b187e10dc96409facc39f99e8dc8f092c5014b7b8982c42be3445204d2be4",
+      "tools/memory_benchmark/answers.py": "7334a046def3dc42ebe38cc2e96b47c2f4c3fa7921318a6d58f1a19d39bff3bf",
+      "tools/memory_benchmark/dataset.py": "bfe01cede6465347dfd569ef950a614cbe39317e09d988c9aeded3e7685af122",
+      "tools/memory_benchmark/embeddings.py": "bfdc69edc0ee75f9845b5338a7adc6545a38ed69fa117485f3861142bf217be8",
+      "tools/memory_benchmark/runner.py": "c09feaffc9b8c2d2e3b5f27246ba98f0c03992c51b04ae1069ecd5d55dfd3eb5",
+      "tools/memory_benchmark/scoring.py": "a2e53fb042c443a0a8e15a393c10624734596cb99e77fe26d4f799b5ecfc539e"
+    },
+    "python": "3.12.14",
+    "platform": "macOS-26.7.1-arm64-arm-64bit",
+    "dependencies": {
+      "graph-engine-memory": "0.7.0",
+      "numpy": "2.3.1",
+      "httpx": "0.28.1"
+    },
+    "captured_at": "2026-10-16T18:40:10.565890+00:00",
+    "corpus_version": "project-v1.0.0",
+    "kind": "real",
+    "freeze_sha256": "1f3c33f1b68a85659b5e3f17378168a2e7be16e5a748c6704760e9ea4a0b9e08",
+    "frozen_files": {
+      "LICENSE": "8e7e434d98c41d656e7657a7049e9f49bd8e66e15cb4c4527d916b744faef9d1",
+      "contract.md": "5f2dbaeabd5586794df8d3be88587c8a025dc8581fae1cbd15f09f21bd47530b",
+      "inputs.json": "a80f99adb5cbd5db23d61cf0382deb236db1d3452aba5cc7539a19ca064f04ce",
+      "labels.json": "1dafa542eaf223ec7fbc6e1ec23bc1adac97d4c810e4ef0ac25823b7f7d08da0",
+      "sources/cache-basis.txt": "a8278e3095044cf1e09819bab75d2b12bc83d241ad66968b909083d9295c14e0",
+      "sources/cache-update-1.txt": "b52a84d3f2f9bc6e2eaeaa4cbcd40a61c47e3d158a608b2e126726756cb54840",
+      "sources/cache-update-2.txt": "5ed9aaaa43f2d1a9fc57fe9820d2a16d7b218bc42e621d947f1791036c1c1fa5",
+      "sources/context-basis.txt": "6b3aa6c55de240dc0b48980a6949ba44e9712ad2480af2fec4fe86f6fcb275f4",
+      "sources/context-update-1.txt": "4cbdfef5a0e22144daebb8ea826a022c10e137137d2fded2499bacbe7c4d7b2a",
+      "sources/context-update-2.txt": "cc95dba7dd1f854e5b8c11986a88398dc28715a9f4e44b059b918d28b2ec8e9a",
+      "sources/documents-basis.txt": "0653ca0e07e351df9cac345d8a545a6f29b97d122db6f4c3f53ae4dca16ef3b7",
+      "sources/documents-update-1.txt": "2cf3ce4ca23a789498715d72bd66213998c313cd5c06b471ea9fae1809bf4e44",
+      "sources/documents-update-2.txt": "a5e9a7c8bfd05987ef988b8fcd9106ac69a6a4f43bf30f1bd8c0c13f8708f1ae",
+      "sources/forget-basis.txt": "3aaf28fe4e07685c37d80a1ec2a6d9d8ee8afc64e2b4180e0e86dd64d123d9e2",
+      "sources/forget-update-1.txt": "59048bab80c43cb175e24d4f199cdb4ed1deb56596d50fe1c929695f5360b88a",
+      "sources/forget-update-2.txt": "32b43a6bd9ffc6593dba29de12d30e6ce292a638212910a63b03dde325a1534d",
+      "sources/graph-basis.txt": "f8fd4889472a34e5a85da9bf18911cc122840b0be737cbaad29029109696692a",
+      "sources/graph-fixture.txt": "3e01f83419bc92afde7ec01093096dca2b5514738b9fe5fbc19d63a81fc7f718",
+      "sources/graph-protocol.txt": "f91efb0d4b0351d7bd9625042f994777df23bf3ed95c744e25af7ada0f8ebb99",
+      "sources/graph-report.txt": "ffecd1b60acd57cb9b6a4b6be877a71f3ff539fe64ce44f267f5df1a293939c6",
+      "sources/graph-update-1.txt": "8c5180f68204316905f5e1015f5dbc58e66f852bbecf27101c1ad57313157c93",
+      "sources/graph-update-2.txt": "5497ae91315d1a8708efd819ba96a0019734118c45e68f893249b997424f0810",
+      "sources/models-basis.txt": "1e80f2132d547be44fa82611ec9e6e94fa4e40e5db654ad0f25f5dda5c047965",
+      "sources/models-update-1.txt": "b25413a3fefe0934f16e9bb8483dd9305893454258bc141e59ecb1723d394334",
+      "sources/models-update-2.txt": "7e607f2126791e30fdc5b063fbd3bab0faf6ab2419f86d57545d13d87bc8c963",
+      "sources/temporal-basis.txt": "8cd9bc9c06f0c2a9a62aa7b2c65303a91b10d63191e7fb08be9fdf1bd752ed2b",
+      "sources/temporal-update-1.txt": "56fb978721b3b2b7fefbed6fe0609d2e19d994e1f1b45dace14e26e81a198027",
+      "sources/temporal-update-2.txt": "84bb2e651adb0671f6d2187b9dc92d148f43c29b02550b87aa493c048a0e1f16",
+      "sources/writer-basis.txt": "2bc4e1a861c60180e2caa1155d45bbadc0d9bbe8191772fcce5c2bf148664434",
+      "sources/writer-update-1.txt": "97fba931f5614ead33f0fd60733ebc0a49a3471564e698fb6185b2b1a6edec51",
+      "sources/writer-update-2.txt": "e4f9003e78f1cfd2b72a71db0bb42c0aebd99c47bc39559b84efaa9cf3e16291"
+    },
+    "configuration": {
+      "k": 5,
+      "context_budget_estimated_tokens": 4000,
+      "task_version": "decision-review-offline/2",
+      "corpus_task_version": "decision-review-offline/1",
+      "task_template": "Which documented decisions need review after this update to {path}? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.",
+      "update_input": "all visible chunks of the current update source",
+      "context_budget_excludes": [
+        "system/task text",
+        "decision inventory",
+        "current update"
+      ],
+      "system_prompt": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources.",
+      "graph_expansion": false,
+      "context_assembly": "graph_engine.context.build_context",
+      "source_chunk_chars": 800,
+      "split": "evaluation",
+      "embedder": "HashEmbedder",
+      "embedder_dimension": 64,
+      "reranker": null,
+      "provider_calls": false,
+      "answer_model": null,
+      "dependency_profiles": [
+        "curated",
+        "proposed"
+      ],
+      "extraction_quality_measured": false
+    }
+  },
+  "results": [
+    {
+      "event_id": "event-writer-1",
+      "split": "evaluation",
+      "eligible_decisions": [
+        "decision-temporal",
+        "decision-forget",
+        "decision-writer"
+      ],
+      "available_source_ids": [
+        "forget-basis",
+        "temporal-basis",
+        "writer-basis",
+        "writer-update-1"
+      ],
+      "visible_inputs_sha256": "2363c3a3e4cc48207e16bf6dcf6ef3b5f030d548bdf5d2c2348d5fd8dc5b1237",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "temporal-basis-c000",
+            "score": 0.03252247488101534
+          },
+          {
+            "id": "temporal-basis-c001",
+            "score": 0.032266458495966696
+          },
+          {
+            "id": "forget-basis-c001",
+            "score": 0.03149801587301587
+          },
+          {
+            "id": "writer-basis-c002",
+            "score": 0.031054405392392875
+          },
+          {
+            "id": "writer-basis-c005",
+            "score": 0.031009615384615385
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:temporal-basis-c000] [semantic, active] source: benchmark\n### Known limitations\n\n- **Intent heuristics use marker words and a similarity gate.** They can\n  produce false positives. Set `IDEAGRAPH_INTENT_PENDING=1` to require review;\n  `ig accept-pending` cap… [truncated]\n\n[memory:temporal-basis-c001] [semantic, active] source: benchmark\neview list, and the command does not merge nodes. Review pairs before using\n  `ig merge`; ingest deduplication uses its separate 0.92 threshold.\n- **Temporal queries filter current records.** `ig vali… [truncated]\n\n[memory:forget-basis-c001] [semantic, active] source: benchmark\nin write mode and carry\n`readOnlyHint: false`, so a client asks its user before letting a model write into\nthe private brain. In read-only mode they return a `write_disabled` envelope.\n\nDesign guarant… [truncated]\n\n[memory:writer-basis-c002] [semantic, active] source: benchmark\nle writers run. Bind-mount aliases and\nhard-linked record layouts are outside this identity contract.\n\nLock ordering is the existing process-wide thread `RLock` first, then the\nper-brain OS lock. Call… [truncated]\n\n[memory:writer-basis-c005] [semantic, active] source: benchmark\ns the contract.\n\n**Crashes and sync failures:** this is serialization, not rollback or a\nmulti-file transaction. A crash can leave complete atomic files from an\nunfinished operation on disk; inspect `… [truncated]",
+          "tokens": 354,
+          "nodes": [
+            "temporal-basis-c000",
+            "temporal-basis-c001",
+            "forget-basis-c001",
+            "writer-basis-c002",
+            "writer-basis-c005"
+          ],
+          "budget": 4000,
+          "truncated": true,
+          "memories": [
+            {
+              "id": "temporal-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "temporal-basis-c001",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "forget-basis-c001",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "writer-basis-c002",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "writer-basis-c005",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "temporal-basis-c000",
+                "temporal-basis-c001",
+                "forget-basis-c001",
+                "writer-basis-c002",
+                "writer-basis-c005"
+              ],
+              "tokens": 354
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to graph_engine/maintenance.py? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"Filter current records by temporal validity; this does not reconstruct historical Git snapshots.\", \"id\": \"decision-temporal\", \"source_id\": \"temporal-basis\"}, {\"action\": \"Forget by tombstoning and invalidating; keep forgotten memories out of live views.\", \"id\": \"decision-forget\", \"source_id\": \"forget-basis\"}, {\"action\": \"Serialize cooperating local brain writes using a shared writer guard.\", \"id\": \"decision-writer\", \"source_id\": \"writer-basis\"}]\nUpdate source: writer-update-1\nUpdate documents (complete task input):\n[{\"id\": \"writer-update-1-c000\", \"source_id\": \"writer-update-1\", \"text\": \"diff --git a/graph_engine/maintenance.py b/graph_engine/maintenance.py\\nnew file mode 100644\\nindex 0000000..b680542\\n--- /dev/null\\n+++ b/graph_engine/maintenance.py\\n@@ -0,0 +1,299 @@\\n+\\\"\\\"\\\"Explicit, single-threaded local maintenance worker. Importing starts nothing.\\\"\\\"\\\"\\n+from __future__ import annotations\\n+\\n+import argparse\\n+from contextlib import contextmanager\\n+from dataclasses import dataclass, field, replace\\n+from datetime import datetime, timezone\\n+import json\\n+import math\\n+import os\\n+import signal\\n+import subprocess\\n+import threading\\n+import time\\n+from typing import Callable, Iterator\\n+\\n+from . import namespaces, runtime\\n+from .brain import Brain\\n+from .consolidation import ConsolidationConfig, consolidate\\n+from .consolidation_protocol import command_extractor, validate_consolidation\\n+fro\"}, {\"id\": \"writer-update-1-c001\", \"source_id\": \"writer-update-1\", \"text\": \"m .dream import lifecycle, refresh\\n+from .write_guard import BrainWriteTimeout, git_deadline\\n+\\n+ACTIONS = (\\\"refresh\\\", \\\"lifecycle\\\", \\\"consolidate\\\")\\n+COUNTS = (\\\"kind_changes\\\", \\\"recall_nodes\\\", \\\"recalls\\\", \\\"promoted\\\", \\\"revived\\\", \\\"staled\\\",\\n+          \\\"created\\\", \\\"reused\\\", \\\"edges\\\", \\\"skipped\\\", \\\"pending_proposals\\\")\\n+\\n+\\n+@dataclass(frozen=True)\\n+class MaintenanceConfig:\\n+    graph: str = \\\"default\\\"\\n+    actions: tuple[str, ...] = (\\\"refresh\\\", \\\"lifecycle\\\")\\n+    interval: float = 900\\n+    pass_timeout: float = 120\\n+    lock_timeout: float = 30\\n+    limit: int = 50\\n+    max_records: int = 10000\\n+    max_input_bytes: int = 64 * 1024 * 1024\\n+    extract_model: bool = False\\n+    model_timeout: float = 30\\n+    consolidation: ConsolidationConfig = field(default_factory=ConsolidationConfig)\\n+\\n+    def __post_ini\"}, {\"id\": \"writer-update-1-c002\", \"source_id\": \"writer-update-1\", \"text\": \"t__(self) -> None:\\n+        namespaces.validate_name(self.graph)\\n+        if not self.actions or len(set(self.actions)) != len(self.actions) or set(self.actions) - set(ACTIONS):\\n+            raise ValueError(\\\"choose distinct actions: refresh, lifecycle, consolidate\\\")\\n+        for name, lower, upper in ((\\\"interval\\\", 0.01, 604800), (\\\"pass_timeout\\\", 0.01, 3600),\\n+                                   (\\\"lock_timeout\\\", 0, 3600), (\\\"model_timeout\\\", 0.01, 3600)):\\n+            value = getattr(self, name)\\n+            if not math.isfinite(value) or not lower <= value <= upper:\\n+                raise ValueError(f\\\"{name} must be finite and between {lower} and {upper} seconds\\\")\\n+        for name, upper in ((\\\"limit\\\", 1000), (\\\"max_records\\\", 1000000),\\n+                            (\\\"max_input_bytes\\\", 1024 * 1\"}, {\"id\": \"writer-update-1-c003\", \"source_id\": \"writer-update-1\", \"text\": \"024 * 1024)):\\n+            value = getattr(self, name)\\n+            if type(value) is not int or not 1 <= value <= upper:\\n+                raise ValueError(f\\\"{name} must be an integer between 1 and {upper}\\\")\\n+        if self.extract_model and (\\\"consolidate\\\" not in self.actions or self.model_timeout >= self.pass_timeout):\\n+            raise ValueError(\\\"--extract-model needs consolidate and a model timeout shorter than the pass timeout\\\")\\n+\\n+\\n+class PassFailure(Exception):\\n+    \\\"\\\"\\\"Public error code, deliberately without exception text or private data.\\\"\\\"\\\"\\n+\\n+    def __init__(self, code: str, *, retryable: bool = True) -> None:\\n+        super().__init__(code)\\n+        self.code, self.retryable = code, retryable\\n+\\n+\\n+class PassDeadline(BaseException):\\n+    \\\"\\\"\\\"Do not let best-effort helpers swall\"}, {\"id\": \"writer-update-1-c004\", \"source_id\": \"writer-update-1\", \"text\": \"ow an expired worker deadline.\\\"\\\"\\\"\\n+\\n+\\n+@contextmanager\\n+def _deadline(seconds: float) -> Iterator[None]:\\n+    if os.name != \\\"posix\\\" or threading.current_thread() is not threading.main_thread():\\n+        raise ValueError(\\\"maintenance requires a POSIX main thread (Linux/macOS)\\\")\\n+    if signal.getitimer(signal.ITIMER_REAL)[0]:\\n+        raise ValueError(\\\"maintenance cannot share an existing alarm timer\\\")\\n+    previous = signal.getsignal(signal.SIGALRM)\\n+\\n+    def expired(signum: int, frame: object) -> None:\\n+        raise PassDeadline()\\n+\\n+    signal.signal(signal.SIGALRM, expired)\\n+    signal.setitimer(signal.ITIMER_REAL, seconds)\\n+    try:\\n+        with git_deadline(time.monotonic() + seconds):\\n+            yield\\n+    finally:\\n+        signal.setitimer(signal.ITIMER_REAL, 0)\\n+        signal\"}, {\"id\": \"writer-update-1-c005\", \"source_id\": \"writer-update-1\", \"text\": \".signal(signal.SIGALRM, previous)\\n+\\n+\\n+def _check_input(brain: Brain, config: MaintenanceConfig) -> None:\\n+    \\\"\\\"\\\"Reject oversized whole-corpus passes before any maintenance writes.\\\"\\\"\\\"\\n+    if not (brain.path / \\\"nodes\\\").is_dir():\\n+        raise PassFailure(\\\"brain_uninitialized\\\")\\n+    total = 0\\n+    for count, path in enumerate((brain.path / \\\"nodes\\\").glob(\\\"*.md\\\"), 1):\\n+        total += path.stat().st_size\\n+        if count > config.max_records or total > config.max_input_bytes:\\n+            raise PassFailure(\\\"input_limit\\\")\\n+    for name in (\\\"edges.jsonl\\\", \\\"vectors.jsonl\\\", \\\"recalls.jsonl\\\"):\\n+        path = brain.path / name\\n+        if not path.exists():\\n+            continue\\n+        total += path.stat().st_size\\n+        if total > config.max_input_bytes:\\n+            raise PassFailure(\\\"inp\"}, {\"id\": \"writer-update-1-c006\", \"source_id\": \"writer-update-1\", \"text\": \"ut_limit\\\")\\n+        with path.open(\\\"rb\\\") as stream:\\n+            for count, _ in enumerate(stream, 1):\\n+                if count > config.max_records:\\n+                    raise PassFailure(\\\"input_limit\\\")\\n+\\n+\\n+def _model(config: MaintenanceConfig) -> Callable[[list[dict]], dict]:\\n+    # Reading configured commands does not enable them. Only --extract-model\\n+    # reaches this factory, and only an eligible batch invokes the command.\\n+    adapter = command_extractor(timeout=config.model_timeout)\\n+\\n+    def extract(events: list[dict]) -> dict:\\n+        try:\\n+            data = adapter(events)\\n+            validate_consolidation(data, events)\\n+            return data\\n+        except RuntimeError as exc:\\n+            code = \\\"model_timeout\\\" if \\\"timed out\\\" in str(exc) else \\\"model_failed\\\"\\n+       \"}, {\"id\": \"writer-update-1-c007\", \"source_id\": \"writer-update-1\", \"text\": \"     raise PassFailure(code) from None\\n+        except (ValueError, OSError):\\n+            raise PassFailure(\\\"model_output_invalid\\\") from None\\n+\\n+    return extract\\n+\\n+\\n+def perform_pass(config: MaintenanceConfig, action: str) -> dict[str, int]:\\n+    \\\"\\\"\\\"Authorize fresh, bound input/time, and guard reads through final Git sync.\\\"\\\"\\\"\\n+    if action not in config.actions:\\n+        raise ValueError(\\\"action was not selected\\\")\\n+    token = namespaces.request_graph.set(config.graph)\\n+    mutating = False\\n+    syncing = False\\n+    try:\\n+        with _deadline(config.pass_timeout):\\n+            brain = runtime.make_brain()  # no embedder load/download; fresh policy\\n+            brain.authorize(\\\"admin\\\")\\n+            with brain.write_guard(timeout=config.lock_timeout):\\n+                if not (brain.pa\"}, {\"id\": \"writer-update-1-c008\", \"source_id\": \"writer-update-1\", \"text\": \"th / \\\"nodes\\\").is_dir() or (brain.mode == \\\"git\\\" and not (brain.path / \\\".git\\\").exists()):\\n+                    raise PassFailure(\\\"brain_uninitialized\\\")\\n+                syncing = True\\n+                brain.pull()\\n+                syncing = False\\n+                _check_input(brain, config)\\n+                extractor = _model(config) if config.extract_model and action == \\\"consolidate\\\" else None\\n+                mutating = True\\n+                if action == \\\"refresh\\\":\\n+                    result = refresh(brain, strict_report=True)\\n+                elif action == \\\"lifecycle\\\":\\n+                    result = lifecycle(brain, limit=config.limit)\\n+                else:\\n+                    result = consolidate(brain, config=replace(config.consolidation, limit=config.limit),\\n+                      \"}, {\"id\": \"writer-update-1-c009\", \"source_id\": \"writer-update-1\", \"text\": \"                   structured_extractor=extractor, pending_evidence=True)\\n+                # Never export the rich maintenance result: it contains node\\n+                # IDs, quotes, proposals and potentially private diagnostics.\\n+                return {key: result[key] for key in COUNTS if type(result.get(key)) is int}\\n+    except PassFailure:\\n+        raise\\n+    except BrainWriteTimeout:\\n+        raise PassFailure(\\\"writer_busy\\\") from None\\n+    except PermissionError:\\n+        raise PassFailure(\\\"access_denied\\\", retryable=not (mutating or syncing)) from None\\n+    except (PassDeadline, subprocess.TimeoutExpired):\\n+        raise PassFailure(\\\"pass_timeout\\\", retryable=not (mutating or syncing)) from None\\n+    except Exception:\\n+        raise PassFailure(\\\"storage_failure\\\", retryable=not (muta\"}, {\"id\": \"writer-update-1-c010\", \"source_id\": \"writer-update-1\", \"text\": \"ting or syncing)) from None\\n+    finally:\\n+        namespaces.request_graph.reset(token)\\n+\\n+\\n+def json_log(row: dict) -> None:\\n+    print(json.dumps({\\\"ts\\\": datetime.now(timezone.utc).isoformat(), **row}), flush=True)\\n+\\n+\\n+class MaintenanceWorker:\\n+    \\\"\\\"\\\"Fixed delay after completion; no catch-up queue or concurrent passes.\\n+\\n+    Clock, wait, runner and event sink are injectable for offline scheduling tests.\\n+    SIGINT/SIGTERM request a stop; the current bounded pass finishes first.\\n+    \\\"\\\"\\\"\\n+\\n+    def __init__(self, config: MaintenanceConfig, *, stop: threading.Event | None = None,\\n+                 clock: Callable[[], float] = time.monotonic,\\n+                 wait: Callable[[float], bool] | None = None,\\n+                 runner: Callable[[MaintenanceConfig, str], dict] = perform_pass,\\n\"}, {\"id\": \"writer-update-1-c011\", \"source_id\": \"writer-update-1\", \"text\": \"+                 emit: Callable[[dict], None] = json_log) -> None:\\n+        self.config = config\\n+        self.stop = stop if stop is not None else threading.Event()\\n+        self.clock, self.wait = clock, wait if wait is not None else self.stop.wait\\n+        self.runner, self.emit = runner, emit\\n+        self._active = threading.Lock()\\n+\\n+    def cycle(self) -> bool:\\n+        if not self._active.acquire(blocking=False):\\n+            self.emit({\\\"event\\\": \\\"cycle_skipped\\\", \\\"reason\\\": \\\"already_running\\\", \\\"graph\\\": self.config.graph})\\n+            return False\\n+        success = True\\n+        try:\\n+            for action in self.config.actions:\\n+                if self.stop.is_set():\\n+                    break\\n+                started = self.clock()\\n+                base = {\\\"graph\\\": self.config.g\"}, {\"id\": \"writer-update-1-c012\", \"source_id\": \"writer-update-1\", \"text\": \"raph, \\\"action\\\": action}\\n+                self.emit({\\\"event\\\": \\\"pass_started\\\", **base})\\n+                try:\\n+                    result = self.runner(self.config, action)\\n+                    counts = {key: result[key] for key in COUNTS if type(result.get(key)) is int}\\n+                    self.emit({\\\"event\\\": \\\"pass_completed\\\", **base, \\\"counts\\\": counts,\\n+                               \\\"duration_seconds\\\": round(self.clock() - started, 6)})\\n+                except PassFailure as exc:\\n+                    success = False\\n+                    self.emit({\\\"event\\\": \\\"pass_failed\\\", **base, \\\"error\\\": exc.code,\\n+                               \\\"retryable\\\": exc.retryable, \\\"counts\\\": {},\\n+                               \\\"duration_seconds\\\": round(self.clock() - started, 6)})\\n+                    if not exc.r\"}, {\"id\": \"writer-update-1-c013\", \"source_id\": \"writer-update-1\", \"text\": \"etryable:\\n+                        self.stop.set()\\n+                    break  # skip dependent actions; retry next interval\\n+                except Exception:\\n+                    success = False\\n+                    self.stop.set()\\n+                    self.emit({\\\"event\\\": \\\"pass_failed\\\", **base, \\\"error\\\": \\\"unexpected_failure\\\",\\n+                               \\\"retryable\\\": False, \\\"counts\\\": {},\\n+                               \\\"duration_seconds\\\": round(self.clock() - started, 6)})\\n+                    break\\n+        finally:\\n+            self._active.release()\\n+        return success\\n+\\n+    def run(self, *, once: bool = False) -> int:\\n+        self.emit({\\\"event\\\": \\\"worker_started\\\", \\\"graph\\\": self.config.graph,\\n+                   \\\"actions\\\": list(self.config.actions), \\\"interval_seconds\\\": self.con\"}, {\"id\": \"writer-update-1-c014\", \"source_id\": \"writer-update-1\", \"text\": \"fig.interval,\\n+                   \\\"extract_model\\\": self.config.extract_model})\\n+        status = 0\\n+        while not self.stop.is_set():\\n+            success = self.cycle()\\n+            if not success and (once or self.stop.is_set()):\\n+                status = 1\\n+            if once or self.stop.is_set() or self.wait(self.config.interval):\\n+                break\\n+        self.emit({\\\"event\\\": \\\"worker_stopped\\\", \\\"graph\\\": self.config.graph, \\\"exit_status\\\": status})\\n+        return status\\n+\\n+\\n+def main(args: list[str] | None = None) -> None:\\n+    parser = argparse.ArgumentParser(prog=\\\"ig maintenance\\\", description=__doc__)\\n+    parser.add_argument(\\\"--once\\\", action=\\\"store_true\\\", help=\\\"run one cycle and exit nonzero on failure\\\")\\n+    parser.add_argument(\\\"--graph\\\", help=\\\"fixed named graph under IG_G\"}, {\"id\": \"writer-update-1-c015\", \"source_id\": \"writer-update-1\", \"text\": \"RAPH_HOME; defaults to startup selection\\\")\\n+    parser.add_argument(\\\"--actions\\\", nargs=\\\"+\\\", choices=ACTIONS, default=[\\\"refresh\\\", \\\"lifecycle\\\"])\\n+    parser.add_argument(\\\"--interval\\\", type=float, default=900, help=\\\"seconds after each completed cycle\\\")\\n+    parser.add_argument(\\\"--pass-timeout\\\", type=float, default=120)\\n+    parser.add_argument(\\\"--lock-timeout\\\", type=float, default=30)\\n+    parser.add_argument(\\\"--limit\\\", type=int, default=50, help=\\\"lifecycle transitions / consolidation source events\\\")\\n+    parser.add_argument(\\\"--max-records\\\", type=int, default=10000, help=\\\"input ceiling per record family\\\")\\n+    parser.add_argument(\\\"--max-input-bytes\\\", type=int, default=64 * 1024 * 1024)\\n+    parser.add_argument(\\\"--extract-model\\\", action=\\\"store_true\\\", help=\\\"explicitly enable structured model co\"}, {\"id\": \"writer-update-1-c016\", \"source_id\": \"writer-update-1\", \"text\": \"nsolidation\\\")\\n+    parser.add_argument(\\\"--model-timeout\\\", type=float, default=30)\\n+    parser.add_argument(\\\"--threshold\\\", type=int, default=1)\\n+    parser.add_argument(\\\"--min-age-days\\\", type=float, default=1)\\n+    parser.add_argument(\\\"--min-count\\\", type=int, default=1)\\n+    opts = parser.parse_args(args)\\n+    try:\\n+        if os.name != \\\"posix\\\":\\n+            raise ValueError(\\\"maintenance currently supports Linux/macOS local filesystems\\\")\\n+        if opts.graph and namespaces.home() is None:\\n+            raise ValueError(\\\"--graph requires IG_GRAPH_HOME\\\")\\n+        config = MaintenanceConfig(\\n+            graph=opts.graph or namespaces.selected(), actions=tuple(opts.actions),\\n+            interval=opts.interval, pass_timeout=opts.pass_timeout, lock_timeout=opts.lock_timeout,\\n+            limi\"}, {\"id\": \"writer-update-1-c017\", \"source_id\": \"writer-update-1\", \"text\": \"t=opts.limit, max_records=opts.max_records, max_input_bytes=opts.max_input_bytes,\\n+            extract_model=opts.extract_model, model_timeout=opts.model_timeout,\\n+            consolidation=ConsolidationConfig(threshold=opts.threshold, min_age_days=opts.min_age_days,\\n+                                              min_count=opts.min_count, limit=opts.limit))\\n+        if config.extract_model:\\n+            _model(config)  # validate configured opt-in before the first pass\\n+    except ValueError as exc:\\n+        parser.error(str(exc))\\n+    worker = MaintenanceWorker(config)\\n+\\n+    def shutdown(signum: int, frame: object) -> None:\\n+        worker.stop.set()\\n+\\n+    previous = {sig: signal.signal(sig, shutdown) for sig in (signal.SIGINT, signal.SIGTERM)}\\n+    try:\\n+        raise SystemExit(worker\"}, {\"id\": \"writer-update-1-c018\", \"source_id\": \"writer-update-1\", \"text\": \".run(once=opts.once))\\n+    finally:\\n+        for sig, handler in previous.items():\\n+            signal.signal(sig, handler)\\n+\\n+\\n+if __name__ == \\\"__main__\\\":\\n+    main()\\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:temporal-basis-c000] [semantic, active] source: benchmark\n### Known limitations\n\n- **Intent heuristics use marker words and a similarity gate.** They can\n  produce false positives. Set `IDEAGRAPH_INTENT_PENDING=1` to require review;\n  `ig accept-pending` cap… [truncated]\n\n[memory:temporal-basis-c001] [semantic, active] source: benchmark\neview list, and the command does not merge nodes. Review pairs before using\n  `ig merge`; ingest deduplication uses its separate 0.92 threshold.\n- **Temporal queries filter current records.** `ig vali… [truncated]\n\n[memory:forget-basis-c001] [semantic, active] source: benchmark\nin write mode and carry\n`readOnlyHint: false`, so a client asks its user before letting a model write into\nthe private brain. In read-only mode they return a `write_disabled` envelope.\n\nDesign guarant… [truncated]\n\n[memory:writer-basis-c002] [semantic, active] source: benchmark\nle writers run. Bind-mount aliases and\nhard-linked record layouts are outside this identity contract.\n\nLock ordering is the existing process-wide thread `RLock` first, then the\nper-brain OS lock. Call… [truncated]\n\n[memory:writer-basis-c005] [semantic, active] source: benchmark\ns the contract.\n\n**Crashes and sync failures:** this is serialization, not rollback or a\nmulti-file transaction. A crash can leave complete atomic files from an\nunfinished operation on disk; inspect `… [truncated]"
+          }
+        ],
+        "prompt_sha256": "b02878034af29bc83be8270ac80c439162019ce4c248e3c7b66957e3ac3bce86",
+        "update_node_ids": [
+          "writer-update-1-c000",
+          "writer-update-1-c001",
+          "writer-update-1-c002",
+          "writer-update-1-c003",
+          "writer-update-1-c004",
+          "writer-update-1-c005",
+          "writer-update-1-c006",
+          "writer-update-1-c007",
+          "writer-update-1-c008",
+          "writer-update-1-c009",
+          "writer-update-1-c010",
+          "writer-update-1-c011",
+          "writer-update-1-c012",
+          "writer-update-1-c013",
+          "writer-update-1-c014",
+          "writer-update-1-c015",
+          "writer-update-1-c016",
+          "writer-update-1-c017",
+          "writer-update-1-c018"
+        ],
+        "prompt_estimated_tokens": 4755,
+        "latency_ms": {
+          "retrieval": 12.455458985641599,
+          "context": 6.46183401113376
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-writer",
+            "path": [
+              "writer-update-1",
+              "writer-basis",
+              "dependency-writer",
+              "decision-writer"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 43.168208037968725,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    },
+    {
+      "event_id": "event-writer-2",
+      "split": "evaluation",
+      "eligible_decisions": [
+        "decision-temporal",
+        "decision-forget",
+        "decision-writer"
+      ],
+      "available_source_ids": [
+        "forget-basis",
+        "temporal-basis",
+        "writer-basis",
+        "writer-update-1",
+        "writer-update-2"
+      ],
+      "visible_inputs_sha256": "ab6540d18316aa3127ab8ef8b4fee415f165800f5f20cb3b43d574510de08b84",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "temporal-basis-c000",
+            "score": 0.03252247488101534
+          },
+          {
+            "id": "temporal-basis-c001",
+            "score": 0.032266458495966696
+          },
+          {
+            "id": "forget-basis-c001",
+            "score": 0.03149801587301587
+          },
+          {
+            "id": "writer-basis-c002",
+            "score": 0.031054405392392875
+          },
+          {
+            "id": "writer-basis-c005",
+            "score": 0.031009615384615385
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:temporal-basis-c000] [semantic, active] source: benchmark\n### Known limitations\n\n- **Intent heuristics use marker words and a similarity gate.** They can\n  produce false positives. Set `IDEAGRAPH_INTENT_PENDING=1` to require review;\n  `ig accept-pending` cap… [truncated]\n\n[memory:temporal-basis-c001] [semantic, active] source: benchmark\neview list, and the command does not merge nodes. Review pairs before using\n  `ig merge`; ingest deduplication uses its separate 0.92 threshold.\n- **Temporal queries filter current records.** `ig vali… [truncated]\n\n[memory:forget-basis-c001] [semantic, active] source: benchmark\nin write mode and carry\n`readOnlyHint: false`, so a client asks its user before letting a model write into\nthe private brain. In read-only mode they return a `write_disabled` envelope.\n\nDesign guarant… [truncated]\n\n[memory:writer-basis-c002] [semantic, active] source: benchmark\nle writers run. Bind-mount aliases and\nhard-linked record layouts are outside this identity contract.\n\nLock ordering is the existing process-wide thread `RLock` first, then the\nper-brain OS lock. Call… [truncated]\n\n[memory:writer-basis-c005] [semantic, active] source: benchmark\ns the contract.\n\n**Crashes and sync failures:** this is serialization, not rollback or a\nmulti-file transaction. A crash can leave complete atomic files from an\nunfinished operation on disk; inspect `… [truncated]",
+          "tokens": 354,
+          "nodes": [
+            "temporal-basis-c000",
+            "temporal-basis-c001",
+            "forget-basis-c001",
+            "writer-basis-c002",
+            "writer-basis-c005"
+          ],
+          "budget": 4000,
+          "truncated": true,
+          "memories": [
+            {
+              "id": "temporal-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "temporal-basis-c001",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "forget-basis-c001",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "writer-basis-c002",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "writer-basis-c005",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "temporal-basis-c000",
+                "temporal-basis-c001",
+                "forget-basis-c001",
+                "writer-basis-c002",
+                "writer-basis-c005"
+              ],
+              "tokens": 354
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to graph_engine/maintenance.py? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"Filter current records by temporal validity; this does not reconstruct historical Git snapshots.\", \"id\": \"decision-temporal\", \"source_id\": \"temporal-basis\"}, {\"action\": \"Forget by tombstoning and invalidating; keep forgotten memories out of live views.\", \"id\": \"decision-forget\", \"source_id\": \"forget-basis\"}, {\"action\": \"Serialize cooperating local brain writes using a shared writer guard.\", \"id\": \"decision-writer\", \"source_id\": \"writer-basis\"}]\nUpdate source: writer-update-2\nUpdate documents (complete task input):\n[{\"id\": \"writer-update-2-c000\", \"source_id\": \"writer-update-2\", \"text\": \"diff --git a/graph_engine/maintenance.py b/graph_engine/maintenance.py\\nindex b680542..610f7e8 100644\\n--- a/graph_engine/maintenance.py\\n+++ b/graph_engine/maintenance.py\\n@@ -123,6 +123,10 @@ def _model(config: MaintenanceConfig) -> Callable[[list[dict]], dict]:\\n             data = adapter(events)\\n             validate_consolidation(data, events)\\n             return data\\n+        except PassDeadline:\\n+            # The adapter has cleaned up its process group, and consolidation\\n+            # has not written any files while extracting/validating this batch.\\n+            raise PassFailure(\\\"pass_timeout\\\") from None\\n         except RuntimeError as exc:\\n             code = \\\"model_timeout\\\" if \\\"timed out\\\" in str(exc) else \\\"model_failed\\\"\\n             raise PassFailure(code) from None\\n@@ -153,12 +15\"}, {\"id\": \"writer-update-2-c001\", \"source_id\": \"writer-update-2\", \"text\": \"7,12 @@ def perform_pass(config: MaintenanceConfig, action: str) -> dict[str, int]:\\n                 extractor = _model(config) if config.extract_model and action == \\\"consolidate\\\" else None\\n                 mutating = True\\n                 if action == \\\"refresh\\\":\\n-                    result = refresh(brain, strict_report=True)\\n+                    result = refresh(brain, strict_report=True, sync=False)\\n                 elif action == \\\"lifecycle\\\":\\n-                    result = lifecycle(brain, limit=config.limit)\\n+                    result = lifecycle(brain, limit=config.limit, sync=False)\\n                 else:\\n                     result = consolidate(brain, config=replace(config.consolidation, limit=config.limit),\\n-                                         structured_extractor=extractor,\"}, {\"id\": \"writer-update-2-c002\", \"source_id\": \"writer-update-2\", \"text\": \" pending_evidence=True)\\n+                                         structured_extractor=extractor, pending_evidence=True, sync=False)\\n                 # Never export the rich maintenance result: it contains node\\n                 # IDs, quotes, proposals and potentially private diagnostics.\\n                 return {key: result[key] for key in COUNTS if type(result.get(key)) is int}\\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:temporal-basis-c000] [semantic, active] source: benchmark\n### Known limitations\n\n- **Intent heuristics use marker words and a similarity gate.** They can\n  produce false positives. Set `IDEAGRAPH_INTENT_PENDING=1` to require review;\n  `ig accept-pending` cap… [truncated]\n\n[memory:temporal-basis-c001] [semantic, active] source: benchmark\neview list, and the command does not merge nodes. Review pairs before using\n  `ig merge`; ingest deduplication uses its separate 0.92 threshold.\n- **Temporal queries filter current records.** `ig vali… [truncated]\n\n[memory:forget-basis-c001] [semantic, active] source: benchmark\nin write mode and carry\n`readOnlyHint: false`, so a client asks its user before letting a model write into\nthe private brain. In read-only mode they return a `write_disabled` envelope.\n\nDesign guarant… [truncated]\n\n[memory:writer-basis-c002] [semantic, active] source: benchmark\nle writers run. Bind-mount aliases and\nhard-linked record layouts are outside this identity contract.\n\nLock ordering is the existing process-wide thread `RLock` first, then the\nper-brain OS lock. Call… [truncated]\n\n[memory:writer-basis-c005] [semantic, active] source: benchmark\ns the contract.\n\n**Crashes and sync failures:** this is serialization, not rollback or a\nmulti-file transaction. A crash can leave complete atomic files from an\nunfinished operation on disk; inspect `… [truncated]"
+          }
+        ],
+        "prompt_sha256": "137914d270c8af88b50d8512052b44db4611d030894a32b79335f322ba6f9755",
+        "update_node_ids": [
+          "writer-update-2-c000",
+          "writer-update-2-c001",
+          "writer-update-2-c002"
+        ],
+        "prompt_estimated_tokens": 1167,
+        "latency_ms": {
+          "retrieval": 10.586957971099764,
+          "context": 5.728833959437907
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-writer",
+            "path": [
+              "writer-update-2",
+              "writer-basis",
+              "dependency-writer",
+              "decision-writer"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 36.131791945081204,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    },
+    {
+      "event_id": "event-forget-1",
+      "split": "evaluation",
+      "eligible_decisions": [
+        "decision-temporal",
+        "decision-models",
+        "decision-forget",
+        "decision-writer"
+      ],
+      "available_source_ids": [
+        "forget-basis",
+        "forget-update-1",
+        "models-basis",
+        "temporal-basis",
+        "writer-basis",
+        "writer-update-1",
+        "writer-update-2"
+      ],
+      "visible_inputs_sha256": "fa7e738af5c7392acabc5fae5c72e96b3cdcc933b9326707f8603fa5b9af96e4",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "temporal-basis-c000",
+            "score": 0.03252247488101534
+          },
+          {
+            "id": "temporal-basis-c001",
+            "score": 0.032266458495966696
+          },
+          {
+            "id": "forget-basis-c001",
+            "score": 0.03149801587301587
+          },
+          {
+            "id": "writer-basis-c002",
+            "score": 0.030621785881252923
+          },
+          {
+            "id": "models-basis-c000",
+            "score": 0.030330882352941176
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:temporal-basis-c000] [semantic, active] source: benchmark\n### Known limitations\n\n- **Intent heuristics use marker words and a similarity gate.** They can\n  produce false positives. Set `IDEAGRAPH_INTENT_PENDING=1` to require review;\n  `ig accept-pending` cap… [truncated]\n\n[memory:temporal-basis-c001] [semantic, active] source: benchmark\neview list, and the command does not merge nodes. Review pairs before using\n  `ig merge`; ingest deduplication uses its separate 0.92 threshold.\n- **Temporal queries filter current records.** `ig vali… [truncated]\n\n[memory:forget-basis-c001] [semantic, active] source: benchmark\nin write mode and carry\n`readOnlyHint: false`, so a client asks its user before letting a model write into\nthe private brain. In read-only mode they return a `write_disabled` envelope.\n\nDesign guarant… [truncated]\n\n[memory:writer-basis-c002] [semantic, active] source: benchmark\nle writers run. Bind-mount aliases and\nhard-linked record layouts are outside this identity contract.\n\nLock ordering is the existing process-wide thread `RLock` first, then the\nper-brain OS lock. Call… [truncated]\n\n[memory:models-basis-c000] [semantic, active] source: benchmark\n## Optional local semantic embeddings\n\nInstall `[st]` separately and prepare a complete, pinned SentenceTransformer\nmodel directory yourself. Selecting it explicitly enables local model execution:\n\n``… [truncated]",
+          "tokens": 354,
+          "nodes": [
+            "temporal-basis-c000",
+            "temporal-basis-c001",
+            "forget-basis-c001",
+            "writer-basis-c002",
+            "models-basis-c000"
+          ],
+          "budget": 4000,
+          "truncated": true,
+          "memories": [
+            {
+              "id": "temporal-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "temporal-basis-c001",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "forget-basis-c001",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "writer-basis-c002",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "models-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "temporal-basis-c000",
+                "temporal-basis-c001",
+                "forget-basis-c001",
+                "writer-basis-c002",
+                "models-basis-c000"
+              ],
+              "tokens": 354
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to graph_engine/dream.py? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"Filter current records by temporal validity; this does not reconstruct historical Git snapshots.\", \"id\": \"decision-temporal\", \"source_id\": \"temporal-basis\"}, {\"action\": \"Use built-in model modules and disable custom Python code in the offline benchmark loader.\", \"id\": \"decision-models\", \"source_id\": \"models-basis\"}, {\"action\": \"Forget by tombstoning and invalidating; keep forgotten memories out of live views.\", \"id\": \"decision-forget\", \"source_id\": \"forget-basis\"}, {\"action\": \"Serialize cooperating local brain writes using a shared writer guard.\", \"id\": \"decision-writer\", \"source_id\": \"writer-basis\"}]\nUpdate source: forget-update-1\nUpdate documents (complete task input):\n[{\"id\": \"forget-update-1-c000\", \"source_id\": \"forget-update-1\", \"text\": \"diff --git a/graph_engine/dream.py b/graph_engine/dream.py\\nindex 2e55533..7f601c2 100644\\n--- a/graph_engine/dream.py\\n+++ b/graph_engine/dream.py\\n@@ -338,6 +338,24 @@ def _summary_ids(brain: Brain) -> set[str]:\\n             if SUMMARY_TAG in n.tags or PROPOSAL_TAG in n.tags}\\n \\n \\n+def _suppressed_summary_members(nodes: dict[str, Node], edges: list[Edge]) -> set[str]:\\n+    \\\"\\\"\\\"Forget suppresses the recorded source lineage, even after repartitioning.\\n+\\n+    Any overlap blocks a new abstraction until the operator explicitly restores\\n+    the forgotten summary. Legacy summaries lack derived_from; their saved\\n+    consolidator links retain at least the linked members, regardless of review\\n+    or validity state. Never infer suppression from ordinary forgotten notes.\\n+    \\\"\\\"\\\"\\n+    forgotten = {n.id\"}, {\"id\": \"forget-update-1-c001\", \"source_id\": \"forget-update-1\", \"text\": \" for n in nodes.values()\\n+                 if n.status == \\\"tombstone\\\" and SUMMARY_TAG in n.tags}\\n+    members = {member for nid in forgotten for member in nodes[nid].derived_from}\\n+    for edge in edges:\\n+        if (edge.source in forgotten and edge.origin == \\\"consolidator\\\"\\n+                and edge.kind == \\\"extends\\\"):\\n+            members.add(edge.target)\\n+    return members\\n+\\n+\\n @write_operation\\n def distill(brain: Brain, *, min_size: int = DREAM_MIN_COMMUNITY,\\n             limit: int = DREAM_MAX_DISTILL, members_per_summary: int = DREAM_MEMBERS_PER_SUMMARY,\\n@@ -352,7 +370,11 @@ def distill(brain: Brain, *, min_size: int = DREAM_MIN_COMMUNITY,\\n     evidence the extractive path uses.\\n \\n     Idempotent: the summary id is derived from the member set, so a second pass\\n-    over an unchanged\"}, {\"id\": \"forget-update-1-c002\", \"source_id\": \"forget-update-1\", \"text\": \" community finds the node and skips it. Summary nodes are\\n+    over an unchanged community finds the node (including tombstones) and skips\\n+    it. Forgotten summaries also suppress any community sharing their recorded\\n+    members; a changed partition cannot undo forgetting. Only an explicit\\n+    operator restore clears this lineage suppression. Saved link decisions and\\n+    provenance are never replaced with fresh accepted links. Summary nodes are\\n     `status=\\\"active\\\"` (a distillation is a deliberate consolidation act) and\\n     carry the `community-summary` tag; their edges are `origin=\\\"consolidator\\\"`.\\n     \\\"\\\"\\\"\\n@@ -360,8 +382,12 @@ def distill(brain: Brain, *, min_size: int = DREAM_MIN_COMMUNITY,\\n     if not dry_run and commit:\\n         brain.ensure_ready()\\n         brain.pull()\\n-    no\"}, {\"id\": \"forget-update-1-c003\", \"source_id\": \"forget-update-1\", \"text\": \"des = {n.id: n for n in brain.read_nodes() if n.status != \\\"tombstone\\\"}\\n-    edges = [e for e in brain.read_edges(include_rejected=True)\\n+    saved_nodes = {n.id: n for n in brain.read_nodes()}\\n+    nodes = {nid: n for nid, n in saved_nodes.items() if n.status != \\\"tombstone\\\"}\\n+    saved_edges = brain.read_edges(include_rejected=True)\\n+    suppressed_members = _suppressed_summary_members(saved_nodes, saved_edges)\\n+    saved_links = {(e.source, e.target, e.kind) for e in saved_edges}\\n+    edges = [e for e in saved_edges\\n              if not e.pending and not e.rejected and e.is_current]\\n     degree: collections.Counter = collections.Counter()\\n     for e in edges:\\n@@ -379,25 +405,29 @@ def distill(brain: Brain, *, min_size: int = DREAM_MIN_COMMUNITY,\\n         if not members:\\n             conti\"}, {\"id\": \"forget-update-1-c004\", \"source_id\": \"forget-update-1\", \"text\": \"nue\\n         summary_id = _summary_id(members)\\n-        if summary_id in nodes:\\n-            continue  # already distilled (idempotent)\\n+        if summary_id in saved_nodes or suppressed_members.intersection(members):\\n+            continue  # Existing identity or explicitly suppressed source lineage.\\n         digest = _community_digest(brain, members, nodes, degree, edges, community.label)\\n         text = summarizer(digest) if summarizer is not None else digest\\n         summaries += 1\\n         if dry_run:\\n             continue\\n-        brain.write_node(Node(id=summary_id, text=text, source=\\\"consolidator\\\",\\n-                              tags=[SUMMARY_TAG], ntype=\\\"semantic\\\", status=\\\"active\\\",\\n-                              derived_from=members))\\n-        nodes[summary_id] = Node(id=summary_i\"}, {\"id\": \"forget-update-1-c005\", \"source_id\": \"forget-update-1\", \"text\": \"d, text=text)\\n+        summary = Node(id=summary_id, text=text, source=\\\"consolidator\\\",\\n+                       tags=[SUMMARY_TAG], ntype=\\\"semantic\\\", status=\\\"active\\\",\\n+                       derived_from=members)\\n+        brain.write_node(summary)\\n+        saved_nodes[summary_id] = summary\\n+        nodes[summary_id] = summary\\n         strongest = sorted(members, key=lambda m: (-degree.get(m, 0), m))[:members_per_summary]\\n         for member in strongest:\\n+            if (summary_id, member, \\\"extends\\\") in saved_links:\\n+                continue  # Preserve even pending/rejected/invalidated history.\\n             new_edges.append(Edge(source=summary_id, target=member, kind=\\\"extends\\\",\\n                                   pending=False, origin=\\\"consolidator\\\"))\\n \\n-    if new_edges and not dry_run:\\n-\"}, {\"id\": \"forget-update-1-c006\", \"source_id\": \"forget-update-1\", \"text\": \"        all_edges = brain.read_edges(include_rejected=True) + new_edges\\n-        brain.write_edges(all_edges)\\n+    if summaries and not dry_run:\\n+        if new_edges:\\n+            brain.write_edges(saved_edges + new_edges)\\n         brain.rebuild_index()\\n         if commit:\\n             brain.commit_and_push(\\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:temporal-basis-c000] [semantic, active] source: benchmark\n### Known limitations\n\n- **Intent heuristics use marker words and a similarity gate.** They can\n  produce false positives. Set `IDEAGRAPH_INTENT_PENDING=1` to require review;\n  `ig accept-pending` cap… [truncated]\n\n[memory:temporal-basis-c001] [semantic, active] source: benchmark\neview list, and the command does not merge nodes. Review pairs before using\n  `ig merge`; ingest deduplication uses its separate 0.92 threshold.\n- **Temporal queries filter current records.** `ig vali… [truncated]\n\n[memory:forget-basis-c001] [semantic, active] source: benchmark\nin write mode and carry\n`readOnlyHint: false`, so a client asks its user before letting a model write into\nthe private brain. In read-only mode they return a `write_disabled` envelope.\n\nDesign guarant… [truncated]\n\n[memory:writer-basis-c002] [semantic, active] source: benchmark\nle writers run. Bind-mount aliases and\nhard-linked record layouts are outside this identity contract.\n\nLock ordering is the existing process-wide thread `RLock` first, then the\nper-brain OS lock. Call… [truncated]\n\n[memory:models-basis-c000] [semantic, active] source: benchmark\n## Optional local semantic embeddings\n\nInstall `[st]` separately and prepare a complete, pinned SentenceTransformer\nmodel directory yourself. Selecting it explicitly enables local model execution:\n\n``… [truncated]"
+          }
+        ],
+        "prompt_sha256": "0b0fd692828c304896564df3c3eb2c779721ee1876686676d867f604814532a1",
+        "update_node_ids": [
+          "forget-update-1-c000",
+          "forget-update-1-c001",
+          "forget-update-1-c002",
+          "forget-update-1-c003",
+          "forget-update-1-c004",
+          "forget-update-1-c005",
+          "forget-update-1-c006"
+        ],
+        "prompt_estimated_tokens": 2086,
+        "latency_ms": {
+          "retrieval": 16.903124982491136,
+          "context": 8.506375015713274
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-forget",
+            "path": [
+              "forget-update-1",
+              "forget-basis",
+              "dependency-forget",
+              "decision-forget"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 53.457750007510185,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    },
+    {
+      "event_id": "event-forget-2",
+      "split": "evaluation",
+      "eligible_decisions": [
+        "decision-temporal",
+        "decision-models",
+        "decision-forget",
+        "decision-writer"
+      ],
+      "available_source_ids": [
+        "forget-basis",
+        "forget-update-1",
+        "forget-update-2",
+        "models-basis",
+        "temporal-basis",
+        "writer-basis",
+        "writer-update-1",
+        "writer-update-2"
+      ],
+      "visible_inputs_sha256": "3d00b8367e0059b31f96b3f7bde7a3b949cbcf84c395badd8d9f7c78b3fb1f6b",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "temporal-basis-c000",
+            "score": 0.03252247488101534
+          },
+          {
+            "id": "temporal-basis-c001",
+            "score": 0.032266458495966696
+          },
+          {
+            "id": "forget-basis-c001",
+            "score": 0.030776515151515152
+          },
+          {
+            "id": "writer-basis-c002",
+            "score": 0.0304147465437788
+          },
+          {
+            "id": "forget-update-2-c002",
+            "score": 0.030330882352941176
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:temporal-basis-c000] [semantic, active] source: benchmark\n### Known limitations\n\n- **Intent heuristics use marker words and a similarity gate.** They can\n  produce false positives. Set `IDEAGRAPH_INTENT_PENDING=1` to require review;\n  `ig accept-pending` cap… [truncated]\n\n[memory:temporal-basis-c001] [semantic, active] source: benchmark\neview list, and the command does not merge nodes. Review pairs before using\n  `ig merge`; ingest deduplication uses its separate 0.92 threshold.\n- **Temporal queries filter current records.** `ig vali… [truncated]\n\n[memory:forget-basis-c001] [semantic, active] source: benchmark\nin write mode and carry\n`readOnlyHint: false`, so a client asks its user before letting a model write into\nthe private brain. In read-only mode they return a `write_disabled` envelope.\n\nDesign guarant… [truncated]\n\n[memory:writer-basis-c002] [semantic, active] source: benchmark\nle writers run. Bind-mount aliases and\nhard-linked record layouts are outside this identity contract.\n\nLock ordering is the existing process-wide thread `RLock` first, then the\nper-brain OS lock. Call… [truncated]\n\n[memory:forget-update-2-c002] [semantic, active] source: benchmark\nuppressed)\n+    while pending:\n+        for child in children.get(pending.pop(), ()):\n+            if child not in suppressed:\n+                suppressed.add(child)\n+                pending.append(ch… [truncated]",
+          "tokens": 355,
+          "nodes": [
+            "temporal-basis-c000",
+            "temporal-basis-c001",
+            "forget-basis-c001",
+            "writer-basis-c002",
+            "forget-update-2-c002"
+          ],
+          "budget": 4000,
+          "truncated": true,
+          "memories": [
+            {
+              "id": "temporal-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "temporal-basis-c001",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "forget-basis-c001",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "writer-basis-c002",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "forget-update-2-c002",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "temporal-basis-c000",
+                "temporal-basis-c001",
+                "forget-basis-c001",
+                "writer-basis-c002",
+                "forget-update-2-c002"
+              ],
+              "tokens": 355
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to graph_engine/dream.py? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"Filter current records by temporal validity; this does not reconstruct historical Git snapshots.\", \"id\": \"decision-temporal\", \"source_id\": \"temporal-basis\"}, {\"action\": \"Use built-in model modules and disable custom Python code in the offline benchmark loader.\", \"id\": \"decision-models\", \"source_id\": \"models-basis\"}, {\"action\": \"Forget by tombstoning and invalidating; keep forgotten memories out of live views.\", \"id\": \"decision-forget\", \"source_id\": \"forget-basis\"}, {\"action\": \"Serialize cooperating local brain writes using a shared writer guard.\", \"id\": \"decision-writer\", \"source_id\": \"writer-basis\"}]\nUpdate source: forget-update-2\nUpdate documents (complete task input):\n[{\"id\": \"forget-update-2-c000\", \"source_id\": \"forget-update-2\", \"text\": \"diff --git a/graph_engine/dream.py b/graph_engine/dream.py\\nindex 7f601c2..f4fc115 100644\\n--- a/graph_engine/dream.py\\n+++ b/graph_engine/dream.py\\n@@ -344,7 +344,9 @@ def _suppressed_summary_members(nodes: dict[str, Node], edges: list[Edge]) -> se\\n     Any overlap blocks a new abstraction until the operator explicitly restores\\n     the forgotten summary. Legacy summaries lack derived_from; their saved\\n     consolidator links retain at least the linked members, regardless of review\\n-    or validity state. Never infer suppression from ordinary forgotten notes.\\n+    or validity state. Their recorded descendants remain suppressed through\\n+    merges, including legacy text provenance. Never infer suppression from\\n+    ordinary forgotten notes.\\n     \\\"\\\"\\\"\\n     forgotten = {n.id for n in nodes.values\"}, {\"id\": \"forget-update-2-c001\", \"source_id\": \"forget-update-2\", \"text\": \"()\\n                  if n.status == \\\"tombstone\\\" and SUMMARY_TAG in n.tags}\\n@@ -353,7 +355,24 @@ def _suppressed_summary_members(nodes: dict[str, Node], edges: list[Edge]) -> se\\n         if (edge.source in forgotten and edge.origin == \\\"consolidator\\\"\\n                 and edge.kind == \\\"extends\\\"):\\n             members.add(edge.target)\\n-    return members\\n+    if not forgotten:\\n+        return set()\\n+\\n+    from .access import derivation_parents\\n+\\n+    children: dict[str, set[str]] = collections.defaultdict(set)\\n+    for child, parents in derivation_parents(nodes, edges).items():\\n+        for parent in parents:\\n+            if parent:  # Unknown legacy lineage is not a shared source identity.\\n+                children[parent].add(child)\\n+    suppressed = members | forgotten\\n+    pending = list(s\"}, {\"id\": \"forget-update-2-c002\", \"source_id\": \"forget-update-2\", \"text\": \"uppressed)\\n+    while pending:\\n+        for child in children.get(pending.pop(), ()):\\n+            if child not in suppressed:\\n+                suppressed.add(child)\\n+                pending.append(child)\\n+    return suppressed\\n \\n \\n @write_operation\\n@@ -372,8 +391,9 @@ def distill(brain: Brain, *, min_size: int = DREAM_MIN_COMMUNITY,\\n     Idempotent: the summary id is derived from the member set, so a second pass\\n     over an unchanged community finds the node (including tombstones) and skips\\n     it. Forgotten summaries also suppress any community sharing their recorded\\n-    members; a changed partition cannot undo forgetting. Only an explicit\\n-    operator restore clears this lineage suppression. Saved link decisions and\\n+    members or their recorded descendants; a changed partition or \"}, {\"id\": \"forget-update-2-c003\", \"source_id\": \"forget-update-2\", \"text\": \"merge cannot\\n+    undo forgetting. Only an explicit operator restore clears this lineage\\n+    suppression. Saved link decisions and\\n     provenance are never replaced with fresh accepted links. Summary nodes are\\n     `status=\\\"active\\\"` (a distillation is a deliberate consolidation act) and\\n     carry the `community-summary` tag; their edges are `origin=\\\"consolidator\\\"`.\\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:temporal-basis-c000] [semantic, active] source: benchmark\n### Known limitations\n\n- **Intent heuristics use marker words and a similarity gate.** They can\n  produce false positives. Set `IDEAGRAPH_INTENT_PENDING=1` to require review;\n  `ig accept-pending` cap… [truncated]\n\n[memory:temporal-basis-c001] [semantic, active] source: benchmark\neview list, and the command does not merge nodes. Review pairs before using\n  `ig merge`; ingest deduplication uses its separate 0.92 threshold.\n- **Temporal queries filter current records.** `ig vali… [truncated]\n\n[memory:forget-basis-c001] [semantic, active] source: benchmark\nin write mode and carry\n`readOnlyHint: false`, so a client asks its user before letting a model write into\nthe private brain. In read-only mode they return a `write_disabled` envelope.\n\nDesign guarant… [truncated]\n\n[memory:writer-basis-c002] [semantic, active] source: benchmark\nle writers run. Bind-mount aliases and\nhard-linked record layouts are outside this identity contract.\n\nLock ordering is the existing process-wide thread `RLock` first, then the\nper-brain OS lock. Call… [truncated]\n\n[memory:forget-update-2-c002] [semantic, active] source: benchmark\nuppressed)\n+    while pending:\n+        for child in children.get(pending.pop(), ()):\n+            if child not in suppressed:\n+                suppressed.add(child)\n+                pending.append(ch… [truncated]"
+          }
+        ],
+        "prompt_sha256": "ae48cd972ed1a1fabf1da9459b73b83b8229a6d095547974b5c6956e1b65a335",
+        "update_node_ids": [
+          "forget-update-2-c000",
+          "forget-update-2-c001",
+          "forget-update-2-c002",
+          "forget-update-2-c003"
+        ],
+        "prompt_estimated_tokens": 1427,
+        "latency_ms": {
+          "retrieval": 18.379999964963645,
+          "context": 11.423584015574306
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-forget",
+            "path": [
+              "forget-update-2",
+              "forget-basis",
+              "dependency-forget",
+              "decision-forget"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 64.74283302668482,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    },
+    {
+      "event_id": "event-temporal-1",
+      "split": "evaluation",
+      "eligible_decisions": [
+        "decision-temporal",
+        "decision-models",
+        "decision-forget",
+        "decision-writer"
+      ],
+      "available_source_ids": [
+        "forget-basis",
+        "forget-update-1",
+        "forget-update-2",
+        "models-basis",
+        "temporal-basis",
+        "temporal-update-1",
+        "writer-basis",
+        "writer-update-1",
+        "writer-update-2"
+      ],
+      "visible_inputs_sha256": "2e27f884ef6ce5b70721aa5372eb2c362a5c6c7871db5b554c22a2dd3d0a7df7",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "temporal-basis-c000",
+            "score": 0.03252247488101534
+          },
+          {
+            "id": "temporal-basis-c001",
+            "score": 0.032266458495966696
+          },
+          {
+            "id": "forget-basis-c001",
+            "score": 0.030776515151515152
+          },
+          {
+            "id": "writer-basis-c002",
+            "score": 0.0304147465437788
+          },
+          {
+            "id": "forget-update-2-c002",
+            "score": 0.030117753623188408
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:temporal-basis-c000] [semantic, active] source: benchmark\n### Known limitations\n\n- **Intent heuristics use marker words and a similarity gate.** They can\n  produce false positives. Set `IDEAGRAPH_INTENT_PENDING=1` to require review;\n  `ig accept-pending` cap… [truncated]\n\n[memory:temporal-basis-c001] [semantic, active] source: benchmark\neview list, and the command does not merge nodes. Review pairs before using\n  `ig merge`; ingest deduplication uses its separate 0.92 threshold.\n- **Temporal queries filter current records.** `ig vali… [truncated]\n\n[memory:forget-basis-c001] [semantic, active] source: benchmark\nin write mode and carry\n`readOnlyHint: false`, so a client asks its user before letting a model write into\nthe private brain. In read-only mode they return a `write_disabled` envelope.\n\nDesign guarant… [truncated]\n\n[memory:writer-basis-c002] [semantic, active] source: benchmark\nle writers run. Bind-mount aliases and\nhard-linked record layouts are outside this identity contract.\n\nLock ordering is the existing process-wide thread `RLock` first, then the\nper-brain OS lock. Call… [truncated]\n\n[memory:forget-update-2-c002] [semantic, active] source: benchmark\nuppressed)\n+    while pending:\n+        for child in children.get(pending.pop(), ()):\n+            if child not in suppressed:\n+                suppressed.add(child)\n+                pending.append(ch… [truncated]",
+          "tokens": 355,
+          "nodes": [
+            "temporal-basis-c000",
+            "temporal-basis-c001",
+            "forget-basis-c001",
+            "writer-basis-c002",
+            "forget-update-2-c002"
+          ],
+          "budget": 4000,
+          "truncated": true,
+          "memories": [
+            {
+              "id": "temporal-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "temporal-basis-c001",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "forget-basis-c001",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "writer-basis-c002",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "forget-update-2-c002",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "temporal-basis-c000",
+                "temporal-basis-c001",
+                "forget-basis-c001",
+                "writer-basis-c002",
+                "forget-update-2-c002"
+              ],
+              "tokens": 355
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to graph_engine/temporal.py? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"Filter current records by temporal validity; this does not reconstruct historical Git snapshots.\", \"id\": \"decision-temporal\", \"source_id\": \"temporal-basis\"}, {\"action\": \"Use built-in model modules and disable custom Python code in the offline benchmark loader.\", \"id\": \"decision-models\", \"source_id\": \"models-basis\"}, {\"action\": \"Forget by tombstoning and invalidating; keep forgotten memories out of live views.\", \"id\": \"decision-forget\", \"source_id\": \"forget-basis\"}, {\"action\": \"Serialize cooperating local brain writes using a shared writer guard.\", \"id\": \"decision-writer\", \"source_id\": \"writer-basis\"}]\nUpdate source: temporal-update-1\nUpdate documents (complete task input):\n[{\"id\": \"temporal-update-1-c000\", \"source_id\": \"temporal-update-1\", \"text\": \"diff --git a/graph_engine/temporal.py b/graph_engine/temporal.py\\nindex badfa4a..1a1ac72 100644\\n--- a/graph_engine/temporal.py\\n+++ b/graph_engine/temporal.py\\n@@ -17,14 +17,19 @@ from __future__ import annotations\\n import datetime\\n from typing import TYPE_CHECKING\\n \\n+from .timestamps import parse_timestamp as _parse_ts\\n+\\n if TYPE_CHECKING:\\n     from .brain import Brain, Edge, Node\\n     from .brain_engine import BrainEngine\\n \\n \\n-def _parse_ts(ts: str) -> datetime.datetime:\\n-    \\\"\\\"\\\"Parse ISO-8601 timestamp, tolerating 'Z' suffix.\\\"\\\"\\\"\\n-    return datetime.datetime.fromisoformat(ts.replace(\\\"Z\\\", \\\"+00:00\\\"))\\n+def _event_time(event: dict) -> datetime.datetime:\\n+    \\\"\\\"\\\"Sort legacy events with missing/malformed dates before dated events.\\\"\\\"\\\"\\n+    try:\\n+        return _parse_ts(event[\\\"timestamp\\\"])\\n+    e\"}, {\"id\": \"temporal-update-1-c001\", \"source_id\": \"temporal-update-1\", \"text\": \"xcept ValueError:\\n+        return datetime.datetime.min.replace(tzinfo=datetime.timezone.utc)\\n \\n \\n def _is_valid_at(edge: \\\"Edge\\\", ts: datetime.datetime) -> bool:\\n@@ -115,7 +120,7 @@ def history(brain: \\\"Brain\\\", node_id: str) -> list[dict]:\\n                 \\\"origin\\\": e.origin,\\n                 \\\"rejected\\\": e.rejected,\\n             })\\n-    events.sort(key=lambda x: x[\\\"timestamp\\\"] or \\\"\\\")\\n+    events.sort(key=_event_time)\\n     return events\\n \\n \\n@@ -168,6 +173,10 @@ def edge_timeline(brain: \\\"Brain\\\", *, since: str | None = None,\\n     Useful for \\\"what changed in the brain recently?\\\" \\u2014 the temporal\\n     equivalent of `ig report --since`.\\n     \\\"\\\"\\\"\\n+    # Validate bounds even on an empty brain. Bounds are inclusive instants,\\n+    # not lexical comparisons of their original ISO-8601 representations.\\n+ \"}, {\"id\": \"temporal-update-1-c002\", \"source_id\": \"temporal-update-1\", \"text\": \"   start = _parse_ts(since) if since is not None else None\\n+    end = _parse_ts(until) if until is not None else None\\n     events: list[dict] = []\\n     for e in brain.read_edges(include_rejected=True):\\n         if e.pending or e.rejected:\\n@@ -178,10 +187,6 @@ def edge_timeline(brain: \\\"Brain\\\", *, since: str | None = None,\\n             vf = None\\n \\n         if vf:\\n-            if since and vf < _parse_ts(since):\\n-                pass  # still include, filtered below\\n-            if until and vf > _parse_ts(until):\\n-                pass\\n             events.append({\\n                 \\\"timestamp\\\": e.valid_from,\\n                 \\\"event\\\": \\\"created\\\",\\n@@ -211,11 +216,10 @@ def edge_timeline(brain: \\\"Brain\\\", *, since: str | None = None,\\n                 \\\"origin\\\": e.origin,\\n             })\\n \\n-    # Filt\"}, {\"id\": \"temporal-update-1-c003\", \"source_id\": \"temporal-update-1\", \"text\": \"er by range\\n-    if since:\\n-        events = [e for e in events if (e[\\\"timestamp\\\"] or \\\"\\\") >= since]\\n-    if until:\\n-        events = [e for e in events if (e[\\\"timestamp\\\"] or \\\"\\\") <= until]\\n+    if start is not None:\\n+        events = [e for e in events if _parse_ts(e[\\\"timestamp\\\"]) >= start]\\n+    if end is not None:\\n+        events = [e for e in events if _parse_ts(e[\\\"timestamp\\\"]) <= end]\\n \\n-    events.sort(key=lambda x: x[\\\"timestamp\\\"] or \\\"\\\")\\n+    events.sort(key=_event_time)\\n     return events\\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:temporal-basis-c000] [semantic, active] source: benchmark\n### Known limitations\n\n- **Intent heuristics use marker words and a similarity gate.** They can\n  produce false positives. Set `IDEAGRAPH_INTENT_PENDING=1` to require review;\n  `ig accept-pending` cap… [truncated]\n\n[memory:temporal-basis-c001] [semantic, active] source: benchmark\neview list, and the command does not merge nodes. Review pairs before using\n  `ig merge`; ingest deduplication uses its separate 0.92 threshold.\n- **Temporal queries filter current records.** `ig vali… [truncated]\n\n[memory:forget-basis-c001] [semantic, active] source: benchmark\nin write mode and carry\n`readOnlyHint: false`, so a client asks its user before letting a model write into\nthe private brain. In read-only mode they return a `write_disabled` envelope.\n\nDesign guarant… [truncated]\n\n[memory:writer-basis-c002] [semantic, active] source: benchmark\nle writers run. Bind-mount aliases and\nhard-linked record layouts are outside this identity contract.\n\nLock ordering is the existing process-wide thread `RLock` first, then the\nper-brain OS lock. Call… [truncated]\n\n[memory:forget-update-2-c002] [semantic, active] source: benchmark\nuppressed)\n+    while pending:\n+        for child in children.get(pending.pop(), ()):\n+            if child not in suppressed:\n+                suppressed.add(child)\n+                pending.append(ch… [truncated]"
+          }
+        ],
+        "prompt_sha256": "0519da2e13b2db497eed2170bf16c981e29c55066ad16ba62af25d0af13a90e1",
+        "update_node_ids": [
+          "temporal-update-1-c000",
+          "temporal-update-1-c001",
+          "temporal-update-1-c002",
+          "temporal-update-1-c003"
+        ],
+        "prompt_estimated_tokens": 1484,
+        "latency_ms": {
+          "retrieval": 16.513834008947015,
+          "context": 18.380666966550052
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-temporal",
+            "path": [
+              "temporal-update-1",
+              "temporal-basis",
+              "dependency-temporal",
+              "decision-temporal"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 71.47187500959262,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    },
+    {
+      "event_id": "event-temporal-2",
+      "split": "evaluation",
+      "eligible_decisions": [
+        "decision-temporal",
+        "decision-models",
+        "decision-forget",
+        "decision-writer"
+      ],
+      "available_source_ids": [
+        "forget-basis",
+        "forget-update-1",
+        "forget-update-2",
+        "models-basis",
+        "temporal-basis",
+        "temporal-update-1",
+        "temporal-update-2",
+        "writer-basis",
+        "writer-update-1",
+        "writer-update-2"
+      ],
+      "visible_inputs_sha256": "04cb889c098e085809b94d306948b65ce558659dde2af3c3a15a38c8ba7a5918",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "temporal-basis-c000",
+            "score": 0.03252247488101534
+          },
+          {
+            "id": "temporal-basis-c001",
+            "score": 0.032266458495966696
+          },
+          {
+            "id": "forget-basis-c001",
+            "score": 0.030776515151515152
+          },
+          {
+            "id": "writer-basis-c002",
+            "score": 0.0304147465437788
+          },
+          {
+            "id": "models-basis-c000",
+            "score": 0.030330882352941176
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:temporal-basis-c000] [semantic, active] source: benchmark\n### Known limitations\n\n- **Intent heuristics use marker words and a similarity gate.** They can\n  produce false positives. Set `IDEAGRAPH_INTENT_PENDING=1` to require review;\n  `ig accept-pending` cap… [truncated]\n\n[memory:temporal-basis-c001] [semantic, active] source: benchmark\neview list, and the command does not merge nodes. Review pairs before using\n  `ig merge`; ingest deduplication uses its separate 0.92 threshold.\n- **Temporal queries filter current records.** `ig vali… [truncated]\n\n[memory:forget-basis-c001] [semantic, active] source: benchmark\nin write mode and carry\n`readOnlyHint: false`, so a client asks its user before letting a model write into\nthe private brain. In read-only mode they return a `write_disabled` envelope.\n\nDesign guarant… [truncated]\n\n[memory:writer-basis-c002] [semantic, active] source: benchmark\nle writers run. Bind-mount aliases and\nhard-linked record layouts are outside this identity contract.\n\nLock ordering is the existing process-wide thread `RLock` first, then the\nper-brain OS lock. Call… [truncated]\n\n[memory:models-basis-c000] [semantic, active] source: benchmark\n## Optional local semantic embeddings\n\nInstall `[st]` separately and prepare a complete, pinned SentenceTransformer\nmodel directory yourself. Selecting it explicitly enables local model execution:\n\n``… [truncated]",
+          "tokens": 354,
+          "nodes": [
+            "temporal-basis-c000",
+            "temporal-basis-c001",
+            "forget-basis-c001",
+            "writer-basis-c002",
+            "models-basis-c000"
+          ],
+          "budget": 4000,
+          "truncated": true,
+          "memories": [
+            {
+              "id": "temporal-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "temporal-basis-c001",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "forget-basis-c001",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "writer-basis-c002",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "models-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "temporal-basis-c000",
+                "temporal-basis-c001",
+                "forget-basis-c001",
+                "writer-basis-c002",
+                "models-basis-c000"
+              ],
+              "tokens": 354
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to graph_engine/temporal.py? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"Filter current records by temporal validity; this does not reconstruct historical Git snapshots.\", \"id\": \"decision-temporal\", \"source_id\": \"temporal-basis\"}, {\"action\": \"Use built-in model modules and disable custom Python code in the offline benchmark loader.\", \"id\": \"decision-models\", \"source_id\": \"models-basis\"}, {\"action\": \"Forget by tombstoning and invalidating; keep forgotten memories out of live views.\", \"id\": \"decision-forget\", \"source_id\": \"forget-basis\"}, {\"action\": \"Serialize cooperating local brain writes using a shared writer guard.\", \"id\": \"decision-writer\", \"source_id\": \"writer-basis\"}]\nUpdate source: temporal-update-2\nUpdate documents (complete task input):\n[{\"id\": \"temporal-update-2-c000\", \"source_id\": \"temporal-update-2\", \"text\": \"diff --git a/graph_engine/temporal.py b/graph_engine/temporal.py\\nindex 1a1ac72..1c32aca 100644\\n--- a/graph_engine/temporal.py\\n+++ b/graph_engine/temporal.py\\n@@ -127,9 +127,9 @@ def history(brain: \\\"Brain\\\", node_id: str) -> list[dict]:\\n def when(engine: \\\"BrainEngine\\\", query: str, at: str, k: int = 5) -> list[tuple[str, float]]:\\n     \\\"\\\"\\\"Retrieval of current text restricted by creation time (Phase 2).\\n \\n-    Runs the normal hybrid retrieval, then filters the results to only\\n-    include nodes that existed at the given timestamp. This is the\\n-    temporal filter; it does not restore old text or review decisions.\\n+    Runs normal hybrid retrieval over only the authorized, live nodes that\\n+    existed at the given timestamp, without writes or recall tracking. This\\n+    temporal filter does not re\"}, {\"id\": \"temporal-update-2-c001\", \"source_id\": \"temporal-update-2\", \"text\": \"store old text or review decisions.\\n     \\\"\\\"\\\"\\n     from .retrieval import retrieve\\n \\n@@ -140,30 +140,14 @@ def when(engine: \\\"BrainEngine\\\", query: str, at: str, k: int = 5) -> list[tuple[s\\n     except (ValueError, TypeError):\\n         raise ValueError(f\\\"Invalid timestamp: {at!r}\\\")\\n \\n-    # Get the full ranking (no tracking \\u2014 this is a historical query)\\n-    results = retrieve(engine, query, k=k * 3, track=False)\\n-    if not results:\\n-        return []\\n-\\n-    # Filter to nodes that existed at the timestamp\\n-    filtered: list[tuple[str, float]] = []\\n-    for node_id, score in results:\\n-        node = engine.brain.read_node(node_id)\\n-        if node is None:\\n-            continue\\n-        if node.status == \\\"tombstone\\\":\\n-            continue\\n+    def eligible(node: \\\"Node\\\") -> bool:\\n         try\"}, {\"id\": \"temporal-update-2-c002\", \"source_id\": \"temporal-update-2\", \"text\": \":\\n             created = _parse_ts(node.created) if node.created else None\\n         except (ValueError, TypeError):\\n             created = None\\n-        if created and created > ts:\\n-            continue\\n-        filtered.append((node_id, score))\\n-        if len(filtered) >= k:\\n-            break\\n+        return created is None or created <= ts\\n \\n-    return filtered\\n+    return retrieve(engine, query, k=k, persist=False, track=False, node_filter=eligible)\\n \\n \\n def edge_timeline(brain: \\\"Brain\\\", *, since: str | None = None,\\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:temporal-basis-c000] [semantic, active] source: benchmark\n### Known limitations\n\n- **Intent heuristics use marker words and a similarity gate.** They can\n  produce false positives. Set `IDEAGRAPH_INTENT_PENDING=1` to require review;\n  `ig accept-pending` cap… [truncated]\n\n[memory:temporal-basis-c001] [semantic, active] source: benchmark\neview list, and the command does not merge nodes. Review pairs before using\n  `ig merge`; ingest deduplication uses its separate 0.92 threshold.\n- **Temporal queries filter current records.** `ig vali… [truncated]\n\n[memory:forget-basis-c001] [semantic, active] source: benchmark\nin write mode and carry\n`readOnlyHint: false`, so a client asks its user before letting a model write into\nthe private brain. In read-only mode they return a `write_disabled` envelope.\n\nDesign guarant… [truncated]\n\n[memory:writer-basis-c002] [semantic, active] source: benchmark\nle writers run. Bind-mount aliases and\nhard-linked record layouts are outside this identity contract.\n\nLock ordering is the existing process-wide thread `RLock` first, then the\nper-brain OS lock. Call… [truncated]\n\n[memory:models-basis-c000] [semantic, active] source: benchmark\n## Optional local semantic embeddings\n\nInstall `[st]` separately and prepare a complete, pinned SentenceTransformer\nmodel directory yourself. Selecting it explicitly enables local model execution:\n\n``… [truncated]"
+          }
+        ],
+        "prompt_sha256": "b2eb9934f51003674b5f871d0ac3de60a66d90a55bc00ec60ba98641d3f3356c",
+        "update_node_ids": [
+          "temporal-update-2-c000",
+          "temporal-update-2-c001",
+          "temporal-update-2-c002"
+        ],
+        "prompt_estimated_tokens": 1254,
+        "latency_ms": {
+          "retrieval": 30.795875005424023,
+          "context": 19.93370900163427
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-temporal",
+            "path": [
+              "temporal-update-2",
+              "temporal-basis",
+              "dependency-temporal",
+              "decision-temporal"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 104.07341597601771,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    },
+    {
+      "event_id": "event-models-1",
+      "split": "evaluation",
+      "eligible_decisions": [
+        "decision-temporal",
+        "decision-models",
+        "decision-forget",
+        "decision-writer"
+      ],
+      "available_source_ids": [
+        "forget-basis",
+        "forget-update-1",
+        "forget-update-2",
+        "models-basis",
+        "models-update-1",
+        "temporal-basis",
+        "temporal-update-1",
+        "temporal-update-2",
+        "writer-basis",
+        "writer-update-1",
+        "writer-update-2"
+      ],
+      "visible_inputs_sha256": "dc4079e484f7bcf0a587b7339fe6b556d7f0233f56acfca5200bc1cf53e1ae78",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "temporal-basis-c000",
+            "score": 0.03252247488101534
+          },
+          {
+            "id": "temporal-basis-c001",
+            "score": 0.032266458495966696
+          },
+          {
+            "id": "forget-basis-c001",
+            "score": 0.030776515151515152
+          },
+          {
+            "id": "writer-basis-c002",
+            "score": 0.0304147465437788
+          },
+          {
+            "id": "forget-update-2-c002",
+            "score": 0.030090497737556562
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:temporal-basis-c000] [semantic, active] source: benchmark\n### Known limitations\n\n- **Intent heuristics use marker words and a similarity gate.** They can\n  produce false positives. Set `IDEAGRAPH_INTENT_PENDING=1` to require review;\n  `ig accept-pending` cap… [truncated]\n\n[memory:temporal-basis-c001] [semantic, active] source: benchmark\neview list, and the command does not merge nodes. Review pairs before using\n  `ig merge`; ingest deduplication uses its separate 0.92 threshold.\n- **Temporal queries filter current records.** `ig vali… [truncated]\n\n[memory:forget-basis-c001] [semantic, active] source: benchmark\nin write mode and carry\n`readOnlyHint: false`, so a client asks its user before letting a model write into\nthe private brain. In read-only mode they return a `write_disabled` envelope.\n\nDesign guarant… [truncated]\n\n[memory:writer-basis-c002] [semantic, active] source: benchmark\nle writers run. Bind-mount aliases and\nhard-linked record layouts are outside this identity contract.\n\nLock ordering is the existing process-wide thread `RLock` first, then the\nper-brain OS lock. Call… [truncated]\n\n[memory:forget-update-2-c002] [semantic, active] source: benchmark\nuppressed)\n+    while pending:\n+        for child in children.get(pending.pop(), ()):\n+            if child not in suppressed:\n+                suppressed.add(child)\n+                pending.append(ch… [truncated]",
+          "tokens": 355,
+          "nodes": [
+            "temporal-basis-c000",
+            "temporal-basis-c001",
+            "forget-basis-c001",
+            "writer-basis-c002",
+            "forget-update-2-c002"
+          ],
+          "budget": 4000,
+          "truncated": true,
+          "memories": [
+            {
+              "id": "temporal-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "temporal-basis-c001",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "forget-basis-c001",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "writer-basis-c002",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "forget-update-2-c002",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "temporal-basis-c000",
+                "temporal-basis-c001",
+                "forget-basis-c001",
+                "writer-basis-c002",
+                "forget-update-2-c002"
+              ],
+              "tokens": 355
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to graph_engine/runtime.py? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"Filter current records by temporal validity; this does not reconstruct historical Git snapshots.\", \"id\": \"decision-temporal\", \"source_id\": \"temporal-basis\"}, {\"action\": \"Use built-in model modules and disable custom Python code in the offline benchmark loader.\", \"id\": \"decision-models\", \"source_id\": \"models-basis\"}, {\"action\": \"Forget by tombstoning and invalidating; keep forgotten memories out of live views.\", \"id\": \"decision-forget\", \"source_id\": \"forget-basis\"}, {\"action\": \"Serialize cooperating local brain writes using a shared writer guard.\", \"id\": \"decision-writer\", \"source_id\": \"writer-basis\"}]\nUpdate source: models-update-1\nUpdate documents (complete task input):\n[{\"id\": \"models-update-1-c000\", \"source_id\": \"models-update-1\", \"text\": \"diff --git a/graph_engine/runtime.py b/graph_engine/runtime.py\\nindex 0c9f676..1ab49c4 100644\\n--- a/graph_engine/runtime.py\\n+++ b/graph_engine/runtime.py\\n@@ -13,24 +13,43 @@ Env contract (identical for every consumer):\\n   IG_BRAIN_MODE          \\u2014 \\\"git\\\" (real repo) or \\\"local\\\" (FS only, tests)\\n   IDEAGRAPH_EMBEDDER     \\u2014 \\\"st\\\" (sentence-transformers) or \\\"hash\\\"\\n   IDEAGRAPH_EMBEDDER_MODEL \\u2014 model override (Audit #60)\\n+  IDEAGRAPH_EMBEDDER_REVISION \\u2014 optional model revision (commit SHA recommended)\\n+  IDEAGRAPH_RERANKER_REVISION \\u2014 optional cross-encoder revision\\n \\\"\\\"\\\"\\n \\n from __future__ import annotations\\n \\n import os\\n+from collections import OrderedDict\\n+from collections.abc import Callable\\n+from threading import RLock\\n+from typing import TypeVar\\n \\n from .brain import Brain\\n from . import access\"}, {\"id\": \"models-update-1-c001\", \"source_id\": \"models-update-1\", \"text\": \", namespaces\\n-from .brain_engine import BrainEngine\\n-from .embedder import get_embedder\\n-\\n-# Audit #16: building a fresh engine per request re-instantiates the\\n-# sentence-transformers model per request (seconds of CPU, memory churn).\\n-# A process-wide cache shares the model + vector cache; write consistency\\n-# is provided by brain.write_guard() across threads and local processes. The cache is keyed on (brain path, embedder):\\n-# a changed env (tests, multi-brain setups) correctly gets a fresh engine\\n-# instead of the foreign instance.\\n-_ENGINES: dict[tuple[str, str, str | None], BrainEngine] = {}\\n+from .brain_engine import BrainEngine, model_revisions_from_env\\n+from .embedder import Embedder, HashEmbedder, get_embedder, local_model_digest\\n+from .reranker import Reranker, get_reranker\\n+\\n+# \"}, {\"id\": \"models-update-1-c002\", \"source_id\": \"models-update-1\", \"text\": \"Model adapters contain no brain, identity, corpus or query-result state.\\n+# Keep them independent of the unprotected engine/corpus cache (issue #55).\\n+# Eviction releases cache references; in-flight requests retain their resources.\\n+_CACHE_LIMIT = 8\\n+_CACHE_LOCK = RLock()\\n+_ENGINES: OrderedDict[tuple, BrainEngine] = OrderedDict()\\n+_EMBEDDERS: OrderedDict[tuple, Embedder | HashEmbedder] = OrderedDict()\\n+_RERANKERS: OrderedDict[tuple, Reranker | None] = OrderedDict()\\n+_T = TypeVar(\\\"_T\\\")\\n+\\n+\\n+def _cached(cache: OrderedDict[tuple, _T], key: tuple, factory: Callable[[], _T]) -> _T:\\n+    \\\"\\\"\\\"Caller holds _CACHE_LOCK, including construction and reset.\\\"\\\"\\\"\\n+    if key not in cache:\\n+        cache[key] = factory()\\n+    cache.move_to_end(key)\\n+    while len(cache) > _CACHE_LIMIT:\\n+        cache.popite\"}, {\"id\": \"models-update-1-c003\", \"source_id\": \"models-update-1\", \"text\": \"m(last=False)\\n+    return cache[key]\\n \\n \\n def brain_path() -> str:\\n@@ -60,26 +79,40 @@ def make_brain() -> Brain:\\n \\n \\n def make_engine() -> BrainEngine:\\n-    \\\"\\\"\\\"A BrainEngine from the env contract, process-wide cached.\\\"\\\"\\\"\\n+    \\\"\\\"\\\"Share models, but always build a fresh authorized brain and engine.\\\"\\\"\\\"\\n     brain = make_brain()\\n-    if access.policy_path():\\n-        # Never cache identities/policies across requests or policy revocation.\\n-        return BrainEngine(brain, get_embedder(\\n-            os.environ.get(\\\"IDEAGRAPH_EMBEDDER\\\", \\\"st\\\"),\\n-            os.environ.get(\\\"IDEAGRAPH_EMBEDDER_MODEL\\\")))\\n     embedder_name = os.environ.get(\\\"IDEAGRAPH_EMBEDDER\\\", \\\"st\\\")\\n-    key = (str(brain.path), embedder_name, os.environ.get(\\\"IDEAGRAPH_EMBEDDER_MODEL\\\"))\\n-    eng = _ENGINES.get(key)\\n-    if eng is No\"}, {\"id\": \"models-update-1-c004\", \"source_id\": \"models-update-1\", \"text\": \"ne:\\n-        model = os.environ.get(\\\"IDEAGRAPH_EMBEDDER_MODEL\\\")  # audit #60\\n-        eng = BrainEngine(brain, get_embedder(embedder_name, model))\\n-        _ENGINES[key] = eng\\n-        # Each engine retains one corpus index; bound multi-brain/model use.\\n-        while len(_ENGINES) > 8:\\n-            _ENGINES.pop(next(iter(_ENGINES), None), None)\\n-    return eng\\n+    model = os.environ.get(\\\"IDEAGRAPH_EMBEDDER_MODEL\\\") or \\\"all-MiniLM-L6-v2\\\"\\n+    revision, rerank_revision = model_revisions_from_env()\\n+    rerank_mode = os.environ.get(\\\"IDEAGRAPH_RERANKER\\\", \\\"none\\\").strip()\\n+    rerank_model = (\\\"cross-encoder/ms-marco-MiniLM-L-6-v2\\\" if rerank_mode.lower() == \\\"st\\\"\\n+                    else rerank_mode)\\n+    embed_key = (embedder_name, model, revision,\\n+                 local_model_digest(model) if\"}, {\"id\": \"models-update-1-c005\", \"source_id\": \"models-update-1\", \"text\": \" embedder_name != \\\"hash\\\" else None)\\n+    rerank_key = (rerank_model, rerank_revision, local_model_digest(rerank_model)\\n+                  if rerank_model and rerank_model.lower() != \\\"none\\\" else None)\\n+    with _CACHE_LOCK:\\n+        embedder = _cached(_EMBEDDERS, embed_key,\\n+                           lambda: get_embedder(embedder_name, model, revision=revision))\\n+        reranker = _cached(_RERANKERS, rerank_key,\\n+                          lambda: get_reranker(rerank_mode, revision=rerank_revision))\\n+\\n+        def build() -> BrainEngine:\\n+            # False explicitly disables the constructor's env-based fallback.\\n+            return BrainEngine(brain, embedder, reranker=reranker if reranker is not None else False)\\n+\\n+        if isinstance(brain, access.SecuredBrain):\\n+            # Never\"}, {\"id\": \"models-update-1-c006\", \"source_id\": \"models-update-1\", \"text\": \" retain an authorized corpus snapshot or a request identity.\\n+            return build()\\n+        # A cached engine can outlive an independently evicted adapter. Include\\n+        # adapter identities rather than mutating an engine used by other threads.\\n+        key = (str(brain.path), brain.mode, embed_key, rerank_key, id(embedder), id(reranker))\\n+        return _cached(_ENGINES, key, build)\\n \\n \\n def reset_engine_cache() -> None:\\n-    \\\"\\\"\\\"Drop the process-wide engine cache (tests, env changes).\\\"\\\"\\\"\\n-    _ENGINES.clear()\\n+    \\\"\\\"\\\"Drop retained engines and model resources; in-flight users stay valid.\\\"\\\"\\\"\\n+    with _CACHE_LOCK:\\n+        _ENGINES.clear()\\n+        _EMBEDDERS.clear()\\n+        _RERANKERS.clear()\\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:temporal-basis-c000] [semantic, active] source: benchmark\n### Known limitations\n\n- **Intent heuristics use marker words and a similarity gate.** They can\n  produce false positives. Set `IDEAGRAPH_INTENT_PENDING=1` to require review;\n  `ig accept-pending` cap… [truncated]\n\n[memory:temporal-basis-c001] [semantic, active] source: benchmark\neview list, and the command does not merge nodes. Review pairs before using\n  `ig merge`; ingest deduplication uses its separate 0.92 threshold.\n- **Temporal queries filter current records.** `ig vali… [truncated]\n\n[memory:forget-basis-c001] [semantic, active] source: benchmark\nin write mode and carry\n`readOnlyHint: false`, so a client asks its user before letting a model write into\nthe private brain. In read-only mode they return a `write_disabled` envelope.\n\nDesign guarant… [truncated]\n\n[memory:writer-basis-c002] [semantic, active] source: benchmark\nle writers run. Bind-mount aliases and\nhard-linked record layouts are outside this identity contract.\n\nLock ordering is the existing process-wide thread `RLock` first, then the\nper-brain OS lock. Call… [truncated]\n\n[memory:forget-update-2-c002] [semantic, active] source: benchmark\nuppressed)\n+    while pending:\n+        for child in children.get(pending.pop(), ()):\n+            if child not in suppressed:\n+                suppressed.add(child)\n+                pending.append(ch… [truncated]"
+          }
+        ],
+        "prompt_sha256": "8ea2b5ef1a55ce736a8f396614776a513888151561c894aa149a5eb1bcb276bb",
+        "update_node_ids": [
+          "models-update-1-c000",
+          "models-update-1-c001",
+          "models-update-1-c002",
+          "models-update-1-c003",
+          "models-update-1-c004",
+          "models-update-1-c005",
+          "models-update-1-c006"
+        ],
+        "prompt_estimated_tokens": 2207,
+        "latency_ms": {
+          "retrieval": 28.19645800627768,
+          "context": 16.515875002369285
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-models",
+            "path": [
+              "models-update-1",
+              "models-basis",
+              "dependency-models",
+              "decision-models"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 85.50924999872223,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    },
+    {
+      "event_id": "event-models-2",
+      "split": "evaluation",
+      "eligible_decisions": [
+        "decision-temporal",
+        "decision-models",
+        "decision-forget",
+        "decision-writer"
+      ],
+      "available_source_ids": [
+        "forget-basis",
+        "forget-update-1",
+        "forget-update-2",
+        "models-basis",
+        "models-update-1",
+        "models-update-2",
+        "temporal-basis",
+        "temporal-update-1",
+        "temporal-update-2",
+        "writer-basis",
+        "writer-update-1",
+        "writer-update-2"
+      ],
+      "visible_inputs_sha256": "c273c894d19f691d035d8163f65408529fe8be3e1b4dbadf79deceece496fc84",
+      "error": null,
+      "retrieval": {
+        "hits": [
+          {
+            "id": "temporal-basis-c000",
+            "score": 0.03252247488101534
+          },
+          {
+            "id": "temporal-basis-c001",
+            "score": 0.032266458495966696
+          },
+          {
+            "id": "forget-basis-c001",
+            "score": 0.030776515151515152
+          },
+          {
+            "id": "writer-basis-c002",
+            "score": 0.0304147465437788
+          },
+          {
+            "id": "forget-update-2-c002",
+            "score": 0.030090497737556562
+          }
+        ],
+        "context": {
+          "context": "## Recall Context\n\n[memory:temporal-basis-c000] [semantic, active] source: benchmark\n### Known limitations\n\n- **Intent heuristics use marker words and a similarity gate.** They can\n  produce false positives. Set `IDEAGRAPH_INTENT_PENDING=1` to require review;\n  `ig accept-pending` cap… [truncated]\n\n[memory:temporal-basis-c001] [semantic, active] source: benchmark\neview list, and the command does not merge nodes. Review pairs before using\n  `ig merge`; ingest deduplication uses its separate 0.92 threshold.\n- **Temporal queries filter current records.** `ig vali… [truncated]\n\n[memory:forget-basis-c001] [semantic, active] source: benchmark\nin write mode and carry\n`readOnlyHint: false`, so a client asks its user before letting a model write into\nthe private brain. In read-only mode they return a `write_disabled` envelope.\n\nDesign guarant… [truncated]\n\n[memory:writer-basis-c002] [semantic, active] source: benchmark\nle writers run. Bind-mount aliases and\nhard-linked record layouts are outside this identity contract.\n\nLock ordering is the existing process-wide thread `RLock` first, then the\nper-brain OS lock. Call… [truncated]\n\n[memory:forget-update-2-c002] [semantic, active] source: benchmark\nuppressed)\n+    while pending:\n+        for child in children.get(pending.pop(), ()):\n+            if child not in suppressed:\n+                suppressed.add(child)\n+                pending.append(ch… [truncated]",
+          "tokens": 355,
+          "nodes": [
+            "temporal-basis-c000",
+            "temporal-basis-c001",
+            "forget-basis-c001",
+            "writer-basis-c002",
+            "forget-update-2-c002"
+          ],
+          "budget": 4000,
+          "truncated": true,
+          "memories": [
+            {
+              "id": "temporal-basis-c000",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "temporal-basis-c001",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "forget-basis-c001",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "writer-basis-c002",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            },
+            {
+              "id": "forget-update-2-c002",
+              "storage_tier": "recall",
+              "selection": "query",
+              "truncated": true,
+              "sources": [
+                "benchmark"
+              ],
+              "evidence": []
+            }
+          ],
+          "omitted": 0,
+          "tiers": {
+            "main": {
+              "nodes": [],
+              "tokens": 0
+            },
+            "recall": {
+              "nodes": [
+                "temporal-basis-c000",
+                "temporal-basis-c001",
+                "forget-basis-c001",
+                "writer-basis-c002",
+                "forget-update-2-c002"
+              ],
+              "tokens": 355
+            },
+            "archival": {
+              "nodes": [],
+              "tokens": 0
+            }
+          },
+          "token_estimate": "Approximate: one token per CJK character plus ceil(other characters / 4). Counts the complete context, including headers, citations, metadata, truncation markers and separators; excludes the JSON envelope and the rest of your prompt. This is not an exact tokenizer limit.",
+          "truncation": "Recall/archival bodies are capped at 200/300 characters. Bodies are prefix-truncated further to fit the estimated budget, with … [truncated]. Entries whose citation and non-empty body cannot fit are omitted. Source labels and evidence references are capped at five per memory (labels at 200 characters)."
+        },
+        "prompt": [
+          {
+            "role": "system",
+            "content": "Use only the supplied sources and declared dependencies. Do not execute code or fetch sources."
+          },
+          {
+            "role": "user",
+            "content": "Which documented decisions need review after this update to graph_engine/runtime.py? Explain exact source evidence, conditions, surviving support and uncertainty. A candidate requests review; it does not reverse a decision. Return decision IDs, source IDs and an explicit inconclusive reason when information is missing.\nDecision inventory:\n[{\"action\": \"Filter current records by temporal validity; this does not reconstruct historical Git snapshots.\", \"id\": \"decision-temporal\", \"source_id\": \"temporal-basis\"}, {\"action\": \"Use built-in model modules and disable custom Python code in the offline benchmark loader.\", \"id\": \"decision-models\", \"source_id\": \"models-basis\"}, {\"action\": \"Forget by tombstoning and invalidating; keep forgotten memories out of live views.\", \"id\": \"decision-forget\", \"source_id\": \"forget-basis\"}, {\"action\": \"Serialize cooperating local brain writes using a shared writer guard.\", \"id\": \"decision-writer\", \"source_id\": \"writer-basis\"}]\nUpdate source: models-update-2\nUpdate documents (complete task input):\n[{\"id\": \"models-update-2-c000\", \"source_id\": \"models-update-2\", \"text\": \"diff --git a/graph_engine/runtime.py b/graph_engine/runtime.py\\nindex 1ab49c4..e019683 100644\\n--- a/graph_engine/runtime.py\\n+++ b/graph_engine/runtime.py\\n@@ -92,6 +92,11 @@ def make_engine() -> BrainEngine:\\n     rerank_key = (rerank_model, rerank_revision, local_model_digest(rerank_model)\\n                   if rerank_model and rerank_model.lower() != \\\"none\\\" else None)\\n     with _CACHE_LOCK:\\n+        cached = _EMBEDDERS.get(embed_key)\\n+        if isinstance(cached, Embedder) and not cached.matches_source(model, revision, embed_key[-1]):\\n+            # Files may have changed between adapter creation and lazy loading.\\n+            # Drop only the cache reference; active callers keep their model.\\n+            del _EMBEDDERS[embed_key]\\n         embedder = _cached(_EMBEDDERS, embed_key,\\n         \"}, {\"id\": \"models-update-2-c001\", \"source_id\": \"models-update-2\", \"text\": \"                   lambda: get_embedder(embedder_name, model, revision=revision))\\n         reranker = _cached(_RERANKERS, rerank_key,\\n\"}]\nRetrieved context:\n## Recall Context\n\n[memory:temporal-basis-c000] [semantic, active] source: benchmark\n### Known limitations\n\n- **Intent heuristics use marker words and a similarity gate.** They can\n  produce false positives. Set `IDEAGRAPH_INTENT_PENDING=1` to require review;\n  `ig accept-pending` cap… [truncated]\n\n[memory:temporal-basis-c001] [semantic, active] source: benchmark\neview list, and the command does not merge nodes. Review pairs before using\n  `ig merge`; ingest deduplication uses its separate 0.92 threshold.\n- **Temporal queries filter current records.** `ig vali… [truncated]\n\n[memory:forget-basis-c001] [semantic, active] source: benchmark\nin write mode and carry\n`readOnlyHint: false`, so a client asks its user before letting a model write into\nthe private brain. In read-only mode they return a `write_disabled` envelope.\n\nDesign guarant… [truncated]\n\n[memory:writer-basis-c002] [semantic, active] source: benchmark\nle writers run. Bind-mount aliases and\nhard-linked record layouts are outside this identity contract.\n\nLock ordering is the existing process-wide thread `RLock` first, then the\nper-brain OS lock. Call… [truncated]\n\n[memory:forget-update-2-c002] [semantic, active] source: benchmark\nuppressed)\n+    while pending:\n+        for child in children.get(pending.pop(), ()):\n+            if child not in suppressed:\n+                suppressed.add(child)\n+                pending.append(ch… [truncated]"
+          }
+        ],
+        "prompt_sha256": "e17499d96d638567758559234f7e60e3d6d3c6b17c3946eaf7116dc1bb3020c0",
+        "update_node_ids": [
+          "models-update-2-c000",
+          "models-update-2-c001"
+        ],
+        "prompt_estimated_tokens": 919,
+        "latency_ms": {
+          "retrieval": 46.14512500120327,
+          "context": 22.29820901993662
+        },
+        "graph": {
+          "selected": false,
+          "used_for_ranking": false,
+          "relationships_ingested": 0
+        }
+      },
+      "baselines": {
+        "curated": [
+          {
+            "decision_id": "decision-models",
+            "path": [
+              "models-update-2",
+              "models-basis",
+              "dependency-models",
+              "decision-models"
+            ],
+            "reason": "declared source dependency changed",
+            "uncertainty_reason": null
+          }
+        ],
+        "proposed": []
+      },
+      "latency_ms": 369.90458297077566,
+      "reference_integrity": {
+        "retrieval_ids_resolve": true,
+        "context_ids_resolve": true,
+        "complete_update_included": true
+      }
+    }
+  ],
+  "scores": {
+    "curated": {
+      "counts": {
+        "raw_alerts": 8,
+        "attempted_pairs": 30,
+        "pending": 30,
+        "surfaced_pairs": 8,
+        "explicit_uncertainty_pairs": 0,
+        "error_pairs": 0,
+        "error_cases": 0
+      },
+      "precision": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "recall": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "false_alert_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "false_discovery_fraction": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "miss_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "path_correctness": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "inconclusive_handling": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "unanswerable_handling": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "explicit_uncertainty_rate": {
+        "value": 0.0,
+        "numerator": 0,
+        "denominator": 30
+      },
+      "false_abstention_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "rationale_correctness": null,
+      "unsupported_conclusions": null,
+      "answer_quality": null,
+      "human_review_time": null
+    },
+    "proposed": {
+      "counts": {
+        "raw_alerts": 0,
+        "attempted_pairs": 30,
+        "pending": 30,
+        "surfaced_pairs": 0,
+        "explicit_uncertainty_pairs": 0,
+        "error_pairs": 0,
+        "error_cases": 0
+      },
+      "precision": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "recall": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "false_alert_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "false_discovery_fraction": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "miss_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "path_correctness": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "inconclusive_handling": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "unanswerable_handling": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "explicit_uncertainty_rate": {
+        "value": 0.0,
+        "numerator": 0,
+        "denominator": 30
+      },
+      "false_abstention_rate": {
+        "value": null,
+        "numerator": 0,
+        "denominator": 0
+      },
+      "rationale_correctness": null,
+      "unsupported_conclusions": null,
+      "answer_quality": null,
+      "human_review_time": null
+    }
+  },
+  "limitations": [
+    "Real labels await independent annotation; draft labels are not scored.",
+    "Synthetic controls are scored separately and cannot establish product readiness.",
+    "No model, answer-quality, rationale judgment, user time or human effort measurement.",
+    "Curated/proposed dependencies are supplied inputs, not measured extraction quality."
+  ],
+  "latency_ms": {
+    "p50": 64.74283302668482,
+    "p95": 369.90458297077566,
+    "n": 8
+  },
+  "cost_effort": {
+    "provider_calls": 0,
+    "provider_cost": 0,
+    "currency": null,
+    "wall_ms": 828.4597069723532,
+    "human_annotation_minutes": null,
+    "human_review_minutes": null
+  },
+  "retrieval_scores": null,
+  "release_readiness": {
+    "passed": false,
+    "frozen_thresholds": {
+      "false_alert_rate_max": 0.05,
+      "miss_rate_max": 0.05,
+      "provenance_correctness_min": 1,
+      "inconclusive_handling_min": 1,
+      "unsupported_conclusions_max": 0,
+      "heldout_positive_min": 20,
+      "heldout_negative_min": 20,
+      "heldout_inconclusive_min": 10,
+      "integrity_pass_min": 1,
+      "median_review_time_reduction_min": 0.2
+    },
+    "reason": "Independent held-out labels, minimum strata and integrity/statement/user studies are incomplete."
+  },
+  "smoke_passed": true
+}

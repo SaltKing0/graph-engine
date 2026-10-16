@@ -7,6 +7,11 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- Complete no-provider Decision Memory workflow audit, conservative production
+  source-change diagnostic, saved-baseline comparisons and explicit release-gate
+  assessment. Missing independent labels and human review-time measurements
+  remain visible; v1 stays experimental. Document activation, CLI/HTTP/MCP/UI,
+  recovery, history and forgetting behavior (#81).
 - Compact Decision Memory review queue and list/detail interface with exact
   claim/source versions, conditions, support/opposition, dependency paths,
   reviewer reasons, acknowledgment/resolution history and revision-pinned briefs.

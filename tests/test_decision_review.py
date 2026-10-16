@@ -118,7 +118,7 @@ def test_review_reads_fail_closed_on_revocation_and_forgetting(service, tmp_path
     with pytest.raises(s.RecordConflict): detail(service, entry)
 
 
-def test_http_cli_and_mcp_share_review_reads_and_headers(service, monkeypatch):
+def test_http_and_cli_share_review_reads_and_headers(service, monkeypatch):
     _, comp = changed(service)
     from graph_engine.server import app
     monkeypatch.setattr(runtime, 'make_brain', lambda: service.brain)
@@ -136,8 +136,17 @@ def test_http_cli_and_mcp_share_review_reads_and_headers(service, monkeypatch):
         input=json.dumps({'comparison':comp}),text=True,capture_output=True,env=env)
     assert proc.returncode == 0, proc.stderr
     assert json.loads(proc.stdout) == response.json()
+
+
+def test_mcp_shares_review_reads(service, monkeypatch):
+    pytest.importorskip('mcp', reason='requires optional [mcp] extra')
     from graph_engine.mcp import server as mcp
-    assert mcp.decision_review_queue({'comparison':comp}) == dict(ok=True, **response.json())
+    _, comp = changed(service)
+    monkeypatch.setattr(runtime, 'make_brain', lambda: service.brain)
+    expected = queue(service, comparison=comp)
+    entry, = expected['items']
+    body = dict(comparison=entry['comparison'], candidate_id=entry['candidate']['candidate_id'])
+    assert mcp.decision_review_queue({'comparison':comp}) == dict(ok=True, **expected)
     assert mcp.decision_review_detail(body) == dict(ok=True, **detail(service, entry))
 
 
