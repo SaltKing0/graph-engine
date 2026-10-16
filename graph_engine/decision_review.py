@@ -95,6 +95,11 @@ class ReviewReader:
             head = self.view.heads[ref['id']]
             if self.view.allowed(head):
                 selected.add(s.key(head))
+        # Decision history spans immutable content versions as well as events.
+        for version in self.view.data['versions']:
+            if (version['kind'] == 'decision' and version['id'] == candidate['target']['id']
+                    and self.view.allowed(version)):
+                selected.add(s.key(version))
         truncated = len(selected) > DETAIL_LIMIT
         selected = set(sorted(selected)[:DETAIL_LIMIT])
         # Add support, opposition, checks and explicit dependencies symmetrically.

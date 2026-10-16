@@ -62,8 +62,9 @@
       const c = entry.candidate;
       const state = entry.item?.state;
       const label = state ? `Reviewed judgment: ${state.finding_disposition}; workflow: ${state.finding_workflow || 'none'}` : 'Proposed judgment · unreviewed';
+      const change = c.delta.event_id ? `Review event: ${c.delta.event_id}` : `Change version: ${(c.delta.new || c.delta.old).version_id}`;
       const li = el('li', undefined, queue);
-      const b = button(`${c.decision.action}\n${c.reasons.map(reasonText).join(', ')}\n${label}\n${c.delta.recorded_at}`, li, () => select(entry));
+      const b = button(`${c.decision.action}\n${c.reasons.map(reasonText).join(', ')}\n${label}\n${change}\n${c.delta.recorded_at}`, li, () => select(entry));
       b.setAttribute('aria-current', String(entryKey(entry) === selected));
       b.disabled = busy;
     }

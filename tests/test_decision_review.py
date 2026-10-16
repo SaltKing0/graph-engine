@@ -164,6 +164,23 @@ def test_empty_local_review_does_not_initialize_brain(tmp_path, monkeypatch):
     assert not brain.path.exists()
 
 
+def test_detail_retains_intermediate_decision_versions_and_review_history(service):
+    from test_decision_memory import draft
+    refs, comp = changed(service)
+    entry, = queue(service, comparison=comp)['items']
+    original = service.inspect(refs['decision'])['record']
+    second, = save(service, draft('decision', dict(original['payload'], rationale='Second rationale'),
+        identity=original['id'], anchor=original['anchor_node_id'], previous=refs['decision']))
+    review(service, second, axis='decision_conclusion', after='revise', basis=[content_basis(refs['claim'])])
+    third, = save(service, draft('decision', dict(original['payload'], rationale='Third rationale'),
+        identity=original['id'], anchor=original['anchor_node_id'], previous=second))
+    result = detail(service, entry)
+    decisions = [item for item in result['records'] if item['record']['kind'] == 'decision']
+    assert {s.key(item['record']) for item in decisions} == {s.key(refs['decision']), s.key(second), s.key(third)}
+    middle = next(item for item in decisions if s.key(item['record']) == s.key(second))
+    assert middle['events'][-1]['to'] == 'revise'
+
+
 def test_detail_neighborhood_depth_is_explicitly_incomplete(service, monkeypatch):
     refs, comp = changed(service)
     entry, = queue(service, comparison=comp)['items']
