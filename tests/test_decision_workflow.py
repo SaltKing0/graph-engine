@@ -63,16 +63,13 @@ def test_production_alerts_require_exact_accepted_path_and_keep_unknown_scope(tm
     assert any(row['stage'] == 'context' and row['output']['omitted'] for row in result['raw_outputs'])
 
 
-def test_execution_boundary_cannot_see_changed_gold_and_retains_partial_failure(tmp_path):
-    inputs, labels, _, event, visible = small_case()
-    labels['pairs'][event['id'] + '/' + visible['decisions'][0]['id']]['rationale'] = 'SECRET_GOLD_CANARY'
-    assert visible_inputs(inputs, event, DATA / 'controls-v2')['documents'] == visible['documents']
+def test_missing_update_retains_partial_failure_outputs(tmp_path):
+    _, _, _, event, visible = small_case()
     trace = {}
     missing = dict(visible, documents=[d for d in visible['documents'] if d['source_id'] != event['source_id']])
     with pytest.raises(ValueError, match='no visible source'):
         execute(missing, event, tmp_path / 'error', 'curated', budget=4000, k=5, trace=trace)
     assert trace['raw_outputs'] and trace['latency_ms']
-    assert 'SECRET_GOLD_CANARY' not in json.dumps(trace)
 
 
 def test_unmeasured_pending_and_synthetic_coverage_cannot_pass_release_gates():
@@ -89,3 +86,35 @@ def test_unmeasured_pending_and_synthetic_coverage_cannot_pass_release_gates():
     assessment = assess(positive, freeze['gates'], independent=False)
     assert assessment['gates']['heldout_positive']['observed'] == 0
     assert not assessment['passed']
+
+
+def test_changed_gold_cannot_change_production_paths_or_source_inputs(tmp_path):
+    import shutil
+    from tools.decision_benchmark.freeze_sources import freeze
+    from tools.decision_benchmark.production import run
+
+    root = tmp_path / 'corpus'
+    shutil.copytree(DATA / 'controls-v2', root)
+    inputs, labels, _ = load_bundle(root)
+    event = inputs['events'][0]
+    dep = inputs['dependencies'][0]
+    inputs['events'] = [event]
+    inputs['decisions'] = [d for d in inputs['decisions'] if d['id'] == dep['decision_id']]
+    inputs['dependencies'] = [dep]
+    pair = event['id'] + '/' + dep['decision_id']
+    labels['pairs'] = {pair: labels['pairs'][pair]}
+    contract = (root / 'contract.md').read_bytes()
+    freeze(root, inputs, labels, contract)
+    first = run(root, tmp_path / 'first.json', split='all')
+    labels['pairs'][pair].update(outcome='negative', valid_paths=[], rationale='SECRET_GOLD_CANARY')
+    freeze(root, inputs, labels, contract)
+    second = run(root, tmp_path / 'second.json', split='all')
+    assert first['smoke_passed'] and second['smoke_passed']
+    assert first['scores'] != second['scores']
+    left, right = first['results'][0], second['results'][0]
+    assert left['visible_inputs_sha256'] == right['visible_inputs_sha256']
+    for mode in ('curated', 'proposed'):
+        def normalized(row: dict) -> list[dict]:
+            return [{k: v for k, v in alert.items() if k != 'candidate_id'} for alert in row['profiles'][mode]['alerts']]
+        assert normalized(left) == normalized(right)
+        assert 'SECRET_GOLD_CANARY' not in json.dumps(right['profiles'][mode]['raw_outputs'])

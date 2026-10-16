@@ -67,8 +67,9 @@ ig decision preview
 ig decision pending
 # review-queue.json: {"history":true}
 ig decision review-queue review-queue.json
-# reference.json: copy an exact {"id":"...","version_id":"sha256:..."} from the output
-ig decision brief reference.json --revision HEAD --format markdown
+# brief.json: {"reference":{"id":"...","version_id":"sha256:..."},"revision":"HEAD"}
+# Copy the exact reference from the example output.
+ig decision brief brief.json --format markdown
 # context.json: {"query":"expansion opt-in","budget":8000,"revision":"HEAD"}
 ig decision context context.json
 python -m uvicorn graph_engine.server:app --host 127.0.0.1 --port 8000

@@ -14,7 +14,7 @@ import tempfile
 import time
 from typing import Any, Callable
 
-from examples.decision_memory import _basis, _commit, _draft, _review, _submit
+from examples.decision_memory import _commit, _draft, _submit
 from graph_engine.brain import Brain, Node
 from graph_engine.decision_service import DecisionService
 from tools.memory_benchmark.runner import checkpoint
@@ -60,50 +60,61 @@ def execute(visible: dict, event: dict, path: Path, mode: str, *, budget: int, k
     refs, claims, decisions, links = {}, {}, {}, {}
     # Preserve the baseline's exact 800-character slices and IDs. These are
     # inert source nodes, not document-import parser output or extracted claims.
-    for doc in visible['documents']:
-        if doc['source_id'] == event['source_id']:
-            continue
-        timed('source_capture', lambda doc=doc: brain.write_node(Node(doc['text'], id=doc['id'])))
-        source = _draft('source', service.source(doc['id']), anchor=doc['id'])
-        ref = timed('proposal', lambda source=source: _submit(service, 'versions', [source]))['refs'][0]
-        refs.setdefault(doc['source_id'], []).append(ref)
-    for decision in visible['decisions']:
-        draft = _draft('decision', dict(action=decision['action'], rationale='Frozen documented action; not independently adjudicated.',
-            alternatives=[], context=None, revisit_checks=[]))
-        decisions[decision['id']] = timed('proposal', lambda draft=draft: _submit(service, 'versions', [draft]))['refs'][0]
-    for dep in visible['dependencies']:
-        if dep['status'] != mode:
-            continue
+    historical = [doc for doc in visible['documents'] if doc['source_id'] != event['source_id']]
+    current = [doc for doc in visible['documents'] if doc['source_id'] == event['source_id']]
+    selected = [dep for dep in visible['dependencies'] if dep['status'] == mode]
+
+    def publish(drafts: list[dict]) -> list[dict]:
+        # Match the public envelope's 200-item bound; each batch preserves order.
+        published = []
+        for start in range(0, len(drafts), 200):
+            batch = drafts[start:start + 200]
+            published.extend(timed('proposal', lambda: _submit(service, 'versions', batch))['refs'])
+        return published
+
+    def sources(documents: list[dict]) -> list[dict]:
+        for doc in documents:
+            timed('source_capture', lambda doc=doc: brain.write_node(Node(doc['text'], id=doc['id'])))
+        drafts = [_draft('source', service.source(doc['id']), anchor=doc['id']) for doc in documents]
+        published = publish(drafts)
+        for doc, ref in zip(documents, published):
+            refs.setdefault(doc['source_id'], []).append(ref)
+        return published
+
+    sources(historical)
+    drafts = [_draft('decision', dict(action=decision['action'],
+        rationale='Frozen documented action; not independently adjudicated.',
+        alternatives=[], context=None, revisit_checks=[])) for decision in visible['decisions']]
+    decisions.update(zip((d['id'] for d in visible['decisions']), publish(drafts)))
+    drafts = []
+    for dep in selected:
         draft = _draft('claim', dict(text='Declared source basis for ' + dep['decision_id'], context=None,
             limitations=['No interpreted claim, comparability or independent truth assessment.']))
         draft['provenance']['inputs'] = refs[dep['source_id']]
-        claim = timed('proposal', lambda draft=draft: _submit(service, 'versions', [draft]))['refs'][0]
-        claims[dep['id']] = claim
-        draft = _draft('relationship', dict(kind='depends_on', source=decisions[dep['decision_id']], target=claim,
-            context=None, explanation='Supplied ' + mode + ' dependency; not extracted by this diagnostic.'))
-        link = timed('proposal', lambda draft=draft: _submit(service, 'versions', [draft]))['refs'][0]
-        links[dep['id']] = link
-        if mode == 'curated':
-            timed('scripted_review', lambda link=link: _review(service, link, 'workflow', 'accepted', [],
-                'Accept supplied curated dependency for wiring diagnostics only.'))
+        drafts.append(draft)
+    claims.update(zip((dep['id'] for dep in selected), publish(drafts)))
+    drafts = [_draft('relationship', dict(kind='depends_on', source=decisions[dep['decision_id']], target=claims[dep['id']],
+        context=None, explanation='Supplied ' + mode + ' dependency; not extracted by this diagnostic.')) for dep in selected]
+    links.update(zip((dep['id'] for dep in selected), publish(drafts)))
+    if mode == 'curated' and links:
+        events = [dict(subject=link, axis='workflow', **{'from': 'proposed', 'to': 'accepted'},
+            previous_event_id=None, supersedes_event_id=None, basis=[],
+            reason='Accept supplied curated dependency for wiring diagnostics only.') for link in links.values()]
+        timed('scripted_review', lambda: _submit(service, 'events', events))
     before = _commit(service)
-    update_refs = []
-    for doc in visible['documents']:
-        if doc['source_id'] != event['source_id']:
-            continue
-        timed('source_capture', lambda doc=doc: brain.write_node(Node(doc['text'], id=doc['id'])))
-        draft = _draft('source', service.source(doc['id']), anchor=doc['id'])
-        update_refs.extend(timed('proposal', lambda draft=draft: _submit(service, 'versions', [draft]))['refs'])
+    update_refs = sources(current)
     if not update_refs:
         raise ValueError('Update has no visible source chunks')
-    for dep in visible['dependencies']:
-        if dep['status'] != mode or dep['source_id'] != event['changed_source_id']:
+    drafts = []
+    for dep in selected:
+        if dep['source_id'] != event['changed_source_id']:
             continue
         old = service.inspect(claims[dep['id']])['record']
         draft = {key: deepcopy(old[key]) for key in ('id', 'kind', 'anchor_node_id', 'provenance', 'payload')}
         draft['previous'] = claims[dep['id']]
         draft['provenance']['inputs'].extend(update_refs)
-        timed('proposal', lambda draft=draft: _submit(service, 'versions', [draft]))
+        drafts.append(draft)
+    publish(drafts)
     after = _commit(service)
     comp = dict(schema='dm.compare/1', before=before, after=after)
     comparison = timed('impact', lambda: service.compare(comp))
