@@ -72,8 +72,9 @@ def audit(graph: str, identity: str, action: str, allowed: bool,
         fh.write(json.dumps(row, ensure_ascii=False) + "\n")
 
 
-def permitted(graph: str, identity: str, action: str, node_id: str | None = None) -> bool:
-    policy = load_policy()
+def permitted(graph: str, identity: str, action: str, node_id: str | None = None, *,
+              _policy: dict | None = None) -> bool:
+    policy = load_policy() if _policy is None else _policy
     config = policy["graphs"].get(graph, {})
     role = config.get("roles", {}).get(identity)
     if not identity or role not in ("admin", "editor", "viewer"):

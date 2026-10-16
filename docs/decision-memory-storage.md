@@ -4,8 +4,9 @@ Issue #76 adds an opt-in Python storage boundary, `brain.decision_memory()`.
 Its data contract is [Decision Memory v1](decision-memory-v1.md). It does not
 change default recall, convert legacy facts, execute commands, fetch evidence,
 or invoke a model. [Source capture and review adapters](decision-capture-review.md)
-now expose this store through CLI/HTTP. Classified deltas, impact candidates and
-briefs belong to the subsequent work packages.
+now expose this store through CLI/HTTP. [Revision comparison and impact review](decision-impact.md)
+add read-only deltas/candidates and explicitly persisted finding content versions.
+Briefs remain subsequent work.
 
 ## First record
 
@@ -142,8 +143,9 @@ distinguish invalid input, unsupported formats, stale previews and unavailable
 basis. Unavailable errors contain no hidden IDs or source bodies. Limits are
 64 MiB, 50,000 total stored items, 200 inputs per content item, 200 entries per
 bounded list, 4,000-character reasons and 32 nesting levels. Authoritative data
-is rejected, never truncated. Delta/candidate arrays must currently be empty;
-future work must add their strict validators before accepting them.
+is rejected, never truncated. Delta/candidate arrays remain empty: comparisons
+are ephemeral; explicitly reviewed findings use strictly validated `finding`
+content versions and `finding_disposition`/`finding_workflow` event axes.
 
 ## Access, forgetting, merge and history
 

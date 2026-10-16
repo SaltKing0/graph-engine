@@ -91,6 +91,18 @@ async def decision_result_draft(request: Request) -> JSONResponse:
     return JSONResponse(await run_in_threadpool(lambda: _decision_service().result_draft(envelope)), headers=NO_CACHE)
 
 
+@app.post('/api/decision-memory/compare')
+async def decision_compare(request: Request) -> JSONResponse:
+    envelope = await _decision_body(request)
+    return JSONResponse(await run_in_threadpool(lambda: _decision_service().compare(envelope)), headers=NO_CACHE)
+
+
+@app.post('/api/decision-memory/findings')
+async def decision_finding(request: Request, dry_run: bool = False) -> JSONResponse:
+    envelope = await _decision_body(request)
+    return JSONResponse(await run_in_threadpool(lambda: _decision_service().record_finding(envelope, dry_run=dry_run)), headers=NO_CACHE)
+
+
 async def _decision_submit(request: Request, schema: str, dry_run: bool) -> JSONResponse:
     from .decision_schema import need
     envelope = await _decision_body(request)

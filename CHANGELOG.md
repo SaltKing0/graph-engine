@@ -7,6 +7,12 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- Read-only Decision Memory comparisons between explicit Git revisions, with
+  classified deltas, structured scope comparisons, bounded accepted dependency
+  paths, source/version citations and surviving lineage-aware support. Add CLI
+  and HTTP comparison plus explicit, idempotent finding review and retained
+  disposition history; preserve current authorization and forgetting boundaries
+  without changing decisions, assessments, vectors or recall state (issue #78).
 - Source-grounded Decision Memory proposals and explicit reviews through a shared
   service, CLI and policy-authenticated HTTP. Validate exact sources, typed scope,
   negative findings, guarded undo and idempotent dry runs; import raw JSON reports

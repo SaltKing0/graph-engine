@@ -11,6 +11,7 @@ from decimal import Decimal
 from functools import wraps
 import json
 from typing import Callable, ParamSpec, TypeVar
+from uuid import NAMESPACE_URL, uuid5
 
 from . import decision_schema as s
 from .brain import Brain
@@ -89,6 +90,9 @@ def compare_context(a: dict | None, b: dict | None, view: RecordView) -> dict:
                 intersection[name] = {'type': 'time_window', 'value': {'from': lo, 'to': hi}}
         else:
             xv, yv = x['value'], y['value']
+            if type(xv['lower']) is not type(yv['lower']):
+                unknown.append(name)
+                continue
             lo = max((xv['lower'], yv['lower']), key=Decimal)
             hi = min((xv['upper'], yv['upper']), key=Decimal)
             li = all(v['lower_inclusive'] for v in (xv, yv) if Decimal(v['lower']) == Decimal(lo))
@@ -112,6 +116,61 @@ class DecisionService:
 
     def preview(self) -> dict:
         return self.store.preview()
+
+    @validated
+    def compare(self, envelope: dict) -> dict:
+        from .decision_impact import compare
+        bounded(envelope)
+        return compare(self.brain, envelope)
+
+    @write_operation
+    @validated
+    def record_finding(self, envelope: dict, *, dry_run: bool = False, commit: bool = True) -> dict:
+        """Explicitly review one regenerated candidate; no caller-authored paths.
+
+        Workflow acknowledgement/resolution then uses the ordinary review API.
+        The reviewer is the authenticated actor, also the resolution owner.
+        """
+        from .decision_impact import series_id
+        bounded(envelope)
+        s.fields(envelope, {'schema', 'idempotency_key', 'expected_generation', 'expected_heads',
+                            'comparison', 'candidate_id', 'disposition', 'reason'})
+        s.need(envelope['schema'] == 'dm.finding-review/1', 'Unsupported finding review schema')
+        s.need(envelope['disposition'] in ('confirmed', 'dismissed', 'inconclusive'))
+        s.string(envelope['reason'])
+        s.digest(envelope['candidate_id'])
+        result = self.compare(envelope['comparison'])
+        candidate = next((c for c in result['candidates'] if c['candidate_id'] == envelope['candidate_id']), None)
+        if candidate is None:
+            raise s.RecordConflict('Candidate unavailable or changed; compare again')
+        fid = series_id(candidate)
+        data = read_file(self.brain)
+        view = RecordView(self.brain, data)
+        versions = [v for v in data['versions'] if v['id'] == fid]
+        existing = next((v for v in versions if v['payload']['candidate']['candidate_id'] == candidate['candidate_id']), None)
+        if existing is not None:
+            view.get(s.reference(existing))
+            previous = view.versions[s.key(existing['previous'])] if existing['previous'] else None
+            # Reconstruct the exact request for a durable same-key retry. A new
+            # key cannot duplicate a finding or erase its former disposition.
+            if not any(r['key'] == envelope['idempotency_key'] for r in data['receipts']):
+                raise s.RecordConflict('Candidate already reviewed; use its explicit review workflow')
+        else:
+            previous = versions[-1] if versions else None
+        if previous is not None:
+            view.get(s.reference(previous))
+        anchor = previous['anchor_node_id'] if previous else str(uuid5(NAMESPACE_URL, 'finding-anchor:' + fid))
+        draft = dict(id=fid, kind='finding', anchor_node_id=anchor,
+            previous=s.reference(previous) if previous else None,
+            provenance={'method': 'manual', 'inputs': []}, payload=dict(candidate=candidate,
+                former_candidate_id=previous['payload']['candidate']['candidate_id'] if previous else None))
+        judgment = dict(subject={'local': fid}, axis='finding_disposition', **{'from': 'unreviewed', 'to': envelope['disposition']},
+            previous_event_id=None, basis=[{'type': 'content_ref', 'ref': candidate['target']}],
+            reason=envelope['reason'], supersedes_event_id=None)
+        request = {k: envelope[k] for k in ('idempotency_key', 'expected_generation', 'expected_heads')}
+        request.update(schema=s.SCHEMA, versions=[draft], events=[judgment])
+        result = self.store.transact(request, dry_run=dry_run, commit=commit)
+        return result if result.get('dry_run') else dict(dry_run=dry_run, receipt=result)
 
     def source(self, node_id: str) -> dict:
         """Pin exact stored bytes and inherited document-import identity."""
@@ -169,6 +228,9 @@ class DecisionService:
             raise s.UnsupportedSchema('Unsupported proposal/review schema')
         field = 'versions' if schema == PROPOSAL else 'events'
         s.fields(envelope, {'schema', 'idempotency_key', 'expected_generation', 'expected_heads', field})
+        if schema == PROPOSAL:
+            s.need(not any(v.get('kind') == 'finding' for v in envelope['versions']),
+                   'Use explicit finding review to regenerate and persist candidates')
         request = dict(deepcopy(envelope), schema=s.SCHEMA)
         request['events' if field == 'versions' else 'versions'] = []
         # Validation has no pull, directory creation, anchors, index, lock file,
