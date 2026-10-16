@@ -3,8 +3,9 @@
 Status: specification for [#74](https://github.com/SaltKing0/graph-engine/issues/74),
 under [#73](https://github.com/SaltKing0/graph-engine/issues/73). This document
 specifies the complete v1 behavior. The [Python storage boundary](decision-memory-storage.md)
-implements versioned persistence and access checks; proposal adapters and automatic
-impact analysis remain future work. The [worked example](decision-memory-example.md)
+implements versioned persistence and access checks; automatic impact analysis
+remains future work. [Capture and explicit review](decision-capture-review.md)
+are available through CLI/HTTP. The [worked example](decision-memory-example.md)
 is a complete paper walkthrough. Normative terms **must**, **must not** and
 **may** apply to the dependent implementation issues.
 

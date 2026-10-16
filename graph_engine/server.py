@@ -14,7 +14,7 @@ from __future__ import annotations
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Query, Request, WebSocket, WebSocketDisconnect
 from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
@@ -22,18 +22,99 @@ from pydantic import BaseModel
 from . import runtime, access, namespaces
 from .write_guard import BrainWriteTimeout
 from .brain_engine import IngestPartialError
+from .decision_memory import RecordPublished
+from .decision_schema import RecordConflict
+from .decision_service import DecisionService
 
 # Shipped UI assets live INSIDE the package so a pip install serves them too
 # (repo-root docs/ would not exist in site-packages).
 DOCS_DIR = Path(__file__).resolve().parent / "web"
 
 app = FastAPI(title="GraphEngine")
+NO_CACHE = {"Cache-Control": "no-store"}
+
+
+@app.exception_handler(RecordConflict)
+async def decision_conflict_handler(_request: Request, exc: RecordConflict) -> JSONResponse:
+    return JSONResponse({'error': str(exc)}, status_code=409, headers={'Cache-Control': 'no-store'})
+
+
+@app.exception_handler(RecordPublished)
+async def decision_published_handler(_request: Request, exc: RecordPublished) -> JSONResponse:
+    return JSONResponse({'error': str(exc), 'published_locally': True, 'receipt': exc.receipt},
+                        status_code=502, headers={'Cache-Control': 'no-store'})
+
+
+def _decision_service() -> DecisionService:
+    return DecisionService(runtime.make_brain())
+
+
+async def _decision_body(request: Request) -> dict:
+    from .decision_schema import MAX_BYTES, RecordError
+    from .decision_service import load_envelope
+    chunks, size = [], 0
+    async for chunk in request.stream():
+        size += len(chunk)
+        if size > MAX_BYTES:
+            raise RecordError('Envelope exceeds 64 MiB')
+        chunks.append(chunk)
+    try:
+        return load_envelope(b''.join(chunks).decode('utf-8'))
+    except UnicodeError as exc:
+        raise RecordError('Invalid UTF-8 envelope') from exc
+
+
+@app.get('/api/decision-memory/preview')
+def decision_preview() -> JSONResponse:
+    return JSONResponse(_decision_service().preview(), headers=NO_CACHE)
+
+
+@app.get('/api/decision-memory/pending')
+def decision_pending() -> JSONResponse:
+    return JSONResponse(_decision_service().pending(), headers=NO_CACHE)
+
+
+@app.get('/api/decision-memory/sources/{node_id}')
+def decision_source(node_id: str) -> JSONResponse:
+    return JSONResponse(_decision_service().source(node_id), headers=NO_CACHE)
+
+
+@app.post('/api/decision-memory/inspect')
+async def decision_inspect(request: Request) -> JSONResponse:
+    reference = await _decision_body(request)
+    return JSONResponse(await run_in_threadpool(lambda: _decision_service().inspect(reference)), headers=NO_CACHE)
+
+
+@app.post('/api/decision-memory/result-draft')
+async def decision_result_draft(request: Request) -> JSONResponse:
+    envelope = await _decision_body(request)
+    return JSONResponse(await run_in_threadpool(lambda: _decision_service().result_draft(envelope)), headers=NO_CACHE)
+
+
+async def _decision_submit(request: Request, schema: str, dry_run: bool) -> JSONResponse:
+    from .decision_schema import need
+    envelope = await _decision_body(request)
+    need(envelope.get('schema') == schema, 'Unexpected envelope schema for this endpoint')
+    result = await run_in_threadpool(lambda: _decision_service().submit(envelope, dry_run=dry_run))
+    return JSONResponse(result, headers=NO_CACHE)
+
+
+@app.post('/api/decision-memory/proposals')
+async def decision_proposal(request: Request, dry_run: bool = False) -> JSONResponse:
+    from .decision_service import PROPOSAL
+    return await _decision_submit(request, PROPOSAL, dry_run)
+
+
+@app.post('/api/decision-memory/reviews')
+async def decision_review(request: Request, dry_run: bool = False) -> JSONResponse:
+    from .decision_service import REVIEW
+    return await _decision_submit(request, REVIEW, dry_run)
 
 
 @app.exception_handler(BrainWriteTimeout)
 async def writer_busy_handler(_request, _exc: BrainWriteTimeout):
     return JSONResponse({"error": "Brain writer busy; retry after the current writer finishes"},
-                        status_code=503, headers={"Retry-After": "1"})
+                        status_code=503, headers={**NO_CACHE, "Retry-After": "1"})
 
 
 @app.middleware("http")
@@ -48,7 +129,7 @@ async def access_control(request, call_next):
                 identity = access.token_principal(request.headers.get("authorization", ""))
             except PermissionError:
                 access.audit("http", "", "authenticate", False)
-                return JSONResponse({"error": "Authentication required"}, status_code=401)
+                return JSONResponse({"error": "Authentication required"}, status_code=401, headers=NO_CACHE)
             identity_token = access.request_principal.set(identity)
         return await call_next(request)
     finally:
@@ -59,7 +140,7 @@ async def access_control(request, call_next):
 
 @app.exception_handler(PermissionError)
 async def permission_error_handler(_request, _exc):
-    return JSONResponse({"error": "Access denied"}, status_code=403)
+    return JSONResponse({"error": "Access denied"}, status_code=403, headers=NO_CACHE)
 
 
 
@@ -91,9 +172,6 @@ class ConnectionManager:
 
 
 manager = ConnectionManager()
-
-
-NO_CACHE = {"Cache-Control": "no-store"}
 
 
 @app.get("/")
@@ -224,7 +302,7 @@ async def value_error_handler(_req, exc: ValueError):
     """Audit #57: engine ValueErrors (e.g. empty ingest text) are client errors,
     not 500s — return a clean 400 with the message."""
     from fastapi.responses import JSONResponse
-    return JSONResponse({"error": str(exc)}, status_code=400)
+    return JSONResponse({"error": str(exc)}, status_code=400, headers=NO_CACHE)
 
 
 @app.exception_handler(IngestPartialError)

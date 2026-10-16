@@ -10,6 +10,11 @@ Examples:
   cat note.md | python -m graph_engine ingest -
   python -m graph_engine import ./notes --recursive --extensions .md .txt --dry-run --json
   python -m graph_engine import paper.pdf --extensions .pdf --source-id paper-2026
+  python -m graph_engine decision preview | pending | source <node_id>
+  python -m graph_engine decision propose proposal.json [--dry-run]
+  python -m graph_engine decision review review.json [--dry-run]
+  python -m graph_engine decision inspect ref.json
+  python -m graph_engine decision result-draft result.json
   python -m graph_engine pending
   python -m graph_engine accept <edge_id>
   python -m graph_engine reject <edge_id>
@@ -1446,7 +1451,7 @@ def cmd_import(args: list[str]) -> None:
     parser.add_argument("paths", nargs="+", help="local files or directories")
     parser.add_argument("--recursive", action="store_true")
     parser.add_argument("--extensions", nargs="+", default=[".md", ".txt"],
-                        help="explicit selection from .md .txt .pdf (PDF requires [pdf])")
+                        help="explicit selection from .md .txt .json .pdf (PDF requires [pdf])")
     parser.add_argument("--max-bytes", type=int, default=DEFAULT_MAX_BYTES)
     parser.add_argument("--chunk-chars", type=int, default=2000)
     source = parser.add_mutually_exclusive_group()
@@ -1482,12 +1487,64 @@ def cmd_import(args: list[str]) -> None:
         sys.exit(1)
 
 
+def cmd_decision(args: list[str]) -> None:
+    """Use the shared typed capture/review service without loading a model."""
+    import argparse
+    import json
+    from pathlib import Path
+    from .decision_service import DecisionService, PROPOSAL, REVIEW, load_envelope
+    from .decision_memory import RecordPublished
+    from .decision_schema import MAX_BYTES, need
+
+    parser = argparse.ArgumentParser(prog='ig decision')
+    parser.add_argument('operation', choices=['preview', 'pending', 'source', 'propose', 'review', 'inspect', 'result-draft'])
+    parser.add_argument('input', nargs='?')
+    parser.add_argument('--dry-run', action='store_true')
+    opts = parser.parse_args(args)
+    if opts.operation not in ('preview', 'pending') and opts.input is None:
+        parser.error('provide a node ID or JSON file (use - for stdin)')
+    if opts.operation in ('preview', 'pending') and opts.input is not None:
+        parser.error('this operation takes no input file')
+    if opts.dry_run and opts.operation not in ('propose', 'review'):
+        parser.error('--dry-run applies to propose/review; other operations are read-only')
+    try:
+        service = DecisionService(runtime.make_brain())
+        if opts.operation in ('preview', 'pending'):
+            result = getattr(service, opts.operation)()
+        elif opts.operation == 'source':
+            result = service.source(opts.input)
+        else:
+            if opts.input == '-':
+                raw = sys.stdin.read(MAX_BYTES + 1)
+            else:
+                with Path(opts.input).open(encoding='utf-8') as stream:
+                    raw = stream.read(MAX_BYTES + 1)
+            envelope = load_envelope(raw)
+            if opts.operation in ('propose', 'review'):
+                need(envelope.get('schema') == (PROPOSAL if opts.operation == 'propose' else REVIEW),
+                     'Unexpected envelope schema for this command')
+                result = service.submit(envelope, dry_run=opts.dry_run)
+            else:
+                result = (service.inspect(envelope) if opts.operation == 'inspect'
+                          else service.result_draft(envelope))
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+    except RecordPublished as exc:
+        print(json.dumps(dict(error=str(exc), published_locally=True, receipt=exc.receipt)), file=sys.stderr)
+        sys.exit(1)
+    except (ValueError, PermissionError, RuntimeError, OSError) as exc:
+        print(f'decision: {exc}', file=sys.stderr)
+        sys.exit(1)
+
+
 def main() -> None:
     args = sys.argv[1:]
     if not args or args[0] in ("-h", "--help"):
         print(__doc__)
         sys.exit(0)
     cmd, rest = args[0], args[1:]
+    if cmd == 'decision':
+        cmd_decision(rest)
+        return
     if cmd == "import":
         cmd_import(rest)
         return

@@ -153,6 +153,7 @@ deployment](docs/guide.md#background-maintenance-worker).
 - [Opt-in graph retrieval and scoring](docs/graph-retrieval.md)
 - [Decision Memory v1 contract and worked example](docs/decision-memory-v1.md)
 - [Decision Memory Python storage and recovery](docs/decision-memory-storage.md)
+- [Decision Memory source capture, CLI/HTTP and explicit review](docs/decision-capture-review.md)
   (opt-in versioned records; proposal and impact adapters follow separately)
 - [Memory answer-quality benchmarks](docs/memory-benchmarks.md)
 - [Retrieval performance and disposable indexes](docs/retrieval-performance.md)

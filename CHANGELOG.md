@@ -7,6 +7,12 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- Source-grounded Decision Memory proposals and explicit reviews through a shared
+  service, CLI and policy-authenticated HTTP. Validate exact sources, typed scope,
+  negative findings, guarded undo and idempotent dry runs; import raw JSON reports
+  with documented benchmark mappings and strict measured/null/error results.
+  Preserve inherited source restrictions when reviewing existing dependencies
+  (issue #77).
 - Opt-in Decision Memory v1 Python storage for immutable claims, exact sources,
   evidence, profiles, recorded checks/results, decisions and relationships.
   Preserve review/correction history, independent state axes, source versions,

@@ -268,7 +268,7 @@ def content_refs(value: object) -> list[dict]:
 
 
 def payload(kind: str, p: dict, by_ref: dict) -> None:
-    fields(p, PAYLOADS[kind])
+    fields(p, PAYLOADS[kind], {'errors'} if kind == 'result' else frozenset())
     if 'context' in p:
         context(p['context'])
         if p['context'] and p['context']['profile']:
@@ -344,6 +344,9 @@ def payload(kind: str, p: dict, by_ref: dict) -> None:
             string(metric['unit'])
         string(p['rule'])
     elif kind == 'result':
+        if 'errors' in p:
+            strings(p['errors'])
+            need(not p['errors'] or p['outcome'] != 'completed', 'A result with errors cannot be completed')
         ref(p['check'])
         need(by_ref[key(p['check'])]['kind'] == 'check')
         need(p['outcome'] in ('completed', 'inconclusive', 'error') and type(p['hypothetical']) is bool)
@@ -351,9 +354,13 @@ def payload(kind: str, p: dict, by_ref: dict) -> None:
         need(all(by_ref[key(r)]['kind'] == 'source' for r in p['sources']))
         sequence(p['metrics'])
         for metric in p['metrics']:
-            fields(metric, {'name', 'value', 'unit', 'denominator'})
+            fields(metric, {'name', 'value', 'unit', 'denominator'}, {'reason'})
             string(metric['name'])
-            decimal(metric['value'])
+            if metric['value'] is None:
+                string(metric.get('reason'))
+            else:
+                decimal(metric['value'])
+                need('reason' not in metric, 'Measured metric cannot have a missing-value reason')
             string(metric['unit'])
             if metric['denominator'] is not None:
                 decimal(metric['denominator'])
