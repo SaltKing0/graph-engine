@@ -6,6 +6,15 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+- Opt-in Decision Memory v1 Python storage for immutable claims, exact sources,
+  evidence, profiles, recorded checks/results, decisions and relationships.
+  Preserve review/correction history, independent state axes, source versions,
+  current permissions on historical reads, atomic publication and durable retry
+  receipts. Reject stale reviews, fabricated quotes and version-unaware merges;
+  retain existing brains without migration or automatic epistemic promotion
+  (issue #76).
+
 ### Fixed
 - Reuse embedding and reranking model adapters across protected requests while
   keeping each authorized brain and corpus view fresh. Bound process caches,

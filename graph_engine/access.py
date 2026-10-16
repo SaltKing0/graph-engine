@@ -203,7 +203,7 @@ class SecuredBrain(Brain):
         if not self.can_access("write", node.id, _view=(nodes, parents)):
             audit(self.graph_name, self.identity, "write", False, node.id)
             raise PermissionError("Derived source unavailable or access denied")
-        self._raw.write_node(node)
+        Brain.write_node(self, node)
 
     def capture_receipts(self, node_id: str) -> list[Node]:
         # Discover all copies before a forget, including copies with tighter

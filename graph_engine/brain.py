@@ -26,6 +26,10 @@ from .write_guard import THREAD_LOCK, canonical_path, run_git, write_guard, writ
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .decision_memory import DecisionMemory
 
 from .timestamps import parse_timestamp
 
@@ -566,9 +570,26 @@ class Brain:
 
     @write_operation
     def write_node(self, node: Node) -> None:
+        from .decision_memory import prepare_node_write, SOURCE_TAG, body
+        markdown = node.to_markdown()
+        # Metadata-only writes must not normalize a pinned source's whitespace.
+        if SOURCE_TAG in node.tags and self.node_path(node.id).is_file():
+            with self.node_path(node.id).open(encoding="utf-8", newline="") as stream:
+                original = stream.read()
+            if node.text == Node.from_markdown(original.replace('\r\n', '\n').replace('\r', '\n')).text:
+                markdown = markdown[:-len(body(markdown))] + body(original) if body(markdown) else markdown + body(original)
+        successor = prepare_node_write(self, node, markdown)
         nodes_dir = self.path / "nodes"
         nodes_dir.mkdir(parents=True, exist_ok=True)
-        _atomic_write(self.node_path(node.id), node.to_markdown())
+        _atomic_write(self.node_path(node.id), markdown)
+        if successor is not None:
+            from .decision_schema import FILENAME, canonical
+            _atomic_write(self.path / FILENAME, canonical(successor) + "\n")
+
+    def decision_memory(self) -> DecisionMemory:
+        """Opt-in typed record store; construction and reads do not migrate."""
+        from .decision_memory import DecisionMemory
+        return DecisionMemory(self)
 
     @write_operation
     def promote_node(self, node_id: str) -> Node | None:
