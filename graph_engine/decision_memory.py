@@ -110,6 +110,8 @@ class RecordView:
         self.parents = (self.current_parents if nodes is None else derivation_parents(self.nodes, edges or []))
         self.versions = {s.key(v): v for v in data['versions']}
         self.events = {e['event_id']: e for e in data['events']}
+        self.event_heads = {_event_key(e): e['event_id'] for e in data['events']}
+        self.event_positions = {e['event_id']: i for i, e in enumerate(data['events'])}
         self.reviews_by_id: dict[str, list[dict]] = {}
         for e in data['events']:
             self.reviews_by_id.setdefault(e['subject']['id'], []).append(e)
@@ -148,7 +150,9 @@ class RecordView:
                         # just the node named in the direct source basis.
                         pending.extend(v for v in self.versions.values() if v['kind'] == 'source'
                                        and v['payload']['source_ref'] == b['ref'])
-                if value['previous_event_id']:
+                # Authorization retains the entire history; a fresh review
+                # does not inherit the basis of the judgment it replaces.
+                if reviews and value['previous_event_id']:
                     pending.append(self.events[value['previous_event_id']])
             else:
                 k = s.key(value)
@@ -196,21 +200,31 @@ class RecordView:
                     return True
                 if s.text_hash(text) != v['payload']['source_ref']['text_sha256']:
                     return True
-        # Any later basis event or withdrawal invalidates a recorded judgment.
-        if 'event_id' in item:
-            basis_events = {b['event_id'] for b in item['basis'] if b['type'] == 'event_ref'}
-            for eid in basis_events:
-                before = self.events[eid]
-                if any(_event_key(e) == _event_key(before) and e['event_id'] != eid
-                       for e in self.data['events'][self.data['events'].index(before) + 1:]):
+        # Check every referenced judgment's own basis, including withdrawals
+        # since that judgment. Restoring an input cannot refresh its reviews.
+        pending = [item] if 'event_id' in item else []
+        seen = set()
+        while pending:
+            judgment = pending.pop()
+            if judgment['event_id'] in seen:
+                continue
+            seen.add(judgment['event_id'])
+            for b in judgment['basis']:
+                if b['type'] != 'event_ref':
+                    continue
+                before = self.events[b['event_id']]
+                if self.event_heads[_event_key(before)] != before['event_id']:
                     return True
-            basis_keys = versions - {s.key(item['subject'])}
+                pending.append(before)
+            basis_versions, _ = self.dependencies(judgment)
+            basis_keys = basis_versions - {s.key(judgment['subject'])}
             availability = {}
             for e in self.data['events']:
                 if s.key(e['subject']) in basis_keys and e['axis'] == 'availability':
                     availability[s.key(e['subject'])] = e['to']
                     # A restored basis still requires a fresh review.
-                    if e['to'] == 'withdrawn' and self.data['events'].index(e) > self.data['events'].index(item):
+                    if (e['to'] == 'withdrawn' and self.event_positions[e['event_id']] >
+                            self.event_positions[judgment['event_id']]):
                         return True
             if 'withdrawn' in availability.values():
                 return True
@@ -234,10 +248,16 @@ class RecordView:
         visible = [e for e in events if self.allowed(e)]
         state = {axis: s.INITIAL[axis] for axis in s.AXES[v['kind']]}
         changed, hidden = self.changed(v), len(visible) != len(events)
+        judgments = {}
         for e in visible:
             state[e['axis']] = e['to']
-            if e['axis'] in ('epistemic', 'decision_conclusion'):
-                changed = changed or self.changed(e)
+            if e['axis'] == 'epistemic':
+                judgments['epistemic'] = e
+            elif e['axis'] in ('decision', 'decision_conclusion'):
+                # Activation supplies the initial justification; a subsequent
+                # decision review can replace it without changing lifecycle.
+                judgments['decision'] = e
+        changed = changed or any(self.changed(e) for e in judgments.values())
         # Hidden reviews cannot confer their recorded assessment.
         effective = ('inconclusive' if changed or hidden else state.get('epistemic', 'unassessed'))
         dependencies, _ = self.dependencies(v, reviews=True)

@@ -714,3 +714,140 @@ def test_cannot_undo_assessment_used_by_later_decision_content_basis(store):
     undo = event(c, before='supported', after='unassessed', previous=eid, correct=eid, basis=[content_basis(ev)])
     with pytest.raises(s.RecordError, match='dependent'):
         store.transact(request(store, events=[undo]), commit=False)
+
+
+def test_fresh_review_replaces_obsolete_basis_without_erasing_history(store):
+    _, _, c, receipt = assessed(store)
+    original = deepcopy(store.get(c)['events'][0])
+    node = store.brain.read_node('source')
+    node.text = 'New measurement'
+    store.brain.write_node(node)
+    src = next(s.reference(v) for v in reversed(store.export()['versions']) if v['kind'] == 'source')
+    ev, = save(store, evidence(src, quote='New measurement'))
+    req = request(store, events=[event(c, before='supported', after='supported',
+                                       previous=receipt['event_ids'][0], basis=[content_basis(ev)])])
+    fresh = store.transact(req, commit=False)
+    view = store.get(c)
+    assert view['effective_assessment'] == 'supported'
+    assert not view['basis_changed']
+    assert view['events'][0] == original
+    assert view['events'][-1]['basis'] == [content_basis(ev)]
+    before = files(store.brain)
+    assert store.transact(req, commit=False) == fresh
+    assert files(store.brain) == before
+
+
+def test_restored_evidence_requires_fresh_review_but_does_not_poison_it(store):
+    _, ev, c, receipt = assessed(store)
+    withdrawn = store.transact(request(store, events=[event(
+        ev, axis='availability', before='available', after='withdrawn')]), commit=False)
+    store.transact(request(store, events=[event(
+        ev, axis='availability', before='withdrawn', after='available',
+        previous=withdrawn['event_ids'][0])]), commit=False)
+    assert store.get(c)['basis_changed']
+    review(store, c, ev, before='supported', after='supported', previous=receipt['event_ids'][0])
+    assert not store.get(c)['basis_changed']
+    assert store.get(c)['effective_assessment'] == 'supported'
+
+
+def test_replaced_review_basis_still_restricts_access_and_retries(store, tmp_path, monkeypatch):
+    protected, path, policy = secure(store, tmp_path, monkeypatch)
+    _, _, c, receipt = assessed(protected)
+    src, = save(protected, source(protected, node='replacement'))
+    ev, = save(protected, evidence(src))
+    req = request(protected, events=[event(c, before='supported', after='supported',
+                                           previous=receipt['event_ids'][0], basis=[content_basis(ev)])])
+    protected.transact(req, commit=False)
+    assert not protected.get(c)['basis_changed']
+    policy['graphs']['default']['nodes']['source'] = {'read': []}
+    path.write_text(json.dumps(policy))
+    with pytest.raises(BasisUnavailable):
+        protected.get(c)
+    with pytest.raises(BasisUnavailable):
+        protected.transact(req, commit=False)
+    assert c['id'] not in {v['id'] for v in protected.export()['versions']}
+
+
+@pytest.mark.parametrize('change', ['review', 'source', 'withdraw_restore'])
+def test_review_basis_freshness_is_transitive_for_reads_and_writes(store, change):
+    _, ev, first, receipt = assessed(store)
+    middle, top, other = save(store, claim('Middle'), claim('Top'), claim('Other'))
+    def assess_event(target, eid):
+        return store.transact(request(store, events=[event(
+            target, basis=[{'type': 'event_ref', 'event_id': eid}])]), commit=False)
+    second = assess_event(middle, receipt['event_ids'][0])
+    third = assess_event(top, second['event_ids'][0])
+    if change == 'review':
+        review(store, first, ev, before='supported', after='opposed', previous=receipt['event_ids'][0])
+    elif change == 'source':
+        node = store.brain.read_node('source')
+        node.text = 'Changed measurement'
+        store.brain.write_node(node)
+    else:
+        withdrawn = store.transact(request(store, events=[event(
+            ev, axis='availability', before='available', after='withdrawn')]), commit=False)
+        store.transact(request(store, events=[event(
+            ev, axis='availability', before='withdrawn', after='available',
+            previous=withdrawn['event_ids'][0])]), commit=False)
+    for ref in (middle, top):
+        view = store.get(ref)
+        assert view['state']['epistemic'] == 'supported'
+        assert view['basis_changed']
+        assert view['effective_assessment'] == 'inconclusive'
+    before = files(store.brain)
+    with pytest.raises(s.RecordConflict, match='stale'):
+        assess_event(other, third['event_ids'][0])
+    assert files(store.brain) == before
+
+
+def test_new_review_can_replace_a_stale_referenced_review(store):
+    _, ev, first, receipt = assessed(store)
+    target, = save(store, claim('Dependent'))
+    dependent = store.transact(request(store, events=[event(target, basis=[
+        {'type': 'event_ref', 'event_id': receipt['event_ids'][0]}])]), commit=False)
+    latest = review(store, first, ev, before='supported', after='mixed', previous=receipt['event_ids'][0])
+    assert store.get(target)['basis_changed']
+    store.transact(request(store, events=[event(
+        target, before='supported', after='mixed', previous=dependent['event_ids'][0],
+        basis=[{'type': 'event_ref', 'event_id': latest['event_ids'][0]}])]), commit=False)
+    assert not store.get(target)['basis_changed']
+    assert store.get(target)['effective_assessment'] == 'mixed'
+
+
+@pytest.mark.parametrize('change', ['source', 'withdrawal'])
+def test_current_decision_reports_changed_activation_basis(store, change):
+    _, ev, _, _ = assessed(store)
+    decision, = save(store, decision_record())
+    review(store, decision, ev, axis='decision', before='proposed', after='current')
+    assert not store.get(decision)['basis_changed']
+    if change == 'source':
+        node = store.brain.read_node('source')
+        node.text = 'Changed result'
+        store.brain.write_node(node)
+    else:
+        store.transact(request(store, events=[event(
+            ev, axis='availability', before='available', after='withdrawn')]), commit=False)
+    view = store.get(decision)
+    assert view['state']['decision'] == 'current'
+    assert view['basis_changed']
+    assert view['effective_assessment'] == 'inconclusive'
+
+
+def test_fresh_decision_conclusion_replaces_obsolete_justification(store):
+    _, ev, _, _ = assessed(store)
+    decision, = save(store, decision_record())
+    review(store, decision, ev, axis='decision', before='proposed', after='current')
+    first = review(store, decision, ev, axis='decision_conclusion', before=None, after='remains_justified')
+    node = store.brain.read_node('source')
+    node.text = 'Changed result'
+    store.brain.write_node(node)
+    assert store.get(decision)['basis_changed']
+    src = next(s.reference(v) for v in reversed(store.export()['versions']) if v['kind'] == 'source')
+    fresh_ev, = save(store, evidence(src, quote='Changed result'))
+    review(store, decision, fresh_ev, axis='decision_conclusion', before='remains_justified',
+           after='remains_justified', previous=first['event_ids'][0])
+    view = store.get(decision)
+    assert view['state']['decision'] == 'current'
+    assert view['state']['decision_conclusion'] == 'remains_justified'
+    assert not view['basis_changed']
+    assert len(view['events']) == 3

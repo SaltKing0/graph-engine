@@ -100,8 +100,12 @@ versions of one logical decision cannot both be current.
 `basis_changed`, `effective_assessment` and a hypothetical-input label. Changed
 source bytes, content heads, withdrawal or enabling basis events make old support
 inconclusive in the current view. The original event remains historical evidence
-of what the reviewer judged. An old decision lifecycle is not reversed by
-freshness metadata. Source edits through `Brain.write_node()` append source
+of what the reviewer judged. Freshness follows the active assessment's basis,
+including transitive referenced reviews; a new review can replace an obsolete
+basis while historical dependencies still restrict access. A decision's activation
+basis is checked until a subsequent decision review supplies a new justification.
+An old decision lifecycle is not reversed by freshness metadata.
+Source edits through `Brain.write_node()` append source
 successors without retargeting consumers. Manual edits are detected through
 source hashes or immutable content/event identities. Source metadata writes
 preserve pinned whitespace. Recall counts, tiers and storage promotion do not
