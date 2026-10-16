@@ -1,0 +1,699 @@
+{
+  "schema": "dm.workflow-summary/1",
+  "code_commit": "1d9581416cba60aa991a9d626f563d8203f34025",
+  "release_ready": false,
+  "corpora": {
+    "controls": {
+      "events": 10,
+      "source_inputs_and_saved_baseline_match": true,
+      "scores": {
+        "curated": {
+          "counts": {
+            "raw_alerts": 10,
+            "attempted_pairs": 100,
+            "positive": 3,
+            "surfaced_pairs": 10,
+            "explicit_uncertainty_pairs": 10,
+            "error_pairs": 0,
+            "scored_surfaced_pairs": 10,
+            "true_positive": 3,
+            "missed_impacts": 0,
+            "known_pairs": 98,
+            "known_surfaced_pairs": 8,
+            "false_abstentions": 8,
+            "emitted_paths": 10,
+            "correct_paths": 5,
+            "negative": 95,
+            "false_alerts": 5,
+            "inconclusive": 1,
+            "inconclusive_explicit_uncertainty": 1,
+            "unanswerable": 1,
+            "unanswerable_explicit_uncertainty": 1,
+            "error_cases": 0
+          },
+          "precision": {
+            "value": 0.375,
+            "numerator": 3,
+            "denominator": 8
+          },
+          "recall": {
+            "value": 1.0,
+            "numerator": 3,
+            "denominator": 3
+          },
+          "false_alert_rate": {
+            "value": 0.05263157894736842,
+            "numerator": 5,
+            "denominator": 95
+          },
+          "false_discovery_fraction": {
+            "value": 0.5,
+            "numerator": 5,
+            "denominator": 10
+          },
+          "miss_rate": {
+            "value": 0.0,
+            "numerator": 0,
+            "denominator": 3
+          },
+          "path_correctness": {
+            "value": 0.5,
+            "numerator": 5,
+            "denominator": 10
+          },
+          "inconclusive_handling": {
+            "value": 1.0,
+            "numerator": 1,
+            "denominator": 1
+          },
+          "unanswerable_handling": {
+            "value": 1.0,
+            "numerator": 1,
+            "denominator": 1
+          },
+          "explicit_uncertainty_rate": {
+            "value": 0.1,
+            "numerator": 10,
+            "denominator": 100
+          },
+          "false_abstention_rate": {
+            "value": 0.08163265306122448,
+            "numerator": 8,
+            "denominator": 98
+          },
+          "rationale_correctness": null,
+          "unsupported_conclusions": null,
+          "answer_quality": null,
+          "human_review_time": null
+        },
+        "proposed": {
+          "counts": {
+            "raw_alerts": 0,
+            "attempted_pairs": 100,
+            "positive": 3,
+            "surfaced_pairs": 0,
+            "explicit_uncertainty_pairs": 0,
+            "error_pairs": 0,
+            "scored_surfaced_pairs": 0,
+            "true_positive": 0,
+            "missed_impacts": 3,
+            "known_pairs": 98,
+            "known_surfaced_pairs": 0,
+            "false_abstentions": 0,
+            "negative": 95,
+            "false_alerts": 0,
+            "inconclusive": 1,
+            "inconclusive_explicit_uncertainty": 0,
+            "unanswerable": 1,
+            "unanswerable_explicit_uncertainty": 0,
+            "error_cases": 0
+          },
+          "precision": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "recall": {
+            "value": 0.0,
+            "numerator": 0,
+            "denominator": 3
+          },
+          "false_alert_rate": {
+            "value": 0.0,
+            "numerator": 0,
+            "denominator": 95
+          },
+          "false_discovery_fraction": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "miss_rate": {
+            "value": 1.0,
+            "numerator": 3,
+            "denominator": 3
+          },
+          "path_correctness": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "inconclusive_handling": {
+            "value": 0.0,
+            "numerator": 0,
+            "denominator": 1
+          },
+          "unanswerable_handling": {
+            "value": 0.0,
+            "numerator": 0,
+            "denominator": 1
+          },
+          "explicit_uncertainty_rate": {
+            "value": 0.0,
+            "numerator": 0,
+            "denominator": 100
+          },
+          "false_abstention_rate": {
+            "value": 0.0,
+            "numerator": 0,
+            "denominator": 98
+          },
+          "rationale_correctness": null,
+          "unsupported_conclusions": null,
+          "answer_quality": null,
+          "human_review_time": null
+        }
+      },
+      "stage_latency_ms": {
+        "curated": {
+          "source_capture": {
+            "n": 10,
+            "p50": 16.11408218741417,
+            "p95": 18.521918915212154,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "proposal": {
+            "n": 10,
+            "p50": 701.0347509058192,
+            "p95": 979.8348339973018,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "scripted_review": {
+            "n": 10,
+            "p50": 237.59791697375476,
+            "p95": 290.2646660222672,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "impact": {
+            "n": 10,
+            "p50": 178.16308297915384,
+            "p95": 264.7462079767138,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "review_queue": {
+            "n": 10,
+            "p50": 211.21683297678828,
+            "p95": 276.3945829938166,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "context": {
+            "n": 10,
+            "p50": 93.69041596073657,
+            "p95": 118.53170802351087,
+            "aggregation": "sum of measured operations within each event"
+          }
+        },
+        "proposed": {
+          "source_capture": {
+            "n": 10,
+            "p50": 11.393211025279015,
+            "p95": 40.945790882688016,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "proposal": {
+            "n": 10,
+            "p50": 196.6240000911057,
+            "p95": 258.86449991958216,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "impact": {
+            "n": 10,
+            "p50": 157.50079200370237,
+            "p95": 175.1841660006903,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "review_queue": {
+            "n": 10,
+            "p50": 161.99479100760072,
+            "p95": 408.9113750378601,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "context": {
+            "n": 10,
+            "p50": 76.41279202653095,
+            "p95": 96.29837499232963,
+            "aggregation": "sum of measured operations within each event"
+          }
+        }
+      },
+      "context": {
+        "curated": {
+          "events": 10,
+          "truncated": 10,
+          "empty": 0,
+          "max_estimated_tokens": 2700
+        },
+        "proposed": {
+          "events": 10,
+          "truncated": 10,
+          "empty": 0,
+          "max_estimated_tokens": 2580
+        }
+      }
+    },
+    "development": {
+      "events": 8,
+      "source_inputs_and_saved_baseline_match": true,
+      "scores": {
+        "curated": {
+          "counts": {
+            "raw_alerts": 8,
+            "attempted_pairs": 27,
+            "pending": 27,
+            "surfaced_pairs": 8,
+            "explicit_uncertainty_pairs": 8,
+            "error_pairs": 0,
+            "error_cases": 0
+          },
+          "precision": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "recall": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "false_alert_rate": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "false_discovery_fraction": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "miss_rate": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "path_correctness": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "inconclusive_handling": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "unanswerable_handling": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "explicit_uncertainty_rate": {
+            "value": 0.2962962962962963,
+            "numerator": 8,
+            "denominator": 27
+          },
+          "false_abstention_rate": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "rationale_correctness": null,
+          "unsupported_conclusions": null,
+          "answer_quality": null,
+          "human_review_time": null
+        },
+        "proposed": {
+          "counts": {
+            "raw_alerts": 0,
+            "attempted_pairs": 27,
+            "pending": 27,
+            "surfaced_pairs": 0,
+            "explicit_uncertainty_pairs": 0,
+            "error_pairs": 0,
+            "error_cases": 0
+          },
+          "precision": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "recall": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "false_alert_rate": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "false_discovery_fraction": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "miss_rate": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "path_correctness": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "inconclusive_handling": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "unanswerable_handling": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "explicit_uncertainty_rate": {
+            "value": 0.0,
+            "numerator": 0,
+            "denominator": 27
+          },
+          "false_abstention_rate": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "rationale_correctness": null,
+          "unsupported_conclusions": null,
+          "answer_quality": null,
+          "human_review_time": null
+        }
+      },
+      "stage_latency_ms": {
+        "curated": {
+          "source_capture": {
+            "n": 8,
+            "p50": 141.6564986575395,
+            "p95": 504.4727853965014,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "proposal": {
+            "n": 8,
+            "p50": 2779.771999048535,
+            "p95": 3941.9287079945207,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "scripted_review": {
+            "n": 8,
+            "p50": 573.8638750044629,
+            "p95": 823.7720829783939,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "impact": {
+            "n": 8,
+            "p50": 246.62787502165884,
+            "p95": 306.79083295399323,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "review_queue": {
+            "n": 8,
+            "p50": 338.7801249627955,
+            "p95": 587.3875829856843,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "context": {
+            "n": 8,
+            "p50": 132.16183398617432,
+            "p95": 162.61487500742078,
+            "aggregation": "sum of measured operations within each event"
+          }
+        },
+        "proposed": {
+          "source_capture": {
+            "n": 8,
+            "p50": 127.52295797690749,
+            "p95": 648.2158759026788,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "proposal": {
+            "n": 8,
+            "p50": 1242.4801249871962,
+            "p95": 1529.6072919736616,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "impact": {
+            "n": 8,
+            "p50": 215.57350002694875,
+            "p95": 248.91337502049282,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "review_queue": {
+            "n": 8,
+            "p50": 363.4112500003539,
+            "p95": 458.64762499695644,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "context": {
+            "n": 8,
+            "p50": 121.48849997902289,
+            "p95": 289.26799999317154,
+            "aggregation": "sum of measured operations within each event"
+          }
+        }
+      },
+      "context": {
+        "curated": {
+          "events": 8,
+          "truncated": 8,
+          "empty": 0,
+          "max_estimated_tokens": 3720
+        },
+        "proposed": {
+          "events": 8,
+          "truncated": 0,
+          "empty": 0,
+          "max_estimated_tokens": 2132
+        }
+      }
+    },
+    "evaluation": {
+      "events": 8,
+      "source_inputs_and_saved_baseline_match": true,
+      "scores": {
+        "curated": {
+          "counts": {
+            "raw_alerts": 8,
+            "attempted_pairs": 30,
+            "pending": 30,
+            "surfaced_pairs": 8,
+            "explicit_uncertainty_pairs": 8,
+            "error_pairs": 0,
+            "error_cases": 0
+          },
+          "precision": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "recall": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "false_alert_rate": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "false_discovery_fraction": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "miss_rate": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "path_correctness": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "inconclusive_handling": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "unanswerable_handling": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "explicit_uncertainty_rate": {
+            "value": 0.26666666666666666,
+            "numerator": 8,
+            "denominator": 30
+          },
+          "false_abstention_rate": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "rationale_correctness": null,
+          "unsupported_conclusions": null,
+          "answer_quality": null,
+          "human_review_time": null
+        },
+        "proposed": {
+          "counts": {
+            "raw_alerts": 0,
+            "attempted_pairs": 30,
+            "pending": 30,
+            "surfaced_pairs": 0,
+            "explicit_uncertainty_pairs": 0,
+            "error_pairs": 0,
+            "error_cases": 0
+          },
+          "precision": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "recall": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "false_alert_rate": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "false_discovery_fraction": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "miss_rate": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "path_correctness": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "inconclusive_handling": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "unanswerable_handling": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "explicit_uncertainty_rate": {
+            "value": 0.0,
+            "numerator": 0,
+            "denominator": 30
+          },
+          "false_abstention_rate": {
+            "value": null,
+            "numerator": 0,
+            "denominator": 0
+          },
+          "rationale_correctness": null,
+          "unsupported_conclusions": null,
+          "answer_quality": null,
+          "human_review_time": null
+        }
+      },
+      "stage_latency_ms": {
+        "curated": {
+          "source_capture": {
+            "n": 8,
+            "p50": 74.49433015426621,
+            "p95": 145.0294989044778,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "proposal": {
+            "n": 8,
+            "p50": 1208.3423750009388,
+            "p95": 1970.213750086259,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "scripted_review": {
+            "n": 8,
+            "p50": 270.1777089969255,
+            "p95": 434.3466670252383,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "impact": {
+            "n": 8,
+            "p50": 189.26808302057907,
+            "p95": 213.68049999000505,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "review_queue": {
+            "n": 8,
+            "p50": 241.4018749841489,
+            "p95": 297.2512080450542,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "context": {
+            "n": 8,
+            "p50": 98.89162500621751,
+            "p95": 110.5361669906415,
+            "aggregation": "sum of measured operations within each event"
+          }
+        },
+        "proposed": {
+          "source_capture": {
+            "n": 8,
+            "p50": 71.79612625623122,
+            "p95": 114.387379901018,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "proposal": {
+            "n": 8,
+            "p50": 536.205414973665,
+            "p95": 675.939875014592,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "impact": {
+            "n": 8,
+            "p50": 171.73054197337478,
+            "p95": 211.97758399648592,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "review_queue": {
+            "n": 8,
+            "p50": 232.94833401450887,
+            "p95": 274.6108749997802,
+            "aggregation": "sum of measured operations within each event"
+          },
+          "context": {
+            "n": 8,
+            "p50": 90.66395898116753,
+            "p95": 99.3228749721311,
+            "aggregation": "sum of measured operations within each event"
+          }
+        }
+      },
+      "context": {
+        "curated": {
+          "events": 8,
+          "truncated": 8,
+          "empty": 0,
+          "max_estimated_tokens": 3494
+        },
+        "proposed": {
+          "events": 8,
+          "truncated": 0,
+          "empty": 0,
+          "max_estimated_tokens": 2124
+        }
+      }
+    }
+  }
+}

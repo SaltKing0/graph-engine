@@ -1,0 +1,54 @@
+{
+  "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/issue-81",
+  "runtime": "/tmp/graph-engine-audit-env/bin/python",
+  "full": [
+    "GRAPH_ENGINE_TEST_D3=/tmp/graph-engine-d3.v7.min.js",
+    "PLAYWRIGHT_BROWSERS_PATH=/tmp/graph-engine-playwright",
+    "/tmp/graph-engine-audit-env/bin/python",
+    "-m",
+    "pytest",
+    "tests/",
+    "-q",
+    "-rs"
+  ],
+  "model_trust": [
+    "HF_HUB_OFFLINE=1",
+    "TRANSFORMERS_OFFLINE=1",
+    "/tmp/graph-engine-issue-46-env/bin/python",
+    "-m",
+    "pytest",
+    "tests/test_model_trust.py",
+    "--fail-on-skip",
+    "-q"
+  ],
+  "corpus_commands": [
+    [
+      "-m",
+      "tools.decision_benchmark.production",
+      "--split",
+      "all",
+      "--output",
+      "/tmp/issue81-production-controls.json"
+    ],
+    [
+      "-m",
+      "tools.decision_benchmark.production",
+      "--real-corpus",
+      "--split",
+      "development",
+      "--output",
+      "/tmp/issue81-production-development.json"
+    ],
+    [
+      "-m",
+      "tools.decision_benchmark.production",
+      "--real-corpus",
+      "--split",
+      "evaluation",
+      "--output",
+      "/tmp/issue81-production-evaluation.json"
+    ]
+  ],
+  "source_verification": "from pathlib import Path; from tools.decision_benchmark.corpus import DATA, load_bundle; from tools.decision_benchmark.freeze_sources import verify_git; inputs, _, _ = load_bundle(DATA / \"project-v1\"); verify_git(Path(\".\"), DATA / \"project-v1\", inputs)",
+  "advisories": "See advisory-commands.py and advisories/*.log for all seven exact resolutions and scans; no model weights."
+}
