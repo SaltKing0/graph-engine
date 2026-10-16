@@ -38,6 +38,14 @@ The revise outcome records the review conclusion; use the existing explicit
 supersede it with the required review basis. No choice automatically reverses a
 decision, and no bulk truth-acceptance control is provided.
 
+When a finding targets an earlier decision version, that version stays read-only.
+**Review current decision version** opens a separate outcome form showing the
+current version's action, rationale, conditions and exact reference. Its outcome
+does not resolve the historical finding; you can acknowledge that finding to
+remove it from pending. Resolution requires an outcome for the finding's exact
+target version. If the current version is missing from the bounded detail, refresh
+the evidence before recording an outcome.
+
 The detail response supplies the exact generation, content heads, source hashes,
 authorization fingerprint and event heads used by the existing review service.
 The browser submits those preconditions without fetching a newer preview first.

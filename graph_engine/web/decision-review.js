@@ -167,8 +167,9 @@
     if (p.limitations?.length) el('p', `Limitations: ${p.limitations.join('; ')}`, box);
     if (r.kind === 'relationship') el('p', `${refKey(p.source)} → ${refKey(p.target)}`, box, 'dm-ref');
     for (const source of p.sources || []) {
-      el('p', `Source: ${refKey(source.ref)}`, box, 'dm-ref');
-      if (source.passage) el('blockquote', source.passage.quote, box);
+      const ref = r.kind === 'evidence' ? source.ref : source;
+      el('p', `Source: ${refKey(ref)}`, box, 'dm-ref');
+      if (r.kind === 'evidence' && source.passage) el('blockquote', source.passage.quote, box);
       else el('p', 'No selected passage; read the pinned source below.', box);
     }
     if (p.lineage_ids) el('p', `Recorded source lineage: ${p.lineage_ids.join(', ') || 'unspecified'}. Independence is not inferred.`, box);
@@ -291,10 +292,27 @@
             reason.value.trim(), [{type:'content_ref',ref:c.target}])]}, entry);
         });
       }
-      const decision = result.records.find(item => refKey(item.record) === refKey(c.target));
+      const targetIsCurrent = result.preview.heads[c.target.id] === c.target.version_id;
+      const decision = result.records.find(item => item.record.id === c.target.id
+        && item.record.version_id === result.preview.heads[c.target.id]);
+      if (!targetIsCurrent) {
+        el('p', 'This finding targets a previous decision version, retained as read-only history. You can acknowledge it and review the current decision version separately.', form, 'dm-status');
+      }
       if (decision) {
         const panel = el('section', undefined, form); panel.id = 'dm-decision-outcome';
-        el('h4', 'Review decision: retain, investigate or revise', panel);
+        el('h4', targetIsCurrent ? 'Review decision: retain, investigate or revise' : 'Review current decision version', panel);
+        el('p', `Outcome target: ${refKey(decision.record)}`, panel, 'dm-ref');
+        if (!targetIsCurrent) {
+          el('p', decision.record.payload.action, panel);
+          el('p', decision.record.payload.rationale, panel);
+          conditions(decision.record.payload.context, panel);
+          panel.hidden = true;
+          const navigation = button('Review current decision version', form, () => {
+            panel.hidden = false;
+            outcome.focus();
+          });
+          panel.before(navigation);
+        }
         el('p', 'Records a review outcome. Revising the decision content uses the explicit proposal contract (ig decision propose); the choice itself is not reversed here.', panel);
         const label = el('label', 'Decision review outcome', panel);
         const outcome = el('select', undefined, label); outcome.setAttribute('aria-label', 'Decision review outcome');
@@ -315,7 +333,8 @@
             reason.value.trim(), chosen.map(item => ({type:'content_ref',ref:refOf(item.record)})))]}, entry);
         });
         basisChoice.addEventListener('change', () => basisChoice.setCustomValidity(''));
-        const last = [...decision.events].reverse().find(e => e.axis === 'decision_conclusion');
+        // A successor outcome cannot resolve a finding pinned to an older target.
+        const last = targetIsCurrent && [...decision.events].reverse().find(e => e.axis === 'decision_conclusion');
         if (last) {
           el('p', `Resolution will pin outcome ${last.to}, event ${last.event_id}. The authenticated reviewer owns the resolution.`, panel);
           const label = el('label', 'Follow-up check (required for investigation)', panel);
@@ -334,6 +353,8 @@
           });
           check.addEventListener('change', () => check.setCustomValidity(''));
         }
+      } else {
+        el('p', 'The current decision version is unavailable in this detail. Refresh evidence before recording a decision outcome.', form, 'dm-status');
       }
       form.addEventListener('submit', ev => ev.preventDefault());
     }

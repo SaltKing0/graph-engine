@@ -40,6 +40,9 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
   (issue #76).
 
 ### Fixed
+- Render sourced check results in Decision Memory review details. Direct outcome
+  reviews to the explicitly opened current decision version while retaining
+  historical targets and their findings without cross-version resolution.
 - Allow scored graph edges in Decision Memory reads and comparisons while
   retaining concurrent-change checks. Expand briefs from exact payload/review
   dependencies so linked opposition and revisit-check results stay visible

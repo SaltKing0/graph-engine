@@ -655,6 +655,118 @@ def test_decision_impact_full_browser_flow_and_pinned_brief(server, page, tmp_pa
 
 
 @pytest.mark.parametrize('server', [{'mode':'git'}], indirect=True)
+def test_decision_review_result_sources_render_and_allow_review(server, page, tmp_path):
+    from graph_engine.decision_service import DecisionService
+    from test_decision_impact import scenario, commit, comparison, link
+    from test_decision_service import save
+    from test_decision_memory import check_record, result_record, draft
+    service = DecisionService(Brain(str(tmp_path / 'brain'), mode='git'))
+    refs = scenario(service)
+    service.brain.write_node(Node(HOSTILE, id='result-source'))
+    source, = save(service, draft('source', service.source('result-source'), anchor='result-source'))
+    check, = save(service, check_record())
+    link(service, 'checks', check, refs['decision'], None)
+    result, = save(service, result_record(check, [refs['source'], source]))
+    before = commit(service)
+    link(service, 'result_of', result, check, None)
+    comp = comparison(before, commit(service))
+    open_decision_comparison(page, server, comp)
+    result_box = page.locator('.dm-record').filter(has=page.get_by_text(
+        f'{result["id"]}@{result["version_id"]}', exact=True))
+    result_box.locator('summary').first.click()
+    expect(result_box).to_contain_text(f'Source: {refs["source"]["id"]}@{refs["source"]["version_id"]}')
+    expect(result_box).to_contain_text(f'Source: {source["id"]}@{source["version_id"]}')
+    # The same detail also contains evidence's {ref, passage} source wrappers.
+    evidence_box = page.locator('.dm-record').filter(has=page.get_by_text(
+        f'{refs["evidence"]["id"]}@{refs["evidence"]["version_id"]}', exact=True))
+    expect(evidence_box).to_contain_text(f'Source: {refs["source"]["id"]}@{refs["source"]["version_id"]}')
+    expect(page.locator('#dm-detail')).to_contain_text(HOSTILE)
+    page.get_by_label('Review reason (required)', exact=True).fill('Review the sourced check result')
+    page.get_by_role('button', name='Record finding judgment', exact=True).click()
+    expect(page.locator('#dm-notice')).to_contain_text('Review recorded')
+    expect(page.locator('#dm-queue button').first).to_contain_text('Reviewed judgment: confirmed')
+    assert_inert(page)
+
+
+@pytest.mark.parametrize('server', [{'mode':'git'}], indirect=True)
+@pytest.mark.parametrize('prior_outcome', [False, True])
+def test_decision_review_successor_outcome_preserves_historical_target(server, page, tmp_path, prior_outcome):
+    from test_decision_impact import finding_envelope
+    from test_decision_service import save, review
+    from test_decision_memory import draft, content_basis
+    service, refs, comp = decision_browser_seed(tmp_path)
+    candidate, = service.compare(comp)['candidates']
+    finding, = service.record_finding(finding_envelope(service, comp, candidate), commit=False)['receipt']['refs']
+    if prior_outcome:
+        review(service, refs['decision'], axis='decision_conclusion', after='revise', basis=[content_basis(refs['claim'])])
+    original = service.inspect(refs['decision'])
+    successor, = save(service, draft('decision', dict(original['record']['payload'], rationale='Updated rationale'),
+        identity=original['record']['id'], anchor=original['record']['anchor_node_id'], previous=refs['decision']))
+    page.goto(f'{server}/review?mode=decisions')
+    page.locator('#dm-queue button').click()
+    expect(page.locator('#dm-detail')).to_contain_text('This finding targets a previous decision version')
+    expect(page.get_by_role('button', name='Record decision outcome', exact=True)).to_be_hidden()
+    expect(page.get_by_role('button', name='Resolve finding with recorded outcome', exact=True)).to_have_count(0)
+    page.get_by_role('button', name='Review current decision version', exact=True).click()
+    expect(page.get_by_label('Decision review outcome', exact=True)).to_be_focused()
+    expect(page.locator('#dm-decision-outcome')).to_contain_text(f'Outcome target: {successor["id"]}@{successor["version_id"]}')
+    expect(page.locator('#dm-decision-outcome')).to_contain_text('Updated rationale')
+    preview = service.preview()
+    reason = 'Review the current decision separately from its historical finding'
+    page.get_by_label('Review reason (required)', exact=True).fill(reason)
+    page.get_by_label('Decision review outcome', exact=True).select_option('revise')
+    page.get_by_label('Evidence / claim basis for this outcome (select one or more)').select_option(label='claim: Graph expansion stays opt-in')
+    with page.expect_response(lambda response: response.url.endswith('/api/decision-memory/reviews')) as response_info:
+        page.get_by_role('button', name='Record decision outcome', exact=True).click()
+    assert response_info.value.status == 200
+    submitted = response_info.value.request.post_data_json
+    assert submitted['expected_heads'] == preview['heads']
+    assert submitted['expected_generation'] == preview['generation']
+    assert submitted['events'][0]['subject'] == successor
+    expect(page.locator('#dm-notice')).to_contain_text('Review recorded')
+    expect(page.locator('#dm-detail')).to_contain_text('This finding targets a previous decision version')
+    retained = service.inspect(refs['decision'])
+    assert retained['record'] == original['record']
+    assert retained['events'] == original['events']
+    assert service.inspect(successor)['events'][-1]['reason'] == reason
+    assert service.inspect(finding)['state']['finding_workflow'] == 'open'
+    # A successor's outcome cannot resolve a finding pinned to the prior version.
+    page.get_by_role('button', name='Review current decision version', exact=True).click()
+    expect(page.get_by_role('button', name='Resolve finding with recorded outcome', exact=True)).to_have_count(0)
+    page.get_by_label('Review reason (required)', exact=True).fill('Acknowledge the historical finding')
+    page.get_by_role('button', name='Acknowledge finding', exact=True).click()
+    expect(page.locator('#dm-message')).to_contain_text('No accessible pending')
+    assert service.inspect(finding)['state']['finding_workflow'] == 'acknowledged'
+
+
+@pytest.mark.parametrize('server', [{'mode':'git'}], indirect=True)
+def test_decision_review_missing_current_version_never_falls_back_to_history(server, page, tmp_path):
+    from test_decision_impact import finding_envelope
+    from test_decision_service import save
+    from test_decision_memory import draft
+    service, refs, comp = decision_browser_seed(tmp_path)
+    candidate, = service.compare(comp)['candidates']
+    service.record_finding(finding_envelope(service, comp, candidate), commit=False)
+    original = service.inspect(refs['decision'])['record']
+    successor, = save(service, draft('decision', dict(original['payload'], rationale='Current rationale'),
+        identity=original['id'], anchor=original['anchor_node_id'], previous=refs['decision']))
+    def truncate_current(route):
+        response = route.fetch()
+        body = response.json()
+        body['records'] = [item for item in body['records'] if item['record']['version_id'] != successor['version_id']]
+        body['truncated'] = True
+        route.fulfill(response=response, json=body)
+    page.route('**/api/decision-memory/read/review-detail', truncate_current)
+    page.goto(f'{server}/review?mode=decisions')
+    page.locator('#dm-queue button').click()
+    expect(page.locator('#dm-detail')).to_contain_text('The current decision version is unavailable in this detail')
+    expect(page.get_by_role('button', name='Record decision outcome', exact=True)).to_have_count(0)
+    expect(page.get_by_role('button', name='Review current decision version', exact=True)).to_have_count(0)
+    expect(page.get_by_role('button', name='Resolve finding with recorded outcome', exact=True)).to_have_count(0)
+    expect(page.get_by_role('button', name='Acknowledge finding', exact=True)).to_be_visible()
+
+
+@pytest.mark.parametrize('server', [{'mode':'git'}], indirect=True)
 def test_decision_review_stale_submission_refreshes_without_overwriting(server, page, tmp_path):
     from test_decision_impact import finding_envelope
     from test_decision_service import review
