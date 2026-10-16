@@ -5,14 +5,14 @@ The caller explicitly chooses this surface instead of memory-only context.
 """
 from __future__ import annotations
 
-from collections import deque
 from copy import deepcopy
+from heapq import heappop, heappush
 import re
 
 from . import decision_schema as s
 from .brain import Brain
 from .context import estimate_tokens, TOKEN_ESTIMATE, SEPARATOR
-from .decision_impact import authorization, revision
+from .decision_impact import authorization, current_fingerprint, revision
 from .decision_memory import BasisUnavailable
 from .decision_service import compare_context
 
@@ -37,11 +37,6 @@ def _current(brain: Brain) -> tuple:
     return ({n.id: n for n in Brain.read_nodes(brain)}, Brain.read_edges(brain, include_rejected=True))
 
 
-def _fingerprint(current: tuple) -> str:
-    return s.hash_record(dict(nodes={nid: n.to_markdown() for nid, n in current[0].items()},
-                              edges=[e.to_dict() for e in current[1]]))
-
-
 class DecisionReader:
     """One Git snapshot, one policy/current-lineage snapshot, checked on return."""
 
@@ -54,13 +49,13 @@ class DecisionReader:
             if not permitted(brain.graph_name, brain.identity, 'read', _policy=self.policy):
                 raise PermissionError('Access denied')
         current = _current(brain)
-        self.fingerprint = _fingerprint(current)
+        self.fingerprint = current_fingerprint(current)
         self.rev = revision(brain, name, current, self.policy)
         self.view = self.rev.view
 
     def finish(self, result: dict) -> dict:
         if (authorization(self.brain) != self.policy or
-                _fingerprint(_current(self.brain)) != self.fingerprint):
+                current_fingerprint(_current(self.brain)) != self.fingerprint):
             raise s.RecordConflict('Authorization or current lineage changed during read; retry')
         return result
 
@@ -92,20 +87,46 @@ class DecisionReader:
     def brief(self, reference: dict) -> dict:
         root = self.inspect(reference)
         s.need(root['record']['kind'] == 'decision', 'Brief requires an exact decision reference')
-        # Traverse only explicit typed dependencies. Opposition is selected
-        # alongside support regardless of ranking or review acceptance.
-        selected = {s.key(reference)}
-        queue = deque([(reference, 0)])
+        # Exact payload/review dependencies also seed the typed neighborhood.
+        # Process lower typed-hop depths first, including zero-hop closure,
+        # so a shared dependency is expanded at its shortest reachable depth.
+        selected, depths, queue = set(), {}, []
         paths, hits = [], set()
+
+        def retain(key: tuple, depth: int) -> None:
+            if key not in self.rev.records:
+                raise BasisUnavailable('Record or basis unavailable')
+            if key not in selected:
+                if len(selected) >= MAX_RECORDS:
+                    hits.add('records')
+                    return
+                selected.add(key)
+            if depth < depths.get(key, MAX_DEPTH + 1):
+                depths[key] = depth
+                heappush(queue, (depth, key))
+
+        retain(s.key(reference), 0)
+        findings = self.findings(reference['id'], unresolved_only=False)
+        if findings['truncated']:
+            hits.add('findings')
+        for item in findings['items']:
+            retain(s.key(item['record']), 0)
         relationships = [v for v in sorted(self.view.heads.values(), key=s.key)
                          if v['kind'] == 'relationship' and s.key(v) in self.rev.records]
         examined = 0
         visited = set()
         while queue:
-            ref, depth = queue.popleft()
-            if s.key(ref) in visited:
+            depth, key = heappop(queue)
+            if key in visited:
                 continue
-            visited.add(s.key(ref))
+            visited.add(key)
+            v = self.rev.records[key]
+            deps, _ = self.view.dependencies(v, reviews=True)
+            for dependency in sorted(deps):
+                retain(dependency, depth)
+            ref = s.reference(v)
+            # Opposition is selected alongside support regardless of ranking
+            # or review acceptance, including for newly discovered dependencies.
             for rel in relationships:
                 p = rel['payload']
                 other = None
@@ -125,34 +146,9 @@ class DecisionReader:
                 if len(selected | {s.key(rel), s.key(other)}) > MAX_RECORDS:
                     hits.add('records')
                     continue
-                selected.update((s.key(rel), s.key(other)))
+                retain(s.key(rel), depth + 1)
+                retain(s.key(other), depth + 1)
                 paths.append(dict(from_ref=ref, to_ref=other, relationship=s.reference(rel), kind=p['kind']))
-                queue.append((other, depth + 1))
-        # Checks pinned directly in the decision payload and review basis,
-        # sources, conditions and findings all carry their complete dependencies.
-        findings = self.findings(reference['id'], unresolved_only=False)
-        if findings['truncated']:
-            hits.add('findings')
-        selected.update(s.key(item['record']) for item in findings['items'])
-        pending = [s.key(reference)] + sorted(selected - {s.key(reference)})
-        selected = set()
-        while pending:
-            key = pending.pop(0)
-            if key in selected:
-                continue
-            if key not in self.rev.records:
-                # A record's ACL dependencies already include all its reviews.
-                # This branch fails closed if that invariant ever changes.
-                raise BasisUnavailable('Record or basis unavailable')
-            if len(selected) >= MAX_RECORDS:
-                hits.add('records')
-                break
-            selected.add(key)
-            v = self.rev.records[key]
-            deps, _ = self.view.dependencies(v, reviews=True)
-            pending.extend(sorted(deps - selected - set(pending)))
-        # Always retain the complete decision itself if bounded closure clipped.
-        selected.add(s.key(reference))
         items = [self.inspect(dict(id=i, version_id=h)) for i, h in sorted(selected)]
         comparisons = []
         for item in items:

@@ -77,6 +77,11 @@ relevance never become truth confidence. Source lineage IDs are descriptive,
 not independent-vote counts. Structured scope comparisons may be comparable,
 disjoint or unknown; free-text reasoning remains unresolved.
 
+Exact payload and review-basis dependencies seed that same typed neighborhood:
+claims cited by a review retain linked opposition, and checks pinned in
+`revisit_checks` retain linked results. Exact-reference closure consumes the
+record bound; the depth bound counts typed relationship hops from those inputs.
+
 A brief retains at most 200 records, 500 relevant link steps and three typed
 hops. It closes the selected dependencies over exact source/profile and review
 basis references subject to that record bound. Findings return at most 200

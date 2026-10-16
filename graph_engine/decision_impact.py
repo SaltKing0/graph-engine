@@ -8,6 +8,7 @@ from __future__ import annotations
 from collections import defaultdict, deque
 from copy import deepcopy
 from dataclasses import dataclass
+import json
 import re
 from uuid import NAMESPACE_URL, uuid5
 
@@ -47,6 +48,16 @@ def authorization(brain: Brain) -> dict | None:
         from .access import load_policy
         return load_policy()
     return None
+
+
+def current_fingerprint(current: tuple) -> str:
+    """Hash graph storage, whose edge confidences may be finite floats.
+
+    Decision records retain their stricter, decimal-string JSON contract.
+    """
+    value = dict(nodes={nid: n.to_markdown() for nid, n in current[0].items()},
+                 edges=[e.to_dict() for e in current[1]])
+    return s.text_hash(json.dumps(value, sort_keys=True, separators=(',', ':'), allow_nan=False))
 
 
 @dataclass
@@ -294,8 +305,7 @@ def compare(brain: Brain, envelope: dict) -> dict:
         if not permitted(brain.graph_name, brain.identity, 'read', _policy=policy):
             raise PermissionError('Access denied')
     current = ({n.id: n for n in Brain.read_nodes(brain)}, Brain.read_edges(brain, include_rejected=True))
-    fingerprint = identity(dict(nodes={nid: n.to_markdown() for nid, n in current[0].items()},
-                                edges=[e.to_dict() for e in current[1]]))
+    fingerprint = current_fingerprint(current)
     before, after = (revision(brain, envelope[k], current, policy) for k in ('before', 'after'))
     budget = Budget(limits)
     old, new = heads(before), heads(after)
@@ -451,9 +461,8 @@ def compare(brain: Brain, envelope: dict) -> dict:
         candidates.extend(found.values())
     # Reject a concurrent ACL or current-lineage change instead of publishing a
     # mixture. Historical text/reviews always came from their selected commits.
-    current_after = ({n.id: n.to_markdown() for n in Brain.read_nodes(brain)},
-                     [e.to_dict() for e in Brain.read_edges(brain, include_rejected=True)])
-    if (policy != authorization(brain) or fingerprint != identity(dict(nodes=current_after[0], edges=current_after[1]))):
+    current_after = ({n.id: n for n in Brain.read_nodes(brain)}, Brain.read_edges(brain, include_rejected=True))
+    if (policy != authorization(brain) or fingerprint != current_fingerprint(current_after)):
         raise s.RecordConflict('Authorization or current lineage changed during comparison; retry')
     completeness = dict(truncated=bool(budget.hit), hit_limits=sorted(budget.hit), limits=limits,
                         visited_objects=len(budget.objects), examined_links=budget.links, retained_paths=budget.paths)

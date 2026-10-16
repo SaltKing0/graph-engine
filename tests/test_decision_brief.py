@@ -8,12 +8,13 @@ import sys
 import pytest
 
 from graph_engine import decision_schema as s, runtime
+from graph_engine.brain import Edge, Node
 from graph_engine.context import estimate_tokens
 from graph_engine.decision_brief import render_markdown, DecisionReader
 from graph_engine.decision_memory import BasisUnavailable
 from graph_engine.decision_service import DecisionService
-from test_decision_memory import draft, content_basis, files, check_record
-from test_decision_service import save, review, context
+from test_decision_memory import draft, claim, content_basis, files, check_record, result_record
+from test_decision_service import save, review, context, profile
 from test_decision_impact import (service, scenario, commit, evidence, link, comparison,
                                   change_source, finding_envelope)
 
@@ -31,6 +32,92 @@ def conflict(service):
     opposition = link(service, 'opposes', ev, refs['claim'], context(refs['profile']), accepted=False)
     refs.update(counter=ev, opposition=opposition)
     return refs
+
+
+def scored_edge(service):
+    service.brain.write_node(Node('Unrelated memory', id='ordinary'))
+    service.brain.add_edge(Edge('source', 'ordinary', 'similar', confidence=0.8, origin='suggester'))
+
+
+def reviewed_basis(service):
+    p = profile(service)
+    src, ev = evidence(service, p)
+    c, = save(service, claim(context=context(p)))
+    support = link(service, 'supports', ev, c, context(p))
+    review(service, c, axis='epistemic', after='supported', basis=[content_basis(ev), content_basis(support)])
+    d, = save(service, draft('decision', dict(action='Keep opt-in', rationale='Limited diagnostic',
+        alternatives=[], context=context(p), revisit_checks=[])))
+    review(service, d, axis='decision', after='current', basis=[content_basis(c)])
+    return dict(profile=p, source=src, evidence=ev, claim=c, support=support, decision=d)
+
+
+def test_scored_graph_edges_allow_all_reads_and_still_detect_concurrent_changes(service):
+    refs = scenario(service)
+    scored_edge(service)
+    sha = commit(service)
+    before = files(service.brain)
+    assert refs['source']['id'] in read(service, 'brief', reference=refs['decision'])['included_ids']
+    assert read(service, 'context', query='Keep opt-in', budget=8000)['context']
+    assert read(service, 'findings')['items'] == []
+    assert read(service, 'inspect-revision', reference=refs['decision'], revision=sha)['record']['id'] == refs['decision']['id']
+    assert service.compare(comparison(sha, sha))['deltas'] == []
+    assert files(service.brain) == before
+    reader = DecisionReader(service.brain, sha)
+    result = reader.brief(refs['decision'])
+    edges = service.brain.read_edges(include_rejected=True)
+    edges[-1].confidence = 0.9
+    service.brain.write_edges(edges)
+    with pytest.raises(s.RecordConflict):
+        reader.finish(result)
+
+
+def test_review_basis_claim_keeps_new_opposition_in_brief_and_context(service):
+    refs = reviewed_basis(service)
+    before = commit(service)
+    source, ev = evidence(service, refs['profile'], node='counter', text='Contrary observation')
+    opposition = link(service, 'opposes', ev, refs['claim'], context(refs['profile']))
+    sha = commit(service)
+    brief = read(service, 'brief', reference=refs['decision'], revision=sha)
+    assert {source['id'], ev['id'], opposition['id']} <= set(brief['included_ids'])
+    assert not brief['completeness']['truncated']
+    assert any(path['relationship'] == opposition for path in brief['paths'])
+    assert 'Unresolved opposition' in render_markdown(brief)
+    packed = read(service, 'context', query='Keep opt-in', budget=8000)
+    assert packed['context'] and opposition['id'] in packed['included_ids']
+    assert 'Contrary observation' in packed['context'] and 'Unresolved opposition' in packed['context']
+    assert opposition['id'] not in read(service, 'brief', reference=refs['decision'], revision=before)['included_ids']
+
+
+def test_payload_revisit_check_keeps_linked_result_in_brief_and_context(service):
+    check, = save(service, check_record())
+    decision, = save(service, draft('decision', dict(action='Keep opt-in', rationale='Revisit the diagnostic',
+        alternatives=[], context=None, revisit_checks=[check])))
+    result, = save(service, result_record(check, hypothetical=True))
+    relationship = link(service, 'result_of', result, check, None)
+    commit(service)
+    brief = read(service, 'brief', reference=decision)
+    assert {check['id'], result['id'], relationship['id']} <= set(brief['included_ids'])
+    assert not brief['completeness']['truncated']
+    assert any(path['relationship'] == relationship for path in brief['paths'])
+    packed = read(service, 'context', query='Keep opt-in', budget=8000)
+    assert packed['context'] and result['id'] in packed['included_ids']
+    assert '"hypothetical":true' in packed['context']
+
+
+@pytest.mark.parametrize('limit,value,hit', [('MAX_DEPTH', 0, 'depth'), ('MAX_LINKS', 1, 'links'),
+                                           ('MAX_RECORDS', 3, 'records')])
+def test_review_dependency_expansion_retains_hard_bounds(service, monkeypatch, limit, value, hit):
+    import graph_engine.decision_brief as module
+    refs = reviewed_basis(service)
+    _, ev = evidence(service, refs['profile'], node='counter', text='Contrary observation')
+    link(service, 'opposes', ev, refs['claim'], context(refs['profile']))
+    commit(service)
+    monkeypatch.setattr(module, limit, value)
+    brief = read(service, 'brief', reference=refs['decision'])
+    assert brief['completeness']['truncated'] and hit in brief['completeness']['hit_limits']
+    assert len(brief['records']) <= module.MAX_RECORDS
+    packed = read(service, 'context', query='Keep opt-in', budget=8000)
+    assert packed['context'] == '' and packed['omitted'][0]['reason'] == 'incomplete'
 
 
 def test_conflicting_evidence_conditions_reviews_and_exact_citations(service, monkeypatch):
@@ -227,6 +314,7 @@ def test_new_reads_through_stdio_are_readonly_in_both_modes(service, write):
     from mcp import ClientSession, StdioServerParameters
     from mcp.client.stdio import stdio_client
     refs = conflict(service)
+    scored_edge(service)
     sha = commit(service)
     before = files(service.brain)
     env = dict(os.environ, PYTHONPATH=str(Path(__file__).resolve().parent.parent), IG_MCP_CACHE_VECTORS='1')

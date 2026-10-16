@@ -33,6 +33,10 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
   (issue #76).
 
 ### Fixed
+- Allow scored graph edges in Decision Memory reads and comparisons while
+  retaining concurrent-change checks. Expand briefs from exact payload/review
+  dependencies so linked opposition and revisit-check results stay visible
+  under the existing traversal and context limits (issue #79).
 - Reuse embedding and reranking model adapters across protected requests while
   keeping each authorized brain and corpus view fresh. Bound process caches,
   serialize model loading/inference, and include model revisions and local
