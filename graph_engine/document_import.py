@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from .brain import Brain
     from .brain_engine import BrainEngine
 
-SUPPORTED = {".md", ".txt", ".pdf"}
+SUPPORTED = {".md", ".txt", ".json", ".pdf"}
 DEFAULT_MAX_BYTES = 10 * 1024 * 1024
 MAX_FILES = 1000
 MAX_PAGES = 1000
@@ -216,7 +216,7 @@ def import_documents(brain: Brain, paths: Iterable[str | Path], *,
         raise ValueError("Select at least one local file or directory")
     extensions = {"." + ext.lower().lstrip(".") for ext in extensions}
     if not extensions or extensions - SUPPORTED:
-        raise ValueError("Select supported extensions: .md, .txt, .pdf")
+        raise ValueError("Select supported extensions: .md, .txt, .json, .pdf")
     if not 1 <= max_bytes <= 100 * 1024 * 1024 or not 1 <= chunk_chars <= 20_000:
         raise ValueError("max_bytes must be 1..104857600 and chunk_chars 1..20000")
     if extraction not in (None, "rules", "model"):

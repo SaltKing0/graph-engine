@@ -1,4 +1,4 @@
-"""Opt-in versioned Decision Memory storage, shared by future adapters.
+"""Opt-in versioned Decision Memory storage, shared by capture/review adapters.
 
 No model calls, source fetching or command execution. Reads never repair files.
 Publication is one atomic sidecar replacement, after conservative ACL anchors.
@@ -89,6 +89,19 @@ def _event_key(e: dict) -> str:
 
 def event_identity(e: dict) -> str:
     return str(uuid5(NAMESPACE_URL, s.canonical({k: v for k, v in e.items() if k != 'event_id'})))
+
+
+def resolve_local(value: object, created: dict[str, dict]) -> object:
+    """Resolve only explicit, backward references within a bounded proposal."""
+    if isinstance(value, dict):
+        if set(value) == {'local'}:
+            s.identifier(value['local'])
+            s.need(value['local'] in created, 'Missing or forward local reference')
+            return deepcopy(created[value['local']])
+        return {k: resolve_local(v, created) for k, v in value.items()}
+    if isinstance(value, list):
+        return [resolve_local(v, created) for v in value]
+    return value
 
 
 class RecordView:
@@ -268,7 +281,7 @@ class RecordView:
 
 
 class DecisionMemory:
-    """Low-level typed persistence API; review UI/CLI/MCP are separate work."""
+    """Low-level typed persistence API used by the shared capture/review service."""
 
     def __init__(self, brain: Brain) -> None:
         self.brain = brain
@@ -312,7 +325,7 @@ class DecisionMemory:
                     text=text, artifact=artifact, locator=locator, lineage_ids=lineage_ids or [])
 
     @write_operation
-    def transact(self, request: dict, *, commit: bool = True) -> dict:
+    def transact(self, request: dict, *, commit: bool = True, dry_run: bool = False) -> dict:
         """Append drafts/events and a durable receipt in one guarded publication.
 
         Callers supply UUIDs and exact predecessor refs; server supplies actor,
@@ -336,8 +349,9 @@ class DecisionMemory:
         replay = self._replay(data, request, request_hash)
         if replay is not None:
             return replay
-        b.ensure_ready()
-        b.pull()
+        if not dry_run:
+            b.ensure_ready()
+            b.pull()
         data = read_file(b)
         replay = self._replay(data, request, request_hash)
         if replay is not None:
@@ -349,17 +363,21 @@ class DecisionMemory:
         new = deepcopy(data)
         timestamp, identity = now(), actor(b)
         created = []
+        local = {}
         for draft in request['versions']:
             s.fields(draft, {'id', 'kind', 'anchor_node_id', 'previous', 'provenance', 'payload'})
+            draft = resolve_local(draft, local)
             version = dict(schema='dm.content/1', recorded_at=timestamp, recorded_by=identity, **deepcopy(draft))
             version['version_id'] = s.hash_record(version)
             new['versions'].append(version)
             created.append(s.reference(version))
+            local[version['id']] = s.reference(version)
         event_ids = []
         by_ref = {s.key(v): v for v in new['versions']}
         heads = _heads(new)
         for draft in request['events']:
             s.fields(draft, {'subject', 'axis', 'from', 'to', 'previous_event_id', 'basis', 'reason', 'supersedes_event_id'})
+            draft = resolve_local(draft, local)
             e = dict(schema='dm.event/1', reviewer=identity, reviewed_at=timestamp,
                      expected_heads={}, **deepcopy(draft))
             s.ref(e['subject'])
@@ -391,6 +409,17 @@ class DecisionMemory:
         s.validate(new)  # Validate before changing ANY anchor or file.
         view = RecordView(b, new)
         changed = [by_ref[s.key(r)] for r in created] + [view.events[eid] for eid in event_ids]
+        # A review may introduce source restrictions to an already-referenced
+        # claim. Propagate that new union to existing dependent anchors in this
+        # same publication; otherwise even authorized readers could no longer
+        # inspect/review those dependents. Never repair pre-existing tampering.
+        before_view = RecordView(b, data)
+        for old in data['versions']:
+            added = view.source_nodes(old) - before_view.source_nodes(old)
+            if added and old not in changed:
+                if not before_view.allowed(old, 'write'):
+                    raise BasisUnavailable('Record or basis unavailable')
+                changed.append(old)
         planned = {}
         # Construct all anchors before testing provenance, so no half-published
         # review can reference an absent input. Nothing is written yet.
@@ -442,6 +471,11 @@ class DecisionMemory:
                 if item['to'] in ('supported', 'current', 'remains_justified') and any(
                         view.versions[k]['kind'] == 'result' and view.versions[k]['payload']['hypothetical'] for k in deps):
                     raise s.RecordError('Hypothetical results cannot justify a real decision')
+        if dry_run:
+            return deepcopy(dict(dry_run=True, receipt=receipt,
+                                 versions=[by_ref[s.key(r)] for r in created],
+                                 events=[view.events[eid] for eid in event_ids],
+                                 anchor_sources={nid: n.derived_from for nid, n in planned.items()}))
         # The source union of a review must also persist on the subject anchor.
         # All writes below reuse the same brain guard. Orphan labelled anchors
         # after interruption are safe and may be reused by the identical retry.

@@ -3,8 +3,9 @@
 Issue #76 adds an opt-in Python storage boundary, `brain.decision_memory()`.
 Its data contract is [Decision Memory v1](decision-memory-v1.md). It does not
 change default recall, convert legacy facts, execute commands, fetch evidence,
-or invoke a model. Proposal/review adapters, comparison rules, classified deltas,
-impact candidates and briefs belong to the subsequent work packages.
+or invoke a model. [Source capture and review adapters](decision-capture-review.md)
+now expose this store through CLI/HTTP. Classified deltas, impact candidates and
+briefs belong to the subsequent work packages.
 
 ## First record
 
@@ -70,7 +71,9 @@ external bytes. Empty lineage lists mean unknown independence.
 
 The strict payload field sets are in `decision_schema.PAYLOADS`. A check's
 `metrics` contains `{name, unit}` definitions; a result's `metrics` contains
-`{name, value, unit, denominator}`, with canonical decimal strings. Execution
+`{name, value, unit, denominator}`, with canonical decimal strings. A null value
+requires a nonempty `reason`; measured values cannot have a missing-value reason.
+Results may also include an `errors` string list. Execution
 identity fields are `code`, `data`, `environment`, `configuration`, `command`,
 `raw_outputs` (exact source refs) and `observed_at`; unknown values remain null.
 `outcome` is `completed`, `inconclusive` or `error`; empty metrics require
@@ -164,7 +167,7 @@ Explicit authorized historical snapshots may retain forgotten reviews, as with
 existing node/edge snapshots; this is not physical erasure from Git. Fact-valid
 filters select legacy facts and do not manufacture or rewrite review history.
 
-The same record guard must be used by future CLI, HTTP and MCP adapters. Older
+The same record guard is used by CLI/HTTP and must be used by future MCP adapters. Older
 binaries cannot honor these rules: mixed-version writers are unsupported once
 a brain uses Decision Memory. Whole-file storage bounds scale; distributed
 writers and automatic Git conflict reconciliation are outside this boundary.
