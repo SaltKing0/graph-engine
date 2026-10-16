@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import json
 import os
 import socket
 import subprocess
@@ -11,7 +12,7 @@ import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from threading import Thread
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 
 import pytest
 
@@ -38,10 +39,14 @@ def d3_script():
 
 
 @pytest.fixture
-def server(tmp_path):
+def server(tmp_path, request):
     """Each workflow gets a fresh brain and a real HTTP/WebSocket server."""
-    brain = Brain(str(tmp_path / "brain"), mode="local")
-    brain.ensure_ready()
+    options = getattr(request, 'param', {})
+    brain = Brain(str(tmp_path / "brain"), mode=options.get('mode', 'local'))
+    if options.get('mode') == 'git':
+        brain.init()
+    else:
+        brain.ensure_ready()
     brain.write_node(Node(id="hostile", text=NODE_TEXT))
     brain.write_node(Node(id="safe", text="A second idea about memory"))
     brain.write_edges([Edge(id="suggestion", source="hostile", target="safe",
@@ -49,8 +54,18 @@ def server(tmp_path):
                            evidence=[{"node_id": "hostile", "text": HOSTILE}])])
     env = {k: v for k, v in os.environ.items()
            if not k.startswith(("IG_", "IDEAGRAPH_"))}
-    env.update(IG_BRAIN_MODE="local", IG_BRAIN_PATH=str(brain.path),
+    env.update(IG_BRAIN_MODE=brain.mode, IG_BRAIN_PATH=str(brain.path),
                IDEAGRAPH_EMBEDDER="hash", PYTHONPATH=str(REPO))
+    headers = {}
+    if options.get('secure'):
+        policy = tmp_path / 'browser-policy.json'
+        policy.write_text(json.dumps({'graphs': {'default': {
+            'roles': {'reviewer': 'editor', 'reader': 'viewer'},
+            'nodes': {'source': {'read': ['reviewer'], 'write': ['reviewer']}}}},
+            'tokens': {hashlib.sha256(token.encode()).hexdigest(): identity for token, identity in
+                       [('reviewer-token', 'reviewer'), ('reader-token', 'reader')]}}))
+        env['IG_ACCESS_POLICY'] = str(policy)
+        headers['Authorization'] = 'Bearer reviewer-token'
     with socket.socket() as sock:
         sock.bind(("127.0.0.1", 0))
         port = sock.getsockname()[1]
@@ -63,7 +78,7 @@ def server(tmp_path):
         try:
             for _ in range(100):
                 try:
-                    with urlopen(f"{base}/api/graph", timeout=1):
+                    with urlopen(Request(f"{base}/api/graph", headers=headers), timeout=1):
                         break
                 except OSError:
                     if proc.poll() is not None:
@@ -577,3 +592,170 @@ def test_structured_consolidation_evidence_is_visible_and_inert(server, page, tm
     page.locator("#undo" if view == "main" else "#undoBtn").click()
     expect(card).to_have_count(1)
     assert result["created"] == 1
+
+
+def decision_browser_seed(tmp_path, *, hostile=False):
+    from graph_engine.decision_service import DecisionService
+    from test_decision_impact import scenario, commit, change_source, comparison
+    brain = Brain(str(tmp_path / 'brain'), mode='git')
+    service = DecisionService(brain)
+    refs = scenario(service)
+    before = commit(service)
+    change_source(service, 'Changed browser observation ' + (HOSTILE if hostile else ''))
+    after = commit(service)
+    return service, refs, comparison(before, after)
+
+
+def open_decision_comparison(page, server, comp):
+    page.goto(f'{server}/review?mode=decisions')
+    expect(page.locator('#dm-message')).to_contain_text('No accessible pending')
+    page.get_by_label('Previous revision', exact=True).fill(comp['before'])
+    page.get_by_label('Current revision', exact=True).fill(comp['after'])
+    page.get_by_role('button', name='Compare revisions', exact=True).click()
+    expect(page.locator('#dm-queue button').first).to_be_visible()
+    page.locator('#dm-queue button').first.click()
+    expect(page.locator('#dm-detail')).to_contain_text('Changed evidence')
+
+
+@pytest.mark.parametrize('server', [{'mode':'git'}], indirect=True)
+def test_decision_impact_full_browser_flow_and_pinned_brief(server, page, tmp_path):
+    service, refs, comp = decision_browser_seed(tmp_path)
+    open_decision_comparison(page, server, comp)
+    expect(page.locator('#dm-detail')).to_contain_text('Previous:')
+    expect(page.locator('#dm-detail')).to_contain_text('Current:')
+    expect(page.locator('#dm-detail')).to_contain_text('Comparable scope')
+    expect(page.locator('#dm-detail')).to_contain_text('Dependency path to the decision')
+    expect(page.locator('#dm-detail')).to_contain_text('Conditions')
+    page.get_by_role('button', name='Open decision brief', exact=True).click()
+    expect(page.locator('#dm-detail')).to_contain_text(f'Decision brief · revision {comp["after"]}')
+    expect(page.locator('#dm-detail')).to_contain_text('dm.markdown/1')
+    page.get_by_label('Review reason (required)', exact=True).fill('Source change warrants explicit review')
+    page.get_by_role('button', name='Record finding judgment', exact=True).click()
+    expect(page.locator('#dm-notice')).to_contain_text('Review recorded')
+    expect(page.locator('#dm-queue button')).to_contain_text('Reviewed judgment: confirmed')
+    page.locator('#dm-queue button').click()
+    page.get_by_label('Review reason (required)', exact=True).fill('I own this follow-up')
+    page.get_by_role('button', name='Acknowledge finding', exact=True).click()
+    expect(page.locator('#dm-message')).to_contain_text('No accessible pending')
+    page.get_by_label('Include acknowledged, resolved and dismissed history').check()
+    page.locator('#dm-queue button').click()
+    expect(page.locator('#dm-detail')).to_contain_text('acknowledged')
+    page.get_by_label('Review reason (required)', exact=True).fill('Revise based on the reviewed premise')
+    page.get_by_label('Decision review outcome', exact=True).select_option('revise')
+    page.get_by_label('Evidence / claim basis for this outcome (select one or more)').select_option(label='claim: Graph expansion stays opt-in')
+    page.get_by_role('button', name='Record decision outcome', exact=True).click()
+    expect(page.get_by_role('button', name='Resolve finding with recorded outcome', exact=True)).to_be_visible()
+    page.get_by_label('Review reason (required)', exact=True).fill('Resolution records the need to revise')
+    page.get_by_role('button', name='Resolve finding with recorded outcome', exact=True).click()
+    expect(page.locator('#dm-detail')).to_contain_text('resolved')
+    page.get_by_label('Include acknowledged, resolved and dismissed history').uncheck()
+    expect(page.locator('#dm-queue button')).to_have_count(0)
+    assert service.inspect(refs['decision'])['state']['decision_conclusion'] == 'revise'
+    assert service.inspect(refs['decision'])['state']['decision'] == 'proposed'
+
+
+@pytest.mark.parametrize('server', [{'mode':'git'}], indirect=True)
+def test_decision_review_stale_submission_refreshes_without_overwriting(server, page, tmp_path):
+    from test_decision_impact import finding_envelope
+    from test_decision_service import review
+    service, refs, comp = decision_browser_seed(tmp_path)
+    c, = service.compare(comp)['candidates']
+    finding, = service.record_finding(finding_envelope(service, comp, c), commit=False)['receipt']['refs']
+    page.goto(f'{server}/review?mode=decisions')
+    page.locator('#dm-queue button').click()
+    expect(page.get_by_role('button', name='Acknowledge finding', exact=True)).to_be_visible()
+    old_generation = service.preview()['generation']
+    review(service, finding, axis='finding_workflow', after='acknowledged')
+    page.get_by_label('Review reason (required)', exact=True).fill('Stale reason must not replace newer review')
+    page.get_by_role('button', name='Acknowledge finding', exact=True).click()
+    expect(page.locator('#dm-notice')).to_contain_text('Stale review')
+    expect(page.locator('#dm-queue button')).to_have_count(0)
+    assert service.preview()['generation'] == old_generation + 1
+    page.get_by_label('Include acknowledged, resolved and dismissed history').check()
+    page.locator('#dm-queue button').click()
+    expect(page.locator('#dm-detail')).to_contain_text('acknowledged')
+    assert 'Stale reason must not replace' not in page.locator('#dm-detail').inner_text()
+
+
+@pytest.mark.parametrize('server', [{'mode':'git','secure':True}], indirect=True)
+def test_decision_review_restricted_evidence_is_hidden_by_real_authenticated_api(server, page, tmp_path):
+    service, refs, comp = decision_browser_seed(tmp_path)
+    page.set_extra_http_headers({'Authorization':'Bearer reviewer-token'})
+    open_decision_comparison(page, server, comp)
+    expect(page.locator('#dm-detail')).to_contain_text('Local observation')
+    # Retain read access while revoking the writer role before submission.
+    policy_path = tmp_path / 'browser-policy.json'
+    policy = json.loads(policy_path.read_text())
+    policy['graphs']['default']['roles']['reviewer'] = 'viewer'
+    policy_path.write_text(json.dumps(policy))
+    generation = service.preview()['generation']
+    page.get_by_label('Review reason (required)', exact=True).fill('Viewer cannot publish')
+    page.get_by_role('button', name='Record finding judgment', exact=True).click()
+    expect(page.locator('#dm-notice')).to_contain_text('Forbidden')
+    assert service.preview()['generation'] == generation
+    page.set_extra_http_headers({'Authorization':'Bearer reader-token'})
+    page.get_by_role('button', name='Refresh evidence', exact=True).click()
+    expect(page.locator('#dm-message')).to_contain_text('No accessible pending')
+    assert 'Local observation' not in page.locator('body').inner_html()
+    response = page.request.post(f'{server}/api/decision-memory/read/review-queue', data={'comparison':comp}, headers={'Authorization':'Bearer reader-token'})
+    assert response.status == 200 and response.json()['items'] == []
+    assert refs['source']['id'] not in response.text()
+    page.set_extra_http_headers({'Authorization':'Bearer invalid-token'})
+    page.get_by_role('button', name='Refresh evidence', exact=True).click()
+    expect(page.locator('#dm-message')).to_contain_text('Authentication required')
+    expect(page.locator('#dm-queue button')).to_have_count(0)
+
+
+@pytest.mark.parametrize('server', [{'mode':'git'}], indirect=True)
+def test_decision_review_untrusted_source_keyboard_and_narrow_layout(server, page, tmp_path):
+    _, _, comp = decision_browser_seed(tmp_path, hostile=True)
+    page.set_viewport_size({'width':375,'height':812})
+    open_decision_comparison(page, server, comp)
+    expect(page.locator('#dm-detail')).to_contain_text(HOSTILE)
+    assert_inert(page)
+    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+    page.get_by_role('button', name='Refresh evidence', exact=True).focus()
+    page.keyboard.press('Enter')
+    expect(page.locator('#dm-queue button').first).to_be_visible()
+    page.locator('#dm-queue button').first.focus()
+    page.keyboard.press('Enter')
+    expect(page.locator('#dm-detail')).to_contain_text('Changed evidence')
+    # Legacy edge shortcuts must never accept/reject connections on this screen.
+    assert page.request.get(f'{server}/api/graph').json()['edges'][0]['pending']
+    assert_inert(page)
+
+
+@pytest.mark.parametrize('server', [{'mode':'git'}], indirect=True)
+def test_decision_review_loading_partial_and_missing_source_states(server, page, tmp_path):
+    from test_decision_impact import link, commit, finding_envelope
+    from test_decision_memory import claim
+    from test_decision_service import save, context
+    service, refs, comp = decision_browser_seed(tmp_path)
+    other, = save(service, claim('Cycle premise', context=context(refs['profile'])))
+    link(service, 'depends_on', refs['claim'], other, context(refs['profile']))
+    link(service, 'depends_on', other, refs['claim'], context(refs['profile']))
+    comp['after'] = commit(service)
+    held = []
+    page.route('**/api/decision-memory/read/review-queue', lambda route: held.append(route))
+    page.goto(f'{server}/review?mode=decisions', wait_until='domcontentloaded')
+    expect(page.locator('#dm-message')).to_contain_text('Loading')
+    page.wait_for_function('document.querySelector("#dm-detail").textContent.includes("Loading")')
+    # Deliver the real test server response after checking the loading state.
+    assert held
+    held.pop().continue_()
+    expect(page.locator('#dm-message')).to_contain_text('No accessible pending')
+    page.unroute('**/api/decision-memory/read/review-queue')
+    page.get_by_label('Previous revision', exact=True).fill(comp['before'])
+    page.get_by_label('Current revision', exact=True).fill(comp['after'])
+    page.get_by_role('button', name='Compare revisions', exact=True).click()
+    expect(page.locator('#dm-message')).to_contain_text('Partial / truncated')
+    page.locator('#dm-queue button').first.click()
+    expect(page.locator('#dm-detail')).to_contain_text('Partial / truncated')
+    candidate = next(c for c in service.compare(comp)['candidates'] if c['delta']['subject_id'] == refs['source']['id'])
+    finding, = service.record_finding(finding_envelope(service, comp, candidate), commit=False)['receipt']['refs']
+    service.brain.node_path('source').unlink()
+    page.get_by_role('button', name='Refresh evidence', exact=True).click()
+    expect(page.locator('#dm-message')).not_to_contain_text('Loading')
+    assert 'Local observation' not in page.locator('body').inner_html()
+    response = page.request.post(f'{server}/api/decision-memory/read/review-detail', data={'reference':finding})
+    assert response.status == 403

@@ -269,6 +269,18 @@ def decision_compare(envelope: dict) -> dict:
 
 
 @_tool
+def decision_review_queue(envelope: dict) -> dict:
+    """Bounded pending impacts or explicit history; optionally compare pinned revisions."""
+    return _decision_read('review-queue', envelope)
+
+
+@_tool
+def decision_review_detail(envelope: dict) -> dict:
+    """Exact finding/candidate evidence and current versions with review preconditions."""
+    return _decision_read('review-detail', envelope)
+
+
+@_tool
 def decision_findings(revision: str = 'HEAD', decision_id: str | None = None,
                       unresolved_only: bool = True) -> dict:
     """Pinned findings with reviewer reasons, exact paths, dispositions and freshness."""

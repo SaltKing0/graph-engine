@@ -7,6 +7,13 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- Compact Decision Memory review queue and list/detail interface with exact
+  claim/source versions, conditions, support/opposition, dependency paths,
+  reviewer reasons, acknowledgment/resolution history and revision-pinned briefs.
+  Share bounded queue/detail reads across HTTP, CLI and MCP; preserve current
+  permissions and refresh stale submissions without overwriting newer judgments.
+  Cover the full flow, restricted evidence and inert source text in Chromium
+  (issue #80).
 - Opt-in qualified Decision Memory context and deterministic revision-pinned
   Markdown/JSON briefs, shared CLI/MCP reads for inspection/comparison/findings,
   exact citation accounting and an offline two-session decision example. Keep

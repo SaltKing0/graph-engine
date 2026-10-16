@@ -230,6 +230,7 @@ $("linkbtn").addEventListener("click", link);
 
 // ---------- Keyboard ----------
 document.addEventListener("keydown", e => {
+  if (new URLSearchParams(location.search).get("mode") === "decisions") return;
   const inField = ["INPUT", "TEXTAREA"].includes(document.activeElement.tagName);
   // Audit #30: key-repeat fired Enter/Escape once per auto-repeat tick —
   // one held key spammed resolve POSTs. Auto-repeats are ignored.
@@ -253,4 +254,4 @@ document.addEventListener("keydown", e => {
   }
 });
 
-refresh();
+if (new URLSearchParams(location.search).get("mode") !== "decisions") refresh();
