@@ -126,15 +126,17 @@ class DecisionService:
         return payload
 
     def inspect(self, reference: dict) -> dict:
-        result = self.store.get(reference)
+        self.brain.authorize('read')
+        # One snapshot for authorization, judgments and lineage. A second raw
+        # sidecar read could introduce newly private basis into an older view.
+        view = RecordView(self.brain, read_file(self.brain))
+        result = view.get(reference)
         result['comparison'] = None
         p = result['record']['payload']
         if result['record']['kind'] == 'relationship' and p['kind'] in ('supports', 'opposes'):
-            view = RecordView(self.brain, read_file(self.brain))
             a, b = (view.get(p[k])['record']['payload'] for k in ('source', 'target'))
             result['comparison'] = compare_context(a['context'], b['context'], view)
         # Lineage groups are descriptive; citation counts never become confidence.
-        view = RecordView(self.brain, read_file(self.brain))
         deps, _ = view.dependencies(result['record'])
         sources = [view.versions[k] for k in sorted(deps) if view.versions[k]['kind'] == 'source']
         result['source_lineage'] = [dict(ref=s.reference(v), lineage_ids=v['payload']['lineage_ids']) for v in sources]
