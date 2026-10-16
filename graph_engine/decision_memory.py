@@ -112,11 +112,14 @@ class RecordView:
     """
 
     def __init__(self, brain: Brain, data: dict, *, nodes: dict[str, Node] | None = None,
-                 texts: dict[str, str] | None = None, edges: list[Edge] | None = None) -> None:
+                 texts: dict[str, str] | None = None, edges: list[Edge] | None = None,
+                 current: tuple[dict[str, Node], list[Edge]] | None = None,
+                 policy: dict | None = None) -> None:
         from .access import derivation_parents
         self.brain, self.data = brain, data
-        self.current = {n.id: n for n in Brain.read_nodes(brain)}
-        self.current_parents = derivation_parents(self.current, Brain.read_edges(brain, include_rejected=True))
+        self.policy = policy
+        self.current = current[0] if current else {n.id: n for n in Brain.read_nodes(brain)}
+        self.current_parents = derivation_parents(self.current, current[1] if current else Brain.read_edges(brain, include_rejected=True))
         self.nodes = self.current if nodes is None else nodes
         self.historical = nodes is not None
         self.texts = texts
@@ -135,8 +138,13 @@ class RecordView:
         # Current missing lineage is never treated as a new writable root.
         def check(source: str) -> bool:
             n = self.current.get(source)
+            from .access import SecuredBrain, permitted
+            access = (permitted(self.brain.graph_name, self.brain.identity, action, source, _policy=self.policy)
+                      if isinstance(self.brain, SecuredBrain) and self.policy is not None else
+                      self.brain.can_access(action, source, _view=(self.current, self.current_parents))
+                      if isinstance(self.brain, SecuredBrain) else self.brain.can_access(action, source))
             return (n is not None and (self.historical or n.status != 'tombstone')
-                    and self.brain.can_access(action, source))
+                    and access)
         return (provenance_allowed(nid, self.current, self.current_parents, check)
                 and provenance_allowed(nid, self.nodes, self.parents, check))
 
@@ -174,6 +182,8 @@ class RecordView:
                 versions.add(k)
                 nodes.add(value['anchor_node_id'])
                 pending.extend(self.versions[s.key(r)] for r in self.inputs(value))
+                if value['kind'] == 'finding':
+                    pending.extend(self.events[eid] for eid in value['payload']['candidate']['basis_event_ids'])
                 if reviews:
                     pending.extend(self.reviews_by_id.get(value['id'], []))
         return versions, nodes
@@ -200,6 +210,38 @@ class RecordView:
         return {self.versions[k]['anchor_node_id'] for k in versions if self.versions[k]['kind'] == 'source'}
 
     def changed(self, item: dict, *, terminal_decision: bool = False) -> bool:
+        subject = self.versions[s.key(item['subject'])] if 'event_id' in item else item
+        if subject['kind'] == 'finding':
+            # Old versions in an impact path explain a change. Freshness is
+            # pinned separately to the selected after revision's relevant heads.
+            candidate = subject['payload']['candidate']
+            if self.heads[subject['id']] != subject:
+                return True
+            if 'event_id' in item and item['axis'] == 'finding_workflow':
+                # Acknowledge/resolve the recorded candidate even when newer
+                # evidence exists. This does not reopen it or replace its basis.
+                return any(self.changed(self.events[b['event_id']]) for b in item['basis']
+                           if b['type'] == 'event_ref')
+            for r in candidate['basis_heads']:
+                v = self.versions[s.key(r)]
+                if self.heads[v['id']] != v:
+                    return True
+                if v['kind'] == 'source':
+                    try:
+                        text = self.texts[v['anchor_node_id']] if self.texts is not None else node_text(self.brain, v['anchor_node_id'])
+                    except (KeyError, BasisUnavailable):
+                        return True
+                    if s.text_hash(text) != v['payload']['source_ref']['text_sha256']:
+                        return True
+            # Historical basis events remain cited; a newer event on the same
+            # chain makes this candidate stale until explicitly regenerated.
+            latest = {}
+            for eid in sorted(candidate['basis_event_ids'], key=self.event_positions.get):
+                e = self.events[eid]
+                latest[_event_key(e)] = eid
+            relevant = {s.key(r) for r in s.content_refs(candidate)}
+            current = {_event_key(e): e['event_id'] for e in self.data['events'] if s.key(e['subject']) in relevant}
+            return current != latest
         versions, _ = self.dependencies(item)
         for k in versions:
             v = self.versions[k]
@@ -270,6 +312,8 @@ class RecordView:
                 # Activation supplies the initial justification; a subsequent
                 # decision review can replace it without changing lifecycle.
                 judgments['decision'] = e
+        if v['kind'] == 'finding' and state['finding_disposition'] != 'confirmed':
+            state['finding_workflow'] = None
         changed = changed or any(self.changed(e) for e in judgments.values())
         # Hidden reviews cannot confer their recorded assessment.
         effective = ('inconclusive' if changed or hidden else state.get('epistemic', 'unassessed'))

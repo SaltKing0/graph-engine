@@ -15,6 +15,8 @@ Examples:
   python -m graph_engine decision review review.json [--dry-run]
   python -m graph_engine decision inspect ref.json
   python -m graph_engine decision result-draft result.json
+  python -m graph_engine decision compare comparison.json
+  python -m graph_engine decision finding finding-review.json [--dry-run]
   python -m graph_engine pending
   python -m graph_engine accept <edge_id>
   python -m graph_engine reject <edge_id>
@@ -1497,7 +1499,7 @@ def cmd_decision(args: list[str]) -> None:
     from .decision_schema import MAX_BYTES, need
 
     parser = argparse.ArgumentParser(prog='ig decision')
-    parser.add_argument('operation', choices=['preview', 'pending', 'source', 'propose', 'review', 'inspect', 'result-draft'])
+    parser.add_argument('operation', choices=['preview', 'pending', 'source', 'propose', 'review', 'inspect', 'result-draft', 'compare', 'finding'])
     parser.add_argument('input', nargs='?')
     parser.add_argument('--dry-run', action='store_true')
     opts = parser.parse_args(args)
@@ -1505,8 +1507,8 @@ def cmd_decision(args: list[str]) -> None:
         parser.error('provide a node ID or JSON file (use - for stdin)')
     if opts.operation in ('preview', 'pending') and opts.input is not None:
         parser.error('this operation takes no input file')
-    if opts.dry_run and opts.operation not in ('propose', 'review'):
-        parser.error('--dry-run applies to propose/review; other operations are read-only')
+    if opts.dry_run and opts.operation not in ('propose', 'review', 'finding'):
+        parser.error('--dry-run applies to propose/review/finding; other operations are read-only')
     try:
         service = DecisionService(runtime.make_brain())
         if opts.operation in ('preview', 'pending'):
@@ -1520,7 +1522,11 @@ def cmd_decision(args: list[str]) -> None:
                 with Path(opts.input).open(encoding='utf-8') as stream:
                     raw = stream.read(MAX_BYTES + 1)
             envelope = load_envelope(raw)
-            if opts.operation in ('propose', 'review'):
+            if opts.operation == 'compare':
+                result = service.compare(envelope)
+            elif opts.operation == 'finding':
+                result = service.record_finding(envelope, dry_run=opts.dry_run)
+            elif opts.operation in ('propose', 'review'):
                 need(envelope.get('schema') == (PROPOSAL if opts.operation == 'propose' else REVIEW),
                      'Unexpected envelope schema for this command')
                 result = service.submit(envelope, dry_run=opts.dry_run)

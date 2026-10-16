@@ -16,7 +16,7 @@ SCHEMA = 'graph-engine.decision-memory/1'
 FILENAME = 'decision-memory.v1.json'
 MAX_BYTES = 64 * 1024 * 1024
 MAX_ITEMS = 50_000
-KINDS = {'source', 'profile', 'claim', 'evidence', 'decision', 'check', 'result', 'relationship'}
+KINDS = {'source', 'profile', 'claim', 'evidence', 'decision', 'check', 'result', 'relationship', 'finding'}
 HASH = re.compile(r'sha256:[0-9a-f]{64}\Z')
 HEX = re.compile(r'[0-9a-f]{64}\Z')
 DECIMAL = re.compile(r'(?:0|-?[1-9][0-9]*)(?:\.[0-9]*[1-9])?\Z|-(?:0\.[0-9]*[1-9])\Z')
@@ -31,6 +31,7 @@ PAYLOADS = {
     'result': {'check', 'outcome', 'context', 'metrics', 'metrics_reason', 'sources',
                'execution', 'limitations', 'hypothetical'},
     'relationship': {'kind', 'source', 'target', 'context', 'explanation'},
+    'finding': {'candidate', 'former_candidate_id'},
 }
 RELATIONS = {
     'supports': ({'evidence', 'result'}, {'claim'}),
@@ -269,6 +270,12 @@ def content_refs(value: object) -> list[dict]:
 
 def payload(kind: str, p: dict, by_ref: dict) -> None:
     fields(p, PAYLOADS[kind], {'errors'} if kind == 'result' else frozenset())
+    if kind == 'finding':
+        from .decision_impact import validate_candidate
+        validate_candidate(p['candidate'])
+        if p['former_candidate_id'] is not None:
+            digest(p['former_candidate_id'])
+        need(by_ref[key(p['candidate']['target'])]['kind'] == 'decision')
     if 'context' in p:
         context(p['context'])
         if p['context'] and p['context']['profile']:
@@ -386,15 +393,21 @@ def payload(kind: str, p: dict, by_ref: dict) -> None:
 
 
 INITIAL = {'epistemic': 'unassessed', 'workflow': 'proposed', 'availability': 'available',
-           'decision': 'proposed', 'decision_conclusion': None}
+           'decision': 'proposed', 'decision_conclusion': None,
+           'finding_disposition': 'unreviewed', 'finding_workflow': 'open'}
 ASSESSED = {'supported', 'opposed', 'mixed', 'inconclusive'}
 AXES = {'claim': {'epistemic', 'workflow'}, 'evidence': {'epistemic', 'workflow', 'availability'},
         'decision': {'decision', 'decision_conclusion', 'workflow'},
         'relationship': {'workflow', 'availability'}, 'profile': {'workflow'},
-        'source': {'workflow'}, 'check': {'workflow'}, 'result': {'workflow'}}
+        'source': {'workflow'}, 'check': {'workflow'}, 'result': {'workflow'},
+        'finding': {'finding_disposition', 'finding_workflow'}}
 
 
 def valid_transition(axis: str, before: str | None, after: str, correction: bool) -> bool:
+    if axis == 'finding_disposition':
+        return not correction and before in ('unreviewed', 'dismissed', 'inconclusive') and after in ('confirmed', 'dismissed', 'inconclusive')
+    if axis == 'finding_workflow':
+        return not correction and (before, after) in {('open', 'acknowledged'), ('open', 'resolved'), ('acknowledged', 'resolved')}
     if correction:
         return after in ({'unassessed'} | ASSESSED if axis == 'epistemic' else
                          {'proposed', 'accepted', 'rejected'} if axis == 'workflow' else
@@ -423,8 +436,8 @@ def _validate(data: dict) -> None:
         need(isinstance(data[name], list))
     need(sum(len(data[n]) for n in ('versions', 'events', 'deltas', 'candidates', 'receipts')) <= MAX_ITEMS,
          'Decision Memory exceeds 50,000 items')
-    # Delta classification and impact candidates are owned by the next work
-    # package. Do not accept unvalidated future records in the storage boundary.
+    # Comparisons are ephemeral; explicit reviews persist validated finding
+    # content versions. Never accept a second, unvalidated persistence format.
     if data['deltas'] or data['candidates']:
         raise UnsupportedSchema('Delta/candidate persistence is not enabled by this writer')
     need(len(canonical(data).encode()) <= MAX_BYTES, 'Decision Memory exceeds 64 MiB')
@@ -447,6 +460,13 @@ def _validate(data: dict) -> None:
         need(v['previous'] == (reference(old) if old else None), 'Missing predecessor or forked version chain')
         if old:
             need((old['kind'], old['anchor_node_id']) == (v['kind'], v['anchor_node_id']), 'Logical identity changed')
+        if v['kind'] == 'finding':
+            from .decision_impact import series_id
+            need(v['id'] == series_id(v['payload']['candidate']), 'Finding series identity mismatch')
+            need(v['payload']['former_candidate_id'] == (old['payload']['candidate']['candidate_id'] if old else None),
+                 'Finding must retain the former candidate identity')
+            need(old is None or old['payload']['candidate']['candidate_id'] != v['payload']['candidate']['candidate_id'],
+                 'Finding reconsideration requires materially new input')
         need(anchors.setdefault(v['anchor_node_id'], v['id']) == v['id'], 'Anchor reused for a different identity')
         inputs = content_refs({k: val for k, val in v.items() if k not in ('id', 'version_id')})
         need(len(inputs) <= 200, 'A content record exceeds 200 references')
@@ -508,10 +528,28 @@ def _validate(data: dict) -> None:
                          for x in list(event_ids.values())[list(event_ids).index(prev['event_id']) + 1:]),
                  'Event has dependent reviews')
         need(valid_transition(e['axis'], before, e['to'], correction), 'Invalid state transition')
+        if e['axis'] == 'finding_workflow':
+            disposition = event_heads.get((*key(e['subject']), 'finding_disposition'))
+            need(disposition is not None and disposition['to'] == 'confirmed', 'Finding workflow requires confirmed disposition')
+            if e['to'] == 'resolved':
+                judgments = [event_ids[b['event_id']] for b in e['basis'] if b['type'] == 'event_ref']
+                target = subject['payload']['candidate']['target']
+                outcomes = [j for j in judgments if j['subject'] == target and j['axis'] == 'decision_conclusion']
+                need(bool(outcomes), 'Resolution must pin an explicit decision review outcome')
+                if outcomes[-1]['to'] == 'needs_investigation':
+                    need(any(b['type'] == 'content_ref' and by_ref[key(b['ref'])]['kind'] == 'check' for b in e['basis']),
+                         'Investigation requires a follow-up check; reviewer owns the resolution')
         if e['axis'] == 'epistemic' and e['to'] in ASSESSED or e['axis'] == 'decision_conclusion':
             need(bool(e['basis']), 'Assessment requires explicit basis')
         event_heads[chain] = e
         event_ids[e['event_id']] = e
+    for v in data['versions']:
+        if v['kind'] == 'finding':
+            candidate = v['payload']['candidate']
+            relevant = {key(r) for r in content_refs(candidate)}
+            need(all(eid in event_ids and key(event_ids[eid]['subject']) in relevant
+                     and by_ref[key(event_ids[eid]['subject'])]['kind'] != 'finding'
+                     for eid in candidate['basis_event_ids']), 'Missing or unrelated candidate basis event')
     # Terminalizing a current choice cannot leave a missing successor.
     for e in data['events']:
         if e['axis'] == 'decision' and e['to'] == 'superseded':
