@@ -7,6 +7,11 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- Opt-in qualified Decision Memory context and deterministic revision-pinned
+  Markdown/JSON briefs, shared CLI/MCP reads for inspection/comparison/findings,
+  exact citation accounting and an offline two-session decision example. Keep
+  support, opposition, scope and review reasons together under the estimated
+  budget; preserve current ACLs, inherited lineage and forgetting in exports.
 - Read-only Decision Memory comparisons between explicit Git revisions, with
   classified deltas, structured scope comparisons, bounded accepted dependency
   paths, source/version citations and surviving lineage-aware support. Add CLI
@@ -28,6 +33,10 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
   (issue #76).
 
 ### Fixed
+- Allow scored graph edges in Decision Memory reads and comparisons while
+  retaining concurrent-change checks. Expand briefs from exact payload/review
+  dependencies so linked opposition and revisit-check results stay visible
+  under the existing traversal and context limits (issue #79).
 - Reuse embedding and reranking model adapters across protected requests while
   keeping each authorized brain and corpus view fresh. Bound process caches,
   serialize model loading/inference, and include model revisions and local

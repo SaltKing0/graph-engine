@@ -123,6 +123,26 @@ class DecisionService:
         bounded(envelope)
         return compare(self.brain, envelope)
 
+    @validated
+    def read(self, operation: str, envelope: dict) -> dict:
+        """Shared, no-model explanatory reads for CLI and MCP."""
+        from . import decision_brief as b
+        bounded(envelope)
+        specs = {
+            'brief': ({'reference'}, {'revision'}),
+            'findings': (set(), {'revision', 'decision_id', 'unresolved_only'}),
+            'context': ({'query'}, {'revision', 'budget', 'k'}),
+            'inspect-revision': ({'reference', 'revision'}, set()),
+        }
+        s.need(operation in specs, 'Unsupported decision read')
+        s.fields(envelope, *specs[operation])
+        options = dict(envelope)
+        if 'revision' in options:
+            options['revision_name'] = options.pop('revision')
+        function = {'brief': b.brief, 'findings': b.findings,
+                    'context': b.build_context, 'inspect-revision': b.inspect}[operation]
+        return function(self.brain, **options)
+
     @write_operation
     @validated
     def record_finding(self, envelope: dict, *, dry_run: bool = False, commit: bool = True) -> dict:

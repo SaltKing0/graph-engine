@@ -229,6 +229,77 @@ def build_context(query: str, budget: int = 2000, k: int = 5,
     return {"ok": True, "query": query, **result}
 
 
+def _decision_read(operation: str, envelope: dict) -> dict:
+    from ..runtime import make_brain
+    from ..decision_service import DecisionService
+    from ..decision_memory import BasisUnavailable
+    from ..decision_schema import RecordConflict
+    if not os.path.isdir(brain_path()):
+        return fmt.brain_missing(brain_path())
+    try:
+        service = DecisionService(make_brain())
+        if operation == 'inspect':
+            result = service.inspect(envelope['reference'])
+        elif operation == 'compare':
+            result = service.compare(envelope)
+        else:
+            result = service.read(operation, envelope)
+        return {'ok': True, **result}
+    except BasisUnavailable:
+        return fmt.err('record_unavailable', 'Record or basis unavailable')
+    except PermissionError:
+        raise
+    except RecordConflict as exc:
+        return fmt.err('conflict', str(exc))
+    except ValueError as exc:
+        return fmt.invalid(str(exc))
+
+
+@_tool
+def decision_inspect(reference: dict, revision: str | None = None) -> dict:
+    """Exact version, conditions, review reasons and evidence; optional pinned Git revision."""
+    return _decision_read('inspect' if revision is None else 'inspect-revision',
+                          dict(reference=reference, **({'revision': revision} if revision is not None else {})))
+
+
+@_tool
+def decision_compare(envelope: dict) -> dict:
+    """Read-only #78 revision deltas and bounded explained review candidates. No mutation."""
+    return _decision_read('compare', envelope)
+
+
+@_tool
+def decision_findings(revision: str = 'HEAD', decision_id: str | None = None,
+                      unresolved_only: bool = True) -> dict:
+    """Pinned findings with reviewer reasons, exact paths, dispositions and freshness."""
+    return _decision_read('findings', dict(revision=revision, decision_id=decision_id,
+                                         unresolved_only=unresolved_only))
+
+
+@_tool
+def decision_brief(reference: dict, revision: str = 'HEAD', format: str = 'json') -> dict:
+    """Deterministic explanatory brief; current ACLs and tombstones still apply to history."""
+    if format not in ('json', 'markdown'):
+        return fmt.invalid('format must be json or markdown')
+    result = _decision_read('brief', dict(reference=reference, revision=revision))
+    if format == 'markdown' and result.get('ok'):
+        from ..decision_brief import render_markdown
+        return dict(ok=True, revision=result['revision'], schema=result['schema'],
+                    renderer=result['renderer'], markdown=render_markdown(result))
+    return result
+
+
+@_tool
+def build_decision_context(query: str, budget: int = 2000, k: int = 5,
+                           revision: str = 'HEAD') -> dict:
+    """Opt-in decision context. Whole conclusions with qualifications fit or are omitted.
+
+    Approximate estimate includes IDs, conditions, warnings and citations. No
+    exact tokenizer cap, recall tracking, model use or persisted vectors.
+    """
+    return _decision_read('context', dict(query=query, budget=budget, k=k, revision=revision))
+
+
 @_tool
 def get_node(id: str, max_chars: int = fmt.DEFAULT_NODE_CHARS) -> dict:
     """One live node by id: full text (capped) + its live edges.

@@ -375,9 +375,10 @@ def test_write_mode_registers_exactly_the_write_tools(mcp_env, tmp_path):
     for name in WRITE_TOOLS:
         assert name in flags, f"{name} not registered in write mode"
         assert flags[name] is False, f"{name} must not claim readOnlyHint"
-    for name in ("search_brain", "explain_search", "build_context", "get_node", "neighbors", "brain_status"):
+    for name in ("search_brain", "explain_search", "build_context", "get_node", "neighbors", "brain_status",
+                 "decision_inspect", "decision_compare", "decision_findings", "decision_brief", "build_decision_context"):
         assert flags.get(name) is True, f"{name} must stay read-only"
-    assert len(flags) == 9
+    assert len(flags) == 14
 
 
 @pytest.mark.skipif(not MCP_AVAILABLE, reason="mcp extra not installed")
@@ -404,7 +405,8 @@ def test_stdio_cli_roundtrip(mcp_env, write):
                 async with ClientSession(reader, writer) as client:
                     await client.initialize()
                     tools = {tool.name: tool for tool in (await client.list_tools()).tools}
-                    readonly = {"search_brain", "explain_search", "build_context", "get_node", "neighbors", "brain_status"}
+                    readonly = {"search_brain", "explain_search", "build_context", "get_node", "neighbors", "brain_status", "decision_inspect", "decision_compare",
+                                "decision_findings", "decision_brief", "build_decision_context"}
                     assert set(tools) == readonly | (set(WRITE_TOOLS) if write else set())
                     for name, tool in tools.items():
                         assert tool.annotations.readOnlyHint is (name in readonly)
