@@ -94,6 +94,8 @@ current permissions. Current ACL/source lineage is captured before analysis and
 rechecked before returning. Changes during the read cause a retryable conflict.
 Missing or tombstoned current sources and all affected intermediate records are
 omitted before classification, counts and paths, including in old revisions.
+This includes tombstoned ancestors anywhere in current or historical source
+lineage, even when the dependent record's own anchor is still live.
 Omission is not an inferred withdrawal or a count of hidden records. Authorized
 explicit `snapshot` inspection retains its existing historical tombstone policy.
 
@@ -130,6 +132,8 @@ writing; omit `--dry-run` to publish. Python is
 `POST /api/decision-memory/findings?dry_run=true` or the same route without the
 query flag. The server regenerates the candidate from the pinned revisions;
 callers cannot supply explanation paths. Stale current basis fails publication.
+The bounded basis references also pin accepted support membership beyond the
+readable support summary; newly accepted support requires a fresh comparison.
 The ordinary proposal endpoint cannot introduce finding records.
 
 Disposition is `confirmed`, `dismissed` or `inconclusive`. Confirmed means

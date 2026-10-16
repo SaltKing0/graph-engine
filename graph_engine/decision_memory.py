@@ -114,7 +114,7 @@ class RecordView:
     def __init__(self, brain: Brain, data: dict, *, nodes: dict[str, Node] | None = None,
                  texts: dict[str, str] | None = None, edges: list[Edge] | None = None,
                  current: tuple[dict[str, Node], list[Edge]] | None = None,
-                 policy: dict | None = None) -> None:
+                 policy: dict | None = None, allow_tombstones: bool | None = None) -> None:
         from .access import derivation_parents
         self.brain, self.data = brain, data
         self.policy = policy
@@ -122,6 +122,7 @@ class RecordView:
         self.current_parents = derivation_parents(self.current, current[1] if current else Brain.read_edges(brain, include_rejected=True))
         self.nodes = self.current if nodes is None else nodes
         self.historical = nodes is not None
+        self.allow_tombstones = self.historical if allow_tombstones is None else allow_tombstones
         self.texts = texts
         self.parents = (self.current_parents if nodes is None else derivation_parents(self.nodes, edges or []))
         self.versions = {s.key(v): v for v in data['versions']}
@@ -143,10 +144,14 @@ class RecordView:
                       if isinstance(self.brain, SecuredBrain) and self.policy is not None else
                       self.brain.can_access(action, source, _view=(self.current, self.current_parents))
                       if isinstance(self.brain, SecuredBrain) else self.brain.can_access(action, source))
-            return (n is not None and (self.historical or n.status != 'tombstone')
+            return (n is not None and (self.allow_tombstones or n.status != 'tombstone')
                     and access)
+        def historical_check(source: str) -> bool:
+            n = self.nodes.get(source)
+            return (n is not None and (self.allow_tombstones or n.status != 'tombstone')
+                    and check(source))
         return (provenance_allowed(nid, self.current, self.current_parents, check)
-                and provenance_allowed(nid, self.nodes, self.parents, check))
+                and provenance_allowed(nid, self.nodes, self.parents, historical_check))
 
     def inputs(self, v: dict) -> list[dict]:
         return s.content_refs({'payload': v['payload'], 'provenance': v['provenance']})
@@ -240,6 +245,19 @@ class RecordView:
                 e = self.events[eid]
                 latest[_event_key(e)] = eid
             relevant = {s.key(r) for r in s.content_refs(candidate)}
+            # New accepted support is an incoming dependency: it cannot be
+            # found by checking only versions/events already in this candidate.
+            # Comparisons pin all selected support heads, even when the readable
+            # support summary is clipped. Check membership before publication.
+            claims = {s.key(r) for path in candidate['paths'] for step in path
+                      for r in (step['from_ref'], step['to_ref'])
+                      if self.versions[s.key(r)]['kind'] == 'claim'}
+            workflows = {s.key(e['subject']): e['to'] for e in self.data['events'] if e['axis'] == 'workflow'}
+            for v in self.heads.values():
+                if (v['kind'] == 'relationship' and v['payload']['kind'] == 'supports'
+                        and s.key(v['payload']['target']) in claims and s.key(v) not in relevant
+                        and workflows.get(s.key(v)) == 'accepted' and self.allowed(v)):
+                    return True
             current = {_event_key(e): e['event_id'] for e in self.data['events'] if s.key(e['subject']) in relevant}
             return current != latest
         versions, _ = self.dependencies(item)

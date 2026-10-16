@@ -65,15 +65,13 @@ def revision(brain: Brain, name: str, current: tuple, policy: dict | None) -> Re
     nodes, edges = _parse_records(raw)
     data = s.loads(raw[s.FILENAME]) if s.FILENAME in raw else s.empty()
     view = RecordView(brain, data, nodes=nodes, edges=edges,
-        texts={nid: body(raw[f'nodes/{nid}.md']) for nid in nodes}, current=current, policy=policy)
+        texts={nid: body(raw[f'nodes/{nid}.md']) for nid in nodes}, current=current, policy=policy,
+        allow_tombstones=False)
     # Historical inspection may display tombstones; impact never reuses forgotten
     # evidence. Omit its entire dependent record, without hidden counts or IDs.
     visible = {}
     for k, v in view.versions.items():
-        if not view.allowed(v):
-            continue
-        _, inputs = view.dependencies(v, reviews=True)
-        if all(current[0][nid].status != 'tombstone' and nodes[nid].status != 'tombstone' for nid in inputs):
+        if view.allowed(v):
             visible[k] = v
     events = {eid: e for eid, e in view.events.items()
               if s.key(e['subject']) in visible and view.allowed(e)}
@@ -401,6 +399,10 @@ def compare(brain: Brain, envelope: dict) -> dict:
                 # Basis heads include relevant judgments only; unrelated commits
                 # and evaluation clocks cannot generate a new candidate identity.
                 refs = {s.key(r) for r in s.content_refs(dict(path=clean_path, support=support))}
+                # Preserve membership beyond the bounded support summary so a
+                # finding can detect later accepted attachments without treating
+                # already selected, clipped supports as newly introduced ones.
+                refs.update(s.key(v) for claim in claim_refs for v in after.supports.get(s.key(claim), []))
                 refs.add(k)
                 refs.update(s.key(r) for r in (change['old'], change['new']) if r)
                 closure = set(refs)

@@ -241,6 +241,130 @@ def finding_envelope(service, comp, candidate, disposition='confirmed'):
         candidate_id=candidate['candidate_id'], disposition=disposition, reason='Explicit triage review')
 
 
+@pytest.mark.parametrize('secured', [False, True])
+@pytest.mark.parametrize('forgotten_at', ['current', 'historical'])
+def test_forgotten_ancestor_filters_comparisons_but_not_explicit_snapshots(
+        service, tmp_path, monkeypatch, secured, forgotten_at):
+    from graph_engine.access import SecuredBrain
+    from graph_engine.snapshots import snapshot
+    refs = scenario(service)
+    service.brain.write_node(Node('Original observation', id='root'))
+    service.brain.write_node(Node('Copied observation', id='copy', derived_from=['root']))
+    source = service.brain.read_node('source')
+    source.derived_from = ['copy']
+    service.brain.write_node(source)
+    before = commit(service)
+    change_source(service)
+    if forgotten_at == 'historical':
+        service.brain.tombstone_node('root')
+    after = commit(service)
+    if forgotten_at == 'current':
+        assert service.compare(comparison(before, after))['candidates']
+        service.brain.tombstone_node('root')
+    else:
+        root = service.brain.read_node('root')
+        root.status = 'active'
+        service.brain.write_node(root)
+    if secured:
+        path = tmp_path / 'policy.json'
+        path.write_text(json.dumps({'graphs': {'default': {'roles': {'reader': 'viewer'}, 'nodes': {}}}, 'tokens': {}}))
+        monkeypatch.setenv('IG_ACCESS_POLICY', str(path))
+        service = DecisionService(SecuredBrain(str(service.brain.path), mode='git', graph_name='default', identity='reader'))
+    saved = files(service.brain)
+    result = service.compare(comparison(before, after))
+    assert result['deltas'] == result['candidates'] == result['reviewed_judgments'] == []
+    assert refs['source']['id'] not in json.dumps(result)
+    assert refs['evidence']['id'] not in json.dumps(result)
+    assert not result['completeness']['truncated']
+    historical = snapshot(service.brain, after)['decision_memory']
+    assert any(v['id'] == refs['source']['id'] for v in historical['versions'])
+    assert files(service.brain) == saved
+
+
+@pytest.mark.parametrize('already_proposed', [False, True])
+def test_newly_accepted_support_prevents_stale_finding_publication(service, already_proposed):
+    refs = scenario(service)
+    _, ev = evidence(service, refs['profile'], node='second', lineage='experiment-2')
+    proposed = link(service, 'supports', ev, refs['claim'], context(refs['profile']), accepted=False) if already_proposed else None
+    before = commit(service)
+    change_source(service)
+    after = commit(service)
+    comp = comparison(before, after)
+    candidate, = service.compare(comp)['candidates']
+    if proposed:
+        review(service, proposed)
+    else:
+        link(service, 'supports', ev, refs['claim'], context(refs['profile']))
+    latest = commit(service)
+    updated = next(c for c in service.compare(comparison(before, latest))['candidates']
+                   if c['delta']['delta_id'] == candidate['delta']['delta_id'])
+    assert updated['support']['remaining'] and updated['candidate_id'] != candidate['candidate_id']
+    saved = files(service.brain)
+    request = finding_envelope(service, comp, candidate)
+    for dry_run in (True, False):
+        with pytest.raises(s.RecordConflict, match='stale'):
+            service.record_finding(request, dry_run=dry_run, commit=False)
+        assert files(service.brain) == saved
+    finding, = service.record_finding(finding_envelope(service, comparison(before, latest), updated), commit=False)['receipt']['refs']
+    assert not service.inspect(finding)['basis_changed']
+
+
+def test_added_support_marks_recorded_finding_stale_without_blocking_retry_or_acknowledgment(service):
+    refs = scenario(service)
+    before = commit(service)
+    change_source(service)
+    after = commit(service)
+    comp = comparison(before, after)
+    candidate, = service.compare(comp)['candidates']
+    request = finding_envelope(service, comp, candidate)
+    result = service.record_finding(request, commit=False)
+    finding, = result['receipt']['refs']
+    _, ev = evidence(service, refs['profile'], node='second', lineage='experiment-2')
+    link(service, 'supports', ev, refs['claim'], context(refs['profile']))
+    assert service.inspect(finding)['basis_changed']
+    assert service.record_finding(request, commit=False) == result
+    review(service, finding, axis='finding_workflow', after='acknowledged')
+    assert service.inspect(finding)['state']['finding_workflow'] == 'acknowledged'
+
+
+def test_unrelated_or_proposed_support_does_not_stale_finding(service):
+    refs = scenario(service)
+    before = commit(service)
+    change_source(service)
+    after = commit(service)
+    comp = comparison(before, after)
+    candidate, = service.compare(comp)['candidates']
+    _, ev = evidence(service, refs['profile'], node='second', lineage='experiment-2')
+    link(service, 'supports', ev, refs['claim'], context(refs['profile']), accepted=False)
+    other, = save(service, claim('An unrelated premise', context(refs['profile'])))
+    link(service, 'supports', ev, other, context(refs['profile']))
+    finding, = service.record_finding(finding_envelope(service, comp, candidate), commit=False)['receipt']['refs']
+    assert not service.inspect(finding)['basis_changed']
+
+
+def test_clipped_support_summary_keeps_complete_membership_for_finding_freshness(service):
+    refs = scenario(service)
+    extra = save(service, *(draft('relationship', dict(kind='supports', source=refs['evidence'],
+        target=refs['claim'], context=context(refs['profile']), explanation='Another recorded attachment'))
+        for _ in range(20)))
+    profile_review = service.inspect(refs['profile'])['events'][-1]
+    service.submit(envelope(service, events=[event(r, axis='workflow', before='proposed', after='accepted',
+        basis=[{'type': 'event_ref', 'event_id': profile_review['event_id']}]) for r in extra]), commit=False)
+    before = commit(service)
+    change_source(service)
+    after = commit(service)
+    comp = comparison(before, after)
+    candidate, = service.compare(comp)['candidates']
+    assert 'support_output' in candidate['completeness']['hit_limits']
+    assert len(candidate['support']['removed']) == 20
+    assert all(r in candidate['basis_refs'] for r in [refs['support'], *extra])
+    request = finding_envelope(service, comp, candidate)
+    result = service.record_finding(request, commit=False)
+    finding, = result['receipt']['refs']
+    assert not service.inspect(finding)['basis_changed']
+    assert service.record_finding(request, commit=False) == result
+
+
 def test_findings_explicit_idempotent_resolved_and_material_successor_preserves_disposition(service):
     refs = scenario(service)
     before = commit(service)
