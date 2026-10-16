@@ -137,7 +137,7 @@ class DecisionService:
             a, b = (view.get(p[k])['record']['payload'] for k in ('source', 'target'))
             result['comparison'] = compare_context(a['context'], b['context'], view)
         # Lineage groups are descriptive; citation counts never become confidence.
-        deps, _ = view.dependencies(result['record'])
+        deps, _ = view.dependencies(result['record'], reviews=True)
         sources = [view.versions[k] for k in sorted(deps) if view.versions[k]['kind'] == 'source']
         result['source_lineage'] = [dict(ref=s.reference(v), lineage_ids=v['payload']['lineage_ids']) for v in sources]
         result['independence'] = 'not inferred'
@@ -211,19 +211,23 @@ class DecisionService:
                    'Relationship must pin the exact comparable intersection')
             self._profile_basis(e, p['context']['profile'], view)
             deps, _ = view.dependencies(a)
-            s.need(not any(view.versions[k]['kind'] == 'result' and view.versions[k]['payload']['outcome'] != 'completed'
-                           for k in deps), 'Failed/inconclusive runs cannot establish support or opposition')
+            results = [view.versions[k] for k in deps if view.versions[k]['kind'] == 'result']
+            s.need(all(v['payload']['outcome'] == 'completed' for v in results),
+                   'Failed/inconclusive runs cannot establish support or opposition')
+            # An interpretation cannot broaden the scope of its recorded runs.
+            comparisons = [compare_context(v['payload']['context'], p['context'], view) for v in results]
+            s.need(all(c['status'] == 'comparable' and c['intersection'] == p['context']['dimensions']
+                       for c in comparisons), 'Support/opposition requires results covering its reviewed scope')
         if e['axis'] == 'epistemic' and e['to'] in ('supported', 'opposed', 'mixed'):
             deps, _ = view.dependencies(e)
             s.need(not any(view.versions[k]['kind'] == 'result' and view.versions[k]['payload']['outcome'] != 'completed'
                            for k in deps), 'Failed/inconclusive runs cannot establish an assessment')
-            if subject['kind'] == 'claim':
-                candidates = [view.versions[k] for k in deps if view.versions[k]['kind'] in ('evidence', 'result')]
-                s.need(bool(candidates), 'Claim assessment requires evidence or a result')
-                comparisons = [compare_context(v['payload']['context'], p['context'], view) for v in candidates]
-                s.need(all(c['status'] == 'comparable' and c['intersection'] == p['context']['dimensions']
-                           for c in comparisons), 'Claim assessment requires comparable evidence covering its reviewed scope')
-                self._profile_basis(e, p['context']['profile'], view)
+            candidates = [view.versions[k] for k in deps if view.versions[k]['kind'] in ('evidence', 'result')]
+            s.need(bool(candidates), 'Assessment requires evidence or a result')
+            comparisons = [compare_context(v['payload']['context'], p['context'], view) for v in candidates]
+            s.need(all(c['status'] == 'comparable' and c['intersection'] == p['context']['dimensions']
+                       for c in comparisons), 'Assessment requires comparable evidence covering its reviewed scope')
+            self._profile_basis(e, p['context']['profile'], view)
 
     def _profile_basis(self, e: dict, profile: dict, view: RecordView) -> None:
         judgment = next(x for x in reversed(view.data['events'])

@@ -519,3 +519,116 @@ def test_failed_result_cannot_be_laundered_through_evidence_into_opposition(serv
     with pytest.raises(s.RecordError, match='Failed'):
         review(service, rel)
     assert service.inspect(rel)['state']['workflow'] == 'proposed'
+
+
+@pytest.mark.parametrize('kind', ['supports', 'opposes'])
+@pytest.mark.parametrize('scope', ['disjoint', 'unknown', 'partial', 'covering'])
+def test_relationship_review_preserves_underlying_result_scope(service, kind, scope):
+    env, _ = result_import(service, outcome='completed')
+    p, = save(service, draft('profile', dict(name='reviewed range', version='1', dimensions={
+        'size': dict(type='range', unit=None, required=True, compare='overlap', allowed_values=None)}, interventions=[])))
+    review(service, p)
+
+    def conditions(lower, upper):
+        return dict(schema='dm.context/1', profile=p, notes='', dimensions={
+            'size': dict(type='range', value=dict(lower=lower, upper=upper,
+                lower_inclusive=True, upper_inclusive=True))})
+
+    result_scope = {'disjoint': conditions(11, 20), 'unknown': None,
+                    'partial': conditions(0, 5), 'covering': conditions(0, 20)}[scope]
+    env['payload']['context'] = result_scope
+    result, = save(service, service.result_draft(env))
+    ev, = save(service, draft('evidence', dict(interpretation='Interpret the recorded run', context=conditions(0, 10),
+        sources=[{'ref': result, 'passage': None}], lineage_ids=[], limitations=[])))
+    c, = save(service, claim(context=conditions(0, 10)))
+    rel, = save(service, draft('relationship', dict(kind=kind, source=ev, target=c,
+        context=conditions(0, 10), explanation='Proposed interpretation within the reviewed range')))
+    acceptance = service.inspect(p)['events'][-1]['event_id']
+    req = envelope(service, events=[event(rel, axis='workflow', before='proposed', after='accepted',
+        basis=[{'type': 'event_ref', 'event_id': acceptance}])])
+    before = files(service.brain)
+    if scope == 'covering':
+        assert service.submit(req, dry_run=True)['dry_run']
+        assert files(service.brain) == before
+        service.submit(req, commit=False)
+        assert service.inspect(rel)['state']['workflow'] == 'accepted'
+    else:
+        for dry_run in (True, False):
+            with pytest.raises(s.RecordError, match='results covering'):
+                service.submit(req, dry_run=dry_run, commit=False)
+            assert files(service.brain) == before
+        assert service.inspect(rel)['state']['workflow'] == 'proposed'
+
+
+@pytest.mark.parametrize('assessment', ['supported', 'opposed', 'mixed'])
+@pytest.mark.parametrize('scope', ['missing', 'unknown', 'unaccepted', 'unpinned', 'accepted'])
+def test_evidence_assessment_requires_reviewed_scope(service, assessment, scope):
+    p, = save(service, draft('profile', dict(name='diagnostic scope', version='1', dimensions={
+        'workload': dict(type='id', unit=None, required=True, compare='equal', allowed_values=None)}, interventions=[])))
+    if scope != 'unaccepted':
+        review(service, p)
+    conditions = context(p)
+    if scope == 'missing':
+        conditions = None
+    elif scope == 'unknown':
+        conditions['dimensions']['workload'] = {'type': 'unknown', 'reason': 'Not supplied'}
+    service.brain.write_node(Node('Recorded observation', id='raw'))
+    src, = save(service, draft('source', service.source('raw'), anchor='raw'))
+    ev, = save(service, draft('evidence', dict(interpretation='Interpret the observation', context=conditions,
+        sources=[{'ref': src, 'passage': None}], lineage_ids=[], limitations=[])))
+    basis = [content_basis(src)]
+    if scope not in ('unaccepted', 'unpinned'):
+        basis.append({'type': 'event_ref', 'event_id': service.inspect(p)['events'][-1]['event_id']})
+    req = envelope(service, events=[event(ev, after=assessment, basis=basis)])
+    before = files(service.brain)
+    if scope == 'accepted':
+        assert service.submit(req, dry_run=True)['dry_run']
+        assert files(service.brain) == before
+        service.submit(req, commit=False)
+        assert service.inspect(ev)['effective_assessment'] == assessment
+    else:
+        for dry_run in (True, False):
+            with pytest.raises(s.RecordError, match='comparable|profile acceptance'):
+                service.submit(req, dry_run=dry_run, commit=False)
+            assert files(service.brain) == before
+        assert service.inspect(ev)['effective_assessment'] == 'unassessed'
+        review(service, ev, axis='epistemic', after='inconclusive', basis=[content_basis(src)])
+        assert service.inspect(ev)['effective_assessment'] == 'inconclusive'
+
+
+@pytest.mark.parametrize('basis_type', ['content_ref', 'event_ref'])
+def test_inspect_includes_review_source_lineage_on_one_snapshot(service, monkeypatch, basis_type):
+    p = profile(service)
+    sources = []
+    for nid in ('a', 'b'):
+        service.brain.write_node(Node('Shared experiment observation', id=nid))
+        payload = service.source(nid)
+        payload['lineage_ids'] = ['shared-experiment']
+        src, = save(service, draft('source', payload, anchor=nid))
+        sources.append(src)
+    ev, = save(service, draft('evidence', dict(interpretation='Two reports of one experiment', context=context(p),
+        sources=[{'ref': src, 'passage': None} for src in sources], lineage_ids=['shared-experiment'], limitations=[])))
+    c, = save(service, claim(context=context(p)))
+    assert service.inspect(c)['source_lineage'] == []
+    if basis_type == 'content_ref':
+        basis = content_basis(ev)
+    else:
+        review(service, ev)
+        basis = {'type': 'event_ref', 'event_id': service.inspect(ev)['events'][-1]['event_id']}
+    review(service, c, axis='epistemic', after='supported', basis=[basis])
+
+    from graph_engine import decision_service
+    snapshot = read_file(service.brain)
+    reads = []
+
+    def read_once(brain):
+        assert not reads, 'Inspection must authorize and display the same snapshot'
+        reads.append(brain)
+        return snapshot
+
+    monkeypatch.setattr(decision_service, 'read_file', read_once)
+    item = service.inspect(c)
+    assert {s.key(x['ref']) for x in item['source_lineage']} == {s.key(src) for src in sources}
+    assert len(item['source_lineage']) == 2
+    assert all(x['lineage_ids'] == ['shared-experiment'] for x in item['source_lineage'])
+    assert item['independence'] == 'not inferred'

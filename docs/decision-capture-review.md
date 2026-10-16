@@ -80,7 +80,9 @@ artifact locator or result as a whole. Quotes must match the exact source versio
 validation alone grants no support. Multiple source entries remain separate.
 Shared `lineage_ids` expose common lineage; empty lists mean unknown independence.
 Inspection reports source lineage and `independence: "not inferred"`, never a
-citation-count confidence score.
+citation-count confidence score. The lineage includes sources introduced through
+the record's retained review history, including sources reached through event
+references in the review basis.
 
 A single atomic envelope can include multiple new records. Use an explicit
 `{"local": "UUID-of-an-earlier-draft"}` in place of an exact version reference
@@ -142,9 +144,13 @@ and `context`. Inspection reports computed `comparable/disjoint/unknown` with
 reasons. Acceptance requires a currently accepted profile (pin its acceptance event in the
 review basis), comparable typed conditions and a relationship context restricted to their exact intersection.
 Unknown profiles/conditions and known disjoint observations can reach review;
-they cannot be accepted as support/opposition. Claim assessments other than
-inconclusive also require evidence/results in comparable scope. Failed or
-inconclusive runs cannot establish support/opposition or a conclusive assessment.
+they cannot be accepted as support/opposition. Results underlying an evidence
+interpretation must cover the relationship's entire reviewed scope; an
+interpretation cannot broaden a recorded run's conditions. Claim and evidence
+assessments other than inconclusive also require comparable scope covering the
+assessment, with an accepted profile and its acceptance event pinned in the basis.
+Failed or inconclusive runs cannot establish support/opposition or a conclusive
+assessment.
 No similarity score or matching quote can substitute for explicit review.
 
 Undo is another event, preserving the exact original basis, with
