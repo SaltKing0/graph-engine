@@ -88,12 +88,12 @@ def test_unmeasured_pending_and_synthetic_coverage_cannot_pass_release_gates():
     assert not assessment['passed']
 
 
-def test_changed_gold_cannot_change_production_paths_or_source_inputs(tmp_path):
+@pytest.fixture
+def single_event_corpus(tmp_path):
     import shutil
     from tools.decision_benchmark.freeze_sources import freeze
-    from tools.decision_benchmark.production import run
 
-    root = tmp_path / 'corpus'
+    root = tmp_path / 'controls-v2'
     shutil.copytree(DATA / 'controls-v2', root)
     inputs, labels, _ = load_bundle(root)
     event = inputs['events'][0]
@@ -105,6 +105,46 @@ def test_changed_gold_cannot_change_production_paths_or_source_inputs(tmp_path):
     labels['pairs'] = {pair: labels['pairs'][pair]}
     contract = (root / 'contract.md').read_bytes()
     freeze(root, inputs, labels, contract)
+    return root
+
+
+@pytest.mark.parametrize('baseline_failure', ['retrieval', 'budget'])
+def test_production_cli_fails_when_baseline_fails(single_event_corpus, tmp_path, monkeypatch, capsys, baseline_failure):
+    from tools.decision_benchmark import production, runner
+
+    prepare = runner.prepare
+
+    def failed_baseline(*args, **kwargs):
+        if baseline_failure == 'retrieval':
+            raise RuntimeError('Baseline retrieval failed')
+        result = prepare(*args, **kwargs)
+        result['context']['tokens'] = result['context']['budget'] + 1
+        return result
+
+    monkeypatch.setattr(runner, 'prepare', failed_baseline)
+    monkeypatch.setattr(production, 'DATA', single_event_corpus.parent)
+    output = tmp_path / 'production.json'
+    monkeypatch.setattr('sys.argv', ['production', '--split', 'all', '--output', str(output)])
+    assert production.main() == 1
+    assert json.loads(capsys.readouterr().out)['smoke_passed'] is False
+    report = json.loads(output.read_bytes())
+    baseline = json.loads((tmp_path / 'production-baseline.json').read_bytes())
+    expected_status = 'completed_with_errors' if baseline_failure == 'retrieval' else 'complete'
+    assert report['status'] == baseline['status'] == expected_status
+    assert report['baseline']['status'] == expected_status
+    assert report['smoke_passed'] is report['baseline']['smoke_passed'] is baseline['smoke_passed'] is False
+    assert all(p['error'] is None and p['complete'] and p['context_within_budget']
+               for row in report['results'] for p in row['profiles'].values())
+
+
+def test_changed_gold_cannot_change_production_paths_or_source_inputs(single_event_corpus, tmp_path):
+    from tools.decision_benchmark.freeze_sources import freeze
+    from tools.decision_benchmark.production import run
+
+    root = single_event_corpus
+    inputs, labels, _ = load_bundle(root)
+    pair, = labels['pairs']
+    contract = (root / 'contract.md').read_bytes()
     first = run(root, tmp_path / 'first.json', split='all')
     labels['pairs'][pair].update(outcome='negative', valid_paths=[], rationale='SECRET_GOLD_CANARY')
     freeze(root, inputs, labels, contract)

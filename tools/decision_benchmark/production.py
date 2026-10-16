@@ -180,6 +180,7 @@ def run(root: Path, output: Path, *, split: str = 'development') -> dict:
     metadata['production_mapping'] = MAPPING
     report = dict(schema='dm.production-diagnostic/1', status='running', metadata=metadata,
         baseline=dict(path=baseline_path.name, sha256=digest(baseline_path.read_bytes()), scores=baseline['scores'],
+            status=baseline['status'], smoke_passed=baseline['smoke_passed'],
             saved_reference=saved_baseline_check(baseline, root, split)),
         results=[], scores={}, release_readiness=baseline['release_readiness'],
         limitations=[*baseline['limitations'],
@@ -217,8 +218,9 @@ def run(root: Path, output: Path, *, split: str = 'development') -> dict:
         human_review_minutes=None, human_review_time_savings=None, comparability_error_rate=None,
         provenance_correctness=None, unsupported_conclusions=None,
         reason='Independent semantic/provenance/statement scoring and controlled users are absent.')
-    report['status'] = 'completed_with_errors' if any(p['error'] for r in report['results'] for p in r['profiles'].values()) else 'complete'
-    report['smoke_passed'] = bool(report['results']) and report['status'] == 'complete' and all(
+    report['status'] = 'completed_with_errors' if baseline['status'] != 'complete' or any(
+        p['error'] for r in report['results'] for p in r['profiles'].values()) else 'complete'
+    report['smoke_passed'] = baseline['smoke_passed'] and bool(report['results']) and report['status'] == 'complete' and all(
         r['baseline_input_matches'] and p['complete'] and p['context_within_budget'] for r in report['results'] for p in r['profiles'].values())
     checkpoint(output, report)
     return report
