@@ -52,7 +52,7 @@ def _records(brain: Brain, revision: str) -> tuple[str, str, dict[str, str]]:
     sha = _git(brain, "rev-parse", "--verify", "--end-of-options",
                revision + "^{commit}").decode().strip()
     committed_at = _git(brain, "show", "-s", "--format=%cI", sha).decode().strip()
-    entries = _git(brain, "ls-tree", "-r", "-l", "-z", sha, "--", "nodes", "edges.jsonl")
+    entries = _git(brain, "ls-tree", "-r", "-l", "-z", sha)
     blobs: list[tuple[str, str, int]] = []
     try:
         for entry in entries.split(b"\0"):
@@ -60,7 +60,9 @@ def _records(brain: Brain, revision: str) -> tuple[str, str, dict[str, str]]:
                 continue
             metadata, name = entry.split(b"\t", 1)
             path = name.decode("utf-8")
-            if path != "edges.jsonl" and not re.fullmatch(r"nodes/[^/]+\.md", path):
+            if not (path == "edges.jsonl" or path.startswith(("nodes/", "decision-memory"))):
+                continue
+            if path not in ("edges.jsonl", "decision-memory.v1.json") and not re.fullmatch(r"nodes/[^/]+\.md", path):
                 raise ValueError("unsupported record path")
             mode, kind, oid, size = metadata.split()
             if mode not in (b"100644", b"100755") or kind != b"blob":
@@ -152,7 +154,7 @@ def _parse_records(records: dict[str, str]) -> tuple[dict[str, Node], list[Edge]
     nodes = {}
     try:
         for path, text in records.items():
-            if path == "edges.jsonl":
+            if path in ("edges.jsonl", "decision-memory.v1.json"):
                 continue
             match = re.match(r"^---\n(.*?)\n---\n", text, re.DOTALL)
             if not match:
@@ -206,6 +208,12 @@ def snapshot(brain: Brain, revision: str, *, fact_valid_at: str | None = None) -
             raise SnapshotError("Invalid fact-validity timestamp") from exc
     sha, committed_at, records = _records(brain, revision)
     nodes, edges = _parse_records(records)
+    from .decision_schema import FILENAME, loads, empty, RecordError
+    from .decision_memory import RecordView, body
+    try:
+        decision_data = loads(records[FILENAME]) if FILENAME in records else empty()
+    except RecordError as exc:
+        raise SnapshotError(f"Incompatible historical Decision Memory schema: {exc}") from exc
 
     from .access import SecuredBrain, derivation_parents, provenance_allowed
     current_view = brain._access_view() if isinstance(brain, SecuredBrain) else None
@@ -255,8 +263,12 @@ def snapshot(brain: Brain, revision: str, *, fact_valid_at: str | None = None) -
         if stamp is not None and (edge.pending or edge.rejected or not edge.is_valid_at(stamp)):
             continue
         result_edges.append(edge)
-    return {"revision": sha, "commit_time": committed_at, "fact_valid_at": fact_valid_at,
-            "nodes": [nodes[nid] for nid in sorted(visible)], "edges": result_edges}
+    result = {"revision": sha, "commit_time": committed_at, "fact_valid_at": fact_valid_at,
+              "nodes": [nodes[nid] for nid in sorted(visible)], "edges": result_edges}
+    decision_view = RecordView(brain, decision_data, nodes=nodes, edges=edges,
+                               texts={nid: body(records[f"nodes/{nid}.md"]) for nid in nodes})
+    result["decision_memory"] = decision_view.export()
+    return result
 
 
 class _SnapshotStore:

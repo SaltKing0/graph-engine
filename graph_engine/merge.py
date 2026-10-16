@@ -165,6 +165,8 @@ def merge_nodes(
     # (audit finding "merge_nodes makes no pull()").
     brain.ensure_ready()
     brain.pull()
+    from .decision_memory import check_merge
+    check_merge(brain, {survivor_id, deletee_id})
     nodes = {n.id: n for n in brain.read_nodes()}
     if survivor_id not in nodes:
         raise ValueError(f"Node not found: {survivor_id}")
