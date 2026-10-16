@@ -91,6 +91,16 @@ async def decision_result_draft(request: Request) -> JSONResponse:
     return JSONResponse(await run_in_threadpool(lambda: _decision_service().result_draft(envelope)), headers=NO_CACHE)
 
 
+@app.post('/api/decision-memory/read/{operation}')
+async def decision_read(operation: str, request: Request) -> JSONResponse:
+    envelope = await _decision_body(request)
+    result = await run_in_threadpool(lambda: _decision_service().read(operation, envelope))
+    if operation == 'brief':
+        from .decision_brief import render_markdown
+        result['markdown'] = render_markdown(result)
+    return JSONResponse(result, headers=NO_CACHE)
+
+
 @app.post('/api/decision-memory/compare')
 async def decision_compare(request: Request) -> JSONResponse:
     envelope = await _decision_body(request)
@@ -204,6 +214,11 @@ def review():
 @app.get("/review.js")
 def review_js():
     return FileResponse(DOCS_DIR / "review.js", headers=NO_CACHE)
+
+
+@app.get('/decision-review.js')
+def decision_review_js():
+    return FileResponse(DOCS_DIR / 'decision-review.js', headers=NO_CACHE)
 
 
 @app.get("/api/graph")

@@ -1500,7 +1500,7 @@ def cmd_decision(args: list[str]) -> None:
     from .decision_schema import MAX_BYTES, need
 
     parser = argparse.ArgumentParser(prog='ig decision')
-    parser.add_argument('operation', choices=['preview', 'pending', 'source', 'propose', 'review', 'inspect', 'result-draft', 'compare', 'finding', 'brief', 'findings', 'context'])
+    parser.add_argument('operation', choices=['preview', 'pending', 'source', 'propose', 'review', 'inspect', 'result-draft', 'compare', 'finding', 'brief', 'findings', 'context', 'review-queue', 'review-detail'])
     parser.add_argument('input', nargs='?')
     parser.add_argument('--dry-run', action='store_true')
     parser.add_argument('--revision', help='Git revision for exact inspect (brief/context/findings use JSON revision)')
@@ -1529,7 +1529,7 @@ def cmd_decision(args: list[str]) -> None:
                 with Path(opts.input).open(encoding='utf-8') as stream:
                     raw = stream.read(MAX_BYTES + 1)
             envelope = load_envelope(raw)
-            if opts.operation in ('brief', 'findings', 'context'):
+            if opts.operation in ('brief', 'findings', 'context', 'review-queue', 'review-detail'):
                 result = service.read(opts.operation, envelope)
             elif opts.operation == 'inspect' and opts.revision is not None:
                 result = service.read('inspect-revision', dict(reference=envelope, revision=opts.revision))

@@ -128,6 +128,10 @@ class DecisionService:
         """Shared, no-model explanatory reads for CLI and MCP."""
         from . import decision_brief as b
         bounded(envelope)
+        if operation in ('review-queue', 'review-detail'):
+            from .decision_review import ReviewReader
+            reader = ReviewReader(self)
+            return (reader.queue if operation == 'review-queue' else reader.detail)(envelope)
         specs = {
             'brief': ({'reference'}, {'revision'}),
             'findings': (set(), {'revision', 'decision_id', 'unresolved_only'}),
