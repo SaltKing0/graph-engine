@@ -183,3 +183,19 @@ release.
 ## License
 
 MIT — see `LICENSE`.
+
+## Decision Memory workflow audit
+
+Before changing production Decision Memory interfaces, run the complete bounded
+no-provider workflow in addition to the existing suite and baseline check:
+
+```bash
+.venv/bin/python -m examples.decision_workflow --output /tmp/decision-workflow.json
+.venv/bin/python -m tools.decision_benchmark.production --split all --output /tmp/decision-production-controls.json
+```
+
+A complete audit checks execution and budget integrity, never release readiness.
+The source-change diagnostic records false alerts, missing semantic annotations,
+scripted review time and absent human measurements explicitly. Project-corpus
+runs still require `--real-corpus`; providers and downloads remain opt-in. See
+[the walkthrough](docs/decision-workflow.md) and [release assessment](docs/decision-release-readiness.md).

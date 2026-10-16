@@ -14,6 +14,16 @@ recorded in Git.
 - Connect agents through the CLI, HTTP API or optional MCP server.
 - Keep separate graphs with optional role and node access control.
 
+## Experimental Decision Memory
+
+Preserve exact evidence, explicit reviews and versioned technical decisions,
+then investigate source changes through recorded dependencies. This requires
+explicit proposals and activation; existing brains and ordinary memory flows
+need no migration. **v1 remains experimental:** independently reviewed held-out
+quality and controlled human review-time savings are unmeasured. See the
+[complete no-provider walkthrough](docs/decision-workflow.md) and
+[release-readiness report](docs/decision-release-readiness.md).
+
 ## Quickstart
 
 Requires **Python 3.11+** and **Git**. These instructions use current `main`;

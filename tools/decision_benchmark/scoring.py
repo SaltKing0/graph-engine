@@ -19,6 +19,7 @@ def score(rows: list[dict], labels: dict) -> dict:
             counts[outcome] += 1
             surfaced = alerts.get(did, [])
             counts["surfaced_pairs"] += bool(surfaced)
+            counts["explicit_uncertainty_pairs"] += any(a.get("uncertainty_reason") for a in surfaced)
             counts["error_pairs"] += bool(row.get("error"))
             if row.get("error"):
                 error_cases.add(row["event_id"])
@@ -57,6 +58,7 @@ def score(rows: list[dict], labels: dict) -> dict:
             "path_correctness": rate("correct_paths", "emitted_paths"),
             "inconclusive_handling": rate("inconclusive_explicit_uncertainty", "inconclusive"),
             "unanswerable_handling": rate("unanswerable_explicit_uncertainty", "unanswerable"),
+            "explicit_uncertainty_rate": rate("explicit_uncertainty_pairs", "attempted_pairs"),
             "false_abstention_rate": rate("false_abstentions", "known_pairs"),
             "rationale_correctness": None, "unsupported_conclusions": None,
             "answer_quality": None, "human_review_time": None}
