@@ -7,6 +7,11 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- Opt-in qualified Decision Memory context and deterministic revision-pinned
+  Markdown/JSON briefs, shared CLI/MCP reads for inspection/comparison/findings,
+  exact citation accounting and an offline two-session decision example. Keep
+  support, opposition, scope and review reasons together under the estimated
+  budget; preserve current ACLs, inherited lineage and forgetting in exports.
 - Read-only Decision Memory comparisons between explicit Git revisions, with
   classified deltas, structured scope comparisons, bounded accepted dependency
   paths, source/version citations and surviving lineage-aware support. Add CLI

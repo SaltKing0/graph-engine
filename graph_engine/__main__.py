@@ -11,6 +11,7 @@ Examples:
   python -m graph_engine import ./notes --recursive --extensions .md .txt --dry-run --json
   python -m graph_engine import paper.pdf --extensions .pdf --source-id paper-2026
   python -m graph_engine decision preview | pending | source <node_id>
+  python -m graph_engine decision brief | findings | context <JSON-file-or-stdin>
   python -m graph_engine decision propose proposal.json [--dry-run]
   python -m graph_engine decision review review.json [--dry-run]
   python -m graph_engine decision inspect ref.json
@@ -1499,10 +1500,16 @@ def cmd_decision(args: list[str]) -> None:
     from .decision_schema import MAX_BYTES, need
 
     parser = argparse.ArgumentParser(prog='ig decision')
-    parser.add_argument('operation', choices=['preview', 'pending', 'source', 'propose', 'review', 'inspect', 'result-draft', 'compare', 'finding'])
+    parser.add_argument('operation', choices=['preview', 'pending', 'source', 'propose', 'review', 'inspect', 'result-draft', 'compare', 'finding', 'brief', 'findings', 'context'])
     parser.add_argument('input', nargs='?')
     parser.add_argument('--dry-run', action='store_true')
+    parser.add_argument('--revision', help='Git revision for exact inspect (brief/context/findings use JSON revision)')
+    parser.add_argument('--format', choices=['json', 'markdown'], default='json')
     opts = parser.parse_args(args)
+    if opts.format == 'markdown' and opts.operation != 'brief':
+        parser.error('--format markdown applies only to brief')
+    if opts.revision is not None and opts.operation != 'inspect':
+        parser.error('--revision applies only to inspect; use the JSON revision field for other reads')
     if opts.operation not in ('preview', 'pending') and opts.input is None:
         parser.error('provide a node ID or JSON file (use - for stdin)')
     if opts.operation in ('preview', 'pending') and opts.input is not None:
@@ -1522,7 +1529,11 @@ def cmd_decision(args: list[str]) -> None:
                 with Path(opts.input).open(encoding='utf-8') as stream:
                     raw = stream.read(MAX_BYTES + 1)
             envelope = load_envelope(raw)
-            if opts.operation == 'compare':
+            if opts.operation in ('brief', 'findings', 'context'):
+                result = service.read(opts.operation, envelope)
+            elif opts.operation == 'inspect' and opts.revision is not None:
+                result = service.read('inspect-revision', dict(reference=envelope, revision=opts.revision))
+            elif opts.operation == 'compare':
                 result = service.compare(envelope)
             elif opts.operation == 'finding':
                 result = service.record_finding(envelope, dry_run=opts.dry_run)
@@ -1533,7 +1544,11 @@ def cmd_decision(args: list[str]) -> None:
             else:
                 result = (service.inspect(envelope) if opts.operation == 'inspect'
                           else service.result_draft(envelope))
-        print(json.dumps(result, ensure_ascii=False, indent=2))
+        if opts.format == 'markdown':
+            from .decision_brief import render_markdown
+            print(render_markdown(result), end='')
+        else:
+            print(json.dumps(result, ensure_ascii=False, indent=2))
     except RecordPublished as exc:
         print(json.dumps(dict(error=str(exc), published_locally=True, receipt=exc.receipt)), file=sys.stderr)
         sys.exit(1)
