@@ -72,3 +72,55 @@ reports unknown comparability. Its warning remains. Next is explicit
 per-observation support/availability and review/versioning of the remaining
 basis, with independent human/provenance acceptance still open. The audit and
 replay are documentation checks, never an alert filter or new runtime input.
+
+## Separate paths and a versioned remaining basis
+
+The fixed, already exposed `controls-v2/event-surviving-support` case can now be
+remodeled through the public proposal, review, compare and historical-read APIs:
+
+```bash
+.venv/bin/python -m tools.decision_benchmark.support_paths --output /tmp/decision-support-paths-new
+.venv/bin/python -m pytest tests/test_decision_support_paths.py -q
+```
+
+Use a new output directory. This is an explicit synthetic developer wiring
+configuration, not a general extraction feature or a replacement for the
+original production diagnostic. It has no case, final-data or outcome option.
+The immutable [source audit](decision-evaluation-results/false-alert-development-v1/withdrawal-v1/source-audit.json)
+is validated against the frozen development sources before any brain write.
+Its field-role validator is retained separately in the new tool so the original
+audit and historical verification remain byte-for-byte reproducible.
+
+X1 and Y1 have separate evidence and `supports` relationships to the original
+basis. Both cite exact passages in the same complete original source. Their
+source-declared `run-X1` and `run-Y1` labels remain interpretations; both paths
+retain the **shared document identity**, with measurement independence explicitly
+not inferred. No execution/result record is invented. Y1's condition citations
+refer only to the five explicitly shared condition fields, not X1's measurement.
+The unit comes from the same recall rule without conversion.
+
+The later update creates an explicit X1 `availability=withdrawn` review event.
+The actual comparison reports `basis_changed` and `support_withdrawn`, with X1
+removed and Y1 remaining. It preserves the warning rather than declaring the
+original aggregate basis unchanged. A confirmed, acknowledged finding and
+`needs_investigation` decision conclusion retain the review requirement.
+
+The claim successor has the original identity, exact predecessor and only Y1
+plus the availability update as its new provenance inputs. It starts proposed
+and unassessed; its new Y1 support starts proposed. Fresh scripted developer
+events then assess the **source-declared** `0.8 >=0.7 fraction` predicate within
+the five declared conditions. This establishes no real-world/statistical validity
+or human acceptance. The old content, exact relationship endpoints and all old
+reviews survive unchanged. After a fresh service session the old aggregate
+assessment is visibly stale/inconclusive, while the newly reviewed scoped basis
+is supported. A successor decision and dependency are **proposals**; they are
+not activated and do not inherit the previous decision's reviews. The finding
+is not resolved.
+
+The report retains initial, withdrawal, successor-proposal and final journals,
+exact references, comparison and historical reconstruction. This one remodeled
+known event is not a new independent case or a comparable false-alert-rate
+measurement; its graph differs from the original aggregate diagnostic. Frozen
+thresholds, sources, labels, previous results and independent acceptance remain
+unchanged. See [versioned execution evidence](decision-evaluation-results/false-alert-development-v1/support-paths-v1/README.md)
+for commands, observed checks and remaining limits.

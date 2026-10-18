@@ -264,3 +264,16 @@ explains the separate trusted interpretation input, exact source/field binding,
 conservative pre-impact basis retention and missing independent acceptance.
 Ordinary diagnostics remain unchanged; this tool supplies no reserved data or
 expected outcomes and does not change frozen thresholds.
+
+For the one already exposed synthetic withdrawal case, separate evidence paths
+and a freshly reviewed successor basis can be exercised explicitly:
+
+```bash
+.venv/bin/python -m tools.decision_benchmark.support_paths --output /tmp/decision-support-paths-new
+.venv/bin/python -m pytest tests/test_decision_support_paths.py -q
+```
+
+This developer wiring run preserves exact sources, old versions and reviews,
+marks X1 withdrawn and Y1 remaining, and leaves the successor decision proposed.
+Its scripted source-level assessment is not independent acceptance or a new
+false-alert score. See the [observation guide](docs/decision-source-observations.md#separate-paths-and-a-versioned-remaining-basis).
