@@ -68,10 +68,11 @@ transcription/proposal is changed or accepted retroactively.
 The contract retains a candidate that explains the loss and remaining support;
 it does not silently preserve the old X1/Y1 basis after X1's withdrawal. The
 current aggregate diagnostic lacks individual X1/Y1 evidence/support paths and
-reports unknown comparability. Its warning remains. Next is explicit
-per-observation support/availability and review/versioning of the remaining
-basis, with independent human/provenance acceptance still open. The audit and
-replay are documentation checks, never an alert filter or new runtime input.
+reports unknown comparability. Its warning remains. The separate opt-in
+configuration below now supplies explicit per-observation support/availability
+and review/versioning of the remaining basis. Independent human/provenance
+acceptance stays open. The historical audit/replay itself remains unchanged;
+only the new explicit configuration consumes its source-bound interpretation.
 
 ## Separate paths and a versioned remaining basis
 
@@ -115,7 +116,8 @@ reviews survive unchanged. After a fresh service session the old aggregate
 assessment is visibly stale/inconclusive, while the newly reviewed scoped basis
 is supported. A successor decision and dependency are **proposals**; they are
 not activated and do not inherit the previous decision's reviews. The finding
-is not resolved.
+is not resolved and is visibly stale after the successor basis; resolving it
+would require a new comparison/review.
 
 The report retains initial, withdrawal, successor-proposal and final journals,
 exact references, comparison and historical reconstruction. This one remodeled

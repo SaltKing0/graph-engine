@@ -1,0 +1,16 @@
+[
+  {
+    "file": "prototype-1.json.gz",
+    "status": "complete",
+    "case_id": "controls-v2/event-surviving-support",
+    "source_dirty": true,
+    "note": "Pre-freeze authoring execution of the same exposed synthetic case; not final validation or a new independent case."
+  },
+  {
+    "file": "prototype-2.json.gz",
+    "status": "complete",
+    "case_id": "controls-v2/event-surviving-support",
+    "source_dirty": true,
+    "note": "Pre-freeze authoring execution of the same exposed synthetic case; not final validation or a new independent case."
+  }
+]

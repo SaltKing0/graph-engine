@@ -1,0 +1,1 @@
+{"status": "complete", "checks": {"no_silent_carry_forward": true, "decision_not_reversed": true, "history_exact": true, "legacy_memory_unchanged": true, "successor_not_activated": true, "forgotten_history_unavailable": true, "forgotten_queue_empty": true}, "release_ready": false}

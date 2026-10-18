@@ -225,7 +225,8 @@ Runtime/tools/tests/CI/frozen data are byte-unchanged; this is a documentation
 and source-audit delivery. Prior full-suite/matrix counts remain historical,
 not newly executed measurements. Current semantic scores and human benefit
 remain null; the historical 5/95 failure and 0/0/0 independent coverage persist.
-No additional acceptance checkbox is completed. Next is explicit X1/Y1 support
+No additional acceptance checkbox is completed. The next step identified by this
+historical audit was explicit X1/Y1 support
 and availability modeling with review of the changed basis; independent-run
 credit requires human review of actual execution/dataset provenance.
 
@@ -394,3 +395,45 @@ coverage. Initial per-record diagnostics were explicitly interrupted to batch
 proposals; their incomplete checkpoints and absent transient artifacts are
 preserved/disclosed in the raw-results index. Completed measurements use only
 the fixed batched commit. No thresholds or labels changed during that correction.
+
+## Separate support paths and remaining-basis versioning
+
+The known fictional withdrawal case now has an explicit opt-in developer
+configuration with separate X1/Y1 evidence and support relationships, exact
+citations and a shared original document identity. The later source update
+withdraws X1. The actual comparison preserves one `support_withdrawn` /
+`basis_changed` candidate explaining X1 removed and Y1 remaining. Source-declared
+run labels do not become independently established measurement roots.
+
+A successor claim records only Y1 plus the availability update as new provenance
+inputs. It starts unassessed/proposed with a proposed new support endpoint;
+fresh scripted developer events assess only the declared 0.8 >=0.7 fraction
+rule and five explicit conditions. Old versions, endpoints and reviews remain
+exact; the old aggregate assessment is stale/inconclusive. After a fresh service
+session the new scoped basis is supported. The successor decision and dependency
+remain proposals, the old decision explicitly needs investigation, and the
+confirmed/acknowledged finding remains unresolved and visibly stale after the
+basis successor; resolution would need a new comparison/review. No human or independent
+acceptance, run, participant or benefit is inferred.
+
+[Versioned evidence, exact commands and reproduction](decision-evaluation-results/false-alert-development-v1/support-paths-v1/README.md)
+separate the source-level assessment, software checks and missing external
+acceptance. This remodeled known event is not a new independent case or an
+updated false-alert score. The original standard diagnostic still fails
+5/95 (5.26%) >5%, and the empty proposed profile misses 3/3 positives. All frozen
+sources, labels, thresholds, earlier reports and review decisions are retained.
+Independent final coverage remains 0/0/0 and product benefit remains unmeasured.
+Keep #90–#93 and #73 open, the PR Draft and Decision Memory experimental;
+no merge or release. Actual execution/dataset artifacts, separate reviewers and
+a separately controlled final corpus/freeze remain required for acceptance.
+
+Software validation of frozen implementation `1bddddc`: full local suite
+**2,182 passed / 10 optional model skips / 1 existing Starlette warning**;
+117 focused checks; strict matrix **55 tests / 41 of 41 applicable cells**,
+13 technical N/A. All 15 CI checks passed, including real-model/local-trust
+and seven advisory profiles. The source/path run and all 13 known development
+replays complete without errors; original normalized alerts, scores, gates and
+thresholds match the previous evidence. Six historical verifiers pass at their
+original heads. Later audit metadata retains documentation-only dirty flags;
+implementation fingerprints remain unchanged. These are bounded software and
+source-consistency checks, not independent semantic or product-benefit proof.
