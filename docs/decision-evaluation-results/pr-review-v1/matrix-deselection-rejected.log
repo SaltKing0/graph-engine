@@ -1,0 +1,1 @@
+{"status": "completed_with_errors", "counts": {"defined_cells": 54, "applicable_cells": 41, "observed_passed_cells": 40, "unverified_or_failed_cells": 1, "declared_not_applicable_cells": 13}, "software_matrix_complete": false, "release_ready": false}

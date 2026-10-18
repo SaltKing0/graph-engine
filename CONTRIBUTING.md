@@ -212,3 +212,27 @@ The source-change diagnostic records false alerts, missing semantic annotations,
 scripted review time and absent human measurements explicitly. Project-corpus
 runs still require `--real-corpus`; providers and downloads remain opt-in. See
 [the walkthrough](docs/decision-workflow.md) and [release assessment](docs/decision-release-readiness.md).
+
+The declared Decision Memory engineering integrity matrix has a strict combined
+transport/browser gate. Install `[dev,mcp]` and Playwright/Chromium as above,
+provide the integrity-checked D3 file, and use a new output directory:
+
+```bash
+GRAPH_ENGINE_TEST_D3=/tmp/graph-engine-d3.v7.min.js PLAYWRIGHT_BROWSERS_PATH=/tmp/graph-engine-playwright .venv/bin/python -m tools.decision_integrity --output /tmp/decision-integrity
+```
+
+The dedicated CI job uploads commands, runtime/code identities, actual pytest
+phase reports, JUnit and cell-by-cell results. Missing evidence, skipped tests,
+setup or teardown failures cannot pass coverage. An execution pass establishes
+the declared bounded software scenarios only; it is not independent sign-off of
+the final candidate or the complete release contract. See the
+[solo development and matrix guide](docs/decision-solo-development.md).
+
+For explicitly exposed, development-only engineering source review:
+
+```bash
+.venv/bin/python -m tools.decision_benchmark.solo --output /tmp/decision-solo-development.json
+```
+
+This runner never opens labels or evaluation-source files, never scores its own
+notes, and preserves missing independent semantic and human measurements.

@@ -360,10 +360,13 @@
     }
     const brief = el('section', undefined, detail);
     el('h3', 'Revision-pinned decision brief', brief);
+    const briefRevision = entry.kind === 'candidate' ? entry.comparison.after : 'HEAD';
+    el('p', entry.kind === 'candidate' ? 'Uses the selected comparison revision.' :
+      'Uses current knowledge with this exact decision version; the returned revision is shown.', brief);
     button('Open decision brief', brief, async () => {
       const ticket = serial;
       try {
-        const result = await request('read/brief', {reference:c.target, revision:'HEAD'});
+        const result = await request('read/brief', {reference:c.target, revision:briefRevision});
         if (ticket !== serial) return;
         brief.replaceChildren();
         el('h3', `Decision brief · revision ${result.revision}`, brief);

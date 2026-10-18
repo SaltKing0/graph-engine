@@ -1,0 +1,168 @@
+{
+  "source_commit": "4558232e197b0fb0e24dedc142ccc1910877251b",
+  "dirty": false,
+  "python": "3.12.14 (main, Aug 12 2026, 13:57:54) [Clang 21.0.0 (clang-2100.1.1.101)]",
+  "platform": "macOS-26.7.1-arm64-arm-64bit",
+  "environment": {
+    "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+    "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+  },
+  "runs": [
+    {
+      "name": "pip-check",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "pip",
+        "check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.4499171660281718,
+      "log": "pip-check.log"
+    },
+    {
+      "name": "memory-smoke",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "tools.memory_benchmark",
+        "--smoke",
+        "--check",
+        "--output",
+        "/tmp/decision-solo-validation-final/memory-smoke.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.44789658405352384,
+      "log": "memory-smoke.log"
+    },
+    {
+      "name": "decision-controls",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "tools.decision_benchmark",
+        "--split",
+        "all",
+        "--check",
+        "--output",
+        "/tmp/decision-solo-validation-final/decision-controls.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.6690472500049509,
+      "log": "decision-controls.log"
+    },
+    {
+      "name": "workflow",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "examples.decision_workflow",
+        "--output",
+        "/tmp/decision-solo-validation-final/workflow.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 3.6588222910068,
+      "log": "workflow.log"
+    },
+    {
+      "name": "production-controls",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "tools.decision_benchmark.production",
+        "--split",
+        "all",
+        "--output",
+        "/tmp/decision-solo-validation-final/production-controls.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 42.934304040973075,
+      "log": "production-controls.log"
+    },
+    {
+      "name": "solo-development",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "tools.decision_benchmark.solo",
+        "--output",
+        "/tmp/decision-solo-validation-final/solo-development.json"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 123.51047400000971,
+      "log": "solo-development.log"
+    },
+    {
+      "name": "integrity-matrix",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "tools.decision_integrity",
+        "--output",
+        "/tmp/decision-solo-validation-final/integrity"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 109.41447095799958,
+      "log": "integrity-matrix.log"
+    },
+    {
+      "name": "strict-mcp",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_mcp.py",
+        "tests/test_access_namespaces.py",
+        "tests/test_entities.py",
+        "tests/test_fact_validity.py",
+        "tests/test_graph_retrieval.py",
+        "tests/test_decision_brief.py",
+        "tests/test_decision_review.py",
+        "--fail-on-skip",
+        "-q"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 68.52310387499165,
+      "log": "strict-mcp.log"
+    },
+    {
+      "name": "strict-pdf",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_document_import.py",
+        "--fail-on-skip",
+        "-q"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.533756542019546,
+      "log": "strict-pdf.log"
+    },
+    {
+      "name": "strict-browser",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_frontend_xss.py",
+        "--fail-on-skip",
+        "-q"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 131.30615437496454,
+      "log": "strict-browser.log"
+    },
+    {
+      "name": "diff-check",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 0.040022875007707626,
+      "log": "diff-check.log"
+    }
+  ]
+}

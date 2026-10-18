@@ -1,0 +1,940 @@
+{
+  "schema": "dm.solo.source-notes/1",
+  "split": "development",
+  "version": "solo-source-notes-v1.0.0",
+  "author": "Codex implementing agent",
+  "human_review": false,
+  "independent": false,
+  "exposure": "Project-v1 and saved aggregate diagnostics previously exposed; not blind. Notes are new engineering analysis of development sources only.",
+  "packet_sha256": "34295bebd8fb39fe31ab0a766fac66680424557d0a8895b34cf569a05200e9c6",
+  "status": "engineering-source-review-not-human-calibration",
+  "pair_count": 27,
+  "pairs": [
+    {
+      "case_id": "event-graph-1",
+      "decision_id": "decision-graph",
+      "decision_source_id": "graph-basis",
+      "source_relevance": "implementation-relevant",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "CI adds graph-retrieval regressions to the strict MCP job. A test-list change supplies no new real-document benchmark measurement. The decision under review is: Keep graph expansion opt-in; synthetic diagnostic results do not establish production answer quality. The implementation surface overlaps this decision; review of the exact dependency and conditions is required. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "graph-update-1",
+          "revision": "c3df1f59ecab55e3ec59fda789abe4ef2442e3b1",
+          "sha256": "8c5180f68204316905f5e1015f5dbc58e66f852bbecf27101c1ad57313157c93",
+          "byte_start": 463,
+          "byte_end": 492,
+          "quote": "tests/test_graph_retrieval.py"
+        },
+        {
+          "source_id": "graph-basis",
+          "revision": "9bf005074685aebb131d7f442705c0732ee7698b",
+          "sha256": "f8fd4889472a34e5a85da9bf18911cc122840b0be737cbaad29029109696692a",
+          "byte_start": 0,
+          "byte_end": 13,
+          "quote": "## Evaluation"
+        }
+      ],
+      "conditions": {
+        "code_revision": "c3df1f59ecab55e3ec59fda789abe4ef2442e3b1",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-graph-1",
+      "decision_id": "decision-context",
+      "decision_source_id": "context-basis",
+      "source_relevance": "no-cross-family-path-shown",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "CI adds graph-retrieval regressions to the strict MCP job. A test-list change supplies no new real-document benchmark measurement. The decision under review is: Assemble citation-bearing context by persisted tier within an estimated token budget. The supplied update does not establish a cross-family dependency. Absence of a supplied path is not proof that no indirect impact exists. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "graph-update-1",
+          "revision": "c3df1f59ecab55e3ec59fda789abe4ef2442e3b1",
+          "sha256": "8c5180f68204316905f5e1015f5dbc58e66f852bbecf27101c1ad57313157c93",
+          "byte_start": 463,
+          "byte_end": 492,
+          "quote": "tests/test_graph_retrieval.py"
+        },
+        {
+          "source_id": "context-basis",
+          "revision": "9b41afc740ce8f083f859944bdebe67b4bbfd1c7",
+          "sha256": "6b3aa6c55de240dc0b48980a6949ba44e9712ad2480af2fec4fe86f6fcb275f4",
+          "byte_start": 0,
+          "byte_end": 46,
+          "quote": "### Budgeted context and a complete agent turn"
+        }
+      ],
+      "conditions": {
+        "code_revision": "c3df1f59ecab55e3ec59fda789abe4ef2442e3b1",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-graph-2",
+      "decision_id": "decision-graph",
+      "decision_source_id": "graph-basis",
+      "source_relevance": "implementation-relevant",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "The search CLI switches to intermixed argument parsing. The patch does not report answer correctness or general graph benefit. The decision under review is: Keep graph expansion opt-in; synthetic diagnostic results do not establish production answer quality. The implementation surface overlaps this decision; review of the exact dependency and conditions is required. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "graph-update-2",
+          "revision": "502b2aa380555aa4a8535fd9f6ff127142dc9a9c",
+          "sha256": "5497ae91315d1a8708efd819ba96a0019734118c45e68f893249b997424f0810",
+          "byte_start": 475,
+          "byte_end": 496,
+          "quote": "parse_intermixed_args"
+        },
+        {
+          "source_id": "graph-basis",
+          "revision": "9bf005074685aebb131d7f442705c0732ee7698b",
+          "sha256": "f8fd4889472a34e5a85da9bf18911cc122840b0be737cbaad29029109696692a",
+          "byte_start": 0,
+          "byte_end": 13,
+          "quote": "## Evaluation"
+        }
+      ],
+      "conditions": {
+        "code_revision": "502b2aa380555aa4a8535fd9f6ff127142dc9a9c",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-graph-2",
+      "decision_id": "decision-context",
+      "decision_source_id": "context-basis",
+      "source_relevance": "no-cross-family-path-shown",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "The search CLI switches to intermixed argument parsing. The patch does not report answer correctness or general graph benefit. The decision under review is: Assemble citation-bearing context by persisted tier within an estimated token budget. The supplied update does not establish a cross-family dependency. Absence of a supplied path is not proof that no indirect impact exists. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "graph-update-2",
+          "revision": "502b2aa380555aa4a8535fd9f6ff127142dc9a9c",
+          "sha256": "5497ae91315d1a8708efd819ba96a0019734118c45e68f893249b997424f0810",
+          "byte_start": 475,
+          "byte_end": 496,
+          "quote": "parse_intermixed_args"
+        },
+        {
+          "source_id": "context-basis",
+          "revision": "9b41afc740ce8f083f859944bdebe67b4bbfd1c7",
+          "sha256": "6b3aa6c55de240dc0b48980a6949ba44e9712ad2480af2fec4fe86f6fcb275f4",
+          "byte_start": 0,
+          "byte_end": 46,
+          "quote": "### Budgeted context and a complete agent turn"
+        }
+      ],
+      "conditions": {
+        "code_revision": "502b2aa380555aa4a8535fd9f6ff127142dc9a9c",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-documents-1",
+      "decision_id": "decision-graph",
+      "decision_source_id": "graph-basis",
+      "source_relevance": "no-cross-family-path-shown",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "Import retries reject conflicting capture linkage and repair the derived index once per file. This changes recovery behavior; it is not a measured contradiction of the import design. The decision under review is: Keep graph expansion opt-in; synthetic diagnostic results do not establish production answer quality. The supplied update does not establish a cross-family dependency. Absence of a supplied path is not proof that no indirect impact exists. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "documents-update-1",
+          "revision": "402f8ae20dbc7fdb7225c01f0ba92a7abb3cfae3",
+          "sha256": "2cf3ce4ca23a789498715d72bd66213998c313cd5c06b471ea9fae1809bf4e44",
+          "byte_start": 1831,
+          "byte_end": 1903,
+          "quote": "Capture receipt conflicts with original input or linkage; refusing reuse"
+        },
+        {
+          "source_id": "graph-basis",
+          "revision": "9bf005074685aebb131d7f442705c0732ee7698b",
+          "sha256": "f8fd4889472a34e5a85da9bf18911cc122840b0be737cbaad29029109696692a",
+          "byte_start": 0,
+          "byte_end": 13,
+          "quote": "## Evaluation"
+        }
+      ],
+      "conditions": {
+        "code_revision": "402f8ae20dbc7fdb7225c01f0ba92a7abb3cfae3",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-documents-1",
+      "decision_id": "decision-context",
+      "decision_source_id": "context-basis",
+      "source_relevance": "implementation-relevant",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "Import retries reject conflicting capture linkage and repair the derived index once per file. This changes recovery behavior; it is not a measured contradiction of the import design. The decision under review is: Assemble citation-bearing context by persisted tier within an estimated token budget. The implementation surface overlaps this decision; review of the exact dependency and conditions is required. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "documents-update-1",
+          "revision": "402f8ae20dbc7fdb7225c01f0ba92a7abb3cfae3",
+          "sha256": "2cf3ce4ca23a789498715d72bd66213998c313cd5c06b471ea9fae1809bf4e44",
+          "byte_start": 1831,
+          "byte_end": 1903,
+          "quote": "Capture receipt conflicts with original input or linkage; refusing reuse"
+        },
+        {
+          "source_id": "context-basis",
+          "revision": "9b41afc740ce8f083f859944bdebe67b4bbfd1c7",
+          "sha256": "6b3aa6c55de240dc0b48980a6949ba44e9712ad2480af2fec4fe86f6fcb275f4",
+          "byte_start": 0,
+          "byte_end": 46,
+          "quote": "### Budgeted context and a complete agent turn"
+        }
+      ],
+      "conditions": {
+        "code_revision": "402f8ae20dbc7fdb7225c01f0ba92a7abb3cfae3",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-documents-1",
+      "decision_id": "decision-documents",
+      "decision_source_id": "documents-basis",
+      "source_relevance": "implementation-relevant",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "Import retries reject conflicting capture linkage and repair the derived index once per file. This changes recovery behavior; it is not a measured contradiction of the import design. The decision under review is: Import local documents with exact source provenance, bounded chunks and retry receipts. The implementation surface overlaps this decision; review of the exact dependency and conditions is required. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "documents-update-1",
+          "revision": "402f8ae20dbc7fdb7225c01f0ba92a7abb3cfae3",
+          "sha256": "2cf3ce4ca23a789498715d72bd66213998c313cd5c06b471ea9fae1809bf4e44",
+          "byte_start": 1831,
+          "byte_end": 1903,
+          "quote": "Capture receipt conflicts with original input or linkage; refusing reuse"
+        },
+        {
+          "source_id": "documents-basis",
+          "revision": "d0b415663dcc04c8430183cb9469fe197b7c0b18",
+          "sha256": "0653ca0e07e351df9cac345d8a545a6f29b97d122db6f4c3f53ae4dca16ef3b7",
+          "byte_start": 0,
+          "byte_end": 25,
+          "quote": "### Local document import"
+        }
+      ],
+      "conditions": {
+        "code_revision": "402f8ae20dbc7fdb7225c01f0ba92a7abb3cfae3",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-context-1",
+      "decision_id": "decision-graph",
+      "decision_source_id": "graph-basis",
+      "source_relevance": "no-cross-family-path-shown",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "Authorization builds an operation-local provenance snapshot, including legacy derivation edges. This is relevant to context exclusion and derived-source access, not a new context-quality measurement. The decision under review is: Keep graph expansion opt-in; synthetic diagnostic results do not establish production answer quality. The supplied update does not establish a cross-family dependency. Absence of a supplied path is not proof that no indirect impact exists. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "context-update-1",
+          "revision": "14a6735f7c1f4c48b4be033aea86c314839d91ad",
+          "sha256": "4cbdfef5a0e22144daebb8ea826a022c10e137137d2fded2499bacbe7c4d7b2a",
+          "byte_start": 4032,
+          "byte_end": 4106,
+          "quote": "Operation-local provenance snapshot; never cache permissions across reads."
+        },
+        {
+          "source_id": "graph-basis",
+          "revision": "9bf005074685aebb131d7f442705c0732ee7698b",
+          "sha256": "f8fd4889472a34e5a85da9bf18911cc122840b0be737cbaad29029109696692a",
+          "byte_start": 0,
+          "byte_end": 13,
+          "quote": "## Evaluation"
+        }
+      ],
+      "conditions": {
+        "code_revision": "14a6735f7c1f4c48b4be033aea86c314839d91ad",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-context-1",
+      "decision_id": "decision-context",
+      "decision_source_id": "context-basis",
+      "source_relevance": "implementation-relevant",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "Authorization builds an operation-local provenance snapshot, including legacy derivation edges. This is relevant to context exclusion and derived-source access, not a new context-quality measurement. The decision under review is: Assemble citation-bearing context by persisted tier within an estimated token budget. The implementation surface overlaps this decision; review of the exact dependency and conditions is required. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "context-update-1",
+          "revision": "14a6735f7c1f4c48b4be033aea86c314839d91ad",
+          "sha256": "4cbdfef5a0e22144daebb8ea826a022c10e137137d2fded2499bacbe7c4d7b2a",
+          "byte_start": 4032,
+          "byte_end": 4106,
+          "quote": "Operation-local provenance snapshot; never cache permissions across reads."
+        },
+        {
+          "source_id": "context-basis",
+          "revision": "9b41afc740ce8f083f859944bdebe67b4bbfd1c7",
+          "sha256": "6b3aa6c55de240dc0b48980a6949ba44e9712ad2480af2fec4fe86f6fcb275f4",
+          "byte_start": 0,
+          "byte_end": 46,
+          "quote": "### Budgeted context and a complete agent turn"
+        }
+      ],
+      "conditions": {
+        "code_revision": "14a6735f7c1f4c48b4be033aea86c314839d91ad",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-context-1",
+      "decision_id": "decision-documents",
+      "decision_source_id": "documents-basis",
+      "source_relevance": "implementation-relevant",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "Authorization builds an operation-local provenance snapshot, including legacy derivation edges. This is relevant to context exclusion and derived-source access, not a new context-quality measurement. The decision under review is: Import local documents with exact source provenance, bounded chunks and retry receipts. The implementation surface overlaps this decision; review of the exact dependency and conditions is required. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "context-update-1",
+          "revision": "14a6735f7c1f4c48b4be033aea86c314839d91ad",
+          "sha256": "4cbdfef5a0e22144daebb8ea826a022c10e137137d2fded2499bacbe7c4d7b2a",
+          "byte_start": 4032,
+          "byte_end": 4106,
+          "quote": "Operation-local provenance snapshot; never cache permissions across reads."
+        },
+        {
+          "source_id": "documents-basis",
+          "revision": "d0b415663dcc04c8430183cb9469fe197b7c0b18",
+          "sha256": "0653ca0e07e351df9cac345d8a545a6f29b97d122db6f4c3f53ae4dca16ef3b7",
+          "byte_start": 0,
+          "byte_end": 25,
+          "quote": "### Local document import"
+        }
+      ],
+      "conditions": {
+        "code_revision": "14a6735f7c1f4c48b4be033aea86c314839d91ad",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-context-1",
+      "decision_id": "decision-cache",
+      "decision_source_id": "cache-basis",
+      "source_relevance": "implementation-relevant",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "Authorization builds an operation-local provenance snapshot, including legacy derivation edges. This is relevant to context exclusion and derived-source access, not a new context-quality measurement. The decision under review is: Use disposable retrieval caches while validating freshness and preserving current authorization. The implementation surface overlaps this decision; review of the exact dependency and conditions is required. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "context-update-1",
+          "revision": "14a6735f7c1f4c48b4be033aea86c314839d91ad",
+          "sha256": "4cbdfef5a0e22144daebb8ea826a022c10e137137d2fded2499bacbe7c4d7b2a",
+          "byte_start": 4032,
+          "byte_end": 4106,
+          "quote": "Operation-local provenance snapshot; never cache permissions across reads."
+        },
+        {
+          "source_id": "cache-basis",
+          "revision": "0ca70b51b1fd088675491e117889714b1acb794c",
+          "sha256": "a8278e3095044cf1e09819bab75d2b12bc83d241ad66968b909083d9295c14e0",
+          "byte_start": 0,
+          "byte_end": 46,
+          "quote": "# Retrieval performance and disposable indexes"
+        }
+      ],
+      "conditions": {
+        "code_revision": "14a6735f7c1f4c48b4be033aea86c314839d91ad",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-documents-2",
+      "decision_id": "decision-graph",
+      "decision_source_id": "graph-basis",
+      "source_relevance": "no-cross-family-path-shown",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "An incomplete prior ingest blocks retrying extraction rather than silently reusing a partial receipt. Exact recovery preconditions need review. The decision under review is: Keep graph expansion opt-in; synthetic diagnostic results do not establish production answer quality. The supplied update does not establish a cross-family dependency. Absence of a supplied path is not proof that no indirect impact exists. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "documents-update-2",
+          "revision": "c06661d08246ee086375a841a7bbcea6e10c6f99",
+          "sha256": "a5e9a7c8bfd05987ef988b8fcd9106ac69a6a4f43bf30f1bd8c0c13f8708f1ae",
+          "byte_start": 688,
+          "byte_end": 775,
+          "quote": "Capture ingest incomplete; inspect stored note and Git state before retrying extraction"
+        },
+        {
+          "source_id": "graph-basis",
+          "revision": "9bf005074685aebb131d7f442705c0732ee7698b",
+          "sha256": "f8fd4889472a34e5a85da9bf18911cc122840b0be737cbaad29029109696692a",
+          "byte_start": 0,
+          "byte_end": 13,
+          "quote": "## Evaluation"
+        }
+      ],
+      "conditions": {
+        "code_revision": "c06661d08246ee086375a841a7bbcea6e10c6f99",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-documents-2",
+      "decision_id": "decision-context",
+      "decision_source_id": "context-basis",
+      "source_relevance": "implementation-relevant",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "An incomplete prior ingest blocks retrying extraction rather than silently reusing a partial receipt. Exact recovery preconditions need review. The decision under review is: Assemble citation-bearing context by persisted tier within an estimated token budget. The implementation surface overlaps this decision; review of the exact dependency and conditions is required. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "documents-update-2",
+          "revision": "c06661d08246ee086375a841a7bbcea6e10c6f99",
+          "sha256": "a5e9a7c8bfd05987ef988b8fcd9106ac69a6a4f43bf30f1bd8c0c13f8708f1ae",
+          "byte_start": 688,
+          "byte_end": 775,
+          "quote": "Capture ingest incomplete; inspect stored note and Git state before retrying extraction"
+        },
+        {
+          "source_id": "context-basis",
+          "revision": "9b41afc740ce8f083f859944bdebe67b4bbfd1c7",
+          "sha256": "6b3aa6c55de240dc0b48980a6949ba44e9712ad2480af2fec4fe86f6fcb275f4",
+          "byte_start": 0,
+          "byte_end": 46,
+          "quote": "### Budgeted context and a complete agent turn"
+        }
+      ],
+      "conditions": {
+        "code_revision": "c06661d08246ee086375a841a7bbcea6e10c6f99",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-documents-2",
+      "decision_id": "decision-documents",
+      "decision_source_id": "documents-basis",
+      "source_relevance": "implementation-relevant",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "An incomplete prior ingest blocks retrying extraction rather than silently reusing a partial receipt. Exact recovery preconditions need review. The decision under review is: Import local documents with exact source provenance, bounded chunks and retry receipts. The implementation surface overlaps this decision; review of the exact dependency and conditions is required. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "documents-update-2",
+          "revision": "c06661d08246ee086375a841a7bbcea6e10c6f99",
+          "sha256": "a5e9a7c8bfd05987ef988b8fcd9106ac69a6a4f43bf30f1bd8c0c13f8708f1ae",
+          "byte_start": 688,
+          "byte_end": 775,
+          "quote": "Capture ingest incomplete; inspect stored note and Git state before retrying extraction"
+        },
+        {
+          "source_id": "documents-basis",
+          "revision": "d0b415663dcc04c8430183cb9469fe197b7c0b18",
+          "sha256": "0653ca0e07e351df9cac345d8a545a6f29b97d122db6f4c3f53ae4dca16ef3b7",
+          "byte_start": 0,
+          "byte_end": 25,
+          "quote": "### Local document import"
+        }
+      ],
+      "conditions": {
+        "code_revision": "c06661d08246ee086375a841a7bbcea6e10c6f99",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-documents-2",
+      "decision_id": "decision-cache",
+      "decision_source_id": "cache-basis",
+      "source_relevance": "no-cross-family-path-shown",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "An incomplete prior ingest blocks retrying extraction rather than silently reusing a partial receipt. Exact recovery preconditions need review. The decision under review is: Use disposable retrieval caches while validating freshness and preserving current authorization. The supplied update does not establish a cross-family dependency. Absence of a supplied path is not proof that no indirect impact exists. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "documents-update-2",
+          "revision": "c06661d08246ee086375a841a7bbcea6e10c6f99",
+          "sha256": "a5e9a7c8bfd05987ef988b8fcd9106ac69a6a4f43bf30f1bd8c0c13f8708f1ae",
+          "byte_start": 688,
+          "byte_end": 775,
+          "quote": "Capture ingest incomplete; inspect stored note and Git state before retrying extraction"
+        },
+        {
+          "source_id": "cache-basis",
+          "revision": "0ca70b51b1fd088675491e117889714b1acb794c",
+          "sha256": "a8278e3095044cf1e09819bab75d2b12bc83d241ad66968b909083d9295c14e0",
+          "byte_start": 0,
+          "byte_end": 46,
+          "quote": "# Retrieval performance and disposable indexes"
+        }
+      ],
+      "conditions": {
+        "code_revision": "c06661d08246ee086375a841a7bbcea6e10c6f99",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-cache-1",
+      "decision_id": "decision-graph",
+      "decision_source_id": "graph-basis",
+      "source_relevance": "no-cross-family-path-shown",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "Raw vector reads are distinguished from freshness validation and model-bound cache writes. Old raw vectors cannot by themselves establish current retrieval compatibility. The decision under review is: Keep graph expansion opt-in; synthetic diagnostic results do not establish production answer quality. The supplied update does not establish a cross-family dependency. Absence of a supplied path is not proof that no indirect impact exists. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "cache-update-1",
+          "revision": "5cea9f40af79db13bf816bedb5ed789f3bcf25e8",
+          "sha256": "b52a84d3f2f9bc6e2eaeaa4cbcd40a61c47e3d158a608b2e126726756cb54840",
+          "byte_start": 1162,
+          "byte_end": 1227,
+          "quote": "Raw values for maintenance/legacy callers; not a freshness check."
+        },
+        {
+          "source_id": "graph-basis",
+          "revision": "9bf005074685aebb131d7f442705c0732ee7698b",
+          "sha256": "f8fd4889472a34e5a85da9bf18911cc122840b0be737cbaad29029109696692a",
+          "byte_start": 0,
+          "byte_end": 13,
+          "quote": "## Evaluation"
+        }
+      ],
+      "conditions": {
+        "code_revision": "5cea9f40af79db13bf816bedb5ed789f3bcf25e8",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-cache-1",
+      "decision_id": "decision-context",
+      "decision_source_id": "context-basis",
+      "source_relevance": "implementation-relevant",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "Raw vector reads are distinguished from freshness validation and model-bound cache writes. Old raw vectors cannot by themselves establish current retrieval compatibility. The decision under review is: Assemble citation-bearing context by persisted tier within an estimated token budget. The implementation surface overlaps this decision; review of the exact dependency and conditions is required. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "cache-update-1",
+          "revision": "5cea9f40af79db13bf816bedb5ed789f3bcf25e8",
+          "sha256": "b52a84d3f2f9bc6e2eaeaa4cbcd40a61c47e3d158a608b2e126726756cb54840",
+          "byte_start": 1162,
+          "byte_end": 1227,
+          "quote": "Raw values for maintenance/legacy callers; not a freshness check."
+        },
+        {
+          "source_id": "context-basis",
+          "revision": "9b41afc740ce8f083f859944bdebe67b4bbfd1c7",
+          "sha256": "6b3aa6c55de240dc0b48980a6949ba44e9712ad2480af2fec4fe86f6fcb275f4",
+          "byte_start": 0,
+          "byte_end": 46,
+          "quote": "### Budgeted context and a complete agent turn"
+        }
+      ],
+      "conditions": {
+        "code_revision": "5cea9f40af79db13bf816bedb5ed789f3bcf25e8",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-cache-1",
+      "decision_id": "decision-documents",
+      "decision_source_id": "documents-basis",
+      "source_relevance": "no-cross-family-path-shown",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "Raw vector reads are distinguished from freshness validation and model-bound cache writes. Old raw vectors cannot by themselves establish current retrieval compatibility. The decision under review is: Import local documents with exact source provenance, bounded chunks and retry receipts. The supplied update does not establish a cross-family dependency. Absence of a supplied path is not proof that no indirect impact exists. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "cache-update-1",
+          "revision": "5cea9f40af79db13bf816bedb5ed789f3bcf25e8",
+          "sha256": "b52a84d3f2f9bc6e2eaeaa4cbcd40a61c47e3d158a608b2e126726756cb54840",
+          "byte_start": 1162,
+          "byte_end": 1227,
+          "quote": "Raw values for maintenance/legacy callers; not a freshness check."
+        },
+        {
+          "source_id": "documents-basis",
+          "revision": "d0b415663dcc04c8430183cb9469fe197b7c0b18",
+          "sha256": "0653ca0e07e351df9cac345d8a545a6f29b97d122db6f4c3f53ae4dca16ef3b7",
+          "byte_start": 0,
+          "byte_end": 25,
+          "quote": "### Local document import"
+        }
+      ],
+      "conditions": {
+        "code_revision": "5cea9f40af79db13bf816bedb5ed789f3bcf25e8",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-cache-1",
+      "decision_id": "decision-cache",
+      "decision_source_id": "cache-basis",
+      "source_relevance": "implementation-relevant",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "Raw vector reads are distinguished from freshness validation and model-bound cache writes. Old raw vectors cannot by themselves establish current retrieval compatibility. The decision under review is: Use disposable retrieval caches while validating freshness and preserving current authorization. The implementation surface overlaps this decision; review of the exact dependency and conditions is required. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "cache-update-1",
+          "revision": "5cea9f40af79db13bf816bedb5ed789f3bcf25e8",
+          "sha256": "b52a84d3f2f9bc6e2eaeaa4cbcd40a61c47e3d158a608b2e126726756cb54840",
+          "byte_start": 1162,
+          "byte_end": 1227,
+          "quote": "Raw values for maintenance/legacy callers; not a freshness check."
+        },
+        {
+          "source_id": "cache-basis",
+          "revision": "0ca70b51b1fd088675491e117889714b1acb794c",
+          "sha256": "a8278e3095044cf1e09819bab75d2b12bc83d241ad66968b909083d9295c14e0",
+          "byte_start": 0,
+          "byte_end": 46,
+          "quote": "# Retrieval performance and disposable indexes"
+        }
+      ],
+      "conditions": {
+        "code_revision": "5cea9f40af79db13bf816bedb5ed789f3bcf25e8",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-cache-2",
+      "decision_id": "decision-graph",
+      "decision_source_id": "graph-basis",
+      "source_relevance": "implementation-relevant",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "Model identity resolution moves after the empty-corpus return; query text is normalized. This changes initialization/freshness behavior; no new performance or answer-quality result is supplied. The decision under review is: Keep graph expansion opt-in; synthetic diagnostic results do not establish production answer quality. The implementation surface overlaps this decision; review of the exact dependency and conditions is required. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "cache-update-2",
+          "revision": "a95f7beb1e852b64ac0f7c02045a40b060b99ad1",
+          "sha256": "5ed9aaaa43f2d1a9fc57fe9820d2a16d7b218bc42e621d947f1791036c1c1fa5",
+          "byte_start": 1314,
+          "byte_end": 1361,
+          "quote": "a model even though there is nothing to search."
+        },
+        {
+          "source_id": "graph-basis",
+          "revision": "9bf005074685aebb131d7f442705c0732ee7698b",
+          "sha256": "f8fd4889472a34e5a85da9bf18911cc122840b0be737cbaad29029109696692a",
+          "byte_start": 0,
+          "byte_end": 13,
+          "quote": "## Evaluation"
+        }
+      ],
+      "conditions": {
+        "code_revision": "a95f7beb1e852b64ac0f7c02045a40b060b99ad1",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-cache-2",
+      "decision_id": "decision-context",
+      "decision_source_id": "context-basis",
+      "source_relevance": "implementation-relevant",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "Model identity resolution moves after the empty-corpus return; query text is normalized. This changes initialization/freshness behavior; no new performance or answer-quality result is supplied. The decision under review is: Assemble citation-bearing context by persisted tier within an estimated token budget. The implementation surface overlaps this decision; review of the exact dependency and conditions is required. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "cache-update-2",
+          "revision": "a95f7beb1e852b64ac0f7c02045a40b060b99ad1",
+          "sha256": "5ed9aaaa43f2d1a9fc57fe9820d2a16d7b218bc42e621d947f1791036c1c1fa5",
+          "byte_start": 1314,
+          "byte_end": 1361,
+          "quote": "a model even though there is nothing to search."
+        },
+        {
+          "source_id": "context-basis",
+          "revision": "9b41afc740ce8f083f859944bdebe67b4bbfd1c7",
+          "sha256": "6b3aa6c55de240dc0b48980a6949ba44e9712ad2480af2fec4fe86f6fcb275f4",
+          "byte_start": 0,
+          "byte_end": 46,
+          "quote": "### Budgeted context and a complete agent turn"
+        }
+      ],
+      "conditions": {
+        "code_revision": "a95f7beb1e852b64ac0f7c02045a40b060b99ad1",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-cache-2",
+      "decision_id": "decision-documents",
+      "decision_source_id": "documents-basis",
+      "source_relevance": "no-cross-family-path-shown",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "Model identity resolution moves after the empty-corpus return; query text is normalized. This changes initialization/freshness behavior; no new performance or answer-quality result is supplied. The decision under review is: Import local documents with exact source provenance, bounded chunks and retry receipts. The supplied update does not establish a cross-family dependency. Absence of a supplied path is not proof that no indirect impact exists. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "cache-update-2",
+          "revision": "a95f7beb1e852b64ac0f7c02045a40b060b99ad1",
+          "sha256": "5ed9aaaa43f2d1a9fc57fe9820d2a16d7b218bc42e621d947f1791036c1c1fa5",
+          "byte_start": 1314,
+          "byte_end": 1361,
+          "quote": "a model even though there is nothing to search."
+        },
+        {
+          "source_id": "documents-basis",
+          "revision": "d0b415663dcc04c8430183cb9469fe197b7c0b18",
+          "sha256": "0653ca0e07e351df9cac345d8a545a6f29b97d122db6f4c3f53ae4dca16ef3b7",
+          "byte_start": 0,
+          "byte_end": 25,
+          "quote": "### Local document import"
+        }
+      ],
+      "conditions": {
+        "code_revision": "a95f7beb1e852b64ac0f7c02045a40b060b99ad1",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-cache-2",
+      "decision_id": "decision-cache",
+      "decision_source_id": "cache-basis",
+      "source_relevance": "implementation-relevant",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "Model identity resolution moves after the empty-corpus return; query text is normalized. This changes initialization/freshness behavior; no new performance or answer-quality result is supplied. The decision under review is: Use disposable retrieval caches while validating freshness and preserving current authorization. The implementation surface overlaps this decision; review of the exact dependency and conditions is required. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "cache-update-2",
+          "revision": "a95f7beb1e852b64ac0f7c02045a40b060b99ad1",
+          "sha256": "5ed9aaaa43f2d1a9fc57fe9820d2a16d7b218bc42e621d947f1791036c1c1fa5",
+          "byte_start": 1314,
+          "byte_end": 1361,
+          "quote": "a model even though there is nothing to search."
+        },
+        {
+          "source_id": "cache-basis",
+          "revision": "0ca70b51b1fd088675491e117889714b1acb794c",
+          "sha256": "a8278e3095044cf1e09819bab75d2b12bc83d241ad66968b909083d9295c14e0",
+          "byte_start": 0,
+          "byte_end": 46,
+          "quote": "# Retrieval performance and disposable indexes"
+        }
+      ],
+      "conditions": {
+        "code_revision": "a95f7beb1e852b64ac0f7c02045a40b060b99ad1",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-context-2",
+      "decision_id": "decision-graph",
+      "decision_source_id": "graph-basis",
+      "source_relevance": "implementation-relevant",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "Filtered temporal corpora bypass the ordinary index and apply node filtering before scoring. This affects context/retrieval inputs and cache boundaries; it is not evidence for general graph benefit. The decision under review is: Keep graph expansion opt-in; synthetic diagnostic results do not establish production answer quality. The implementation surface overlaps this decision; review of the exact dependency and conditions is required. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "context-update-2",
+          "revision": "d2a6bfd11bea473827814e8a731083374a64ba00",
+          "sha256": "cc95dba7dd1f854e5b8c11986a88398dc28715a9f4e44b059b918d28b2ec8e9a",
+          "byte_start": 1591,
+          "byte_end": 1661,
+          "quote": "A filtered corpus has different dense rows and BM25 statistics. Bypass"
+        },
+        {
+          "source_id": "graph-basis",
+          "revision": "9bf005074685aebb131d7f442705c0732ee7698b",
+          "sha256": "f8fd4889472a34e5a85da9bf18911cc122840b0be737cbaad29029109696692a",
+          "byte_start": 0,
+          "byte_end": 13,
+          "quote": "## Evaluation"
+        }
+      ],
+      "conditions": {
+        "code_revision": "d2a6bfd11bea473827814e8a731083374a64ba00",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-context-2",
+      "decision_id": "decision-context",
+      "decision_source_id": "context-basis",
+      "source_relevance": "implementation-relevant",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "Filtered temporal corpora bypass the ordinary index and apply node filtering before scoring. This affects context/retrieval inputs and cache boundaries; it is not evidence for general graph benefit. The decision under review is: Assemble citation-bearing context by persisted tier within an estimated token budget. The implementation surface overlaps this decision; review of the exact dependency and conditions is required. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "context-update-2",
+          "revision": "d2a6bfd11bea473827814e8a731083374a64ba00",
+          "sha256": "cc95dba7dd1f854e5b8c11986a88398dc28715a9f4e44b059b918d28b2ec8e9a",
+          "byte_start": 1591,
+          "byte_end": 1661,
+          "quote": "A filtered corpus has different dense rows and BM25 statistics. Bypass"
+        },
+        {
+          "source_id": "context-basis",
+          "revision": "9b41afc740ce8f083f859944bdebe67b4bbfd1c7",
+          "sha256": "6b3aa6c55de240dc0b48980a6949ba44e9712ad2480af2fec4fe86f6fcb275f4",
+          "byte_start": 0,
+          "byte_end": 46,
+          "quote": "### Budgeted context and a complete agent turn"
+        }
+      ],
+      "conditions": {
+        "code_revision": "d2a6bfd11bea473827814e8a731083374a64ba00",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-context-2",
+      "decision_id": "decision-documents",
+      "decision_source_id": "documents-basis",
+      "source_relevance": "no-cross-family-path-shown",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "Filtered temporal corpora bypass the ordinary index and apply node filtering before scoring. This affects context/retrieval inputs and cache boundaries; it is not evidence for general graph benefit. The decision under review is: Import local documents with exact source provenance, bounded chunks and retry receipts. The supplied update does not establish a cross-family dependency. Absence of a supplied path is not proof that no indirect impact exists. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "context-update-2",
+          "revision": "d2a6bfd11bea473827814e8a731083374a64ba00",
+          "sha256": "cc95dba7dd1f854e5b8c11986a88398dc28715a9f4e44b059b918d28b2ec8e9a",
+          "byte_start": 1591,
+          "byte_end": 1661,
+          "quote": "A filtered corpus has different dense rows and BM25 statistics. Bypass"
+        },
+        {
+          "source_id": "documents-basis",
+          "revision": "d0b415663dcc04c8430183cb9469fe197b7c0b18",
+          "sha256": "0653ca0e07e351df9cac345d8a545a6f29b97d122db6f4c3f53ae4dca16ef3b7",
+          "byte_start": 0,
+          "byte_end": 25,
+          "quote": "### Local document import"
+        }
+      ],
+      "conditions": {
+        "code_revision": "d2a6bfd11bea473827814e8a731083374a64ba00",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    },
+    {
+      "case_id": "event-context-2",
+      "decision_id": "decision-cache",
+      "decision_source_id": "cache-basis",
+      "source_relevance": "implementation-relevant",
+      "working_outcome": "inconclusive",
+      "accepted_historical_path": null,
+      "rationale": "Filtered temporal corpora bypass the ordinary index and apply node filtering before scoring. This affects context/retrieval inputs and cache boundaries; it is not evidence for general graph benefit. The decision under review is: Use disposable retrieval caches while validating freshness and preserving current authorization. The implementation surface overlaps this decision; review of the exact dependency and conditions is required. The packet reconstructs documented choices and topic attachments, not accepted historical decision dependencies.",
+      "evidence": [
+        {
+          "source_id": "context-update-2",
+          "revision": "d2a6bfd11bea473827814e8a731083374a64ba00",
+          "sha256": "cc95dba7dd1f854e5b8c11986a88398dc28715a9f4e44b059b918d28b2ec8e9a",
+          "byte_start": 1591,
+          "byte_end": 1661,
+          "quote": "A filtered corpus has different dense rows and BM25 statistics. Bypass"
+        },
+        {
+          "source_id": "cache-basis",
+          "revision": "0ca70b51b1fd088675491e117889714b1acb794c",
+          "sha256": "a8278e3095044cf1e09819bab75d2b12bc83d241ad66968b909083d9295c14e0",
+          "byte_start": 0,
+          "byte_end": 46,
+          "quote": "# Retrieval performance and disposable indexes"
+        }
+      ],
+      "conditions": {
+        "code_revision": "d2a6bfd11bea473827814e8a731083374a64ba00",
+        "runtime_profile": "unknown",
+        "comparability": "unknown"
+      },
+      "remaining_support": "Original basis bytes remain in the packet; independent support and current justification have not been adjudicated.",
+      "uncertainty": "Need source-grounded typed conditions and independently reviewed accepted/proposed dependencies. Do not treat missing inputs as negative gold."
+    }
+  ],
+  "disagreement_records": null,
+  "adjudication": null,
+  "independent_sign_off": null,
+  "limits": [
+    "Working inconclusive labels are not independent inconclusive coverage.",
+    "No original label, source, freeze or threshold has been changed.",
+    "No LLM self-rating is used as a quality or release measurement."
+  ]
+}

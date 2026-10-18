@@ -1,0 +1,10 @@
+{
+  "original_source_commit": "1a4d282ab46ab3141ebe933b24d9cee3fac2504e",
+  "steps": [
+    "git show 1a4d282ab46ab3141ebe933b24d9cee3fac2504e:graph_engine/web/decision-review.js > /tmp/decision-solo-original-review.js",
+    "cp docs/decision-evaluation-results/solo-development-v1/development/original_brief_plugin.py /tmp/decision_solo_original_brief.py",
+    "GRAPH_ENGINE_TEST_D3=/tmp/decision-solo-d3.v7.min.js PLAYWRIGHT_BROWSERS_PATH=/tmp/decision-solo-playwright PYTHONPATH=/tmp:. .venv/bin/python -m pytest -p decision_solo_original_brief tests/test_frontend_xss.py -k brief_keeps_selected --fail-on-skip -q"
+  ],
+  "expected_and_observed": "exit 1: selected comparison-revision heading absent with original HEAD-based script; 1 failed, 40 deselected. Current script passes in strict current browser/matrix/CI runs.",
+  "boundaries": "Only the decision-review.js browser response is replaced. Server/production repository files are not modified. No participant or semantic quality outcome."
+}

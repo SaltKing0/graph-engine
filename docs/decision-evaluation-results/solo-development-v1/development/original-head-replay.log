@@ -1,0 +1,39 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_decision_integrity_brief_keeps_selected_revision_after_later_edit[git] __
+
+server = 'http://127.0.0.1:57058'
+page = <Page url='http://127.0.0.1:57058/review?mode=decisions'>
+tmp_path = PosixPath('/private/var/folders/sj/799zmzcs10n9pm_vhxx4typc0000gn/T/pytest-of-niklas/pytest-803/test_decision_integrity_brief_0')
+
+    @pytest.mark.parametrize('server', [{'mode': 'git'}], indirect=True, ids=['git'])
+    def test_decision_integrity_brief_keeps_selected_revision_after_later_edit(server, page, tmp_path):
+        from test_decision_impact import change_source, commit
+        service, refs, comp = decision_browser_seed(tmp_path)
+        change_source(service, 'Later text outside the selected historical comparison')
+        commit(service)
+        open_decision_comparison(page, server, comp)
+        expect(page.locator('#dm-detail')).to_contain_text('Changed browser observation')
+        # Review detail deliberately includes the current successor alongside the
+        # pinned comparison; the explicit historical brief must remain pinned.
+        expect(page.locator('#dm-detail')).to_contain_text('Later text outside')
+        page.get_by_role('button', name='Open decision brief', exact=True).click()
+        heading = page.get_by_role('heading', name=f'Decision brief · revision {comp["after"]}', exact=True)
+>       expect(heading).to_be_visible()
+E       AssertionError: Locator expected to be visible
+E       Actual value: None
+E       Error: element(s) not found 
+E       Call log:
+E         - Expect "to_be_visible" with timeout 5000ms
+E         - waiting for get_by_role("heading", name="Decision brief · revision 74f56994dae514a0965bf0d5eedc020f0773842e", exact=True)
+
+tests/test_frontend_xss.py:914: AssertionError
+=============================== warnings summary ===============================
+tests/test_frontend_xss.py::test_decision_integrity_brief_keeps_selected_revision_after_later_edit[git]
+  /Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_frontend_xss.py::test_decision_integrity_brief_keeps_selected_revision_after_later_edit[git]
+1 failed, 40 deselected, 1 warning in 11.25s

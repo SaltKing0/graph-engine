@@ -1,0 +1,100 @@
+{
+  "source_commit": "4558232e197b0fb0e24dedc142ccc1910877251b",
+  "packet": {
+    "schema": "dm.annotation.preparation-report/1",
+    "packet_valid": true,
+    "cases": 8,
+    "eligible_pairs": 27,
+    "independently_reviewed_pairs": null,
+    "final_coverage": {
+      "positive_pairs": 0,
+      "negative_pairs": 0,
+      "inconclusive_cases": 0
+    },
+    "acceptance_complete": false,
+    "blockers": [
+      "Human calibration not recorded",
+      "No successor final sources or labels",
+      "Two independent judgments and adjudication not verified",
+      "No custodian access-control or freeze sign-off"
+    ]
+  },
+  "notes": {
+    "pairs": 27,
+    "quotes": 54,
+    "independent": false,
+    "human_review": false
+  },
+  "old_development_runtime_input_hashes_match": {
+    "event-graph-1": true,
+    "event-graph-2": true,
+    "event-documents-1": true,
+    "event-context-1": true,
+    "event-documents-2": true,
+    "event-cache-1": true,
+    "event-cache-2": true,
+    "event-context-2": true
+  },
+  "profiles": {
+    "curated": {
+      "events": 8,
+      "raw_alerts": 8,
+      "errors": 0,
+      "complete": 8,
+      "context_truncated": 8,
+      "context_within_budget": 8,
+      "context_tokens": [
+        3720,
+        3720,
+        3195,
+        3194,
+        3195,
+        3194,
+        3194,
+        3194
+      ]
+    },
+    "proposed": {
+      "events": 8,
+      "raw_alerts": 0,
+      "errors": 0,
+      "complete": 8,
+      "context_truncated": 0,
+      "context_within_budget": 8,
+      "context_tokens": [
+        1066,
+        1066,
+        1598,
+        2132,
+        2132,
+        2132,
+        2132,
+        2132
+      ]
+    }
+  },
+  "protected_paths": {
+    "command": [
+      "git",
+      "diff",
+      "--exit-code",
+      "a3ea0910a976e7035d7f4757b6b99dffb5c8ef49",
+      "--",
+      "tools/decision_benchmark/data",
+      "docs/decision-memory-v1.md",
+      "docs/decision-evaluation-results/workflow-v1",
+      "docs/decision-evaluation-results/controls.json",
+      "docs/decision-evaluation-results/project-development.json",
+      "docs/decision-evaluation-results/project-evaluation.json"
+    ],
+    "exit_code": 0
+  },
+  "independent_final_coverage": {
+    "positive_pairs": 0,
+    "negative_pairs": 0,
+    "inconclusive_cases": 0
+  },
+  "semantic_quality": null,
+  "human_review_time": null,
+  "release_ready": false
+}

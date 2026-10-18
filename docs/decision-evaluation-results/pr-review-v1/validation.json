@@ -1,0 +1,46 @@
+{
+  "source_commit": "f76dde05c0b042ba4e1a20c5196ca00225408083",
+  "full_command": [
+    ".venv/bin/python",
+    "-m",
+    "pytest",
+    "tests/",
+    "-q",
+    "-rs"
+  ],
+  "full_environment": {
+    "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+    "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+  },
+  "full_result": {
+    "exit_code": 0,
+    "passed": 2084,
+    "skipped": 10,
+    "warnings": 1,
+    "elapsed_seconds": 538.27
+  },
+  "focused_command": [
+    ".venv/bin/python",
+    "-m",
+    "pytest",
+    "tests/test_decision_annotation_packets.py",
+    "tests/test_decision_integrity_matrix.py",
+    "tests/test_decision_solo.py",
+    "-q"
+  ],
+  "focused_result": "55 passed",
+  "privacy_command": [
+    ".venv/bin/python",
+    "-m",
+    "pytest",
+    "tests/test_decision_integrity.py",
+    "-k",
+    "historical_privacy",
+    "--fail-on-skip",
+    "-q"
+  ],
+  "privacy_result": "20 passed, 13 deselected, 1 warning",
+  "review_author_role": "Implementing agent; engineering review only, not independent semantic/human evaluation",
+  "independent_acceptance": false,
+  "release_ready": false
+}

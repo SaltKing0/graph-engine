@@ -1,0 +1,23 @@
+{
+  "command": [
+    ".venv/bin/python",
+    "-m",
+    "pytest",
+    "tests/",
+    "-q",
+    "-rs"
+  ],
+  "environment": {
+    "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+    "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+  },
+  "collection_commit": "2010640f81d8498d70f6d18779badfa5c8784ad1",
+  "source_commit_at_completion": "4558232e197b0fb0e24dedc142ccc1910877251b",
+  "exit_code": 0,
+  "passed": 2069,
+  "skipped": 10,
+  "warnings": 1,
+  "pytest_elapsed_seconds": 525.42,
+  "scope": "Initial full collection before one additional browser-only test. Not a clean full-suite run at the later commit. Production code, tools and CI configuration unchanged; current strict matrix/browser and full matching CI cover the additional test.",
+  "omitted": "Local [st] stack absent; exact matching CI supplies real-model/trust coverage. No independent semantic/human acceptance."
+}

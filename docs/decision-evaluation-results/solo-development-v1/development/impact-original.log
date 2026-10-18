@@ -1,0 +1,55 @@
+F...F                                                                    [100%]
+=================================== FAILURES ===================================
+___ test_claim_crlf_only_change_is_informational_without_transferring_review ___
+
+service = <graph_engine.decision_service.DecisionService object at 0x109b21280>
+
+    def test_claim_crlf_only_change_is_informational_without_transferring_review(service):
+        c, = save(service, claim('Keep expansion opt-in.\r\nEvidence remains limited.'))
+        review(service, c)
+        d, = save(service, draft('decision', dict(action='Keep opt-in', rationale='Limited evidence',
+            alternatives=[], context=None, revisit_checks=[])))
+        dep = link(service, 'depends_on', d, c, None)
+        before = commit(service)
+        old = service.inspect(c)['record']
+        successor, = save(service, claim('Keep expansion opt-in.\nEvidence remains limited.',
+            identity=c['id'], anchor=old['anchor_node_id'], previous=c))
+        after = commit(service)
+        result = service.compare(comparison(before, after))
+>       assert result['candidates'] == []
+E       AssertionError: assert [{'basis_even...4d912b', ...}] == []
+E         
+E         Left contains one more item: {'basis_event_ids': ['384abab4-50ea-509f-a79b-6f1a27c9d0e4', 'e9c759a1-c1c8-51d6-b38f-540a0b900812'], 'basis_heads': [...0a44a5a80abc35df316'}], 'candidate_id': 'sha256:30ed538d1926765dd4b92d4b9509f5402b0b1b2a5cb634da53ba1de0da4d912b', ...}
+E         Use -v to get more diff
+
+tests/test_decision_impact.py:137: AssertionError
+____ test_reconvergent_dependency_paths_survive_with_bounds_and_one_finding ____
+
+service = <graph_engine.decision_service.DecisionService object at 0x109ba38c0>
+
+    def test_reconvergent_dependency_paths_survive_with_bounds_and_one_finding(service):
+        refs = scenario(service)
+        ev2, = save(service, draft('evidence', dict(interpretation='Second interpretation of the same source',
+            context=context(refs['profile']), sources=[dict(ref=refs['source'], passage=None)],
+            lineage_ids=[], limitations=['Same source lineage; not an independent measurement'])))
+        second = link(service, 'supports', ev2, refs['claim'], context(refs['profile']))
+        before = commit(service)
+        change_source(service)
+        after = commit(service)
+        result = service.compare(comparison(before, after))
+        candidate, = result['candidates']
+>       assert len(candidate['paths']) == 2
+E       AssertionError: assert 1 == 2
+E        +  where 1 = len([[{'acceptance': 'recorded_input', 'direction': 'consumer', 'from_ref': {'id': '9ce2db0a-c334-431f-893f-36a82c182c97',... 'version_id': 'sha256:c296491e5c3c8f572f436b49681c2f397fe062cba141547ee9caf462510878fe'}, 'kind': 'depends_on', ...}]])
+
+tests/test_decision_impact.py:181: AssertionError
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_decision_impact.py::test_claim_crlf_only_change_is_informational_without_transferring_review
+FAILED tests/test_decision_impact.py::test_reconvergent_dependency_paths_survive_with_bounds_and_one_finding
+2 failed, 3 passed, 45 deselected, 1 warning in 7.25s
