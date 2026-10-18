@@ -1,0 +1,14 @@
+{
+  "schema": "dm.annotation.stored-preparation/1",
+  "files": {
+    "blank-form.json.gz": "8c8df2403d131a23e9a88edf05ea85b30f3afd63fcfc2aeed0310f31d41eea8d",
+    "manifest.json": "29fbc2d97c812273994462b9609a6a9120e9fb1d687b82fed9cc833bf07d5642",
+    "packet.json.gz": "8c4e491d3a943b771c2632e6393382247cf1005280d1901212b972405d9dec4a",
+    "preparation-report.json": "eb1e693b6ffe820d1f6454ecc90c6c0098e6b505c470e3969b7a5daf999efc4d"
+  },
+  "sha256": "fcb320580a123d4ea7a2ecac120d0875eeeee597f6c0352ef8accf51325d78ee",
+  "handbook_sha256": "9adbfe29aa7e9562a7f3371a7b564d8c19d87ae02786f02d8268800a5b1a311c",
+  "contract_sha256": "a272e747c85262090eb4f2bcfb8332558de498d0efdecf8d050ccdf46df94829",
+  "base_main": "a3ea0910a976e7035d7f4757b6b99dffb5c8ef49",
+  "status": "development-preparation-not-independent-final-evidence"
+}

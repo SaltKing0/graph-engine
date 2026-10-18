@@ -77,11 +77,15 @@ assessment marks missing observations unmeasured and inadequate independent
 coverage failed. A partial integrity walkthrough cannot satisfy the complete
 integrity gate.
 
-Remaining delivery for #81: independently frozen semantic held-out cases,
-independent provenance/statement/comparability assessment, full integrity-matrix
-sign-off and the actual controlled user exercise. Until those are complete,
-keep #81 open and the feature explicitly experimental. Paid calls and real
-corpus execution remain opt-in. Release publishing is a separate action.
+The #81 implementation/diagnostic work package is closed. Remaining acceptance
+is tracked in [#90](https://github.com/SaltKing0/graph-engine/issues/90) (independent
+successor corpus), #91 (semantic/baseline assessment), #92 (integrity matrix)
+and #93 (actual controlled user exercise), under open epic #73. Keep Decision
+Memory experimental until these evidence gates pass. The
+[annotation handbook](decision-annotation-handbook.md) prepares source-only
+development packets and reviewer forms; no human calibration or final corpus
+is established by that preparation. Paid calls and real corpus execution remain
+opt-in. Release publishing is a separate action.
 
 ## Executed measurements (16 October 2026)
 

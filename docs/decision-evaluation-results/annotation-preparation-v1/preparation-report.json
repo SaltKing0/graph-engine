@@ -1,0 +1,19 @@
+{
+  "schema": "dm.annotation.preparation-report/1",
+  "packet_valid": true,
+  "cases": 8,
+  "eligible_pairs": 27,
+  "independently_reviewed_pairs": null,
+  "final_coverage": {
+    "positive_pairs": 0,
+    "negative_pairs": 0,
+    "inconclusive_cases": 0
+  },
+  "acceptance_complete": false,
+  "blockers": [
+    "Human calibration not recorded",
+    "No successor final sources or labels",
+    "Two independent judgments and adjudication not verified",
+    "No custodian access-control or freeze sign-off"
+  ]
+}

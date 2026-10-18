@@ -6,7 +6,12 @@ Status: evaluation infrastructure and **provisional source corpus** for
 This adds no runtime decision types, propagation or UI. Project sources are
 real; annotations are source-only **Codex drafts**, not independent gold.
 Independent review and adequate held-out coverage remain delivery requirements.
-Do not close #75 or claim release readiness from these baseline runs.
+The delivered #75/#81 work packages are closed; their closure does not complete
+independent acceptance. Remaining corpus work is tracked in
+[#90](https://github.com/SaltKing0/graph-engine/issues/90), followed by #91–#93.
+See the [successor annotation handbook](decision-annotation-handbook.md) for
+development-only tools, reviewer forms and the controlled final-data handoff.
+Do not claim release readiness from these baseline runs.
 
 ## Frozen inputs
 
@@ -92,7 +97,7 @@ records provenance; human review must authenticate the review itself.
 
 The held-out families and gold must remain unavailable to feature tuning.
 This author has read/prepared the bundle and is not a blind independent
-evaluator. For #81 use an independent reviewer and disclose this exposure,
+evaluator. For #90/#91 use independent reviewers and disclose this exposure,
 or reserve additional independently prepared held-out families.
 
 ## Availability and baselines
@@ -206,7 +211,7 @@ run establishes no production latency guarantee or controlled usability result.
 
 `--check` establishes successful offline execution and budget integrity only;
 it does not require the deliberately simple baseline to pass product gates.
-Release readiness remains false pending #81's independent coverage, statement,
+Release readiness remains false pending #90–#93's independent coverage, statement,
 integrity and usability evaluations. Existing engine, memory, optional model/
 MCP/PDF/browser and advisory gates remain in place.
 
@@ -223,7 +228,8 @@ The real bundle contains eight action reconstructions and sixteen events but
 dependency review and disagreements remain missing. No real positive/negative/
 inconclusive release stratum is established; extraction, answer and user-time
 outcomes are unmeasured. Synthetic controls establish harness coverage only.
-Freeze an independently reviewed successor before #78 tuning/#81 evaluation.
+Freeze an independently reviewed successor in #90 before #91's final evaluation;
+subsequent tuning requires fresh final evidence.
 
 
 ## Production workflow audit (#81)
