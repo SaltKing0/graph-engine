@@ -4,6 +4,7 @@ from __future__ import annotations
 from copy import deepcopy
 import json
 from pathlib import Path
+import subprocess
 
 import pytest
 
@@ -92,3 +93,19 @@ def test_failed_profile_is_visible_and_existing_reports_are_never_overwritten(tm
     with pytest.raises(FileExistsError):
         solo.run(path, executor=fail)
     assert path.read_bytes() == original
+
+
+def test_solo_git_identity_is_bound_to_the_code_checkout_not_the_callers_repo(tmp_path, monkeypatch):
+    subprocess.run(['git', 'init', '-q', str(tmp_path)], check=True)
+    subprocess.run(['git', '-C', str(tmp_path), '-c', 'user.name=Fixture',
+                    '-c', 'user.email=fixture@example.invalid', 'commit', '--allow-empty',
+                    '-qm', 'Unrelated test checkout'], check=True)
+    expected = subprocess.check_output(['git', '-C', str(solo.ROOT), 'rev-parse', 'HEAD'], text=True).strip()
+    unrelated = subprocess.check_output(['git', '-C', str(tmp_path), 'rev-parse', 'HEAD'], text=True).strip()
+    assert unrelated != expected
+    dirty = bool(subprocess.check_output(['git', '-C', str(solo.ROOT), 'status', '--porcelain']))
+    monkeypatch.chdir(tmp_path)
+    report = solo.run(tmp_path / 'fixture-only.json', executor=lambda *a, **kw: dict(
+        complete=True, context_within_budget=True))
+    assert report['source_commit'] == expected and report['dirty'] == dirty
+    assert report['invocation_directory'] == str(tmp_path)

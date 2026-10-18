@@ -17,6 +17,7 @@ from .corpus import canonical, digest, instant
 from .production import execute
 
 NOTES = Path(__file__).resolve().parents[2] / 'docs/decision-evaluation-results/solo-development-v1/source-notes.json'
+ROOT = Path(__file__).resolve().parents[2]
 
 
 def runtime_inputs(case: dict) -> tuple[dict, dict]:
@@ -86,8 +87,9 @@ def run(output: Path, *, executor: Callable = execute) -> dict:
     output.parent.mkdir(parents=True, exist_ok=True)
     with output.open('x', encoding='utf-8') as handle:
         report = dict(schema='dm.solo.development-run/1', status='running',
-            source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(),
-            dirty=bool(subprocess.check_output(['git', 'status', '--porcelain'])),
+            source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
+            dirty=bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT)),
+            invocation_directory=str(Path.cwd()),
             packet_sha256=digest(canonical(packet)), notes_sha256=digest(NOTES.read_bytes()),
             exposure='Previously exposed project-v1 development; implementing-agent notes, not human calibration',
             release_ready=False, independent_final_coverage=dict(positive_pairs=0, negative_pairs=0, inconclusive_cases=0),
@@ -98,7 +100,7 @@ def run(output: Path, *, executor: Callable = execute) -> dict:
                 'Curated dependencies are old manual topic attachments, script-accepted for wiring diagnostics only.',
                 'No fresh final data, providers or participant sessions; unknowns do not become negative labels.',
                 'The original diagnostic false-alert gate and historical artifacts remain unchanged.'])
-        repository = Path(__file__).resolve().parents[2]
+        repository = ROOT
         paths = [*repository.glob('graph_engine/**/*.py'), *repository.glob('graph_engine/web/*.js'),
                  *repository.glob('tools/decision_benchmark/*.py'), *repository.glob('examples/*.py')]
         report['code_manifest'] = {str(path.relative_to(repository)): digest(path.read_bytes()) for path in sorted(paths)}

@@ -60,6 +60,18 @@ class Capture:
     """Use actual pytest phase reports; absence, skips and teardown failures fail coverage."""
     def __init__(self) -> None:
         self.reports: dict[str, dict[str, dict]] = {}
+        self.expected_nodes: set[str] = set()
+        self.deselected_nodes: set[str] = set()
+
+    def pytest_collection_finish(self, session: Any) -> None:
+        self.expected_nodes.update(item.nodeid for item in session.items)
+
+    def pytest_deselected(self, items: list[Any]) -> None:
+        # -k/-m and PYTEST_ADDOPTS may remove just one parameter instance.
+        # Retain that denominator even when pytest itself exits successfully.
+        nodes = {item.nodeid for item in items}
+        self.expected_nodes.update(nodes)
+        self.deselected_nodes.update(nodes)
 
     def pytest_runtest_logreport(self, report: Any) -> None:
         self.reports.setdefault(report.nodeid, {})[report.when] = dict(
@@ -67,20 +79,24 @@ class Capture:
             detail=str(report.longrepr) if report.failed or report.skipped else None)
 
 
-def coverage(matrix: dict, reports: dict) -> dict:
+def coverage(matrix: dict, reports: dict, expected_nodes: set[str]) -> dict:
     validate(matrix)
     cells = []
     for cell in matrix['cells']:
-        result = dict(cell, observed_nodes=[])
+        result = dict(cell, observed_nodes=[], expected_nodes=[], missing_nodes=[])
         if not cell['applicable']:
             result['result'] = 'not_applicable_declared'
         else:
             selector_results = []
             for selector in cell['tests']:
+                expected = {node for node in expected_nodes
+                            if node == selector or node.startswith(selector + '[')}
                 matches = {node: phases for node, phases in reports.items()
                            if node == selector or node.startswith(selector + '[')}
                 result['observed_nodes'].extend(sorted(matches))
-                passed = bool(matches) and all(set(phases) == {'setup', 'call', 'teardown'}
+                result['expected_nodes'].extend(sorted(expected))
+                result['missing_nodes'].extend(sorted(expected - matches.keys()))
+                passed = bool(expected) and matches.keys() == expected and all(set(phases) == {'setup', 'call', 'teardown'}
                     and all(phase['outcome'] == 'passed' for phase in phases.values())
                     for phases in matches.values())
                 selector_results.append(passed)
@@ -99,22 +115,31 @@ def coverage(matrix: dict, reports: dict) -> dict:
             'scenario sufficiency and inapplicability declarations still need review.')))
 
 
+def code_manifest() -> dict[str, str]:
+    """Fingerprint runtime and transitive test/tool helpers, not only test selectors."""
+    code_paths = [*ROOT.glob('graph_engine/**/*.py'), *ROOT.glob('graph_engine/web/*.js'),
+                  *ROOT.glob('graph_engine/web/*.html'), *ROOT.glob('graph_engine/**/*.md'),
+                  *ROOT.glob('tests/**/*.py'), *ROOT.glob('tools/**/*.py'), MATRIX,
+                  ROOT / '.github/workflows/ci.yml', ROOT / 'docs/decision-memory-v1.md',
+                  ROOT / 'pyproject.toml']
+    return {str(p.relative_to(ROOT)): digest(p.read_bytes()) for p in sorted(set(code_paths))}
+
+
 def run(output: Path) -> dict:
     import pytest
     matrix = json.loads(MATRIX.read_bytes())
     selectors = validate(matrix)
+    output = output.resolve()
     output.mkdir(parents=True, exist_ok=False)
     capture = Capture()
-    args = [*selectors, '-q', '--fail-on-skip', f'--junitxml={output / "junit.xml"}']
-    code_paths = [*ROOT.glob('graph_engine/**/*.py'), *ROOT.glob('graph_engine/web/*.js'),
-                  *ROOT.glob('graph_engine/web/*.html'), Path(__file__), MATRIX,
-                  ROOT / 'tests/conftest.py', ROOT / '.github/workflows/ci.yml',
-                  ROOT / 'docs/decision-memory-v1.md', ROOT / 'pyproject.toml',
-                  *(ROOT / selector.split('::')[0] for selector in selectors)]
-    manifest = {str(p.relative_to(ROOT)): digest(p.read_bytes()) for p in sorted(set(code_paths))}
+    absolute_selectors = [str(ROOT / selector.split('::', 1)[0]) + '::' + selector.split('::', 1)[1]
+                          for selector in selectors]
+    args = ['--rootdir', str(ROOT), *absolute_selectors, '-q', '--fail-on-skip', f'--junitxml={output / "junit.xml"}']
+    manifest = code_manifest()
     report = dict(schema='dm.integrity.engineering-run/1',
         source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         dirty=bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT)),
+        invocation_directory=str(Path.cwd()),
         python=sys.version, platform=platform.platform(),
         dependencies=dict(sorted((d.metadata['Name'], d.version) for d in importlib.metadata.distributions())),
         environment={key: os.environ.get(key) for key in ('GRAPH_ENGINE_TEST_D3', 'PLAYWRIGHT_BROWSERS_PATH')},
@@ -122,7 +147,9 @@ def run(output: Path) -> dict:
         pytest_args=args, status='running', human_reviewers=None, release_ready=False)
     with (output / 'pytest.log').open('w') as log, redirect_stdout(log), redirect_stderr(log):
         code = int(pytest.main(args, plugins=[capture]))
-    report.update(coverage(matrix, capture.reports), pytest_exit_code=code, phase_reports=capture.reports)
+    report.update(coverage(matrix, capture.reports, capture.expected_nodes), pytest_exit_code=code,
+        phase_reports=capture.reports, expected_nodes=sorted(capture.expected_nodes),
+        deselected_nodes=sorted(capture.deselected_nodes))
     report['execution_passed'] = code == 0 and report['software_matrix_complete']
     report['status'] = 'complete' if report['execution_passed'] else 'completed_with_errors'
     (output / 'report.json').write_text(json.dumps(report, indent=2, allow_nan=False) + '\n')

@@ -137,6 +137,14 @@ def test_historical_privacy_and_read_only_adapters(service, tmp_path, monkeypatc
     values = public_reads(service, surface, refs, before, after, monkeypatch)
     encoded = json.dumps(values)
     if case_name in ('acl', 'multisource-acl', 'tombstone'):
+        # A broken adapter returning only errors is not successful privacy/read
+        # evidence. Authorized queue/context projections must still work.
+        projections = [('dm.context-result/1', values[-1])]
+        if surface != 'exports':
+            projections.append(('dm.review-queue/1', values[-2]))
+        for schema, value in projections:
+            assert not value.get('error') and value.get('code', 0) in (0, 200)
+            assert value['value']['schema'] == schema
         assert 'MULTI_SOURCE_SECRET' not in encoded
         assert 'Local observation' not in encoded
         assert 'Changed exact source' not in encoded
