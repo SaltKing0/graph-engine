@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-basis-review-v1/check_references.py", line 12, in <module>
+    assert target.is_file(),(name,raw)
+           ^^^^^^^^^^^^^^^^
+AssertionError: ('docs/decision-evaluation-results/false-alert-development-v1/y1-basis-review-v1/README.md', 'commands.json')

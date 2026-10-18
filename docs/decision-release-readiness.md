@@ -437,3 +437,24 @@ thresholds match the previous evidence. Six historical verifiers pass at their
 original heads. Later audit metadata retains documentation-only dirty flags;
 implementation fingerprints remain unchanged. These are bounded software and
 source-consistency checks, not independent semantic or product-benefit proof.
+
+## Source review of the proposed Y1 basis
+
+The [Y1 source-consistency review](decision-evaluation-results/false-alert-development-v1/y1-basis-review-v1/README.md)
+finds no required correction to the recorded source-qualified claim within the
+known fictional rule: declared recall 0.8 >=0.7 fraction, explicit same conditions
+and Y1 availability at the fictional event. Unit/context resolution is clearly
+distinguished from direct measurements. Real execution/dataset provenance,
+measurement independence, statistical sufficiency and general decision validity
+remain unestablished. This implementing-agent document is not independent
+annotation, human acceptance, a runtime outcome input or measured product benefit.
+
+Existing content/review events remain unchanged. No new engine review, decision
+activation or finding resolution is performed; the proposed successor and stale,
+unresolved finding remain visible. Runtime/tools/tests/CI/frozen data are
+byte-unchanged, so the earlier full-suite/matrix counts remain historical;
+fresh focused checks and source/journal/reference verification are recorded
+separately. The 5/95 (5.26%) >5% failure, empty-profile 3/3 misses, independent
+0/0/0 coverage and missing human/final-candidate/user evidence remain open.
+No additional checkbox is completed; keep #90–#93/#73 open and the PR Draft.
+No merge, release or threshold change.

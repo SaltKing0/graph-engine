@@ -1,0 +1,19 @@
+{
+  "schema": "dm.y1-source-review-manifest/1",
+  "files": {
+    "README.md": "b79148f822ba8f6b790cae6eb4ccb828f333f22a2908a4bac2a128943b647b93",
+    "authoring.json": "06d535adc48fce064c6353287fac041f6098df41bbe69cc5865c977ca500aa82",
+    "capture.log": "ddac8ea577b162cda94998037f9a4cd76826587df21cdaab52316c7f39d98d6e",
+    "check_references.py": "fcb5c120fa99790d6193c2c63dbd758d8e97fe4a4bf30c19f0e29fcd7b666b1c",
+    "checks.py": "739db214cd308d744d3149a7ef738d8b0eb55033de0c10d4e9133e2656862909",
+    "commands.json": "67a2ca49bdf1e5c286e45565ba111084480da38f4c39cb9a82125e1cee5cd14f",
+    "diff-check.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "focused.log": "5fdf67890685e1ac90779d20db0c23e5c62f788b509a796705b60a38a0bb2180",
+    "prior-evidence.log": "a13db31cdaac56bcacb5512506c8e710f34981edf693ba68b3a21994e318970a",
+    "references-early.log": "bae19dab0716a9ea3a8bc4fd2fcb907ee134ff191a0e7e94f3194f8529a59048",
+    "references.log": "8fe74d5777ce9f4e1dc791c1e1b6e8c78e8a9b8950e1dcfb1a2645e0e8e589b4",
+    "review.json": "f7497f2060a4fd82b5b51c1ce2ffe999a340b2e701ada4fd6f0428c359fa93cc",
+    "review.py": "f86426dc5af77d13b4e1d753caddcd7d5cf911b6e1cdadbdf8b22fc83ed8e20b",
+    "verification.log": "b341ffb14d5c7f3e8375502410071f88c8c0ecd64eb52ca4637da0f3e62c922d"
+  }
+}

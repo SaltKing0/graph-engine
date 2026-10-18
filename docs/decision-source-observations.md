@@ -126,3 +126,24 @@ measurement; its graph differs from the original aggregate diagnostic. Frozen
 thresholds, sources, labels, previous results and independent acceptance remain
 unchanged. See [versioned execution evidence](decision-evaluation-results/false-alert-development-v1/support-paths-v1/README.md)
 for commands, observed checks and remaining limits.
+
+## Source review of the Y1 successor
+
+The [source review](decision-evaluation-results/false-alert-development-v1/y1-basis-review-v1/README.md)
+checks the exact recorded successor against the two known development texts.
+It finds the **source-qualified fictional rule** consistent: Y1's declared 0.8
+meets 0.7 fraction under the explicit shared conditions, and the update leaves
+Y1 available at the fictional event. The unit is derived from the same metric
+rule and the conditions from an explicit reference, not separately repeated
+measurements. Those interpretations are recorded, not hidden as direct quotes.
+Local condition IDs and run labels do not establish actual execution/dataset
+provenance, statistical sufficiency or general decision validity.
+
+No claim/source correction is required within this bounded scope. The source
+review is an additional implementing-agent document, never independent gold
+or a new runtime input. It does not change the existing 15 versions / 16 review
+events or append an engine review. The successor decision/dependency remain
+proposals; the stale finding remains unresolved and the old decision needs
+investigation. Independent acceptance and the original failed/unmeasured gates
+remain open. A fresh comparison and explicit authorized review would be needed
+before any resolution or activation.
