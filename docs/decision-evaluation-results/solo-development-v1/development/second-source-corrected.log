@@ -1,0 +1,8 @@
+.                                                                        [100%]
+=============================== warnings summary ===============================
+tests/test_frontend_xss.py::test_decision_integrity_second_source_revocation_clears_derived_ui[git-secure]
+  /Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+1 passed, 40 deselected, 1 warning in 4.39s

@@ -36,7 +36,7 @@ new support, opposition, withdrawal or typed conditions. Curated and proposed
 inputs run independently, and proposed links stay unaccepted. This mapping is
 pinned as `dm.source-change-diagnostic/1` in every raw report.
 
-This executes available held-out inputs through production interfaces, but
+The historical #81 run executed available held-out inputs through production interfaces, but
 **does not complete semantic held-out evaluation**. The frozen corpus lacks
 independently reviewed structured proposals/conditions and accepted semantic
 judgments. Inventing those after reading held-out labels would invalidate the
@@ -91,6 +91,22 @@ Memory experimental until these evidence gates pass. The
 development packets and reviewer forms; no human calibration or final corpus
 is established by that preparation. Paid calls and real corpus execution remain
 opt-in. Release publishing is a separate action.
+
+## Solo engineering follow-up (18 October 2026)
+
+The [saved solo results](decision-evaluation-results/solo-development-v1/README.md)
+add source-only notes for the eight already exposed development events / 27
+pairs, three bounded production corrections and an explicit 54-cell inventory.
+On code `4558232e197b0fb0e24dedc142ccc1910877251b`, all 41 declared applicable
+cells passed through 55 actual tests; 13 cells have technical N/A reasons.
+The matching CI matrix has the same code hash, and all 15 PR CI checks passed.
+This closes the engineering inventory gap, not independent exhaustive/final
+candidate sign-off. Human scenario sufficiency review and the final #91 candidate
+remain absent. Original 5/95 false alerts and the empty proposed profile's 3/3
+misses were reproduced, not replaced by scores from authored regressions.
+All eight curated development contexts remain visibly truncated within budget.
+No new final/evaluation-source bytes, independent labels or user sessions were
+used in this follow-up; independent coverage and human benefit remain absent.
 
 ## Executed measurements (16 October 2026)
 
