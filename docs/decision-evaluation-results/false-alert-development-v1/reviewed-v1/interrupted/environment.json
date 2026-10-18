@@ -1,0 +1,10 @@
+{
+  "python": "3.12.14 (main, Aug 12 2026, 13:57:54) [Clang 21.0.0 (clang-2100.1.1.101)]",
+  "platform": "macOS-26.7.1-arm64-arm-64bit",
+  "executable": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+  "environment": {
+    "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+    "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+  },
+  "source_commit": "dff1451034684649cb0b4503d3564ce5b0c26cb8"
+}

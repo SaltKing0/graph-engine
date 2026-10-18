@@ -163,6 +163,47 @@ This completes bounded development capture/checking only. Explicit review and
 authoritative integration, independent final comparison and actual user study
 remain open under #90–#93 and #73. Decision Memory remains experimental.
 
+## Developer-reviewed source preparation (18 October 2026)
+
+The [reviewed development evidence](decision-evaluation-results/false-alert-development-v1/reviewed-v1/README.md)
+adds an explicit implementing-agent field/completeness review for ten already
+exposed fictional source documents. Exact source/fact hashes and spans, metric
+units and local condition/measurement namespaces bind this trusted input.
+Twelve existing JSON means are checked by full field paths and coordinates,
+n=2/n=10 and original precision; missing units/environment/roots stay unknown.
+Those incomplete project facts receive no runtime review. The
+[guide](decision-source-observations.md#explicit-developer-field-review-and-source-preparation)
+explains the boundary between this review configuration and independent gold.
+
+On clean code `b597bc65f6c85057e570060edc93b5b3df0f17fa`, all 26 profile
+executions for the same 13 known development cases completed without errors
+and preserved original input hashes. Curated raw alerts change from 13 to 10:
+5 to 2 in the five synthetic development events and 8 unchanged project alerts.
+Verified immaterial updates retain the old basis before impact analysis; no
+emitted warning is filtered. Changed values, withdrawals, unknown fields and
+incomplete reviews retain the original path. All update sources, old references
+and authorized version/review journals survive. No human/independent acceptance,
+semantic-profile review, source-root independence or support sufficiency is
+invented. All 13 curated and 5 proposed contexts remain visibly truncated while
+within budget; execution completeness does not establish context coverage.
+
+Full local validation passed 2,164 tests with 10 optional model skips and one existing warning (850.07 seconds). Focused tests passed 99; strict matrix passed 55 tests / 41
+applicable cells, with 13 technical N/A and no skipped/deselected matrix cases.
+All 15 code CI checks passed. Four historical evidence verifiers pass at their
+original report head `fb2fff2`; the new verifier checks the new candidate,
+source serialization, 2,302 journal versions, 77 original scripted dependency
+events and preservation of historical bytes separately. The deliberately
+interrupted initial candidate measurement and verifier corrections remain
+visible in the saved evidence.
+
+**No independent gate is passed by this development replay.** The ordinary
+unreviewed diagnostic still reproduces 5/95 false alerts (5.26%) and the empty
+proposed profile's 3/3 misses. Original sources, labels, frozen thresholds and
+historical results remain unchanged. Independent final coverage stays 0/0/0;
+matched completed agent decisions, independent final scoring, actual users and
+measured benefit remain absent. No additional acceptance checkbox is completed;
+#90–#93 and #73 stay open and Decision Memory stays experimental.
+
 ## Executed measurements (16 October 2026)
 
 Raw reports, source/code/config manifests, prompts, errors, timings and baseline

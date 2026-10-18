@@ -36,7 +36,7 @@ The historical 5/95 false-alert result remains failed and the empty proposed dep
 
 ## Explicit developer field review and source preparation
 
-The separate opt-in runner now supplies a checked field mapping to the production diagnostic:
+The separate opt-in runner now supplies a checked field mapping to the production diagnostic. The [saved field-review evidence](decision-evaluation-results/false-alert-development-v1/reviewed-v1/README.md) retains exact commands, raw outputs, source/version journals and remaining context/acceptance limits:
 
 ```sh
 .venv/bin/python -m tools.decision_benchmark.reviewed_development --output /tmp/decision-reviewed-development-new
@@ -52,3 +52,5 @@ Before impact analysis, `production.execute(..., observation_review=...)` valida
 The runner separately verifies all twelve existing JSON means by full dataset/adapter/metric paths, exact scalar/key coordinates, original decimal precision, sample counts and condition/code/protocol paths. Equal numeric text at another field is rejected; duplicate JSON keys are rejected. Missing units, environment and measurement roots remain null. Those report facts and the untranscribed project updates receive no runtime field review. No new measurements, answer scores or product benefit are inferred.
 
 The output retains all thirteen known development cases and both dependency profiles, input/code/review/source hashes, raw production impact/queue/context outputs, retained basis and captured update references, and all errors. It has no final/evaluation option and no semantic scoring. Independent acceptance/coverage and user measurements remain absent. Historical reports and frozen thresholds remain unchanged; a development reduction in raw alerts does not replace the still-failed historical gate or satisfy the independent final gates.
+
+The reviewed replay journals preserve every authorized immutable version and original scripted dependency event. Original input hashes and stored-node hashes stay separate: the existing Markdown serializer adds a terminal LF to each chunk. The verifier reconstructs that exact serialization; it does not normalize text or infer measurement roots from either hash.

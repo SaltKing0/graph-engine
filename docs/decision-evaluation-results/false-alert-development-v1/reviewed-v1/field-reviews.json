@@ -1,0 +1,994 @@
+{
+  "schema": "dm.development.field-review-inventory/1",
+  "author": {
+    "role": "implementing-agent",
+    "human": false,
+    "independent": false,
+    "review": "field-mapping-checked"
+  },
+  "sources": [
+    {
+      "runtime_source_id": "comparable-basis",
+      "namespace": "fictional-experiment/comparable",
+      "text_sha256": "94fadfaa18438c6ba805547241c1e7f7058d44c1c0cab06d5c527faee6978861",
+      "facts_sha256": "aabf08e96a655477294e387dca956f1b3d7e5d7bc5af6edc37d4720d54d7865b",
+      "complete": true,
+      "roles": [
+        "Read the complete source. Observation subjects, current values and workload/environment/code/corpus/protocol tokens refer to the local fictional experiment vocabulary.",
+        "The recall unit fraction is explicitly declared for the metric in the basis rule and in measurement updates; the 0.7 rule threshold is not an observed value. X1 recall=0.8 is the observation, X2 is the current update. No conversion or rounding is applied.",
+        "run-X1/run-Y1 name recorded measurement roots within this vocabulary only; source hashes, timestamps, artifact names and code revisions are not roots. Repeated references do not establish independent evidence."
+      ],
+      "observations": {
+        "source_id": "controls-v2/comparable-basis",
+        "text_sha256": "94fadfaa18438c6ba805547241c1e7f7058d44c1c0cab06d5c527faee6978861",
+        "facts": [
+          {
+            "id": "observation-X1",
+            "kind": "measurement",
+            "subject": {
+              "type": "id",
+              "value": "X1",
+              "start": 65,
+              "end": 67,
+              "quote": "X1"
+            },
+            "metric": {
+              "name": {
+                "type": "id",
+                "value": "recall",
+                "start": 30,
+                "end": 36,
+                "quote": "recall"
+              },
+              "value": {
+                "type": "decimal",
+                "value": "0.8",
+                "start": 76,
+                "end": 79,
+                "quote": "0.8"
+              },
+              "unit": {
+                "type": "id",
+                "value": "fraction",
+                "start": 43,
+                "end": 51,
+                "quote": "fraction"
+              },
+              "sample_count": null
+            },
+            "conditions": {
+              "workload": {
+                "type": "id",
+                "value": "W",
+                "start": 90,
+                "end": 91,
+                "quote": "W"
+              },
+              "environment": {
+                "type": "id",
+                "value": "E",
+                "start": 105,
+                "end": 106,
+                "quote": "E"
+              },
+              "code": {
+                "type": "id",
+                "value": "C",
+                "start": 113,
+                "end": 114,
+                "quote": "C"
+              },
+              "corpus": {
+                "type": "id",
+                "value": "H",
+                "start": 123,
+                "end": 124,
+                "quote": "H"
+              },
+              "protocol": {
+                "type": "id",
+                "value": "P",
+                "start": 135,
+                "end": 136,
+                "quote": "P"
+              }
+            },
+            "measurement_lineage": {
+              "type": "id",
+              "value": "run-X1",
+              "start": 146,
+              "end": 152,
+              "quote": "run-X1"
+            },
+            "observed_at": null,
+            "availability": null,
+            "limitations": [
+              "Selected source transcription by implementing agent; semantic role and completeness need review."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "runtime_source_id": "comparable-update",
+      "namespace": "fictional-experiment/comparable",
+      "text_sha256": "d1bea7e35548f395cbb22bc1830a084da139468296b40e2fbb73a3d4ca16c4b3",
+      "facts_sha256": "934143a5998925f2fee9665b5d0fd91699a0f26ef64525425634370b8f68c49d",
+      "complete": true,
+      "roles": [
+        "Read the complete source. Observation subjects, current values and workload/environment/code/corpus/protocol tokens refer to the local fictional experiment vocabulary.",
+        "The recall unit fraction is explicitly declared for the metric in the basis rule and in measurement updates; the 0.7 rule threshold is not an observed value. X1 recall=0.8 is the observation, X2 is the current update. No conversion or rounding is applied.",
+        "run-X1/run-Y1 name recorded measurement roots within this vocabulary only; source hashes, timestamps, artifact names and code revisions are not roots. Repeated references do not establish independent evidence."
+      ],
+      "observations": {
+        "source_id": "controls-v2/comparable-update",
+        "text_sha256": "d1bea7e35548f395cbb22bc1830a084da139468296b40e2fbb73a3d4ca16c4b3",
+        "facts": [
+          {
+            "id": "observation-X2",
+            "kind": "measurement",
+            "subject": {
+              "type": "id",
+              "value": "X2",
+              "start": 30,
+              "end": 32,
+              "quote": "X2"
+            },
+            "metric": {
+              "name": {
+                "type": "id",
+                "value": "recall",
+                "start": 34,
+                "end": 40,
+                "quote": "recall"
+              },
+              "value": {
+                "type": "decimal",
+                "value": "0.2",
+                "start": 41,
+                "end": 44,
+                "quote": "0.2"
+              },
+              "unit": {
+                "type": "id",
+                "value": "fraction",
+                "start": 45,
+                "end": 53,
+                "quote": "fraction"
+              },
+              "sample_count": null
+            },
+            "conditions": {
+              "workload": {
+                "type": "id",
+                "value": "W",
+                "start": 64,
+                "end": 65,
+                "quote": "W"
+              },
+              "environment": {
+                "type": "id",
+                "value": "E",
+                "start": 79,
+                "end": 80,
+                "quote": "E"
+              },
+              "code": {
+                "type": "id",
+                "value": "C",
+                "start": 87,
+                "end": 88,
+                "quote": "C"
+              },
+              "corpus": {
+                "type": "id",
+                "value": "H",
+                "start": 97,
+                "end": 98,
+                "quote": "H"
+              },
+              "protocol": {
+                "type": "id",
+                "value": "P",
+                "start": 164,
+                "end": 165,
+                "quote": "P"
+              }
+            },
+            "measurement_lineage": null,
+            "observed_at": null,
+            "availability": null,
+            "limitations": [
+              "Selected source transcription by implementing agent; semantic role and completeness need review."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "runtime_source_id": "changed-conditions-basis",
+      "namespace": "fictional-experiment/changed-conditions",
+      "text_sha256": "94fadfaa18438c6ba805547241c1e7f7058d44c1c0cab06d5c527faee6978861",
+      "facts_sha256": "aabf08e96a655477294e387dca956f1b3d7e5d7bc5af6edc37d4720d54d7865b",
+      "complete": true,
+      "roles": [
+        "Read the complete source. Observation subjects, current values and workload/environment/code/corpus/protocol tokens refer to the local fictional experiment vocabulary.",
+        "The recall unit fraction is explicitly declared for the metric in the basis rule and in measurement updates; the 0.7 rule threshold is not an observed value. X1 recall=0.8 is the observation, X2 is the current update. No conversion or rounding is applied.",
+        "run-X1/run-Y1 name recorded measurement roots within this vocabulary only; source hashes, timestamps, artifact names and code revisions are not roots. Repeated references do not establish independent evidence."
+      ],
+      "observations": {
+        "source_id": "controls-v2/changed-conditions-basis",
+        "text_sha256": "94fadfaa18438c6ba805547241c1e7f7058d44c1c0cab06d5c527faee6978861",
+        "facts": [
+          {
+            "id": "observation-X1",
+            "kind": "measurement",
+            "subject": {
+              "type": "id",
+              "value": "X1",
+              "start": 65,
+              "end": 67,
+              "quote": "X1"
+            },
+            "metric": {
+              "name": {
+                "type": "id",
+                "value": "recall",
+                "start": 30,
+                "end": 36,
+                "quote": "recall"
+              },
+              "value": {
+                "type": "decimal",
+                "value": "0.8",
+                "start": 76,
+                "end": 79,
+                "quote": "0.8"
+              },
+              "unit": {
+                "type": "id",
+                "value": "fraction",
+                "start": 43,
+                "end": 51,
+                "quote": "fraction"
+              },
+              "sample_count": null
+            },
+            "conditions": {
+              "workload": {
+                "type": "id",
+                "value": "W",
+                "start": 90,
+                "end": 91,
+                "quote": "W"
+              },
+              "environment": {
+                "type": "id",
+                "value": "E",
+                "start": 105,
+                "end": 106,
+                "quote": "E"
+              },
+              "code": {
+                "type": "id",
+                "value": "C",
+                "start": 113,
+                "end": 114,
+                "quote": "C"
+              },
+              "corpus": {
+                "type": "id",
+                "value": "H",
+                "start": 123,
+                "end": 124,
+                "quote": "H"
+              },
+              "protocol": {
+                "type": "id",
+                "value": "P",
+                "start": 135,
+                "end": 136,
+                "quote": "P"
+              }
+            },
+            "measurement_lineage": {
+              "type": "id",
+              "value": "run-X1",
+              "start": 146,
+              "end": 152,
+              "quote": "run-X1"
+            },
+            "observed_at": null,
+            "availability": null,
+            "limitations": [
+              "Selected source transcription by implementing agent; semantic role and completeness need review."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "runtime_source_id": "time-only-basis",
+      "namespace": "fictional-experiment/time-only",
+      "text_sha256": "94fadfaa18438c6ba805547241c1e7f7058d44c1c0cab06d5c527faee6978861",
+      "facts_sha256": "aabf08e96a655477294e387dca956f1b3d7e5d7bc5af6edc37d4720d54d7865b",
+      "complete": true,
+      "roles": [
+        "Read the complete source. Observation subjects, current values and workload/environment/code/corpus/protocol tokens refer to the local fictional experiment vocabulary.",
+        "The recall unit fraction is explicitly declared for the metric in the basis rule and in measurement updates; the 0.7 rule threshold is not an observed value. X1 recall=0.8 is the observation, X2 is the current update. No conversion or rounding is applied.",
+        "run-X1/run-Y1 name recorded measurement roots within this vocabulary only; source hashes, timestamps, artifact names and code revisions are not roots. Repeated references do not establish independent evidence."
+      ],
+      "observations": {
+        "source_id": "controls-v2/time-only-basis",
+        "text_sha256": "94fadfaa18438c6ba805547241c1e7f7058d44c1c0cab06d5c527faee6978861",
+        "facts": [
+          {
+            "id": "observation-X1",
+            "kind": "measurement",
+            "subject": {
+              "type": "id",
+              "value": "X1",
+              "start": 65,
+              "end": 67,
+              "quote": "X1"
+            },
+            "metric": {
+              "name": {
+                "type": "id",
+                "value": "recall",
+                "start": 30,
+                "end": 36,
+                "quote": "recall"
+              },
+              "value": {
+                "type": "decimal",
+                "value": "0.8",
+                "start": 76,
+                "end": 79,
+                "quote": "0.8"
+              },
+              "unit": {
+                "type": "id",
+                "value": "fraction",
+                "start": 43,
+                "end": 51,
+                "quote": "fraction"
+              },
+              "sample_count": null
+            },
+            "conditions": {
+              "workload": {
+                "type": "id",
+                "value": "W",
+                "start": 90,
+                "end": 91,
+                "quote": "W"
+              },
+              "environment": {
+                "type": "id",
+                "value": "E",
+                "start": 105,
+                "end": 106,
+                "quote": "E"
+              },
+              "code": {
+                "type": "id",
+                "value": "C",
+                "start": 113,
+                "end": 114,
+                "quote": "C"
+              },
+              "corpus": {
+                "type": "id",
+                "value": "H",
+                "start": 123,
+                "end": 124,
+                "quote": "H"
+              },
+              "protocol": {
+                "type": "id",
+                "value": "P",
+                "start": 135,
+                "end": 136,
+                "quote": "P"
+              }
+            },
+            "measurement_lineage": {
+              "type": "id",
+              "value": "run-X1",
+              "start": 146,
+              "end": 152,
+              "quote": "run-X1"
+            },
+            "observed_at": null,
+            "availability": null,
+            "limitations": [
+              "Selected source transcription by implementing agent; semantic role and completeness need review."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "runtime_source_id": "duplicate-citation-basis",
+      "namespace": "fictional-experiment/duplicate-citation",
+      "text_sha256": "94fadfaa18438c6ba805547241c1e7f7058d44c1c0cab06d5c527faee6978861",
+      "facts_sha256": "aabf08e96a655477294e387dca956f1b3d7e5d7bc5af6edc37d4720d54d7865b",
+      "complete": true,
+      "roles": [
+        "Read the complete source. Observation subjects, current values and workload/environment/code/corpus/protocol tokens refer to the local fictional experiment vocabulary.",
+        "The recall unit fraction is explicitly declared for the metric in the basis rule and in measurement updates; the 0.7 rule threshold is not an observed value. X1 recall=0.8 is the observation, X2 is the current update. No conversion or rounding is applied.",
+        "run-X1/run-Y1 name recorded measurement roots within this vocabulary only; source hashes, timestamps, artifact names and code revisions are not roots. Repeated references do not establish independent evidence."
+      ],
+      "observations": {
+        "source_id": "controls-v2/duplicate-citation-basis",
+        "text_sha256": "94fadfaa18438c6ba805547241c1e7f7058d44c1c0cab06d5c527faee6978861",
+        "facts": [
+          {
+            "id": "observation-X1",
+            "kind": "measurement",
+            "subject": {
+              "type": "id",
+              "value": "X1",
+              "start": 65,
+              "end": 67,
+              "quote": "X1"
+            },
+            "metric": {
+              "name": {
+                "type": "id",
+                "value": "recall",
+                "start": 30,
+                "end": 36,
+                "quote": "recall"
+              },
+              "value": {
+                "type": "decimal",
+                "value": "0.8",
+                "start": 76,
+                "end": 79,
+                "quote": "0.8"
+              },
+              "unit": {
+                "type": "id",
+                "value": "fraction",
+                "start": 43,
+                "end": 51,
+                "quote": "fraction"
+              },
+              "sample_count": null
+            },
+            "conditions": {
+              "workload": {
+                "type": "id",
+                "value": "W",
+                "start": 90,
+                "end": 91,
+                "quote": "W"
+              },
+              "environment": {
+                "type": "id",
+                "value": "E",
+                "start": 105,
+                "end": 106,
+                "quote": "E"
+              },
+              "code": {
+                "type": "id",
+                "value": "C",
+                "start": 113,
+                "end": 114,
+                "quote": "C"
+              },
+              "corpus": {
+                "type": "id",
+                "value": "H",
+                "start": 123,
+                "end": 124,
+                "quote": "H"
+              },
+              "protocol": {
+                "type": "id",
+                "value": "P",
+                "start": 135,
+                "end": 136,
+                "quote": "P"
+              }
+            },
+            "measurement_lineage": {
+              "type": "id",
+              "value": "run-X1",
+              "start": 146,
+              "end": 152,
+              "quote": "run-X1"
+            },
+            "observed_at": null,
+            "availability": null,
+            "limitations": [
+              "Selected source transcription by implementing agent; semantic role and completeness need review."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "runtime_source_id": "surviving-support-basis",
+      "namespace": "fictional-experiment/surviving-support",
+      "text_sha256": "079b7acb941c5992583093e0c6d6a4d5d81ad217bea51fcd535dcb0f0330b031",
+      "facts_sha256": "6c4e56fb36bf974995c91dd2cadfb0fa7be9ceaf8e689eae95d6df7451ccacc2",
+      "complete": true,
+      "roles": [
+        "Read the complete source. Observation subjects, current values and workload/environment/code/corpus/protocol tokens refer to the local fictional experiment vocabulary.",
+        "The recall unit fraction is explicitly declared for the metric in the basis rule and in measurement updates; the 0.7 rule threshold is not an observed value. X1 recall=0.8 is the observation, X2 is the current update. No conversion or rounding is applied.",
+        "run-X1/run-Y1 name recorded measurement roots within this vocabulary only; source hashes, timestamps, artifact names and code revisions are not roots. Repeated references do not establish independent evidence.",
+        "Y1 has no explicitly repeated unit or individual condition fields in this transcription; those fields remain unknown. No inferred inheritance."
+      ],
+      "observations": {
+        "source_id": "controls-v2/surviving-support-basis",
+        "text_sha256": "079b7acb941c5992583093e0c6d6a4d5d81ad217bea51fcd535dcb0f0330b031",
+        "facts": [
+          {
+            "id": "observation-X1",
+            "kind": "measurement",
+            "subject": {
+              "type": "id",
+              "value": "X1",
+              "start": 65,
+              "end": 67,
+              "quote": "X1"
+            },
+            "metric": {
+              "name": {
+                "type": "id",
+                "value": "recall",
+                "start": 30,
+                "end": 36,
+                "quote": "recall"
+              },
+              "value": {
+                "type": "decimal",
+                "value": "0.8",
+                "start": 76,
+                "end": 79,
+                "quote": "0.8"
+              },
+              "unit": {
+                "type": "id",
+                "value": "fraction",
+                "start": 43,
+                "end": 51,
+                "quote": "fraction"
+              },
+              "sample_count": null
+            },
+            "conditions": {
+              "workload": {
+                "type": "id",
+                "value": "W",
+                "start": 90,
+                "end": 91,
+                "quote": "W"
+              },
+              "environment": {
+                "type": "id",
+                "value": "E",
+                "start": 105,
+                "end": 106,
+                "quote": "E"
+              },
+              "code": {
+                "type": "id",
+                "value": "C",
+                "start": 113,
+                "end": 114,
+                "quote": "C"
+              },
+              "corpus": {
+                "type": "id",
+                "value": "H",
+                "start": 123,
+                "end": 124,
+                "quote": "H"
+              },
+              "protocol": {
+                "type": "id",
+                "value": "P",
+                "start": 135,
+                "end": 136,
+                "quote": "P"
+              }
+            },
+            "measurement_lineage": {
+              "type": "id",
+              "value": "run-X1",
+              "start": 146,
+              "end": 152,
+              "quote": "run-X1"
+            },
+            "observed_at": null,
+            "availability": null,
+            "limitations": [
+              "Selected source transcription by implementing agent; semantic role and completeness need review."
+            ]
+          },
+          {
+            "id": "observation-Y1",
+            "kind": "measurement",
+            "subject": {
+              "type": "id",
+              "value": "Y1",
+              "start": 171,
+              "end": 173,
+              "quote": "Y1"
+            },
+            "metric": {
+              "name": {
+                "type": "id",
+                "value": "recall",
+                "start": 175,
+                "end": 181,
+                "quote": "recall"
+              },
+              "value": {
+                "type": "decimal",
+                "value": "0.8",
+                "start": 182,
+                "end": 185,
+                "quote": "0.8"
+              },
+              "unit": null,
+              "sample_count": null
+            },
+            "conditions": {
+              "workload": null,
+              "environment": null,
+              "code": null,
+              "corpus": null,
+              "protocol": null
+            },
+            "measurement_lineage": {
+              "type": "id",
+              "value": "run-Y1",
+              "start": 233,
+              "end": 239,
+              "quote": "run-Y1"
+            },
+            "observed_at": null,
+            "availability": null,
+            "limitations": [
+              "Selected source transcription by implementing agent; semantic role and completeness need review.",
+              "Same-conditions prose was not expanded into inherited dimensions or independent support."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "runtime_source_id": "changed-conditions-update",
+      "namespace": "fictional-experiment/changed-conditions",
+      "text_sha256": "882cb0f2977885a517aea285f0103e8d7185664a44ebee011a0f3917294656df",
+      "facts_sha256": "aaa6b30c19b659b0e56ae56d78663eb214ea9d59c5b56a84dbe2da023a4c74ae",
+      "complete": true,
+      "roles": [
+        "Read the complete source. Observation subjects, current values and workload/environment/code/corpus/protocol tokens refer to the local fictional experiment vocabulary.",
+        "The recall unit fraction is explicitly declared for the metric in the basis rule and in measurement updates; the 0.7 rule threshold is not an observed value. X1 recall=0.8 is the observation, X2 is the current update. No conversion or rounding is applied.",
+        "run-X1/run-Y1 name recorded measurement roots within this vocabulary only; source hashes, timestamps, artifact names and code revisions are not roots. Repeated references do not establish independent evidence."
+      ],
+      "observations": {
+        "source_id": "controls-v2/changed-conditions-update",
+        "text_sha256": "882cb0f2977885a517aea285f0103e8d7185664a44ebee011a0f3917294656df",
+        "facts": [
+          {
+            "id": "observation-X2",
+            "kind": "measurement",
+            "subject": {
+              "type": "id",
+              "value": "X2",
+              "start": 30,
+              "end": 32,
+              "quote": "X2"
+            },
+            "metric": {
+              "name": {
+                "type": "id",
+                "value": "recall",
+                "start": 34,
+                "end": 40,
+                "quote": "recall"
+              },
+              "value": {
+                "type": "decimal",
+                "value": "0.2",
+                "start": 41,
+                "end": 44,
+                "quote": "0.2"
+              },
+              "unit": {
+                "type": "id",
+                "value": "fraction",
+                "start": 45,
+                "end": 53,
+                "quote": "fraction"
+              },
+              "sample_count": null
+            },
+            "conditions": {
+              "workload": {
+                "type": "id",
+                "value": "W2",
+                "start": 64,
+                "end": 66,
+                "quote": "W2"
+              },
+              "environment": {
+                "type": "id",
+                "value": "E",
+                "start": 80,
+                "end": 81,
+                "quote": "E"
+              },
+              "code": {
+                "type": "id",
+                "value": "C",
+                "start": 88,
+                "end": 89,
+                "quote": "C"
+              },
+              "corpus": {
+                "type": "id",
+                "value": "H2",
+                "start": 98,
+                "end": 100,
+                "quote": "H2"
+              },
+              "protocol": {
+                "type": "id",
+                "value": "P",
+                "start": 111,
+                "end": 112,
+                "quote": "P"
+              }
+            },
+            "measurement_lineage": null,
+            "observed_at": null,
+            "availability": null,
+            "limitations": [
+              "Selected source transcription by implementing agent; semantic role and completeness need review."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "runtime_source_id": "time-only-update",
+      "namespace": "fictional-experiment/time-only",
+      "text_sha256": "db3de59cbd11651ec0933f9fe46c91076a49470d6f4ec69451a937cc3b9a5fe5",
+      "facts_sha256": "54bde60c17a9417654e4839c2c12c2690429026460233586cbf2803836277965",
+      "complete": true,
+      "roles": [
+        "Read the complete source. Observation subjects, current values and workload/environment/code/corpus/protocol tokens refer to the local fictional experiment vocabulary.",
+        "The recall unit fraction is explicitly declared for the metric in the basis rule and in measurement updates; the 0.7 rule threshold is not an observed value. X1 recall=0.8 is the observation, X2 is the current update. No conversion or rounding is applied.",
+        "run-X1/run-Y1 name recorded measurement roots within this vocabulary only; source hashes, timestamps, artifact names and code revisions are not roots. Repeated references do not establish independent evidence."
+      ],
+      "observations": {
+        "source_id": "controls-v2/time-only-update",
+        "text_sha256": "db3de59cbd11651ec0933f9fe46c91076a49470d6f4ec69451a937cc3b9a5fe5",
+        "facts": [
+          {
+            "id": "observation-X2",
+            "kind": "measurement",
+            "subject": {
+              "type": "id",
+              "value": "X2",
+              "start": 30,
+              "end": 32,
+              "quote": "X2"
+            },
+            "metric": {
+              "name": {
+                "type": "id",
+                "value": "recall",
+                "start": 48,
+                "end": 54,
+                "quote": "recall"
+              },
+              "value": {
+                "type": "decimal",
+                "value": "0.8",
+                "start": 55,
+                "end": 58,
+                "quote": "0.8"
+              },
+              "unit": {
+                "type": "id",
+                "value": "fraction",
+                "start": 59,
+                "end": 67,
+                "quote": "fraction"
+              },
+              "sample_count": null
+            },
+            "conditions": {
+              "workload": {
+                "type": "id",
+                "value": "W",
+                "start": 78,
+                "end": 79,
+                "quote": "W"
+              },
+              "environment": {
+                "type": "id",
+                "value": "E",
+                "start": 93,
+                "end": 94,
+                "quote": "E"
+              },
+              "code": {
+                "type": "id",
+                "value": "C",
+                "start": 101,
+                "end": 102,
+                "quote": "C"
+              },
+              "corpus": {
+                "type": "id",
+                "value": "H",
+                "start": 111,
+                "end": 112,
+                "quote": "H"
+              },
+              "protocol": {
+                "type": "id",
+                "value": "P",
+                "start": 123,
+                "end": 124,
+                "quote": "P"
+              }
+            },
+            "measurement_lineage": null,
+            "observed_at": {
+              "type": "date",
+              "value": "2026-01-04",
+              "start": 36,
+              "end": 46,
+              "quote": "2026-01-04"
+            },
+            "availability": null,
+            "limitations": [
+              "Selected source transcription by implementing agent; semantic role and completeness need review."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "runtime_source_id": "duplicate-citation-update",
+      "namespace": "fictional-experiment/duplicate-citation",
+      "text_sha256": "83ee61623b51412c9759abf92f65491e9b30f7776487f5a83653c22bf2a4a629",
+      "facts_sha256": "b421ee1b9569659ffc8e4a2e00736c6d16a4eef4f0db9d2de405d22da9424eca",
+      "complete": true,
+      "roles": [
+        "run-X1/run-Y1 name recorded measurement roots within this vocabulary only; source hashes, timestamps, artifact names and code revisions are not roots. Repeated references do not establish independent evidence.",
+        "The entire update explicitly quotes measurement X1 verbatim and states no new measurement was performed; run-X1 is that measurement reference, not a new run."
+      ],
+      "observations": {
+        "source_id": "controls-v2/duplicate-citation-update",
+        "text_sha256": "83ee61623b51412c9759abf92f65491e9b30f7776487f5a83653c22bf2a4a629",
+        "facts": [
+          {
+            "id": "citation-X1",
+            "kind": "citation",
+            "subject": {
+              "type": "id",
+              "value": "X1",
+              "start": 53,
+              "end": 55,
+              "quote": "X1"
+            },
+            "metric": null,
+            "conditions": {
+              "workload": null,
+              "environment": null,
+              "code": null,
+              "corpus": null,
+              "protocol": null
+            },
+            "measurement_lineage": {
+              "type": "id",
+              "value": "run-X1",
+              "start": 77,
+              "end": 83,
+              "quote": "run-X1"
+            },
+            "observed_at": null,
+            "availability": null,
+            "limitations": [
+              "Selected source transcription by implementing agent; semantic role and completeness need review."
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "runtime_source_id": "surviving-support-update",
+      "namespace": "fictional-experiment/surviving-support",
+      "text_sha256": "bbfdc5e54a02a1dce66d5364fdfb152450e6dd1d320c1f2245ba1385fae22379",
+      "facts_sha256": "1eb8078936ce69f05bb7bc87b586ad04c6cd41fcdb7db7837de945653fef9f00",
+      "complete": true,
+      "roles": [
+        "run-X1/run-Y1 name recorded measurement roots within this vocabulary only; source hashes, timestamps, artifact names and code revisions are not roots. Repeated references do not establish independent evidence.",
+        "withdrawn and available are support availability statements, not measurement results. Y1 independence and remaining support sufficiency are not established by this review."
+      ],
+      "observations": {
+        "source_id": "controls-v2/surviving-support-update",
+        "text_sha256": "bbfdc5e54a02a1dce66d5364fdfb152450e6dd1d320c1f2245ba1385fae22379",
+        "facts": [
+          {
+            "id": "availability-X1",
+            "kind": "availability",
+            "subject": {
+              "type": "id",
+              "value": "X1",
+              "start": 47,
+              "end": 49,
+              "quote": "X1"
+            },
+            "metric": null,
+            "conditions": {
+              "workload": null,
+              "environment": null,
+              "code": null,
+              "corpus": null,
+              "protocol": null
+            },
+            "measurement_lineage": null,
+            "observed_at": null,
+            "availability": {
+              "type": "id",
+              "value": "withdrawn",
+              "start": 50,
+              "end": 59,
+              "quote": "withdrawn"
+            },
+            "limitations": [
+              "Selected source transcription by implementing agent; semantic role and completeness need review.",
+              "Availability statement captured only; no runtime support withdrawal or independence judgment is applied."
+            ]
+          },
+          {
+            "id": "availability-Y1",
+            "kind": "availability",
+            "subject": {
+              "type": "id",
+              "value": "Y1",
+              "start": 95,
+              "end": 97,
+              "quote": "Y1"
+            },
+            "metric": null,
+            "conditions": {
+              "workload": null,
+              "environment": null,
+              "code": null,
+              "corpus": null,
+              "protocol": null
+            },
+            "measurement_lineage": null,
+            "observed_at": null,
+            "availability": {
+              "type": "id",
+              "value": "available",
+              "start": 106,
+              "end": 115,
+              "quote": "available"
+            },
+            "limitations": [
+              "Selected source transcription by implementing agent; semantic role and completeness need review.",
+              "Availability statement captured only; no runtime support withdrawal or independence judgment is applied."
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

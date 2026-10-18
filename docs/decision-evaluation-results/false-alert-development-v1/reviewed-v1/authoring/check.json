@@ -1,0 +1,9 @@
+{
+  "argv": [
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/reviewed-v1/verify_evidence.py"
+  ],
+  "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+  "exit_code": 1,
+  "scope": "Reproduced artifact-authoring error: README edited after manifest; verifier correctly rejects stale checksum. Regenerate manifest after all documentation edits. Not a semantic gate measurement."
+}

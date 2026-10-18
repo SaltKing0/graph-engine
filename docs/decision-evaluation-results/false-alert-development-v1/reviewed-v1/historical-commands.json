@@ -1,0 +1,50 @@
+[
+  {
+    "name": "historical-0",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "docs/decision-evaluation-results/false-alert-development-v1/verify_evidence.py"
+    ],
+    "cwd": "/tmp/issue91-historical-evidence-fb2fff2",
+    "source_commit": "fb2fff2eee39c8d3a57360e934a09613fcab0e33",
+    "exit_code": 0,
+    "elapsed_seconds": 0.24562874995172024,
+    "log": "historical-0.log"
+  },
+  {
+    "name": "historical-1",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "docs/decision-evaluation-results/false-alert-development-v1/structured-v1/verify_evidence.py"
+    ],
+    "cwd": "/tmp/issue91-historical-evidence-fb2fff2",
+    "source_commit": "fb2fff2eee39c8d3a57360e934a09613fcab0e33",
+    "exit_code": 0,
+    "elapsed_seconds": 2.9742665420053527,
+    "log": "historical-1.log"
+  },
+  {
+    "name": "historical-2",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "docs/decision-evaluation-results/pr-review-v1/verify_review.py"
+    ],
+    "cwd": "/tmp/issue91-historical-evidence-fb2fff2",
+    "source_commit": "fb2fff2eee39c8d3a57360e934a09613fcab0e33",
+    "exit_code": 0,
+    "elapsed_seconds": 3.513299582991749,
+    "log": "historical-2.log"
+  },
+  {
+    "name": "historical-3",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "docs/decision-evaluation-results/solo-development-v1/verify_artifacts.py"
+    ],
+    "cwd": "/tmp/issue91-historical-evidence-fb2fff2",
+    "source_commit": "fb2fff2eee39c8d3a57360e934a09613fcab0e33",
+    "exit_code": 0,
+    "elapsed_seconds": 3.4773514580447227,
+    "log": "historical-3.log"
+  }
+]

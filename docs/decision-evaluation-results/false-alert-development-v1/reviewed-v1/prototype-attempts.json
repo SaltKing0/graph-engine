@@ -1,0 +1,78 @@
+{
+  "scope": "Intermediate working-tree experiments; terminal outputs are in the session transcript, not saved final logs. These counts do not establish final candidate acceptance.",
+  "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+  "attempts": [
+    {
+      "argv": [
+        "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_decision_reviewed_observations.py",
+        "tests/test_decision_source_updates.py",
+        "tests/test_decision_observations.py",
+        "-q"
+      ],
+      "passed": 70,
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_decision_reviewed_observations.py",
+        "-q"
+      ],
+      "passed": 36,
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_decision_reviewed_observations.py",
+        "tests/test_decision_observations.py",
+        "tests/test_decision_source_updates.py",
+        "tests/test_decision_workflow.py",
+        "tests/test_decision_solo.py",
+        "-q"
+      ],
+      "passed": 98,
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_decision_reviewed_observations.py",
+        "-q"
+      ],
+      "passed": 37,
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_decision_reviewed_observations.py",
+        "-q"
+      ],
+      "passed": 37,
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_decision_reviewed_observations.py",
+        "-q"
+      ],
+      "passed": 38,
+      "exit_code": 0
+    }
+  ]
+}
