@@ -1,0 +1,322 @@
+..............................................EEEEEEEE.                  [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of test_decision_impact_full_browser_flow_and_pinned_brief[server0] _
+
+tmp_path = PosixPath('/private/var/folders/sj/799zmzcs10n9pm_vhxx4typc0000gn/T/pytest-of-niklas/pytest-820/test_decision_impact_full_brow0')
+request = <SubRequest 'server' for <Function test_decision_impact_full_browser_flow_and_pinned_brief[server0]>>
+
+    @pytest.fixture
+    def server(tmp_path, request):
+        """Each workflow gets a fresh brain and a real HTTP/WebSocket server."""
+        options = getattr(request, 'param', {})
+        brain = Brain(str(tmp_path / "brain"), mode=options.get('mode', 'local'))
+        if options.get('mode') == 'git':
+            brain.init()
+        else:
+            brain.ensure_ready()
+        brain.write_node(Node(id="hostile", text=NODE_TEXT))
+        brain.write_node(Node(id="safe", text="A second idea about memory"))
+        brain.write_edges([Edge(id="suggestion", source="hostile", target="safe",
+                               kind="fact", predicate=HOSTILE, pending=True,
+                               evidence=[{"node_id": "hostile", "text": HOSTILE}])])
+        env = {k: v for k, v in os.environ.items()
+               if not k.startswith(("IG_", "IDEAGRAPH_"))}
+        env.update(IG_BRAIN_MODE=brain.mode, IG_BRAIN_PATH=str(brain.path),
+                   IDEAGRAPH_EMBEDDER="hash", PYTHONPATH=str(REPO))
+        headers = {}
+        if options.get('secure'):
+            policy = tmp_path / 'browser-policy.json'
+            policy.write_text(json.dumps({'graphs': {'default': {
+                'roles': {'reviewer': 'editor', 'reader': 'viewer'},
+                'nodes': {'source': {'read': ['reviewer'], 'write': ['reviewer']}}}},
+                'tokens': {hashlib.sha256(token.encode()).hexdigest(): identity for token, identity in
+                           [('reviewer-token', 'reviewer'), ('reader-token', 'reader')]}}))
+            env['IG_ACCESS_POLICY'] = str(policy)
+            headers['Authorization'] = 'Bearer reviewer-token'
+        with socket.socket() as sock:
+>           sock.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+tests/test_frontend_xss.py:71: PermissionError
+_ ERROR at setup of test_decision_integrity_brief_keeps_selected_revision_after_later_edit[git] _
+
+tmp_path = PosixPath('/private/var/folders/sj/799zmzcs10n9pm_vhxx4typc0000gn/T/pytest-of-niklas/pytest-820/test_decision_integrity_brief_0')
+request = <SubRequest 'server' for <Function test_decision_integrity_brief_keeps_selected_revision_after_later_edit[git]>>
+
+    @pytest.fixture
+    def server(tmp_path, request):
+        """Each workflow gets a fresh brain and a real HTTP/WebSocket server."""
+        options = getattr(request, 'param', {})
+        brain = Brain(str(tmp_path / "brain"), mode=options.get('mode', 'local'))
+        if options.get('mode') == 'git':
+            brain.init()
+        else:
+            brain.ensure_ready()
+        brain.write_node(Node(id="hostile", text=NODE_TEXT))
+        brain.write_node(Node(id="safe", text="A second idea about memory"))
+        brain.write_edges([Edge(id="suggestion", source="hostile", target="safe",
+                               kind="fact", predicate=HOSTILE, pending=True,
+                               evidence=[{"node_id": "hostile", "text": HOSTILE}])])
+        env = {k: v for k, v in os.environ.items()
+               if not k.startswith(("IG_", "IDEAGRAPH_"))}
+        env.update(IG_BRAIN_MODE=brain.mode, IG_BRAIN_PATH=str(brain.path),
+                   IDEAGRAPH_EMBEDDER="hash", PYTHONPATH=str(REPO))
+        headers = {}
+        if options.get('secure'):
+            policy = tmp_path / 'browser-policy.json'
+            policy.write_text(json.dumps({'graphs': {'default': {
+                'roles': {'reviewer': 'editor', 'reader': 'viewer'},
+                'nodes': {'source': {'read': ['reviewer'], 'write': ['reviewer']}}}},
+                'tokens': {hashlib.sha256(token.encode()).hexdigest(): identity for token, identity in
+                           [('reviewer-token', 'reviewer'), ('reader-token', 'reader')]}}))
+            env['IG_ACCESS_POLICY'] = str(policy)
+            headers['Authorization'] = 'Bearer reviewer-token'
+        with socket.socket() as sock:
+>           sock.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+tests/test_frontend_xss.py:71: PermissionError
+_ ERROR at setup of test_decision_integrity_published_finding_failure_preserves_receipt_and_history[git-fault] _
+
+tmp_path = PosixPath('/private/var/folders/sj/799zmzcs10n9pm_vhxx4typc0000gn/T/pytest-of-niklas/pytest-820/test_decision_integrity_publis0')
+request = <SubRequest 'server' for <Function test_decision_integrity_published_finding_failure_preserves_receipt_and_history[git-fault]>>
+
+    @pytest.fixture
+    def server(tmp_path, request):
+        """Each workflow gets a fresh brain and a real HTTP/WebSocket server."""
+        options = getattr(request, 'param', {})
+        brain = Brain(str(tmp_path / "brain"), mode=options.get('mode', 'local'))
+        if options.get('mode') == 'git':
+            brain.init()
+        else:
+            brain.ensure_ready()
+        brain.write_node(Node(id="hostile", text=NODE_TEXT))
+        brain.write_node(Node(id="safe", text="A second idea about memory"))
+        brain.write_edges([Edge(id="suggestion", source="hostile", target="safe",
+                               kind="fact", predicate=HOSTILE, pending=True,
+                               evidence=[{"node_id": "hostile", "text": HOSTILE}])])
+        env = {k: v for k, v in os.environ.items()
+               if not k.startswith(("IG_", "IDEAGRAPH_"))}
+        env.update(IG_BRAIN_MODE=brain.mode, IG_BRAIN_PATH=str(brain.path),
+                   IDEAGRAPH_EMBEDDER="hash", PYTHONPATH=str(REPO))
+        headers = {}
+        if options.get('secure'):
+            policy = tmp_path / 'browser-policy.json'
+            policy.write_text(json.dumps({'graphs': {'default': {
+                'roles': {'reviewer': 'editor', 'reader': 'viewer'},
+                'nodes': {'source': {'read': ['reviewer'], 'write': ['reviewer']}}}},
+                'tokens': {hashlib.sha256(token.encode()).hexdigest(): identity for token, identity in
+                           [('reviewer-token', 'reviewer'), ('reader-token', 'reader')]}}))
+            env['IG_ACCESS_POLICY'] = str(policy)
+            headers['Authorization'] = 'Bearer reviewer-token'
+        with socket.socket() as sock:
+>           sock.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+tests/test_frontend_xss.py:71: PermissionError
+_ ERROR at setup of test_decision_integrity_second_source_revocation_clears_derived_ui[git-secure] _
+
+tmp_path = PosixPath('/private/var/folders/sj/799zmzcs10n9pm_vhxx4typc0000gn/T/pytest-of-niklas/pytest-820/test_decision_integrity_second0')
+request = <SubRequest 'server' for <Function test_decision_integrity_second_source_revocation_clears_derived_ui[git-secure]>>
+
+    @pytest.fixture
+    def server(tmp_path, request):
+        """Each workflow gets a fresh brain and a real HTTP/WebSocket server."""
+        options = getattr(request, 'param', {})
+        brain = Brain(str(tmp_path / "brain"), mode=options.get('mode', 'local'))
+        if options.get('mode') == 'git':
+            brain.init()
+        else:
+            brain.ensure_ready()
+        brain.write_node(Node(id="hostile", text=NODE_TEXT))
+        brain.write_node(Node(id="safe", text="A second idea about memory"))
+        brain.write_edges([Edge(id="suggestion", source="hostile", target="safe",
+                               kind="fact", predicate=HOSTILE, pending=True,
+                               evidence=[{"node_id": "hostile", "text": HOSTILE}])])
+        env = {k: v for k, v in os.environ.items()
+               if not k.startswith(("IG_", "IDEAGRAPH_"))}
+        env.update(IG_BRAIN_MODE=brain.mode, IG_BRAIN_PATH=str(brain.path),
+                   IDEAGRAPH_EMBEDDER="hash", PYTHONPATH=str(REPO))
+        headers = {}
+        if options.get('secure'):
+            policy = tmp_path / 'browser-policy.json'
+            policy.write_text(json.dumps({'graphs': {'default': {
+                'roles': {'reviewer': 'editor', 'reader': 'viewer'},
+                'nodes': {'source': {'read': ['reviewer'], 'write': ['reviewer']}}}},
+                'tokens': {hashlib.sha256(token.encode()).hexdigest(): identity for token, identity in
+                           [('reviewer-token', 'reviewer'), ('reader-token', 'reader')]}}))
+            env['IG_ACCESS_POLICY'] = str(policy)
+            headers['Authorization'] = 'Bearer reviewer-token'
+        with socket.socket() as sock:
+>           sock.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+tests/test_frontend_xss.py:71: PermissionError
+_ ERROR at setup of test_decision_integrity_tombstone_clears_historical_ui[git] _
+
+tmp_path = PosixPath('/private/var/folders/sj/799zmzcs10n9pm_vhxx4typc0000gn/T/pytest-of-niklas/pytest-820/test_decision_integrity_tombst0')
+request = <SubRequest 'server' for <Function test_decision_integrity_tombstone_clears_historical_ui[git]>>
+
+    @pytest.fixture
+    def server(tmp_path, request):
+        """Each workflow gets a fresh brain and a real HTTP/WebSocket server."""
+        options = getattr(request, 'param', {})
+        brain = Brain(str(tmp_path / "brain"), mode=options.get('mode', 'local'))
+        if options.get('mode') == 'git':
+            brain.init()
+        else:
+            brain.ensure_ready()
+        brain.write_node(Node(id="hostile", text=NODE_TEXT))
+        brain.write_node(Node(id="safe", text="A second idea about memory"))
+        brain.write_edges([Edge(id="suggestion", source="hostile", target="safe",
+                               kind="fact", predicate=HOSTILE, pending=True,
+                               evidence=[{"node_id": "hostile", "text": HOSTILE}])])
+        env = {k: v for k, v in os.environ.items()
+               if not k.startswith(("IG_", "IDEAGRAPH_"))}
+        env.update(IG_BRAIN_MODE=brain.mode, IG_BRAIN_PATH=str(brain.path),
+                   IDEAGRAPH_EMBEDDER="hash", PYTHONPATH=str(REPO))
+        headers = {}
+        if options.get('secure'):
+            policy = tmp_path / 'browser-policy.json'
+            policy.write_text(json.dumps({'graphs': {'default': {
+                'roles': {'reviewer': 'editor', 'reader': 'viewer'},
+                'nodes': {'source': {'read': ['reviewer'], 'write': ['reviewer']}}}},
+                'tokens': {hashlib.sha256(token.encode()).hexdigest(): identity for token, identity in
+                           [('reviewer-token', 'reviewer'), ('reader-token', 'reader')]}}))
+            env['IG_ACCESS_POLICY'] = str(policy)
+            headers['Authorization'] = 'Bearer reviewer-token'
+        with socket.socket() as sock:
+>           sock.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+tests/test_frontend_xss.py:71: PermissionError
+_ ERROR at setup of test_decision_integrity_two_browser_reviews_have_one_winner_without_duplicate_effects[git] _
+
+tmp_path = PosixPath('/private/var/folders/sj/799zmzcs10n9pm_vhxx4typc0000gn/T/pytest-of-niklas/pytest-820/test_decision_integrity_two_br0')
+request = <SubRequest 'server' for <Function test_decision_integrity_two_browser_reviews_have_one_winner_without_duplicate_effects[git]>>
+
+    @pytest.fixture
+    def server(tmp_path, request):
+        """Each workflow gets a fresh brain and a real HTTP/WebSocket server."""
+        options = getattr(request, 'param', {})
+        brain = Brain(str(tmp_path / "brain"), mode=options.get('mode', 'local'))
+        if options.get('mode') == 'git':
+            brain.init()
+        else:
+            brain.ensure_ready()
+        brain.write_node(Node(id="hostile", text=NODE_TEXT))
+        brain.write_node(Node(id="safe", text="A second idea about memory"))
+        brain.write_edges([Edge(id="suggestion", source="hostile", target="safe",
+                               kind="fact", predicate=HOSTILE, pending=True,
+                               evidence=[{"node_id": "hostile", "text": HOSTILE}])])
+        env = {k: v for k, v in os.environ.items()
+               if not k.startswith(("IG_", "IDEAGRAPH_"))}
+        env.update(IG_BRAIN_MODE=brain.mode, IG_BRAIN_PATH=str(brain.path),
+                   IDEAGRAPH_EMBEDDER="hash", PYTHONPATH=str(REPO))
+        headers = {}
+        if options.get('secure'):
+            policy = tmp_path / 'browser-policy.json'
+            policy.write_text(json.dumps({'graphs': {'default': {
+                'roles': {'reviewer': 'editor', 'reader': 'viewer'},
+                'nodes': {'source': {'read': ['reviewer'], 'write': ['reviewer']}}}},
+                'tokens': {hashlib.sha256(token.encode()).hexdigest(): identity for token, identity in
+                           [('reviewer-token', 'reviewer'), ('reader-token', 'reader')]}}))
+            env['IG_ACCESS_POLICY'] = str(policy)
+            headers['Authorization'] = 'Bearer reviewer-token'
+        with socket.socket() as sock:
+>           sock.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+tests/test_frontend_xss.py:71: PermissionError
+_ ERROR at setup of test_decision_review_restricted_evidence_is_hidden_by_real_authenticated_api[server0] _
+
+tmp_path = PosixPath('/private/var/folders/sj/799zmzcs10n9pm_vhxx4typc0000gn/T/pytest-of-niklas/pytest-820/test_decision_review_restricte0')
+request = <SubRequest 'server' for <Function test_decision_review_restricted_evidence_is_hidden_by_real_authenticated_api[server0]>>
+
+    @pytest.fixture
+    def server(tmp_path, request):
+        """Each workflow gets a fresh brain and a real HTTP/WebSocket server."""
+        options = getattr(request, 'param', {})
+        brain = Brain(str(tmp_path / "brain"), mode=options.get('mode', 'local'))
+        if options.get('mode') == 'git':
+            brain.init()
+        else:
+            brain.ensure_ready()
+        brain.write_node(Node(id="hostile", text=NODE_TEXT))
+        brain.write_node(Node(id="safe", text="A second idea about memory"))
+        brain.write_edges([Edge(id="suggestion", source="hostile", target="safe",
+                               kind="fact", predicate=HOSTILE, pending=True,
+                               evidence=[{"node_id": "hostile", "text": HOSTILE}])])
+        env = {k: v for k, v in os.environ.items()
+               if not k.startswith(("IG_", "IDEAGRAPH_"))}
+        env.update(IG_BRAIN_MODE=brain.mode, IG_BRAIN_PATH=str(brain.path),
+                   IDEAGRAPH_EMBEDDER="hash", PYTHONPATH=str(REPO))
+        headers = {}
+        if options.get('secure'):
+            policy = tmp_path / 'browser-policy.json'
+            policy.write_text(json.dumps({'graphs': {'default': {
+                'roles': {'reviewer': 'editor', 'reader': 'viewer'},
+                'nodes': {'source': {'read': ['reviewer'], 'write': ['reviewer']}}}},
+                'tokens': {hashlib.sha256(token.encode()).hexdigest(): identity for token, identity in
+                           [('reviewer-token', 'reviewer'), ('reader-token', 'reader')]}}))
+            env['IG_ACCESS_POLICY'] = str(policy)
+            headers['Authorization'] = 'Bearer reviewer-token'
+        with socket.socket() as sock:
+>           sock.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+tests/test_frontend_xss.py:71: PermissionError
+_ ERROR at setup of test_decision_review_stale_submission_refreshes_without_overwriting[server0] _
+
+tmp_path = PosixPath('/private/var/folders/sj/799zmzcs10n9pm_vhxx4typc0000gn/T/pytest-of-niklas/pytest-820/test_decision_review_stale_sub0')
+request = <SubRequest 'server' for <Function test_decision_review_stale_submission_refreshes_without_overwriting[server0]>>
+
+    @pytest.fixture
+    def server(tmp_path, request):
+        """Each workflow gets a fresh brain and a real HTTP/WebSocket server."""
+        options = getattr(request, 'param', {})
+        brain = Brain(str(tmp_path / "brain"), mode=options.get('mode', 'local'))
+        if options.get('mode') == 'git':
+            brain.init()
+        else:
+            brain.ensure_ready()
+        brain.write_node(Node(id="hostile", text=NODE_TEXT))
+        brain.write_node(Node(id="safe", text="A second idea about memory"))
+        brain.write_edges([Edge(id="suggestion", source="hostile", target="safe",
+                               kind="fact", predicate=HOSTILE, pending=True,
+                               evidence=[{"node_id": "hostile", "text": HOSTILE}])])
+        env = {k: v for k, v in os.environ.items()
+               if not k.startswith(("IG_", "IDEAGRAPH_"))}
+        env.update(IG_BRAIN_MODE=brain.mode, IG_BRAIN_PATH=str(brain.path),
+                   IDEAGRAPH_EMBEDDER="hash", PYTHONPATH=str(REPO))
+        headers = {}
+        if options.get('secure'):
+            policy = tmp_path / 'browser-policy.json'
+            policy.write_text(json.dumps({'graphs': {'default': {
+                'roles': {'reviewer': 'editor', 'reader': 'viewer'},
+                'nodes': {'source': {'read': ['reviewer'], 'write': ['reviewer']}}}},
+                'tokens': {hashlib.sha256(token.encode()).hexdigest(): identity for token, identity in
+                           [('reviewer-token', 'reviewer'), ('reader-token', 'reader')]}}))
+            env['IG_ACCESS_POLICY'] = str(policy)
+            headers['Authorization'] = 'Bearer reviewer-token'
+        with socket.socket() as sock:
+>           sock.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+tests/test_frontend_xss.py:71: PermissionError
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/fastapi/testclient.py:1
+  /Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR tests/test_frontend_xss.py::test_decision_impact_full_browser_flow_and_pinned_brief[server0]
+ERROR tests/test_frontend_xss.py::test_decision_integrity_brief_keeps_selected_revision_after_later_edit[git]
+ERROR tests/test_frontend_xss.py::test_decision_integrity_published_finding_failure_preserves_receipt_and_history[git-fault]
+ERROR tests/test_frontend_xss.py::test_decision_integrity_second_source_revocation_clears_derived_ui[git-secure]
+ERROR tests/test_frontend_xss.py::test_decision_integrity_tombstone_clears_historical_ui[git]
+ERROR tests/test_frontend_xss.py::test_decision_integrity_two_browser_reviews_have_one_winner_without_duplicate_effects[git]
+ERROR tests/test_frontend_xss.py::test_decision_review_restricted_evidence_is_hidden_by_real_authenticated_api[server0]
+ERROR tests/test_frontend_xss.py::test_decision_review_stale_submission_refreshes_without_overwriting[server0]
+47 passed, 1 warning, 8 errors in 54.64s

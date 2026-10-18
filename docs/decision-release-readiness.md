@@ -108,6 +108,30 @@ All eight curated development contexts remain visibly truncated within budget.
 No new final/evaluation-source bytes, independent labels or user sessions were
 used in this follow-up; independent coverage and human benefit remain absent.
 
+## False-alert development follow-up (18 October 2026)
+
+The [no-op source-update report](decision-evaluation-results/false-alert-development-v1/README.md)
+records mapping `dm.source-change-diagnostic/2`. The diagnostic retains the
+original basis only for identical complete task-source text or pure CRLF
+differences. Separately captured update sources and exact hashes remain in its
+audit trace; no review is transferred or semantic comparability invented.
+Changed or unavailable text still follows the conservative diagnostic path.
+
+The twelve authored regression variants derive from a known development input;
+they are not new independent cases. Full local validation passed 2,096 tests
+with 10 optional model skips; all 15 code CI checks passed. The strict local
+matrix passed 55 tests / 41 applicable cells. Initial sandbox failures and the
+successful repeats are retained separately in the report.
+
+**This does not resolve the historical semantic gate:** the known synthetic
+diagnostic still emits 5/95 false alerts (5.26%), and the empty proposed profile
+still misses 3/3 positives. All ten control update texts are nonidentical, so
+none is hidden by the no-op rule. Typed source-grounded result, condition and
+lineage handling remains implementation work. The eight real development input
+hashes and all frozen inputs/labels/thresholds and historical results remain
+unchanged. Independent coverage, semantic acceptance and human benefit remain
+absent; #90–#93 and #73 stay open and Decision Memory stays experimental.
+
 ## Executed measurements (16 October 2026)
 
 Raw reports, source/code/config manifests, prompts, errors, timings and baseline

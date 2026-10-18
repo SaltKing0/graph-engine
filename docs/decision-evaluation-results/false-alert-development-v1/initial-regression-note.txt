@@ -1,0 +1,3 @@
+No new independent cases: regressions derive from the already exposed controls-v2 comparable development input.
+The old controls-v2 five false alerts are prose-semantic cases. Exact-byte/CRLF equality cannot classify them as no-impact.
+No runtime may consume synthetic labels, working notes, expected impact instructions or an inferred reviewer judgment.
