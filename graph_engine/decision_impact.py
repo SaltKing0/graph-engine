@@ -139,6 +139,9 @@ def delta(old: dict | None, new: dict | None, *, event: dict | None = None) -> d
             for p in (a, b):
                 p['text'] = p['text'].replace('\r\n', '\n')
                 p['source_ref'] = {'node_id': p['source_ref']['node_id']}
+        if v['kind'] == 'claim':
+            for p in (a, b):
+                p['text'] = p['text'].replace('\r\n', '\n')
         if a == b and old['provenance'] == new['provenance']:
             classes = ['cosmetic']
     result = dict(schema='dm.delta/1', rule=RULE, subject_id=v['id'], kind=v['kind'],
@@ -287,6 +290,85 @@ def _supports(claims: list[dict], before: Revision, after: Revision, budget: Bud
     return dict(remaining=remaining, removed=removed, independence='not inferred; shared roots are not independent votes')
 
 
+def _candidate(change: dict, reference: dict, paths: list[list[dict]],
+               comparisons_by_path: list[list[dict]], before: Revision, after: Revision,
+               budget: Budget, all_records: dict, substitutions: dict) -> dict | None:
+    """Retain bounded alternative paths as one finding with all qualifications.
+
+    Path limits bound work even when a dependency graph reconverges. Old stored
+    findings keep their own exact paths and identities; no review is transferred.
+    """
+    obj = all_records[s.key(reference)]
+    comparisons = [check for checks in comparisons_by_path for check in checks]
+    claims = sorted({s.key(step[key]) for path in paths for step in path for key in ('from_ref', 'to_ref')
+                     if all_records[s.key(step[key])]['kind'] == 'claim'})
+    claim_refs = [dict(id=i, version_id=h) for i, h in claims]
+    support = _supports(claim_refs, before, after, budget)
+    reasons = ['basis_changed']
+    if any(c['status'] == 'disjoint' for c in comparisons):
+        reasons.append('scope_changed')
+    if any(c['status'] == 'unknown' for c in comparisons):
+        reasons.append('comparability_unknown')
+    if any(any(step['kind'] == 'opposes' for step in path) and all(c['status'] == 'comparable' for c in checks)
+           for path, checks in zip(paths, comparisons_by_path)):
+        reasons.append('comparable_opposition')
+    event = after.events.get(change['event_id'])
+    if event and event['axis'] == 'availability' and event['to'] == 'withdrawn':
+        reasons.append('support_withdrawn')
+    if any(step['kind'] in ('result_of', 'checks') for path in paths for step in path):
+        reasons.append('revisit_check_result')
+    preview = all(any(step['acceptance'] == 'proposed' for step in path) for path in paths)
+    clean_paths = [[{key: val for key, val in step.items() if key != 'view'} for step in path] for path in paths]
+    # Basis heads include relevant judgments only; unrelated commits
+    # and evaluation clocks cannot generate a new candidate identity.
+    refs = {s.key(r) for r in s.content_refs(dict(paths=clean_paths, support=support))}
+    # Preserve membership beyond the bounded support summary so a
+    # finding can detect later accepted attachments without treating
+    # already selected, clipped supports as newly introduced ones.
+    refs.update(s.key(v) for claim in claim_refs for v in after.supports.get(s.key(claim), []))
+    refs.add(s.key(reference))
+    refs.update(s.key(r) for r in (change['old'], change['new']) if r)
+    closure = set(refs)
+    for ref_key in sorted(refs):
+        if ref_key in after.records:
+            dependencies, _ = after.view.dependencies(after.records[ref_key])
+            closure.update(dependencies)
+    if len(closure) > 200:
+        budget.hit.add('basis_refs')
+    refs = set(sorted(closure)[:200])
+    # Pin the selected revision's heads for freshness while retaining
+    # old path versions as historical explanations, not current basis.
+    basis_heads = [s.reference(after.view.heads[vid]) for vid in sorted({i for i, _ in refs})
+                   if vid in after.view.heads and s.key(after.view.heads[vid]) in after.records]
+    basis_events = sorted(eid for eid, e in after.events.items() if s.key(e['subject']) in refs)
+    if len(basis_events) > 200:
+        budget.hit.add('basis_events')
+        basis_events = sorted(sorted(basis_events, key=after.view.event_positions.get)[-200:])
+    candidate = dict(schema='dm.candidate/1', rule=RULE, delta=change, target=reference,
+        decision=dict(action=obj['payload']['action'], rationale=obj['payload']['rationale']),
+        paths=clean_paths, substitutions=[dict(old=dict(id=i, version_id=h), new=s.reference(n))
+                                          for (i, h), n in sorted(substitutions.items())],
+        comparison=comparisons, reasons=sorted(reasons), support=support,
+        basis_event_ids=basis_events, basis_heads=basis_heads,
+        basis_refs=[dict(id=i, version_id=h) for i, h in sorted(refs)],
+        classification='proposed_preview' if preview else 'candidate_semantic_impact',
+        judgment='unreviewed; no established refutation or automatic decision change',
+        needs_review='Review changed basis, scope and surviving support; retain or revise explicitly')
+    # Findings must fit the existing 200-reference storage bound, including
+    # repeated exact references in paths and support summaries. Keep complete
+    # paths as units; expose any omission instead of producing an unrecordable
+    # candidate or silently relaxing the persistence contract.
+    if len(s.content_refs(candidate)) > 200:
+        budget.hit.add('candidate_refs')
+        budget.paths -= 1
+        if len(paths) == 1:
+            return None
+        return _candidate(change, reference, paths[:-1], comparisons_by_path[:-1],
+                          before, after, budget, all_records, substitutions)
+    candidate['candidate_id'] = candidate_identity(candidate)
+    return candidate
+
+
 def compare(brain: Brain, envelope: dict) -> dict:
     """Compare two explicit Git revisions; output is ephemeral until reviewed."""
     s.fields(envelope, {'schema', 'before', 'after'}, {'limits'})
@@ -369,9 +451,10 @@ def compare(brain: Brain, envelope: dict) -> dict:
         while queue:
             reference, path, seen = queue.popleft()
             k = s.key(reference)
-            if k in visited or not budget.object(k):
+            route = (k, identity({'path': path}))
+            if route in visited or not budget.object(k):
                 continue
-            visited.add(k)
+            visited.add(route)
             obj = all_records.get(k)
             if obj is None:
                 continue
@@ -388,61 +471,9 @@ def compare(brain: Brain, envelope: dict) -> dict:
                     comparisons = [dict(status='unknown', reasons=['No structured evidential scope comparison on path'], intersection={})]
                 if any(c['status'] == 'disjoint' for c in comparisons) and any(step['acceptance'] == 'proposed' for step in path):
                     continue
-                claims = sorted({s.key(step[key]) for step in path for key in ('from_ref', 'to_ref')
-                                 if all_records[s.key(step[key])]['kind'] == 'claim'})
-                claim_refs = [dict(id=i, version_id=h) for i, h in claims]
-                support = _supports(claim_refs, before, after, budget)
-                reasons = ['basis_changed']
-                if any(c['status'] == 'disjoint' for c in comparisons):
-                    reasons.append('scope_changed')
-                if any(c['status'] == 'unknown' for c in comparisons):
-                    reasons.append('comparability_unknown')
-                if any(step['kind'] == 'opposes' for step in path) and comparisons and all(c['status'] == 'comparable' for c in comparisons):
-                    reasons.append('comparable_opposition')
-                event = after.events.get(change['event_id'])
-                if event and event['axis'] == 'availability' and event['to'] == 'withdrawn':
-                    reasons.append('support_withdrawn')
-                if any(step['kind'] in ('result_of', 'checks') for step in path):
-                    reasons.append('revisit_check_result')
-                preview = any(step['acceptance'] == 'proposed' for step in path)
-                clean_path = [{key: val for key, val in step.items() if key != 'view'} for step in path]
-                # Basis heads include relevant judgments only; unrelated commits
-                # and evaluation clocks cannot generate a new candidate identity.
-                refs = {s.key(r) for r in s.content_refs(dict(path=clean_path, support=support))}
-                # Preserve membership beyond the bounded support summary so a
-                # finding can detect later accepted attachments without treating
-                # already selected, clipped supports as newly introduced ones.
-                refs.update(s.key(v) for claim in claim_refs for v in after.supports.get(s.key(claim), []))
-                refs.add(k)
-                refs.update(s.key(r) for r in (change['old'], change['new']) if r)
-                closure = set(refs)
-                for ref_key in sorted(refs):
-                    if ref_key in after.records:
-                        dependencies, _ = after.view.dependencies(after.records[ref_key])
-                        closure.update(dependencies)
-                if len(closure) > 200:
-                    budget.hit.add('basis_refs')
-                refs = set(sorted(closure)[:200])
-                # Pin the selected revision's heads for freshness while retaining
-                # old path versions as historical explanations, not current basis.
-                basis_heads = [s.reference(after.view.heads[vid]) for vid in sorted({i for i, _ in refs})
-                               if vid in after.view.heads and s.key(after.view.heads[vid]) in after.records]
-                basis_events = sorted(eid for eid, e in after.events.items() if s.key(e['subject']) in refs)
-                if len(basis_events) > 200:
-                    budget.hit.add('basis_events')
-                    basis_events = sorted(sorted(basis_events, key=after.view.event_positions.get)[-200:])
-                candidate = dict(schema='dm.candidate/1', rule=RULE, delta=change, target=reference,
-                    decision=dict(action=obj['payload']['action'], rationale=obj['payload']['rationale']),
-                    paths=[clean_path], substitutions=[dict(old=dict(id=i, version_id=h), new=s.reference(n))
-                                                      for (i, h), n in sorted(substitutions.items())],
-                    comparison=comparisons, reasons=sorted(reasons), support=support,
-                    basis_event_ids=basis_events, basis_heads=basis_heads,
-                    basis_refs=[dict(id=i, version_id=h) for i, h in sorted(refs)],
-                    classification='proposed_preview' if preview else 'candidate_semantic_impact',
-                    judgment='unreviewed; no established refutation or automatic decision change',
-                    needs_review='Review changed basis, scope and surviving support; retain or revise explicitly')
-                candidate['candidate_id'] = candidate_identity(candidate)
-                found[candidate['candidate_id']] = candidate
+                entry = found.setdefault(k, (reference, [], []))
+                entry[1].append(path)
+                entry[2].append(comparisons)
                 budget.paths += 1
                 continue
             outgoing = graph.get(k, [])
@@ -458,7 +489,11 @@ def compare(brain: Brain, envelope: dict) -> dict:
                     warnings.add('dependency_cycle')
                     continue
                 queue.append((step['to_ref'], path + [step], seen | {dest}))
-        candidates.extend(found.values())
+        for reference, paths, checks in found.values():
+            candidate = _candidate(change, reference, paths, checks, before, after,
+                                   budget, all_records, substitutions)
+            if candidate is not None:
+                candidates.append(candidate)
     # Reject a concurrent ACL or current-lineage change instead of publishing a
     # mixture. Historical text/reviews always came from their selected commits.
     current_after = ({n.id: n for n in Brain.read_nodes(brain)}, Brain.read_edges(brain, include_rejected=True))

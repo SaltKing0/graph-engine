@@ -1,0 +1,764 @@
+{
+  "schema": "dm.integrity.matrix/1",
+  "version": "engineering-matrix-v1.0.0",
+  "scope": "Nine concrete engineering scenarios x six public surfaces; bounded inventory, not exhaustive final contract sign-off.",
+  "final_sign_off": null,
+  "final_candidate": null,
+  "limitations": [
+    "Scenario sufficiency and inapplicability declarations require review before final acceptance.",
+    "MCP typed Decision Memory tools are read-only; generic remember/forget are different operations.",
+    "Explicit forensic snapshots may retain authorized forgotten history; live/context resurrection remains forbidden.",
+    "Software observations are implementing-agent evidence, not independent reviewer judgments.",
+    "Recovery includes raw proposal index/commit boundaries and browser finding index failure; no claim covers every possible OS crash instruction boundary."
+  ],
+  "cells": [
+    {
+      "scenario_id": "ACL-01",
+      "category": "acl_revocation",
+      "surface": "service",
+      "operation": "Revoke one direct or second derivation source before current/historical reads",
+      "preconditions": "A versioned decision/evidence graph exists; one source permission is removed while graph read remains allowed.",
+      "invariant": "No unauthorized source bytes or IDs, including multi-source derivatives, paths and historical/context exports.",
+      "scope": "Shared typed service over exact Git revisions",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-service]",
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-service]",
+        "tests/test_decision_memory.py::test_sidecar_reference_acl_checks_basis_anchor_as_well_as_source",
+        "tests/test_decision_memory.py::test_missing_and_cyclic_node_lineage_fail_closed"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "ACL-01",
+      "category": "acl_revocation",
+      "surface": "cli",
+      "operation": "Revoke one direct or second derivation source before current/historical reads",
+      "preconditions": "A versioned decision/evidence graph exists; one source permission is removed while graph read remains allowed.",
+      "invariant": "No unauthorized source bytes or IDs, including multi-source derivatives, paths and historical/context exports.",
+      "scope": "Actual CLI subprocess / JSON stdin and stdout",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-cli]",
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-cli]"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "ACL-01",
+      "category": "acl_revocation",
+      "surface": "http",
+      "operation": "Revoke one direct or second derivation source before current/historical reads",
+      "preconditions": "A versioned decision/evidence graph exists; one source permission is removed while graph read remains allowed.",
+      "invariant": "No unauthorized source bytes or IDs, including multi-source derivatives, paths and historical/context exports.",
+      "scope": "ASGI HTTP request/response and authorization middleware; real TCP UI cases are separate",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-http]",
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-http]"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "ACL-01",
+      "category": "acl_revocation",
+      "surface": "mcp",
+      "operation": "Revoke one direct or second derivation source before current/historical reads",
+      "preconditions": "A versioned decision/evidence graph exists; one source permission is removed while graph read remains allowed.",
+      "invariant": "No unauthorized source bytes or IDs, including multi-source derivatives, paths and historical/context exports.",
+      "scope": "Actual CLI stdio JSON-RPC session",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-mcp]",
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-mcp]",
+        "tests/test_mcp.py::test_write_mode_registers_exactly_the_write_tools"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "ACL-01",
+      "category": "acl_revocation",
+      "surface": "browser",
+      "operation": "Revoke one direct or second derivation source before current/historical reads",
+      "preconditions": "A versioned decision/evidence graph exists; one source permission is removed while graph read remains allowed.",
+      "invariant": "No unauthorized source bytes or IDs, including multi-source derivatives, paths and historical/context exports.",
+      "scope": "Real Chromium DOM interaction against a real authenticated/local HTTP server",
+      "applicable": true,
+      "tests": [
+        "tests/test_frontend_xss.py::test_decision_review_restricted_evidence_is_hidden_by_real_authenticated_api"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "ACL-01",
+      "category": "acl_revocation",
+      "surface": "exports",
+      "operation": "Revoke one direct or second derivation source before current/historical reads",
+      "preconditions": "A versioned decision/evidence graph exists; one source permission is removed while graph read remains allowed.",
+      "invariant": "No unauthorized source bytes or IDs, including multi-source derivatives, paths and historical/context exports.",
+      "scope": "Actual bounded context JSON and rendered Markdown brief",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-exports]",
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-exports]"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "FORGET-01",
+      "category": "tombstones",
+      "surface": "service",
+      "operation": "Forget a captured source, then query the historical decision and live review/context views",
+      "preconditions": "A stored source and decision have a historical revision and an explained update.",
+      "invariant": "No live/context/brief resurrection of forgotten source bytes or IDs; explicit forensic snapshot semantics remain separate.",
+      "scope": "Shared typed service over exact Git revisions",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-service]"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "FORGET-01",
+      "category": "tombstones",
+      "surface": "cli",
+      "operation": "Forget a captured source, then query the historical decision and live review/context views",
+      "preconditions": "A stored source and decision have a historical revision and an explained update.",
+      "invariant": "No live/context/brief resurrection of forgotten source bytes or IDs; explicit forensic snapshot semantics remain separate.",
+      "scope": "Actual CLI subprocess / JSON stdin and stdout",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-cli]"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "FORGET-01",
+      "category": "tombstones",
+      "surface": "http",
+      "operation": "Forget a captured source, then query the historical decision and live review/context views",
+      "preconditions": "A stored source and decision have a historical revision and an explained update.",
+      "invariant": "No live/context/brief resurrection of forgotten source bytes or IDs; explicit forensic snapshot semantics remain separate.",
+      "scope": "ASGI HTTP request/response and authorization middleware; real TCP UI cases are separate",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-http]"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "FORGET-01",
+      "category": "tombstones",
+      "surface": "mcp",
+      "operation": "Forget a captured source, then query the historical decision and live review/context views",
+      "preconditions": "A stored source and decision have a historical revision and an explained update.",
+      "invariant": "No live/context/brief resurrection of forgotten source bytes or IDs; explicit forensic snapshot semantics remain separate.",
+      "scope": "Actual CLI stdio JSON-RPC session",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-mcp]"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "FORGET-01",
+      "category": "tombstones",
+      "surface": "browser",
+      "operation": "Forget a captured source, then query the historical decision and live review/context views",
+      "preconditions": "A stored source and decision have a historical revision and an explained update.",
+      "invariant": "No live/context/brief resurrection of forgotten source bytes or IDs; explicit forensic snapshot semantics remain separate.",
+      "scope": "Real Chromium DOM interaction against a real authenticated/local HTTP server",
+      "applicable": true,
+      "tests": [
+        "tests/test_frontend_xss.py::test_decision_integrity_tombstone_clears_historical_ui"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "FORGET-01",
+      "category": "tombstones",
+      "surface": "exports",
+      "operation": "Forget a captured source, then query the historical decision and live review/context views",
+      "preconditions": "A stored source and decision have a historical revision and an explained update.",
+      "invariant": "No live/context/brief resurrection of forgotten source bytes or IDs; explicit forensic snapshot semantics remain separate.",
+      "scope": "Actual bounded context JSON and rendered Markdown brief",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-exports]"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "EDIT-01",
+      "category": "source_edit",
+      "surface": "service",
+      "operation": "Capture a successor source; read old versions and explained review candidates",
+      "preconditions": "Old source, evidence, dependencies and decision are pinned before a later edit.",
+      "invariant": "Exact old versions remain resolvable; successor review/assessment is not silently inherited; reads do not write brain state.",
+      "scope": "Shared typed service over exact Git revisions",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-service]",
+        "tests/test_decision_memory.py::test_claim_wording_and_context_edit_never_transfer_review",
+        "tests/test_decision_memory.py::test_source_edit_versions_exact_bytes_and_marks_basis_changed"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "EDIT-01",
+      "category": "source_edit",
+      "surface": "cli",
+      "operation": "Capture a successor source; read old versions and explained review candidates",
+      "preconditions": "Old source, evidence, dependencies and decision are pinned before a later edit.",
+      "invariant": "Exact old versions remain resolvable; successor review/assessment is not silently inherited; reads do not write brain state.",
+      "scope": "Actual CLI subprocess / JSON stdin and stdout",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-cli]"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "EDIT-01",
+      "category": "source_edit",
+      "surface": "http",
+      "operation": "Capture a successor source; read old versions and explained review candidates",
+      "preconditions": "Old source, evidence, dependencies and decision are pinned before a later edit.",
+      "invariant": "Exact old versions remain resolvable; successor review/assessment is not silently inherited; reads do not write brain state.",
+      "scope": "ASGI HTTP request/response and authorization middleware; real TCP UI cases are separate",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-http]"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "EDIT-01",
+      "category": "source_edit",
+      "surface": "mcp",
+      "operation": "Capture a successor source; read old versions and explained review candidates",
+      "preconditions": "Old source, evidence, dependencies and decision are pinned before a later edit.",
+      "invariant": "Exact old versions remain resolvable; successor review/assessment is not silently inherited; reads do not write brain state.",
+      "scope": "Actual CLI stdio JSON-RPC session",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-mcp]"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "EDIT-01",
+      "category": "source_edit",
+      "surface": "browser",
+      "operation": "Capture a successor source; read old versions and explained review candidates",
+      "preconditions": "Old source, evidence, dependencies and decision are pinned before a later edit.",
+      "invariant": "Exact old versions remain resolvable; successor review/assessment is not silently inherited; reads do not write brain state.",
+      "scope": "Real Chromium DOM interaction against a real authenticated/local HTTP server",
+      "applicable": true,
+      "tests": [
+        "tests/test_frontend_xss.py::test_decision_impact_full_browser_flow_and_pinned_brief"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "EDIT-01",
+      "category": "source_edit",
+      "surface": "exports",
+      "operation": "Capture a successor source; read old versions and explained review candidates",
+      "preconditions": "Old source, evidence, dependencies and decision are pinned before a later edit.",
+      "invariant": "Exact old versions remain resolvable; successor review/assessment is not silently inherited; reads do not write brain state.",
+      "scope": "Actual bounded context JSON and rendered Markdown brief",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-exports]"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "MERGE-01",
+      "category": "merge",
+      "surface": "service",
+      "operation": "Attempt an explicit generic merge involving a version-pinned source",
+      "preconditions": "Decision Memory provenance pins a source node; an unrelated node is the other operand.",
+      "invariant": "Reject before any node/edge/history mutation; do not retarget reviews or source identity.",
+      "scope": "Actual generic merge_nodes service boundary",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_memory.py::test_pinned_merge_refuses_before_any_changes"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "MERGE-01",
+      "category": "merge",
+      "surface": "cli",
+      "operation": "Attempt an explicit generic merge involving a version-pinned source",
+      "preconditions": "Decision Memory provenance pins a source node; an unrelated node is the other operand.",
+      "invariant": "Reject before any node/edge/history mutation; do not retarget reviews or source identity.",
+      "scope": "Actual generic ig merge subprocess",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_cli_cannot_merge_version_pinned_source_or_reassign_reviews"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "MERGE-01",
+      "category": "merge",
+      "surface": "http",
+      "operation": "Attempt an explicit generic merge involving a version-pinned source",
+      "preconditions": "Decision Memory provenance pins a source node; an unrelated node is the other operand.",
+      "invariant": "Reject before any node/edge/history mutation; do not retarget reviews or source identity.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "This scenario is explicit generic node merge. No merge operation exists on this typed http surface; read projections are separately covered in ACL/EDIT/HISTORY rows."
+    },
+    {
+      "scenario_id": "MERGE-01",
+      "category": "merge",
+      "surface": "mcp",
+      "operation": "Attempt an explicit generic merge involving a version-pinned source",
+      "preconditions": "Decision Memory provenance pins a source node; an unrelated node is the other operand.",
+      "invariant": "Reject before any node/edge/history mutation; do not retarget reviews or source identity.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "This scenario is explicit generic node merge. No merge operation exists on this typed mcp surface; read projections are separately covered in ACL/EDIT/HISTORY rows."
+    },
+    {
+      "scenario_id": "MERGE-01",
+      "category": "merge",
+      "surface": "browser",
+      "operation": "Attempt an explicit generic merge involving a version-pinned source",
+      "preconditions": "Decision Memory provenance pins a source node; an unrelated node is the other operand.",
+      "invariant": "Reject before any node/edge/history mutation; do not retarget reviews or source identity.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "This scenario is explicit generic node merge. No merge operation exists on this typed browser surface; read projections are separately covered in ACL/EDIT/HISTORY rows."
+    },
+    {
+      "scenario_id": "MERGE-01",
+      "category": "merge",
+      "surface": "exports",
+      "operation": "Attempt an explicit generic merge involving a version-pinned source",
+      "preconditions": "Decision Memory provenance pins a source node; an unrelated node is the other operand.",
+      "invariant": "Reject before any node/edge/history mutation; do not retarget reviews or source identity.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "This scenario is explicit generic node merge. No merge operation exists on this typed exports surface; read projections are separately covered in ACL/EDIT/HISTORY rows."
+    },
+    {
+      "scenario_id": "HISTORY-01",
+      "category": "snapshot",
+      "surface": "service",
+      "operation": "Resolve explicit historical inspect/brief revisions after a later source change",
+      "preconditions": "A selected historical revision differs from current HEAD; source remains authorized and live.",
+      "invariant": "Historical payloads use their selected version and review state; current ACLs still apply; UI comparison brief uses comparison.after.",
+      "scope": "Shared typed service over exact Git revisions",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-service]"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "HISTORY-01",
+      "category": "snapshot",
+      "surface": "cli",
+      "operation": "Resolve explicit historical inspect/brief revisions after a later source change",
+      "preconditions": "A selected historical revision differs from current HEAD; source remains authorized and live.",
+      "invariant": "Historical payloads use their selected version and review state; current ACLs still apply; UI comparison brief uses comparison.after.",
+      "scope": "Actual CLI subprocess / JSON stdin and stdout",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-cli]"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "HISTORY-01",
+      "category": "snapshot",
+      "surface": "http",
+      "operation": "Resolve explicit historical inspect/brief revisions after a later source change",
+      "preconditions": "A selected historical revision differs from current HEAD; source remains authorized and live.",
+      "invariant": "Historical payloads use their selected version and review state; current ACLs still apply; UI comparison brief uses comparison.after.",
+      "scope": "ASGI HTTP request/response and authorization middleware; real TCP UI cases are separate",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-http]"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "HISTORY-01",
+      "category": "snapshot",
+      "surface": "mcp",
+      "operation": "Resolve explicit historical inspect/brief revisions after a later source change",
+      "preconditions": "A selected historical revision differs from current HEAD; source remains authorized and live.",
+      "invariant": "Historical payloads use their selected version and review state; current ACLs still apply; UI comparison brief uses comparison.after.",
+      "scope": "Actual CLI stdio JSON-RPC session",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-mcp]"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "HISTORY-01",
+      "category": "snapshot",
+      "surface": "browser",
+      "operation": "Resolve explicit historical inspect/brief revisions after a later source change",
+      "preconditions": "A selected historical revision differs from current HEAD; source remains authorized and live.",
+      "invariant": "Historical payloads use their selected version and review state; current ACLs still apply; UI comparison brief uses comparison.after.",
+      "scope": "Real Chromium DOM interaction against a real authenticated/local HTTP server",
+      "applicable": true,
+      "tests": [
+        "tests/test_frontend_xss.py::test_decision_integrity_brief_keeps_selected_revision_after_later_edit"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "HISTORY-01",
+      "category": "snapshot",
+      "surface": "exports",
+      "operation": "Resolve explicit historical inspect/brief revisions after a later source change",
+      "preconditions": "A selected historical revision differs from current HEAD; source remains authorized and live.",
+      "invariant": "Historical payloads use their selected version and review state; current ACLs still apply; UI comparison brief uses comparison.after.",
+      "scope": "Actual bounded context JSON and rendered Markdown brief",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-exports]"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "STALE-01",
+      "category": "stale_review",
+      "surface": "service",
+      "operation": "Submit a review after its captured generation or source basis changes",
+      "preconditions": "A review envelope was prepared before intervening source/content/review activity.",
+      "invariant": "Reject stale submission without overwriting newer content/reviews; UI refreshes evidence and retains explicit version targets.",
+      "scope": "Source and generation preconditions in typed review/store service",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_service.py::test_import_propose_review_changed_source_and_stale_review",
+        "tests/test_decision_memory.py::test_stale_generation_and_source_hash_previews_conflict"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "STALE-01",
+      "category": "stale_review",
+      "surface": "cli",
+      "operation": "Submit a review after its captured generation or source basis changes",
+      "preconditions": "A review envelope was prepared before intervening source/content/review activity.",
+      "invariant": "Reject stale submission without overwriting newer content/reviews; UI refreshes evidence and retains explicit version targets.",
+      "scope": "Actual CLI subprocess",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[stale-cli]"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "STALE-01",
+      "category": "stale_review",
+      "surface": "http",
+      "operation": "Submit a review after its captured generation or source basis changes",
+      "preconditions": "A review envelope was prepared before intervening source/content/review activity.",
+      "invariant": "Reject stale submission without overwriting newer content/reviews; UI refreshes evidence and retains explicit version targets.",
+      "scope": "Actual ASGI HTTP review endpoint",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[stale-http]"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "STALE-01",
+      "category": "stale_review",
+      "surface": "mcp",
+      "operation": "Submit a review after its captured generation or source basis changes",
+      "preconditions": "A review envelope was prepared before intervening source/content/review activity.",
+      "invariant": "Reject stale submission without overwriting newer content/reviews; UI refreshes evidence and retains explicit version targets.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "Typed Decision Memory review writes are not exposed by mcp. This is a mutation scenario; historical read behavior is covered separately."
+    },
+    {
+      "scenario_id": "STALE-01",
+      "category": "stale_review",
+      "surface": "browser",
+      "operation": "Submit a review after its captured generation or source basis changes",
+      "preconditions": "A review envelope was prepared before intervening source/content/review activity.",
+      "invariant": "Reject stale submission without overwriting newer content/reviews; UI refreshes evidence and retains explicit version targets.",
+      "scope": "Actual Chromium stale submission and evidence refresh",
+      "applicable": true,
+      "tests": [
+        "tests/test_frontend_xss.py::test_decision_review_stale_submission_refreshes_without_overwriting"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "STALE-01",
+      "category": "stale_review",
+      "surface": "exports",
+      "operation": "Submit a review after its captured generation or source basis changes",
+      "preconditions": "A review envelope was prepared before intervening source/content/review activity.",
+      "invariant": "Reject stale submission without overwriting newer content/reviews; UI refreshes evidence and retains explicit version targets.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "Typed Decision Memory review writes are not exposed by exports. This is a mutation scenario; historical read behavior is covered separately."
+    },
+    {
+      "scenario_id": "UNDO-01",
+      "category": "undo",
+      "surface": "service",
+      "operation": "Correct an unconsumed review and reject correction after a decision consumed it",
+      "preconditions": "An accepted review exists; optionally a subsequent decision cites that exact review event.",
+      "invariant": "Fresh correction retains original history; dependent correction is refused without silent review reassignment.",
+      "scope": "Exact review correction and downstream event-basis guard",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_service.py::test_explicit_revise_and_guarded_undo",
+        "tests/test_decision_service.py::test_undo_fails_after_dependent_review"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "UNDO-01",
+      "category": "undo",
+      "surface": "cli",
+      "operation": "Correct an unconsumed review and reject correction after a decision consumed it",
+      "preconditions": "An accepted review exists; optionally a subsequent decision cites that exact review event.",
+      "invariant": "Fresh correction retains original history; dependent correction is refused without silent review reassignment.",
+      "scope": "Actual CLI subprocess correction envelope",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[fresh-undo-cli]",
+        "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[dependent-undo-cli]"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "UNDO-01",
+      "category": "undo",
+      "surface": "http",
+      "operation": "Correct an unconsumed review and reject correction after a decision consumed it",
+      "preconditions": "An accepted review exists; optionally a subsequent decision cites that exact review event.",
+      "invariant": "Fresh correction retains original history; dependent correction is refused without silent review reassignment.",
+      "scope": "Actual ASGI HTTP correction envelope",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[fresh-undo-http]",
+        "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[dependent-undo-http]"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "UNDO-01",
+      "category": "undo",
+      "surface": "mcp",
+      "operation": "Correct an unconsumed review and reject correction after a decision consumed it",
+      "preconditions": "An accepted review exists; optionally a subsequent decision cites that exact review event.",
+      "invariant": "Fresh correction retains original history; dependent correction is refused without silent review reassignment.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "No correction/undo of typed assessment events is exposed on mcp. Ordinary-memory edge undo is a different operation and is not counted as evidence."
+    },
+    {
+      "scenario_id": "UNDO-01",
+      "category": "undo",
+      "surface": "browser",
+      "operation": "Correct an unconsumed review and reject correction after a decision consumed it",
+      "preconditions": "An accepted review exists; optionally a subsequent decision cites that exact review event.",
+      "invariant": "Fresh correction retains original history; dependent correction is refused without silent review reassignment.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "No correction/undo of typed assessment events is exposed on browser. Ordinary-memory edge undo is a different operation and is not counted as evidence."
+    },
+    {
+      "scenario_id": "UNDO-01",
+      "category": "undo",
+      "surface": "exports",
+      "operation": "Correct an unconsumed review and reject correction after a decision consumed it",
+      "preconditions": "An accepted review exists; optionally a subsequent decision cites that exact review event.",
+      "invariant": "Fresh correction retains original history; dependent correction is refused without silent review reassignment.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "No correction/undo of typed assessment events is exposed on exports. Ordinary-memory edge undo is a different operation and is not counted as evidence."
+    },
+    {
+      "scenario_id": "RECOVERY-01",
+      "category": "crash_retry",
+      "surface": "service",
+      "operation": "Inject failure after authoritative publication at index rebuild and commit boundaries",
+      "preconditions": "A structured proposal has a stable idempotency key; index/commit raises after local publication.",
+      "invariant": "Return an explicit published-locally receipt; identical retry returns the durable receipt without duplicate records; sync may remain required.",
+      "scope": "Actual storage publication, index and commit failure boundaries",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_memory.py::test_interrupted_sidecar_publication_leaves_only_reusable_anchors",
+        "tests/test_decision_memory.py::test_commit_failure_preserves_authoritative_receipt",
+        "tests/test_decision_service.py::test_post_publication_failure_returns_durable_retry"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "RECOVERY-01",
+      "category": "crash_retry",
+      "surface": "cli",
+      "operation": "Inject failure after authoritative publication at index rebuild and commit boundaries",
+      "preconditions": "A structured proposal has a stable idempotency key; index/commit raises after local publication.",
+      "invariant": "Return an explicit published-locally receipt; identical retry returns the durable receipt without duplicate records; sync may remain required.",
+      "scope": "Actual CLI parser/output with injected local index/commit failures (in process)",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[index-cli]",
+        "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[commit-cli]"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "RECOVERY-01",
+      "category": "crash_retry",
+      "surface": "http",
+      "operation": "Inject failure after authoritative publication at index rebuild and commit boundaries",
+      "preconditions": "A structured proposal has a stable idempotency key; index/commit raises after local publication.",
+      "invariant": "Return an explicit published-locally receipt; identical retry returns the durable receipt without duplicate records; sync may remain required.",
+      "scope": "Actual ASGI HTTP 502/receipt/retry responses at index/commit boundaries",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[index-http]",
+        "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[commit-http]"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "RECOVERY-01",
+      "category": "crash_retry",
+      "surface": "mcp",
+      "operation": "Inject failure after authoritative publication at index rebuild and commit boundaries",
+      "preconditions": "A structured proposal has a stable idempotency key; index/commit raises after local publication.",
+      "invariant": "Return an explicit published-locally receipt; identical retry returns the durable receipt without duplicate records; sync may remain required.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "No raw structured-version proposal operation exists on mcp. This scenario concerns that proposal publication boundary; browser finding-review failure paths require separate future scenarios."
+    },
+    {
+      "scenario_id": "RECOVERY-UI-01",
+      "category": "crash_retry",
+      "surface": "browser",
+      "operation": "Publish a finding review while the real server fails its first post-publication index rebuild",
+      "preconditions": "A browser displays a source-change candidate; a test-only server hook fails once after finding publication.",
+      "invariant": "UI explicitly reports published-locally/incomplete sync, refreshes the stored finding, and does not duplicate the review or receipt.",
+      "scope": "Real Chromium click, real HTTP 502 response, actual durable sidecar and history after refresh",
+      "applicable": true,
+      "tests": [
+        "tests/test_frontend_xss.py::test_decision_integrity_published_finding_failure_preserves_receipt_and_history"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "RECOVERY-01",
+      "category": "crash_retry",
+      "surface": "exports",
+      "operation": "Inject failure after authoritative publication at index rebuild and commit boundaries",
+      "preconditions": "A structured proposal has a stable idempotency key; index/commit raises after local publication.",
+      "invariant": "Return an explicit published-locally receipt; identical retry returns the durable receipt without duplicate records; sync may remain required.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "No raw structured-version proposal operation exists on exports. This scenario concerns that proposal publication boundary; browser finding-review failure paths require separate future scenarios."
+    },
+    {
+      "scenario_id": "WRITERS-01",
+      "category": "two_writers",
+      "surface": "service",
+      "operation": "Start concurrent same-generation structured proposals, then retry the losing request",
+      "preconditions": "Two CLI processes or HTTP workers share one brain and captured generation, using distinct idempotency keys.",
+      "invariant": "Exactly one initial transaction wins; loser gets a conflict, then a fresh-preview retry retains both records without forks or duplicates.",
+      "scope": "Two actual CLI processes from a common start barrier; inspect persisted generations, receipts and Git state",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_simultaneous_cli_proposals_have_one_winner_and_lossless_retry"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "WRITERS-01",
+      "category": "two_writers",
+      "surface": "cli",
+      "operation": "Start concurrent same-generation structured proposals, then retry the losing request",
+      "preconditions": "Two CLI processes or HTTP workers share one brain and captured generation, using distinct idempotency keys.",
+      "invariant": "Exactly one initial transaction wins; loser gets a conflict, then a fresh-preview retry retains both records without forks or duplicates.",
+      "scope": "Two actual CLI processes from a common start barrier; inspect persisted generations, receipts and Git state",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_simultaneous_cli_proposals_have_one_winner_and_lossless_retry"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "WRITERS-01",
+      "category": "two_writers",
+      "surface": "http",
+      "operation": "Start concurrent same-generation structured proposals, then retry the losing request",
+      "preconditions": "Two CLI processes or HTTP workers share one brain and captured generation, using distinct idempotency keys.",
+      "invariant": "Exactly one initial transaction wins; loser gets a conflict, then a fresh-preview retry retains both records without forks or duplicates.",
+      "scope": "Two synchronized actual ASGI HTTP workers, conflict and fresh-preview retry",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_simultaneous_http_proposals_share_generation_and_preserve_both_on_retry"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "WRITERS-01",
+      "category": "two_writers",
+      "surface": "mcp",
+      "operation": "Start concurrent same-generation structured proposals, then retry the losing request",
+      "preconditions": "Two CLI processes or HTTP workers share one brain and captured generation, using distinct idempotency keys.",
+      "invariant": "Exactly one initial transaction wins; loser gets a conflict, then a fresh-preview retry retains both records without forks or duplicates.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "Concurrent raw structured-version proposals are not exposed on mcp. This cell does not assert coverage of every other possible write concurrency pattern."
+    },
+    {
+      "scenario_id": "WRITERS-UI-01",
+      "category": "two_writers",
+      "surface": "browser",
+      "operation": "Release two actual browser finding-review requests from the same captured generation",
+      "preconditions": "Two tabs display the same candidate and each prepares a distinct review request; request routing supplies a common start barrier only.",
+      "invariant": "One review wins, the other displays a stale-review conflict; only one finding transaction/receipt is stored and both tabs refresh.",
+      "scope": "Two real Chromium tabs and actual server responses; request bodies and responses are not mocked",
+      "applicable": true,
+      "tests": [
+        "tests/test_frontend_xss.py::test_decision_integrity_two_browser_reviews_have_one_winner_without_duplicate_effects"
+      ],
+      "not_applicable_reason": null
+    },
+    {
+      "scenario_id": "WRITERS-01",
+      "category": "two_writers",
+      "surface": "exports",
+      "operation": "Start concurrent same-generation structured proposals, then retry the losing request",
+      "preconditions": "Two CLI processes or HTTP workers share one brain and captured generation, using distinct idempotency keys.",
+      "invariant": "Exactly one initial transaction wins; loser gets a conflict, then a fresh-preview retry retains both records without forks or duplicates.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "Concurrent raw structured-version proposals are not exposed on exports. This cell does not assert coverage of every other possible write concurrency pattern."
+    }
+  ]
+}

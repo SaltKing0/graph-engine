@@ -13,8 +13,8 @@ from graph_engine import decision_schema as s, runtime
 from graph_engine.brain import Brain, Node
 from graph_engine.decision_memory import read_file
 from graph_engine.decision_service import DecisionService
-from graph_engine.decision_impact import COMPARE, LIMITS, candidate_identity, validate_candidate
-from test_decision_memory import draft, claim, event, content_basis, files, check_record, result_record
+from graph_engine.decision_impact import COMPARE, LIMITS, candidate_identity, validate_candidate, series_id
+from test_decision_memory import draft, claim, event, content_basis, files, check_record, result_record, request as storage_request
 from test_decision_service import save, review, profile, context, envelope
 
 
@@ -120,6 +120,111 @@ def test_irrelevant_serialization_usage_tier_and_repeated_capture_have_no_deltas
     other = commit(service)
     result = service.compare(comparison(after, other))
     assert len(result['deltas']) == 1 and result['candidates'] == []
+
+
+def test_claim_crlf_only_change_is_informational_without_transferring_review(service):
+    c, = save(service, claim('Keep expansion opt-in.\r\nEvidence remains limited.'))
+    review(service, c)
+    d, = save(service, draft('decision', dict(action='Keep opt-in', rationale='Limited evidence',
+        alternatives=[], context=None, revisit_checks=[])))
+    dep = link(service, 'depends_on', d, c, None)
+    before = commit(service)
+    old = service.inspect(c)['record']
+    successor, = save(service, claim('Keep expansion opt-in.\nEvidence remains limited.',
+        identity=c['id'], anchor=old['anchor_node_id'], previous=c))
+    after = commit(service)
+    result = service.compare(comparison(before, after))
+    assert result['candidates'] == []
+    assert len(result['deltas']) == 1 and result['deltas'][0]['classes'] == ['cosmetic']
+    assert result['deltas'][0]['cosmetic_rule'] == 'exact-payload-or-crlf/1'
+    assert service.inspect(c)['state']['workflow'] == 'accepted'
+    assert service.inspect(successor)['state']['workflow'] == 'proposed'
+    assert service.inspect(dep)['record']['payload']['target'] == c
+
+
+@pytest.mark.parametrize('change', ['wording', 'scope', 'provenance'])
+def test_claim_line_endings_do_not_hide_material_changes(service, change):
+    refs = scenario(service)
+    old = service.inspect(refs['claim'])['record']
+    # First pin a multiline claim before the measured comparison.
+    first = draft('claim', dict(old['payload'], text='Keep opt-in.\r\nLimited evidence.'),
+        identity=old['id'], anchor=old['anchor_node_id'], previous=refs['claim'])
+    c, = save(service, first)
+    link(service, 'depends_on', refs['decision'], c, context(refs['profile']))
+    before = commit(service)
+    payload = dict(first['payload'], text='Keep opt-in.\nLimited evidence.')
+    if change == 'wording':
+        payload['text'] = 'Enable by default.\nLimited evidence.'
+    elif change == 'scope':
+        payload['context'] = context(refs['profile'], 'other-workload')
+    updated = draft('claim', payload, identity=old['id'], anchor=old['anchor_node_id'], previous=c)
+    if change == 'provenance':
+        updated['provenance']['inputs'] = [refs['source']]
+    save(service, updated)
+    after = commit(service)
+    result = service.compare(comparison(before, after))
+    assert result['candidates']
+    assert any(delta['classes'] != ['cosmetic'] for delta in result['deltas'])
+
+
+def test_reconvergent_dependency_paths_survive_with_bounds_and_one_finding(service):
+    refs = scenario(service)
+    ev2, = save(service, draft('evidence', dict(interpretation='Second interpretation of the same source',
+        context=context(refs['profile']), sources=[dict(ref=refs['source'], passage=None)],
+        lineage_ids=[], limitations=['Same source lineage; not an independent measurement'])))
+    second = link(service, 'supports', ev2, refs['claim'], context(refs['profile']))
+    before = commit(service)
+    change_source(service)
+    after = commit(service)
+    unchanged = files(service.brain)
+    result = service.compare(comparison(before, after))
+    candidate, = result['candidates']
+    assert len(candidate['paths']) == 2
+    assert {path[1]['relationship']['id'] for path in candidate['paths']} == {refs['support']['id'], second['id']}
+    assert all(path[-1]['to_ref'] == refs['decision'] for path in candidate['paths'])
+    assert candidate['completeness']['retained_paths'] == 2
+    validate_candidate(candidate)
+    assert service.compare(comparison(before, after))['candidates'] == [candidate]
+    # Retaining alternatives must not create unbounded work or a false complete result.
+    tiny = service.compare(comparison(before, after, paths=1))
+    assert len(tiny['candidates']) == 1 and len(tiny['candidates'][0]['paths']) == 1
+    assert tiny['completeness']['truncated'] and 'paths' in tiny['completeness']['hit_limits']
+    assert files(service.brain) == unchanged
+    published = service.record_finding(finding_envelope(service, comparison(before, after), candidate), commit=False)
+    assert len(published['receipt']['refs']) == 1
+
+
+def test_legacy_single_path_finding_keeps_its_recorded_review_after_path_expansion(service):
+    refs = scenario(service)
+    extra = link(service, 'supports', refs['evidence'], refs['claim'], context(refs['profile']))
+    before = commit(service)
+    change_source(service)
+    after = commit(service)
+    candidate, = service.compare(comparison(before, after))['candidates']
+    assert len(candidate['paths']) == 2
+    legacy = deepcopy(candidate)
+    legacy['paths'] = legacy['paths'][:1]
+    legacy['comparison'] = legacy['comparison'][:1]
+    legacy['completeness']['retained_paths'] = 1
+    legacy['candidate_id'] = candidate_identity(legacy)
+    validate_candidate(legacy)
+    # A valid legacy payload is loaded through storage, not regenerated using
+    # the corrected traversal. Its explicit judgment must remain on that version.
+    record = draft('finding', dict(candidate=legacy, former_candidate_id=None), identity=series_id(legacy))
+    finding, = service.store.transact(storage_request(service.store, versions=[record]), commit=False)['refs']
+    review(service, finding, axis='finding_disposition', after='confirmed')
+    review(service, finding, axis='finding_workflow', after='acknowledged')
+    stored = deepcopy(service.inspect(finding))
+    successor, = service.record_finding(finding_envelope(service, comparison(before, after), candidate),
+                                        commit=False)['receipt']['refs']
+    assert successor['id'] == finding['id'] and successor != finding
+    historical = service.inspect(finding)
+    assert historical['record'] == stored['record'] and historical['events'] == stored['events']
+    assert historical['state'] == stored['state']
+    assert historical['basis_changed']  # Superseded content is not a current justification.
+    assert service.inspect(successor)['record']['previous'] == finding
+    assert service.inspect(successor)['state']['finding_workflow'] == 'open'
+    assert len(service.inspect(finding)['record']['payload']['candidate']['paths']) == 1
 
 
 @pytest.mark.parametrize('accepted', [False, True])
@@ -357,6 +462,8 @@ def test_clipped_support_summary_keeps_complete_membership_for_finding_freshness
     candidate, = service.compare(comp)['candidates']
     assert 'support_output' in candidate['completeness']['hit_limits']
     assert len(candidate['support']['removed']) == 20
+    assert 'candidate_refs' in candidate['completeness']['hit_limits']
+    assert len(s.content_refs(candidate)) <= 200
     assert all(r in candidate['basis_refs'] for r in [refs['support'], *extra])
     request = finding_envelope(service, comp, candidate)
     result = service.record_finding(request, commit=False)

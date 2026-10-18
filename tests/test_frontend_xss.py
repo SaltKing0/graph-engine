@@ -5,6 +5,7 @@ import base64
 import hashlib
 import json
 import os
+import re
 import socket
 import subprocess
 import sys
@@ -70,9 +71,32 @@ def server(tmp_path, request):
         sock.bind(("127.0.0.1", 0))
         port = sock.getsockname()[1]
     with (tmp_path / "server.log").open("w+") as log:
+        command = [sys.executable, "-m", "uvicorn", "graph_engine.server:app",
+                   "--host", "127.0.0.1", "--port", str(port), "--log-level", "warning"]
+        if options.get('fail_finding_index_once'):
+            # Fault injection is confined to this test server process. No
+            # production environment switch or changed recovery policy.
+            code = '''import json,sys
+from graph_engine.brain import Brain
+from graph_engine.decision_schema import FILENAME
+original = Brain.rebuild_index
+failed = False
+def injected(self, *args, **kwargs):
+    global failed
+    path = self.path / FILENAME
+    if path.exists() and not failed:
+        data = json.loads(path.read_text())
+        if any(v['kind'] == 'finding' for v in data['versions']):
+            failed = True
+            raise OSError('Scripted finding index failure after publication')
+    return original(self, *args, **kwargs)
+Brain.rebuild_index = injected
+import uvicorn
+uvicorn.run('graph_engine.server:app',host='127.0.0.1',port=int(sys.argv[1]),log_level='warning')
+'''
+            command = [sys.executable, '-c', code, str(port)]
         proc = subprocess.Popen(
-            [sys.executable, "-m", "uvicorn", "graph_engine.server:app",
-             "--host", "127.0.0.1", "--port", str(port), "--log-level", "warning"],
+            command,
             env=env, cwd=REPO, stdout=log, stderr=log)
         base = f"http://127.0.0.1:{port}"
         try:
@@ -108,7 +132,8 @@ def page(d3_script):
         if os.environ.get("PLAYWRIGHT_CHROMIUM"):
             options["executable_path"] = os.environ["PLAYWRIGHT_CHROMIUM"]
         browser = pw.chromium.launch(**options)
-        page = browser.new_page()
+        context = browser.new_context()
+        page = context.new_page()
         errors = []
         page.on("pageerror", lambda error: errors.append(str(error)))
         if d3_script is not None:
@@ -816,6 +841,106 @@ def test_decision_review_restricted_evidence_is_hidden_by_real_authenticated_api
     page.get_by_role('button', name='Refresh evidence', exact=True).click()
     expect(page.locator('#dm-message')).to_contain_text('Authentication required')
     expect(page.locator('#dm-queue button')).to_have_count(0)
+
+
+@pytest.mark.parametrize('server', [{'mode': 'git'}], indirect=True, ids=['git'])
+def test_decision_integrity_tombstone_clears_historical_ui(server, page, tmp_path):
+    service, refs, comp = decision_browser_seed(tmp_path)
+    open_decision_comparison(page, server, comp)
+    expect(page.locator('#dm-detail')).to_contain_text('Local observation')
+    service.brain.tombstone_node('source')
+    page.get_by_role('button', name='Refresh evidence', exact=True).click()
+    expect(page.locator('#dm-message')).to_contain_text('No accessible pending')
+    page.get_by_label('Include acknowledged, resolved and dismissed history').check()
+    expect(page.locator('#dm-queue button')).to_have_count(0)
+    html = page.locator('body').inner_html()
+    assert 'Local observation' not in html and 'Changed browser observation' not in html
+    assert refs['source']['id'] not in html
+
+
+@pytest.mark.parametrize('server', [{'mode': 'git'}], indirect=True, ids=['git'])
+def test_decision_integrity_brief_keeps_selected_revision_after_later_edit(server, page, tmp_path):
+    from test_decision_impact import change_source, commit
+    service, refs, comp = decision_browser_seed(tmp_path)
+    change_source(service, 'Later text outside the selected historical comparison')
+    commit(service)
+    open_decision_comparison(page, server, comp)
+    expect(page.locator('#dm-detail')).to_contain_text('Changed browser observation')
+    # Review detail deliberately includes the current successor alongside the
+    # pinned comparison; the explicit historical brief must remain pinned.
+    expect(page.locator('#dm-detail')).to_contain_text('Later text outside')
+    page.get_by_role('button', name='Open decision brief', exact=True).click()
+    heading = page.get_by_role('heading', name=f'Decision brief · revision {comp["after"]}', exact=True)
+    expect(heading).to_be_visible()
+    brief = page.locator('#dm-detail section').filter(has=heading).locator('pre')
+    expect(brief).not_to_contain_text('Later text outside')
+    expect(brief).to_contain_text(refs['source']['version_id'])
+    assert service.inspect(refs['decision'])['state']['decision'] == 'proposed'
+
+
+@pytest.mark.parametrize('server', [{'mode': 'git', 'fail_finding_index_once': True}], indirect=True, ids=['git-fault'])
+def test_decision_integrity_published_finding_failure_preserves_receipt_and_history(server, page, tmp_path):
+    from graph_engine.decision_memory import read_file
+    service, refs, comp = decision_browser_seed(tmp_path)
+    open_decision_comparison(page, server, comp)
+    before = read_file(service.brain)
+    page.get_by_label('Review reason (required)', exact=True).fill('Scripted browser recovery regression')
+    page.get_by_role('button', name='Record finding judgment', exact=True).click()
+    expect(page.locator('#dm-notice')).to_contain_text('Published locally; sync is incomplete')
+    expect(page.locator('#dm-queue button')).to_have_count(1)
+    after = read_file(service.brain)
+    assert after['generation'] == before['generation'] + 1
+    findings = [v for v in after['versions'] if v['kind'] == 'finding']
+    assert len(findings) == 1 and len(after['receipts']) == len(before['receipts']) + 1
+    assert len([e for e in after['events'] if e['subject']['id'] == findings[0]['id']]) == 1
+    page.get_by_role('button', name='Refresh evidence', exact=True).click()
+    expect(page.locator('#dm-queue button')).to_have_count(1)
+    assert read_file(service.brain) == after
+    page.locator('#dm-queue button').click()
+    expect(page.locator('#dm-detail')).to_contain_text('Reviewed finding')
+
+
+@pytest.mark.parametrize('server', [{'mode': 'git'}], indirect=True, ids=['git'])
+def test_decision_integrity_two_browser_reviews_have_one_winner_without_duplicate_effects(server, page, tmp_path):
+    from graph_engine.decision_memory import read_file
+    service, refs, comp = decision_browser_seed(tmp_path)
+    second = page.context.new_page()
+    second_errors = []
+    second.on('pageerror', lambda error: second_errors.append(str(error)))
+    open_decision_comparison(page, server, comp)
+    open_decision_comparison(second, server, comp)
+    before = read_file(service.brain)
+    held = []
+    def release_together(route):
+        held.append(route)
+        if len(held) == 2:
+            for item in held:
+                item.continue_()
+    page.context.route('**/api/decision-memory/findings', release_together)
+    try:
+        for i, tab in enumerate((page, second)):
+            tab.get_by_label('Review reason (required)', exact=True).fill(f'Scripted concurrent browser request {i}')
+            tab.get_by_role('button', name='Record finding judgment', exact=True).click()
+        deadline = time.monotonic() + 5
+        while len(held) < 2 and time.monotonic() < deadline:
+            page.wait_for_timeout(10)
+        assert len(held) == 2
+        expect(page.locator('#dm-queue button')).to_have_count(1)
+        expect(second.locator('#dm-queue button')).to_have_count(1)
+        # Wait for both actual HTTP outcomes, never infer success from a click.
+        expect(page.locator('#dm-notice')).to_contain_text(re.compile('Review recorded|Stale review'))
+        expect(second.locator('#dm-notice')).to_contain_text(re.compile('Review recorded|Stale review'))
+        notices = [tab.locator('#dm-notice').inner_text() for tab in (page, second)]
+        assert sum('Review recorded' in text for text in notices) == 1
+        assert sum('Stale review' in text for text in notices) == 1
+        after = read_file(service.brain)
+        assert after['generation'] == before['generation'] + 1
+        assert len([v for v in after['versions'] if v['kind'] == 'finding']) == 1
+        assert len(after['receipts']) == len(before['receipts']) + 1
+        assert not second_errors
+    finally:
+        page.context.unroute('**/api/decision-memory/findings', release_together)
+        second.close()
 
 
 @pytest.mark.parametrize('server', [{'mode':'git'}], indirect=True)

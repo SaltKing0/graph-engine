@@ -2,6 +2,11 @@
 
 **Decision: keep experimental; do not promote v1 as a validated improvement.**
 No version bump, release tag or package publication is authorized by this report.
+The [solo development and integrity inventory](decision-solo-development.md)
+adds exposed development source review, bounded functional corrections and an
+explicit engineering matrix. These do not complete independent annotation,
+semantic comparison or final-candidate integrity sign-off. Historical results
+and the failed 5/95 false-alert gate below remain unchanged.
 This assessment follows [issue #81](https://github.com/SaltKing0/graph-engine/issues/81)
 and retains the [original frozen gates](decision-memory-v1.md#evaluation-gates-frozen-before-tuning).
 
