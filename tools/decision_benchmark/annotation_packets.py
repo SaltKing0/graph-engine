@@ -42,20 +42,21 @@ def _blank_judgment() -> dict:
     }
 
 
-def prepare_development() -> tuple[dict, dict]:
-    """Read only the fixed development inputs and their chronological bytes."""
+def _read_frozen(freeze: dict, name: str) -> bytes:
+    raw = local_file(BUNDLE, name).read_bytes()
+    if digest(raw) != freeze['files'][name]:
+        raise ValueError(f'frozen file changed: {name}')
+    return raw
+
+
+def _metadata() -> tuple[dict, dict]:
+    """Verify source-only metadata without opening labels or evaluation bytes."""
     freeze = json.loads((BUNDLE / "freeze.json").read_bytes())
     if (freeze["schema"] != "dm.eval.freeze/1"
             or digest(canonical(freeze["files"])) != freeze["sha256"]):
         raise ValueError("invalid source freeze")
 
-    def read_frozen(name: str) -> bytes:
-        raw = local_file(BUNDLE, name).read_bytes()
-        if digest(raw) != freeze["files"][name]:
-            raise ValueError(f"frozen file changed: {name}")
-        return raw
-
-    inputs = json.loads(read_frozen("inputs.json"))
+    inputs = json.loads(_read_frozen(freeze, "inputs.json"))
     if inputs["schema"] != "dm.eval.inputs/1" or inputs["version"] != "project-v1.0.0":
         raise ValueError("only the known exposed development bundle is supported")
     sources = _unique(inputs["sources"])
@@ -72,6 +73,14 @@ def prepare_development() -> tuple[dict, dict]:
             lineages.setdefault(lineage, set()).add(source["split"])
     if any(len(splits) != 1 for splits in [*families.values(), *lineages.values()]):
         raise ValueError("family or source lineage crosses split")
+    return inputs, freeze
+
+
+def prepare_development() -> tuple[dict, dict]:
+    """Read only the fixed development inputs and their chronological bytes."""
+    inputs, freeze = _metadata()
+    sources = _unique(inputs['sources'])
+    decisions = _unique(inputs['decisions'])
 
     cases = []
     pairs = []
@@ -91,8 +100,8 @@ def prepare_development() -> tuple[dict, dict]:
                      and decision["source_id"] in ids]
         documents = []
         for source in visible:
-            raw = read_frozen(source["file"])
-            notice = read_frozen(source["license_file"])
+            raw = _read_frozen(freeze, source["file"])
+            notice = _read_frozen(freeze, source["license_file"])
             if digest(notice) != source["license_sha256"]:
                 raise ValueError("license hash mismatch")
             documents.append({**{key: source[key] for key in SOURCE_KEYS},
@@ -128,30 +137,57 @@ def _keys(row: dict, keys: set[str]) -> None:
 
 
 def validate_packet(packet: dict) -> dict:
-    """Validate development packet structure only; never certify human evidence."""
+    """Bind structure/provenance to the source freeze; never certify human evidence."""
     _keys(packet, {"schema", "exposure", "split", "origin_version", "origin_freeze_sha256",
                    "origin_inputs_sha256", "cases"})
     if (packet["schema"] != SCHEMA or packet["split"] != "development"
             or packet["exposure"] != EXPOSURE or packet["origin_version"] != "project-v1.0.0"):
         raise ValueError("not a previously exposed development packet")
+    inputs, freeze = _metadata()
+    if (packet['origin_freeze_sha256'] != freeze['sha256']
+            or packet['origin_inputs_sha256'] != freeze['files']['inputs.json']):
+        raise ValueError('packet origin differs from the frozen development inputs')
+    events = [event for event in inputs['events'] if event['split'] == 'development']
+    if [case['id'] for case in packet['cases']] != [event['id'] for event in events]:
+        raise ValueError('packet cases differ from the frozen development inventory')
     _unique(packet["cases"])
     pairs = 0
     previous = None
     seen_sources: dict[str, dict] = {}
     seen_decisions: dict[str, dict] = {}
-    for case in packet["cases"]:
+    for case, event in zip(packet["cases"], events):
         _keys(case, {"id", "at", "update_source_id", "changed_source_id", "sources", "decisions"})
         cutoff = instant(case["at"])
+        if (case['at'] != event['at'] or case['update_source_id'] != event['source_id']
+                or case['changed_source_id'] != event['changed_source_id']):
+            raise ValueError('packet event differs from the frozen chronology')
         if previous is not None and cutoff < previous:
             raise ValueError("cases must be chronological")
         previous = cutoff
         sources = _unique(case["sources"])
+        expected_sources = {source['id']: source for source in inputs['sources']
+                            if source['split'] == 'development' and instant(source['available_at']) <= cutoff}
+        if sources.keys() != expected_sources.keys():
+            raise ValueError('packet sources differ from the frozen chronological inventory')
+        expected_decisions = {decision['id']: {key: decision[key] for key in
+                              ('id', 'family', 'source_id', 'action', 'status')}
+                              for decision in inputs['decisions'] if decision['split'] == 'development'
+                              and decision['source_id'] in expected_sources}
+        if _unique(case['decisions']) != expected_decisions:
+            raise ValueError('packet decisions differ from the frozen eligible pairs')
         for key in ("update_source_id", "changed_source_id"):
             if case[key] not in sources:
                 raise ValueError("missing event source")
         for source in sources.values():
             _keys(source, {*SOURCE_KEYS, "sha256", "text", "license_text",
                            "measurement_lineages", "limitations"})
+            original = expected_sources[source['id']]
+            if (any(source[key] != original[key] for key in SOURCE_KEYS)
+                    or source['sha256'] != freeze['files'][original['file']]
+                    or source['license_sha256'] != freeze['files'][original['license_file']]
+                    or source['measurement_lineages'] != original.get('measurement_lineages', [])
+                    or source['limitations'] != original.get('limitations', 'not recorded')):
+                raise ValueError('packet provenance differs from the frozen source version')
             if instant(source["available_at"]) > cutoff:
                 raise ValueError("future source in case")
             if digest(source["text"].encode("utf-8")) != source["sha256"]:
