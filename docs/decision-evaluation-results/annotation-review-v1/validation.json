@@ -1,0 +1,86 @@
+{
+  "source_commit": "2c479b8f7d7289d877a5822e212896531e6d450c",
+  "python": "3.12.14 (main, Aug 12 2026, 13:57:54) [Clang 21.0.0 (clang-2100.1.1.101)]",
+  "commands": [
+    {
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_decision_annotation_packets.py",
+        "-k",
+        "binds_provenance",
+        "-q"
+      ],
+      "phase": "before fix; added regression against old implementation",
+      "result": "10 failed, 23 deselected",
+      "expected_failure": true
+    },
+    {
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_decision_annotation_packets.py",
+        "-q"
+      ],
+      "result": "33 passed",
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/",
+        "-q",
+        "-rs"
+      ],
+      "result": "1982 passed, 11 skipped, 1 warning",
+      "exit_code": 0,
+      "elapsed_seconds": 312.78
+    },
+    {
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "tools.memory_benchmark",
+        "--smoke",
+        "--check",
+        "--output",
+        "/tmp/review94-memory.json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "tools.decision_benchmark",
+        "--split",
+        "all",
+        "--check",
+        "--output",
+        "/tmp/review94-controls.json"
+      ],
+      "exit_code": 0
+    },
+    {
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "tools.decision_benchmark.annotation_packets",
+        "--output",
+        "/tmp/review94-export"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "exact_original_export_bytes_match": {
+    "packet.json": true,
+    "blank-form.json": true,
+    "manifest.json": true
+  },
+  "independent_acceptance": false,
+  "release_ready": false
+}

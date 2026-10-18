@@ -1,0 +1,10 @@
+{
+  "schema": "dm.annotation.preparation-freeze/1",
+  "files": {
+    "blank-form.json": "840755c02784ca8d8a060e6cb10dff5ee368ab144f0d3c44f72742710a66e419",
+    "packet.json": "c635f4c16f6a31786f992e9a52029b1afbd56b8b80ebc36dd2893b7c69d020d9",
+    "preparation-report.json": "eb1e693b6ffe820d1f6454ecc90c6c0098e6b505c470e3969b7a5daf999efc4d"
+  },
+  "sha256": "edb52ffccc182509edf6a0fe36a3c063a45e5f8f8609bc2f4695fceb3b820738",
+  "status": "development-preparation-not-successor-freeze"
+}

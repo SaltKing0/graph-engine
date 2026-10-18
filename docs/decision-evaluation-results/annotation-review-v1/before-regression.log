@@ -1,0 +1,354 @@
+FFFFFFFFFF                                                               [100%]
+=================================== FAILURES ===================================
+_ test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs[revision] _
+
+mutation = 'revision'
+
+    @pytest.mark.parametrize('mutation', ['revision', 'path', 'lineage', 'license', 'origin',
+                                         'case', 'cutoff', 'missing-case', 'missing-source', 'missing-pair'])
+    def test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs(mutation):
+        packet, _ = prepare_development()
+        case = packet['cases'][-1]
+        source = next(s for s in case['sources'] if s['id'] == case['update_source_id'])
+        if mutation in ('revision', 'path', 'lineage'):
+            source[mutation] = 'changed-without-changing-the-source-text'
+        elif mutation == 'license':
+            source['license_text'] = 'A different license notice'
+            source['license_sha256'] = digest(source['license_text'].encode())
+        elif mutation == 'origin':
+            packet['origin_inputs_sha256'] = '0' * 64
+        elif mutation == 'case':
+            case['id'] = 'not-the-frozen-event'
+        elif mutation == 'cutoff':
+            case['at'] = '2099-01-01T00:00:00Z'
+        elif mutation == 'missing-case':
+            packet['cases'].pop()
+        elif mutation == 'missing-source':
+            required = {case['update_source_id'], case['changed_source_id'],
+                        *(d['source_id'] for d in case['decisions'])}
+            case['sources'].remove(next(s for s in case['sources'] if s['id'] not in required))
+        else:
+            case['decisions'].pop()
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/test_decision_annotation_packets.py:131: Failed
+_ test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs[path] _
+
+mutation = 'path'
+
+    @pytest.mark.parametrize('mutation', ['revision', 'path', 'lineage', 'license', 'origin',
+                                         'case', 'cutoff', 'missing-case', 'missing-source', 'missing-pair'])
+    def test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs(mutation):
+        packet, _ = prepare_development()
+        case = packet['cases'][-1]
+        source = next(s for s in case['sources'] if s['id'] == case['update_source_id'])
+        if mutation in ('revision', 'path', 'lineage'):
+            source[mutation] = 'changed-without-changing-the-source-text'
+        elif mutation == 'license':
+            source['license_text'] = 'A different license notice'
+            source['license_sha256'] = digest(source['license_text'].encode())
+        elif mutation == 'origin':
+            packet['origin_inputs_sha256'] = '0' * 64
+        elif mutation == 'case':
+            case['id'] = 'not-the-frozen-event'
+        elif mutation == 'cutoff':
+            case['at'] = '2099-01-01T00:00:00Z'
+        elif mutation == 'missing-case':
+            packet['cases'].pop()
+        elif mutation == 'missing-source':
+            required = {case['update_source_id'], case['changed_source_id'],
+                        *(d['source_id'] for d in case['decisions'])}
+            case['sources'].remove(next(s for s in case['sources'] if s['id'] not in required))
+        else:
+            case['decisions'].pop()
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/test_decision_annotation_packets.py:131: Failed
+_ test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs[lineage] _
+
+mutation = 'lineage'
+
+    @pytest.mark.parametrize('mutation', ['revision', 'path', 'lineage', 'license', 'origin',
+                                         'case', 'cutoff', 'missing-case', 'missing-source', 'missing-pair'])
+    def test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs(mutation):
+        packet, _ = prepare_development()
+        case = packet['cases'][-1]
+        source = next(s for s in case['sources'] if s['id'] == case['update_source_id'])
+        if mutation in ('revision', 'path', 'lineage'):
+            source[mutation] = 'changed-without-changing-the-source-text'
+        elif mutation == 'license':
+            source['license_text'] = 'A different license notice'
+            source['license_sha256'] = digest(source['license_text'].encode())
+        elif mutation == 'origin':
+            packet['origin_inputs_sha256'] = '0' * 64
+        elif mutation == 'case':
+            case['id'] = 'not-the-frozen-event'
+        elif mutation == 'cutoff':
+            case['at'] = '2099-01-01T00:00:00Z'
+        elif mutation == 'missing-case':
+            packet['cases'].pop()
+        elif mutation == 'missing-source':
+            required = {case['update_source_id'], case['changed_source_id'],
+                        *(d['source_id'] for d in case['decisions'])}
+            case['sources'].remove(next(s for s in case['sources'] if s['id'] not in required))
+        else:
+            case['decisions'].pop()
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/test_decision_annotation_packets.py:131: Failed
+_ test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs[license] _
+
+mutation = 'license'
+
+    @pytest.mark.parametrize('mutation', ['revision', 'path', 'lineage', 'license', 'origin',
+                                         'case', 'cutoff', 'missing-case', 'missing-source', 'missing-pair'])
+    def test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs(mutation):
+        packet, _ = prepare_development()
+        case = packet['cases'][-1]
+        source = next(s for s in case['sources'] if s['id'] == case['update_source_id'])
+        if mutation in ('revision', 'path', 'lineage'):
+            source[mutation] = 'changed-without-changing-the-source-text'
+        elif mutation == 'license':
+            source['license_text'] = 'A different license notice'
+            source['license_sha256'] = digest(source['license_text'].encode())
+        elif mutation == 'origin':
+            packet['origin_inputs_sha256'] = '0' * 64
+        elif mutation == 'case':
+            case['id'] = 'not-the-frozen-event'
+        elif mutation == 'cutoff':
+            case['at'] = '2099-01-01T00:00:00Z'
+        elif mutation == 'missing-case':
+            packet['cases'].pop()
+        elif mutation == 'missing-source':
+            required = {case['update_source_id'], case['changed_source_id'],
+                        *(d['source_id'] for d in case['decisions'])}
+            case['sources'].remove(next(s for s in case['sources'] if s['id'] not in required))
+        else:
+            case['decisions'].pop()
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/test_decision_annotation_packets.py:131: Failed
+_ test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs[origin] _
+
+mutation = 'origin'
+
+    @pytest.mark.parametrize('mutation', ['revision', 'path', 'lineage', 'license', 'origin',
+                                         'case', 'cutoff', 'missing-case', 'missing-source', 'missing-pair'])
+    def test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs(mutation):
+        packet, _ = prepare_development()
+        case = packet['cases'][-1]
+        source = next(s for s in case['sources'] if s['id'] == case['update_source_id'])
+        if mutation in ('revision', 'path', 'lineage'):
+            source[mutation] = 'changed-without-changing-the-source-text'
+        elif mutation == 'license':
+            source['license_text'] = 'A different license notice'
+            source['license_sha256'] = digest(source['license_text'].encode())
+        elif mutation == 'origin':
+            packet['origin_inputs_sha256'] = '0' * 64
+        elif mutation == 'case':
+            case['id'] = 'not-the-frozen-event'
+        elif mutation == 'cutoff':
+            case['at'] = '2099-01-01T00:00:00Z'
+        elif mutation == 'missing-case':
+            packet['cases'].pop()
+        elif mutation == 'missing-source':
+            required = {case['update_source_id'], case['changed_source_id'],
+                        *(d['source_id'] for d in case['decisions'])}
+            case['sources'].remove(next(s for s in case['sources'] if s['id'] not in required))
+        else:
+            case['decisions'].pop()
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/test_decision_annotation_packets.py:131: Failed
+_ test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs[case] _
+
+mutation = 'case'
+
+    @pytest.mark.parametrize('mutation', ['revision', 'path', 'lineage', 'license', 'origin',
+                                         'case', 'cutoff', 'missing-case', 'missing-source', 'missing-pair'])
+    def test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs(mutation):
+        packet, _ = prepare_development()
+        case = packet['cases'][-1]
+        source = next(s for s in case['sources'] if s['id'] == case['update_source_id'])
+        if mutation in ('revision', 'path', 'lineage'):
+            source[mutation] = 'changed-without-changing-the-source-text'
+        elif mutation == 'license':
+            source['license_text'] = 'A different license notice'
+            source['license_sha256'] = digest(source['license_text'].encode())
+        elif mutation == 'origin':
+            packet['origin_inputs_sha256'] = '0' * 64
+        elif mutation == 'case':
+            case['id'] = 'not-the-frozen-event'
+        elif mutation == 'cutoff':
+            case['at'] = '2099-01-01T00:00:00Z'
+        elif mutation == 'missing-case':
+            packet['cases'].pop()
+        elif mutation == 'missing-source':
+            required = {case['update_source_id'], case['changed_source_id'],
+                        *(d['source_id'] for d in case['decisions'])}
+            case['sources'].remove(next(s for s in case['sources'] if s['id'] not in required))
+        else:
+            case['decisions'].pop()
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/test_decision_annotation_packets.py:131: Failed
+_ test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs[cutoff] _
+
+mutation = 'cutoff'
+
+    @pytest.mark.parametrize('mutation', ['revision', 'path', 'lineage', 'license', 'origin',
+                                         'case', 'cutoff', 'missing-case', 'missing-source', 'missing-pair'])
+    def test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs(mutation):
+        packet, _ = prepare_development()
+        case = packet['cases'][-1]
+        source = next(s for s in case['sources'] if s['id'] == case['update_source_id'])
+        if mutation in ('revision', 'path', 'lineage'):
+            source[mutation] = 'changed-without-changing-the-source-text'
+        elif mutation == 'license':
+            source['license_text'] = 'A different license notice'
+            source['license_sha256'] = digest(source['license_text'].encode())
+        elif mutation == 'origin':
+            packet['origin_inputs_sha256'] = '0' * 64
+        elif mutation == 'case':
+            case['id'] = 'not-the-frozen-event'
+        elif mutation == 'cutoff':
+            case['at'] = '2099-01-01T00:00:00Z'
+        elif mutation == 'missing-case':
+            packet['cases'].pop()
+        elif mutation == 'missing-source':
+            required = {case['update_source_id'], case['changed_source_id'],
+                        *(d['source_id'] for d in case['decisions'])}
+            case['sources'].remove(next(s for s in case['sources'] if s['id'] not in required))
+        else:
+            case['decisions'].pop()
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/test_decision_annotation_packets.py:131: Failed
+_ test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs[missing-case] _
+
+mutation = 'missing-case'
+
+    @pytest.mark.parametrize('mutation', ['revision', 'path', 'lineage', 'license', 'origin',
+                                         'case', 'cutoff', 'missing-case', 'missing-source', 'missing-pair'])
+    def test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs(mutation):
+        packet, _ = prepare_development()
+        case = packet['cases'][-1]
+        source = next(s for s in case['sources'] if s['id'] == case['update_source_id'])
+        if mutation in ('revision', 'path', 'lineage'):
+            source[mutation] = 'changed-without-changing-the-source-text'
+        elif mutation == 'license':
+            source['license_text'] = 'A different license notice'
+            source['license_sha256'] = digest(source['license_text'].encode())
+        elif mutation == 'origin':
+            packet['origin_inputs_sha256'] = '0' * 64
+        elif mutation == 'case':
+            case['id'] = 'not-the-frozen-event'
+        elif mutation == 'cutoff':
+            case['at'] = '2099-01-01T00:00:00Z'
+        elif mutation == 'missing-case':
+            packet['cases'].pop()
+        elif mutation == 'missing-source':
+            required = {case['update_source_id'], case['changed_source_id'],
+                        *(d['source_id'] for d in case['decisions'])}
+            case['sources'].remove(next(s for s in case['sources'] if s['id'] not in required))
+        else:
+            case['decisions'].pop()
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/test_decision_annotation_packets.py:131: Failed
+_ test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs[missing-source] _
+
+mutation = 'missing-source'
+
+    @pytest.mark.parametrize('mutation', ['revision', 'path', 'lineage', 'license', 'origin',
+                                         'case', 'cutoff', 'missing-case', 'missing-source', 'missing-pair'])
+    def test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs(mutation):
+        packet, _ = prepare_development()
+        case = packet['cases'][-1]
+        source = next(s for s in case['sources'] if s['id'] == case['update_source_id'])
+        if mutation in ('revision', 'path', 'lineage'):
+            source[mutation] = 'changed-without-changing-the-source-text'
+        elif mutation == 'license':
+            source['license_text'] = 'A different license notice'
+            source['license_sha256'] = digest(source['license_text'].encode())
+        elif mutation == 'origin':
+            packet['origin_inputs_sha256'] = '0' * 64
+        elif mutation == 'case':
+            case['id'] = 'not-the-frozen-event'
+        elif mutation == 'cutoff':
+            case['at'] = '2099-01-01T00:00:00Z'
+        elif mutation == 'missing-case':
+            packet['cases'].pop()
+        elif mutation == 'missing-source':
+            required = {case['update_source_id'], case['changed_source_id'],
+                        *(d['source_id'] for d in case['decisions'])}
+            case['sources'].remove(next(s for s in case['sources'] if s['id'] not in required))
+        else:
+            case['decisions'].pop()
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/test_decision_annotation_packets.py:131: Failed
+_ test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs[missing-pair] _
+
+mutation = 'missing-pair'
+
+    @pytest.mark.parametrize('mutation', ['revision', 'path', 'lineage', 'license', 'origin',
+                                         'case', 'cutoff', 'missing-case', 'missing-source', 'missing-pair'])
+    def test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs(mutation):
+        packet, _ = prepare_development()
+        case = packet['cases'][-1]
+        source = next(s for s in case['sources'] if s['id'] == case['update_source_id'])
+        if mutation in ('revision', 'path', 'lineage'):
+            source[mutation] = 'changed-without-changing-the-source-text'
+        elif mutation == 'license':
+            source['license_text'] = 'A different license notice'
+            source['license_sha256'] = digest(source['license_text'].encode())
+        elif mutation == 'origin':
+            packet['origin_inputs_sha256'] = '0' * 64
+        elif mutation == 'case':
+            case['id'] = 'not-the-frozen-event'
+        elif mutation == 'cutoff':
+            case['at'] = '2099-01-01T00:00:00Z'
+        elif mutation == 'missing-case':
+            packet['cases'].pop()
+        elif mutation == 'missing-source':
+            required = {case['update_source_id'], case['changed_source_id'],
+                        *(d['source_id'] for d in case['decisions'])}
+            case['sources'].remove(next(s for s in case['sources'] if s['id'] not in required))
+        else:
+            case['decisions'].pop()
+>       with pytest.raises(ValueError):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'ValueError'>
+
+tests/test_decision_annotation_packets.py:131: Failed
+=========================== short test summary info ============================
+FAILED tests/test_decision_annotation_packets.py::test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs[revision]
+FAILED tests/test_decision_annotation_packets.py::test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs[path]
+FAILED tests/test_decision_annotation_packets.py::test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs[lineage]
+FAILED tests/test_decision_annotation_packets.py::test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs[license]
+FAILED tests/test_decision_annotation_packets.py::test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs[origin]
+FAILED tests/test_decision_annotation_packets.py::test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs[case]
+FAILED tests/test_decision_annotation_packets.py::test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs[cutoff]
+FAILED tests/test_decision_annotation_packets.py::test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs[missing-case]
+FAILED tests/test_decision_annotation_packets.py::test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs[missing-source]
+FAILED tests/test_decision_annotation_packets.py::test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs[missing-pair]
+10 failed, 23 deselected in 0.61s

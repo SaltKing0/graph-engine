@@ -1,0 +1,14 @@
+{
+  "source_commit": "2c479b8f7d7289d877a5822e212896531e6d450c",
+  "files": {
+    "README.md": "debfe172fab4b92b88381a0200dd37631360c7a8b5670c4bb0d88b3259c7b587",
+    "before-regression.log": "8ad74d90f55a68cd4112a4fe52a21a6e3b4c806dfcbe77dbf14e94505f0eeab9",
+    "ci-code.json": "f9592ab3857e95007709af5dd4ae165696b2d8f367b939046a509fad3bbc0906",
+    "controls.log": "c9785cd4c325fcb4527b2781b2af2b15b4ad139c743863402a2af5a385b6dca4",
+    "focused.log": "a62ada063632b3b8a0afb1cae0b642cd5f463541998994c479c6491e29d7b185",
+    "full.log": "f35ee7e60d536dd0dd18271a526ebabf5f1dc56e652ebdde90da4776b780c7bc",
+    "memory.log": "8adf4cda9484066000b2b15cdd7e68106e1595c47f647c9563d99007e2d086d3",
+    "validation.json": "306fe05ae48138d62a98e9b84f9d202e3c360cb9fdaead79436d41d4f737c0cf"
+  },
+  "independent_acceptance": false
+}

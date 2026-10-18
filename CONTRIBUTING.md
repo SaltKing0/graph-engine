@@ -89,6 +89,19 @@ project corpus, frozen sources/split, annotation protocol and baseline limits.
 Real annotations still require independent review; this check establishes no
 product release, extraction, answer-quality or review-time result.
 
+For successor annotation preparation, see the
+[annotation handbook](docs/decision-annotation-handbook.md). Export only the
+previously exposed development sources into a new directory:
+
+```bash
+.venv/bin/python -m tools.decision_benchmark.annotation_packets --output /tmp/decision-annotation-development-v1
+.venv/bin/python -m pytest tests/test_decision_annotation_packets.py -q
+```
+
+This tool never opens labels or evaluation-source files, and never establishes
+independent reviewer acceptance. Reserved successor data belongs in a separately
+access-controlled evaluator environment, outside the implementation workspace.
+
 Large performance measurements are opt-in and stay outside required CI:
 
 ```bash
