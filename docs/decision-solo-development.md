@@ -146,6 +146,13 @@ outcomes, JUnit, commands, dependencies, platform and code/configuration hashes.
 Missing tests, empty observations, skips and teardown failures cannot pass a
 cell. The dedicated CI job uploads that report.
 
+Collected and deselected parameter instances now establish the expected test
+denominator; filters such as `-k` cannot silently remove a required instance.
+The code manifest includes transitive test/tool helpers. Git identity is bound
+to the code checkout, and absolute selectors preserve matrix execution when
+invoked from another directory. The [PR review record](decision-evaluation-results/pr-review-v1/README.md)
+preserves the reproduced defects, corrections and full/filtered reruns.
+
 This is a **bounded engineering inventory**, not an independently approved
 exhaustive definition of every failure scenario. Scenario sufficiency and the
 N/A declarations still need review. `software_matrix_complete=true` means all

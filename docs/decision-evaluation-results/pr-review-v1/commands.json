@@ -1,0 +1,134 @@
+{
+  "source_commit": "f76dde05c0b042ba4e1a20c5196ca00225408083",
+  "dirty": false,
+  "python": "3.12.14 (main, Aug 12 2026, 13:57:54) [Clang 21.0.0 (clang-2100.1.1.101)]",
+  "platform": "macOS-26.7.1-arm64-arm-64bit",
+  "environment": {
+    "PYTHONPATH": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+    "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+  },
+  "runs": [
+    {
+      "name": "matrix-outside-checkout",
+      "argv": [
+        "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+        "-m",
+        "tools.decision_integrity",
+        "--output",
+        "/tmp/review95-validation/matrix"
+      ],
+      "cwd": "/tmp",
+      "environment_overrides": {},
+      "expected_exit_code": 0,
+      "actual_exit_code": 0,
+      "expectation_met": true,
+      "elapsed_seconds": 90.20746562501881
+    },
+    {
+      "name": "matrix-deselection-rejected",
+      "argv": [
+        "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+        "-m",
+        "tools.decision_integrity",
+        "--output",
+        "/tmp/review95-validation/matrix-deselected"
+      ],
+      "cwd": "/tmp",
+      "environment_overrides": {
+        "PYTEST_ADDOPTS": "-k \"not lineage1\""
+      },
+      "expected_exit_code": 1,
+      "actual_exit_code": 1,
+      "expectation_met": true,
+      "elapsed_seconds": 96.17945733299712
+    },
+    {
+      "name": "memory-smoke",
+      "argv": [
+        "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+        "-m",
+        "tools.memory_benchmark",
+        "--smoke",
+        "--check",
+        "--output",
+        "/tmp/review95-validation/memory.json"
+      ],
+      "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+      "environment_overrides": {},
+      "expected_exit_code": 0,
+      "actual_exit_code": 0,
+      "expectation_met": true,
+      "elapsed_seconds": 0.5145331250387244
+    },
+    {
+      "name": "decision-controls",
+      "argv": [
+        "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+        "-m",
+        "tools.decision_benchmark",
+        "--split",
+        "all",
+        "--check",
+        "--output",
+        "/tmp/review95-validation/controls.json"
+      ],
+      "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+      "environment_overrides": {},
+      "expected_exit_code": 0,
+      "actual_exit_code": 0,
+      "expectation_met": true,
+      "elapsed_seconds": 0.7199031669879332
+    },
+    {
+      "name": "workflow",
+      "argv": [
+        "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+        "-m",
+        "examples.decision_workflow",
+        "--output",
+        "/tmp/review95-validation/workflow.json"
+      ],
+      "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+      "environment_overrides": {},
+      "expected_exit_code": 0,
+      "actual_exit_code": 0,
+      "expectation_met": true,
+      "elapsed_seconds": 4.0177882090210915
+    },
+    {
+      "name": "production-controls",
+      "argv": [
+        "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+        "-m",
+        "tools.decision_benchmark.production",
+        "--split",
+        "all",
+        "--output",
+        "/tmp/review95-validation/production.json"
+      ],
+      "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+      "environment_overrides": {},
+      "expected_exit_code": 0,
+      "actual_exit_code": 0,
+      "expectation_met": true,
+      "elapsed_seconds": 48.71113324997714
+    },
+    {
+      "name": "solo-outside-checkout",
+      "argv": [
+        "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+        "-m",
+        "tools.decision_benchmark.solo",
+        "--output",
+        "/tmp/review95-validation/solo.json"
+      ],
+      "cwd": "/tmp",
+      "environment_overrides": {},
+      "expected_exit_code": 0,
+      "actual_exit_code": 0,
+      "expectation_met": true,
+      "elapsed_seconds": 120.15338066598633
+    }
+  ]
+}
