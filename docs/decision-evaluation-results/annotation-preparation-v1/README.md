@@ -4,11 +4,16 @@
 successor evidence or product benefit established.** Related to
 [#90](https://github.com/SaltKing0/graph-engine/issues/90) and
 [epic #73](https://github.com/SaltKing0/graph-engine/issues/73).
+Delivered in [draft PR #94](https://github.com/SaltKing0/graph-engine/pull/94).
 
 ## Dependency audit and scope
 
 Inspected current main `a3ea0910a976e7035d7f4757b6b99dffb5c8ef49`, #90,
-#73, dependencies #74/#75/#81 and downstream #91/#92/#93. #74's normative
+#73, dependencies #74/#75/#81 and downstream #91/#92/#93.
+The transitive #76–#80 contracts were also checked for immutable versions,
+source-only proposals, accepted/proposed path separation, qualified context and
+explicit review/ACL invariants; none is changed by this preparation.
+#74's normative
 contract was delivered in merged PR #82; #75's infrastructure in #83; #81's
 workflow/diagnostic report in #89. Their closed states are not independent
 acceptance evidence. No open PR was found at the start of this work. The new
@@ -114,6 +119,14 @@ for name, sha in manifest['files'].items():
 assert (saved / 'manifest.json').read_bytes() == (generated / 'manifest.json').read_bytes()
 packet = json.loads(gzip.decompress((saved / 'packet.json.gz').read_bytes()))
 assert validate_packet(packet)['eligible_pairs'] == 27
+logs = saved / 'validation'
+log_manifest = json.loads((logs / 'files.json').read_bytes())
+assert digest(canonical(log_manifest['files'])) == log_manifest['sha256']
+for name, sha in log_manifest['files'].items():
+    assert digest((logs / name).read_bytes()) == sha
+identity = json.loads((logs / 'run-identity.json').read_bytes())
+for name, sha in identity['code_files'].items():
+    assert digest(Path(name).read_bytes()) == sha
 print('Stored bytes, decompressed hashes, rubric/contract and regenerated artifacts match; acceptance remains incomplete.')
 PY
 ```
