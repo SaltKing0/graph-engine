@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-adoption-plan-v1/prepare.py", line 216, in <module>
+    main()
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-adoption-plan-v1/prepare.py", line 209, in main
+    plan, checks = build()
+                   ^^^^^^^
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-adoption-plan-v1/prepare.py", line 106, in build
+    assert node.text == payload['text']
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

@@ -188,3 +188,22 @@ bundle and source/read/retry guards are reproducible. Fresh focused verification
 case supplies no new independent case, semantic score or human judgment. Frozen
 thresholds and the failed historical gate remain unchanged; independent
 acceptance, decision/dependency adoption and activation remain open.
+
+## Unsigned Y1 adoption decision
+
+The [concrete adoption preparation](decision-evaluation-results/false-alert-development-v1/y1-adoption-plan-v1/README.md)
+pins the exact successor decision, Y1 claim/support, proposed dependency, old
+decision and all three unresolved findings. Recommendation now: defer execution
+and present conditional adoption only within the known fictional rule and its
+five conditions. Selected option, authorizer, reviewer and actual outcomes remain
+unfilled. The JSON is a non-executable plan, not a signed API transaction.
+
+Future authorization would require fresh dependency/successor reviews, followed
+by one atomic old-current-to-superseded/new-proposed-to-current transaction.
+The old `needs_investigation` conclusion is preserved: fresh nonterminal reviews
+of that old content version are rejected by the existing writer. New outcomes
+cannot automatically resolve old-target findings. All domain writes/dry runs are
+blocked during preparation; the exact 18-version/19-event state remains intact.
+Original artifact and captured-node hashes are checked separately with the exact
+serializer-added newline retained. Independent acceptance, activation, resolution
+and measured benefit remain open; no threshold or historical review is changed.

@@ -513,3 +513,24 @@ is 0/0/0. No new acceptance checkbox is completed. Independent annotation/final
 evaluation, real provenance, final sign-off and actual user sessions/product
 benefit remain absent; successor adoption/activation remain open. PR #96 remains
 Draft and Decision Memory experimental. No merge or release.
+
+## Conditional Y1 adoption remains unsigned
+
+The [unsigned Y1 adoption decision](decision-evaluation-results/false-alert-development-v1/y1-adoption-plan-v1/README.md)
+is concrete preparation for the exact known development successor, not an
+approval or activation. It identifies current/proposed versions, source hashes,
+event heads, three unresolved findings, separate future dependency/successor
+reviews and the required atomic lifecycle pair. The old investigation and all
+reviews remain historical; no new old-version conclusion or automatic finding
+resolution is proposed. All signers and actual reviewer outcomes remain null.
+
+Read-only restoration reproduces the exact 18 versions / 19 events and the
+10-delta/3-candidate comparison without writes or dry runs. Five existing
+lifecycle regressions pass in disposable engineering fixtures; that is not
+execution of this plan. Independent final coverage remains 0/0/0, the historical
+5/95 (5.26%) false-alert gate still fails, and the empty proposed profile misses
+3/3 positives. No new acceptance checkbox is completed. Existing sources, labels,
+thresholds, results and reviews remain unchanged. Independent feature acceptance,
+real provenance/final evaluation, user sessions/product benefit and a later
+explicit authorization to activate are still open. PR #96 stays Draft and the
+feature experimental. No merge or release.
