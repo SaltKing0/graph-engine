@@ -236,3 +236,18 @@ For explicitly exposed, development-only engineering source review:
 
 This runner never opens labels or evaluation-source files, never scores its own
 notes, and preserves missing independent semantic and human measurements.
+
+For source-bound observation proposals from the fixed, already exposed
+development cases:
+
+```bash
+.venv/bin/python -m tools.decision_benchmark.structured_development --capture --output /tmp/decision-observations-new
+.venv/bin/python -m pytest tests/test_decision_observations.py -q
+```
+
+Use a new output directory. The [observation guide](docs/decision-source-observations.md)
+explains exact source/value bindings, units, conditions, root lineage and the
+retained source-version journal. All new profiles/evidence remain unreviewed
+proposals; structural comparisons never filter the original runtime alerts or
+establish independent semantic acceptance. No final/evaluation-data option is
+provided, and no existing sources, labels, freezes or results are replaced.

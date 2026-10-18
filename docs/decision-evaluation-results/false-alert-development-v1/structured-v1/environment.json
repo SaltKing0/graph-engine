@@ -1,0 +1,12 @@
+{
+  "source_commit": "016c52c5e6ab9ffd7c04a09ae870bc15da24e6f5",
+  "dirty": false,
+  "python": "3.12.14 (main, Aug 12 2026, 13:57:54) [Clang 21.0.0 (clang-2100.1.1.101)]",
+  "platform": "macOS-26.7.1-arm64-arm-64bit",
+  "environment": {
+    "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+    "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+  },
+  "python_executable": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+  "metadata_note": "Recorded with the actual .venv interpreter used by every subprocess command; the first shell metadata writer used the system interpreter and was corrected before publication."
+}

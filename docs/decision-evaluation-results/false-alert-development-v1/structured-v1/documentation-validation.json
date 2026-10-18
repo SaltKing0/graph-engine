@@ -1,0 +1,106 @@
+{
+  "reference_count": 25,
+  "references": [
+    {
+      "document": "docs/decision-evaluation-results/false-alert-development-v1/structured-v1/README.md",
+      "target": "../README.md"
+    },
+    {
+      "document": "docs/decision-evaluation-results/false-alert-development-v1/structured-v1/README.md",
+      "target": "commands.json"
+    },
+    {
+      "document": "docs/decision-evaluation-results/false-alert-development-v1/structured-v1/README.md",
+      "target": "environment.json"
+    },
+    {
+      "document": "docs/decision-evaluation-results/false-alert-development-v1/structured-v1/README.md",
+      "target": "manifest.json"
+    },
+    {
+      "document": "docs/decision-evaluation-results/false-alert-development-v1/structured-v1/README.md",
+      "target": "capture-report.json.gz"
+    },
+    {
+      "document": "docs/decision-evaluation-results/false-alert-development-v1/structured-v1/README.md",
+      "target": "transcriptions.json"
+    },
+    {
+      "document": "docs/decision-source-observations.md",
+      "target": "decision-evaluation-results/false-alert-development-v1/structured-v1/README.md"
+    },
+    {
+      "document": "docs/decision-release-readiness.md",
+      "target": "decision-solo-development.md"
+    },
+    {
+      "document": "docs/decision-release-readiness.md",
+      "target": "decision-memory-v1.md#evaluation-gates-frozen-before-tuning"
+    },
+    {
+      "document": "docs/decision-release-readiness.md",
+      "target": "decision-workflow.md"
+    },
+    {
+      "document": "docs/decision-release-readiness.md",
+      "target": "decision-annotation-handbook.md"
+    },
+    {
+      "document": "docs/decision-release-readiness.md",
+      "target": "decision-evaluation-results/solo-development-v1/README.md"
+    },
+    {
+      "document": "docs/decision-release-readiness.md",
+      "target": "decision-evaluation-results/false-alert-development-v1/README.md"
+    },
+    {
+      "document": "docs/decision-release-readiness.md",
+      "target": "decision-source-observations.md"
+    },
+    {
+      "document": "docs/decision-release-readiness.md",
+      "target": "decision-evaluation-results/false-alert-development-v1/structured-v1/README.md"
+    },
+    {
+      "document": "docs/decision-release-readiness.md",
+      "target": "decision-evaluation-results/workflow-v1/README.md"
+    },
+    {
+      "document": "CONTRIBUTING.md",
+      "target": "docs/memory-benchmarks.md#graph-expansion-comparison"
+    },
+    {
+      "document": "CONTRIBUTING.md",
+      "target": "docs/memory-benchmarks.md"
+    },
+    {
+      "document": "CONTRIBUTING.md",
+      "target": "docs/decision-evaluation.md"
+    },
+    {
+      "document": "CONTRIBUTING.md",
+      "target": "docs/decision-annotation-handbook.md"
+    },
+    {
+      "document": "CONTRIBUTING.md",
+      "target": "docs/retrieval-performance.md"
+    },
+    {
+      "document": "CONTRIBUTING.md",
+      "target": "docs/decision-workflow.md"
+    },
+    {
+      "document": "CONTRIBUTING.md",
+      "target": "docs/decision-release-readiness.md"
+    },
+    {
+      "document": "CONTRIBUTING.md",
+      "target": "docs/decision-solo-development.md"
+    },
+    {
+      "document": "CONTRIBUTING.md",
+      "target": "docs/decision-source-observations.md"
+    }
+  ],
+  "passed": true
+}

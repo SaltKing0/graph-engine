@@ -126,11 +126,42 @@ successful repeats are retained separately in the report.
 **This does not resolve the historical semantic gate:** the known synthetic
 diagnostic still emits 5/95 false alerts (5.26%), and the empty proposed profile
 still misses 3/3 positives. All ten control update texts are nonidentical, so
-none is hidden by the no-op rule. Typed source-grounded result, condition and
-lineage handling remains implementation work. The eight real development input
+none is hidden by the no-op rule. Authoritative semantic integration of typed
+source-grounded results, conditions and lineage remains implementation work.
+The eight real development input
 hashes and all frozen inputs/labels/thresholds and historical results remain
 unchanged. Independent coverage, semantic acceptance and human benefit remain
 absent; #90–#93 and #73 stay open and Decision Memory stays experimental.
+
+## Structured observation proposals (18 October 2026)
+
+The [source-bound observation guide](decision-source-observations.md) and
+[saved capture evidence](decision-evaluation-results/false-alert-development-v1/structured-v1/README.md)
+add 24 distinct source-bound draft facts from 30 known development sources.
+The complete replay covers five synthetic development events and eight project
+development events, with identical original input hashes and normalized alerts.
+Thirteen proposed profiles, 142 repeated evidence proposals and 992 replayed
+source versions remain separate from the 24 distinct facts and from independent
+coverage. There are no new observation-review events; every new profile and
+evidence record remains proposed, and evidence stays unassessed.
+
+Literal structural checks distinguish declared condition changes, equal or
+different values under matching declared units, shared recorded roots and
+availability statements. Missing units, environments, root identity or semantic
+scope completeness remain unresolved. The official comparator returns unknown
+for every proposed profile. Transcriptions never enter the original diagnostic
+inputs and never filter alerts. The 5/95 false-alert gate remains failed, the
+empty proposed dependency profile still misses 3/3 positives, and independent
+semantic acceptance and human benefit remain unmeasured.
+
+Full local validation on clean code `016c52c5e6ab9ffd7c04a09ae870bc15da24e6f5`
+passed 2,126 tests with 10 optional model skips. Focused tests passed 61; the
+strict engineering matrix passed 55 tests / 41 applicable cells; all 15 code
+CI checks passed. Raw commands, source-version hashes, exact citations,
+prototype failures and preserved-warning comparisons are in the saved report.
+This completes bounded development capture/checking only. Explicit review and
+authoritative integration, independent final comparison and actual user study
+remain open under #90–#93 and #73. Decision Memory remains experimental.
 
 ## Executed measurements (16 October 2026)
 

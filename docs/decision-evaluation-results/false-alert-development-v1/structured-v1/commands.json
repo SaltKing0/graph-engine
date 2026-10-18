@@ -1,0 +1,172 @@
+[
+  {
+    "name": "capture",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "-m",
+      "tools.decision_benchmark.structured_development",
+      "--capture",
+      "--output",
+      "/tmp/issue91-structured-final/capture"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "exit_code": 0,
+    "elapsed_seconds": 245.65669479203643,
+    "log": "capture.log"
+  },
+  {
+    "name": "decision-controls",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "-m",
+      "tools.decision_benchmark",
+      "--split",
+      "all",
+      "--check",
+      "--output",
+      "/tmp/issue91-structured-final/decision-controls.json"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "exit_code": 0,
+    "elapsed_seconds": 1.204392083978746,
+    "log": "decision-controls.log"
+  },
+  {
+    "name": "focused",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "-m",
+      "pytest",
+      "tests/test_decision_observations.py",
+      "tests/test_decision_source_updates.py",
+      "tests/test_decision_workflow.py",
+      "tests/test_decision_solo.py",
+      "-q"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "exit_code": 0,
+    "elapsed_seconds": 53.69263050000882,
+    "log": "focused.log"
+  },
+  {
+    "name": "full",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "-m",
+      "pytest",
+      "tests/",
+      "-q",
+      "-rs"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "exit_code": 0,
+    "elapsed_seconds": 673.3759670839645,
+    "log": "full.log"
+  },
+  {
+    "name": "integrity",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "-m",
+      "tools.decision_integrity",
+      "--output",
+      "/tmp/issue91-structured-final/integrity"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "exit_code": 0,
+    "elapsed_seconds": 120.30913245800184,
+    "log": "integrity.log"
+  },
+  {
+    "name": "memory-smoke",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "-m",
+      "tools.memory_benchmark",
+      "--smoke",
+      "--check",
+      "--output",
+      "/tmp/issue91-structured-final/memory-smoke.json"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "exit_code": 0,
+    "elapsed_seconds": 0.7881185419973917,
+    "log": "memory-smoke.log"
+  },
+  {
+    "name": "old-noop-evidence",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "docs/decision-evaluation-results/false-alert-development-v1/verify_evidence.py"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "exit_code": 0,
+    "elapsed_seconds": 0.21574458299437538,
+    "log": "old-noop-evidence.log"
+  },
+  {
+    "name": "old-review-evidence",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "docs/decision-evaluation-results/pr-review-v1/verify_review.py"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "exit_code": 0,
+    "elapsed_seconds": 4.188865125004668,
+    "log": "old-review-evidence.log"
+  },
+  {
+    "name": "old-solo-evidence",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "docs/decision-evaluation-results/solo-development-v1/verify_artifacts.py"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "exit_code": 0,
+    "elapsed_seconds": 4.257075333967805,
+    "log": "old-solo-evidence.log"
+  },
+  {
+    "name": "pip-check",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "-m",
+      "pip",
+      "check"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "exit_code": 0,
+    "elapsed_seconds": 0.5403171249781735,
+    "log": "pip-check.log"
+  },
+  {
+    "name": "production-controls",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "-m",
+      "tools.decision_benchmark.production",
+      "--split",
+      "all",
+      "--output",
+      "/tmp/issue91-structured-final/production-controls.json"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "exit_code": 0,
+    "elapsed_seconds": 61.08385495800758,
+    "log": "production-controls.log"
+  },
+  {
+    "name": "workflow",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "-m",
+      "examples.decision_workflow",
+      "--output",
+      "/tmp/issue91-structured-final/workflow.json"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "exit_code": 0,
+    "elapsed_seconds": 5.89803550002398,
+    "log": "workflow.log"
+  }
+]

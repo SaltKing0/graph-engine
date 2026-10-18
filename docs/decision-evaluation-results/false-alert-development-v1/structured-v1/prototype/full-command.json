@@ -1,0 +1,15 @@
+{
+  "name": "full",
+  "argv": [
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+    "-m",
+    "pytest",
+    "tests/",
+    "-q",
+    "-rs"
+  ],
+  "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+  "exit_code": 2,
+  "elapsed_seconds": 269.85016333300155,
+  "log": "full.log"
+}
