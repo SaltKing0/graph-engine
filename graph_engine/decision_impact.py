@@ -290,6 +290,42 @@ def _supports(claims: list[dict], before: Revision, after: Revision, budget: Bud
     return dict(remaining=remaining, removed=removed, independence='not inferred; shared roots are not independent votes')
 
 
+
+def _review_basis_refs(roots: set[tuple], after: Revision, budget: Budget) -> set[tuple]:
+    """Pin current endpoint heads and the content behind their recorded reviews.
+
+    Historical paths remain exact. A successor head is freshness context, not
+    inherited endorsement; its existing judgments and inputs must also be pinned
+    or the new candidate is immediately stale (or misses later basis changes).
+    """
+    closure = set(roots)
+    pending = deque(sorted(roots))
+    seen = set()
+    events = defaultdict(list)
+    for event in after.events.values():
+        events[s.key(event['subject'])].append(event)
+    while pending:
+        key = pending.popleft()
+        if key in seen or key not in after.records:
+            continue
+        if len(seen) >= 200:
+            budget.hit.add('basis_refs')
+            break
+        seen.add(key)
+        record = after.records[key]
+        dependencies, _ = after.view.dependencies(record)
+        head = after.view.heads[record['id']]
+        if s.key(head) in after.records:
+            dependencies.add(s.key(head))
+        for event in events[key]:
+            inputs, _ = after.view.dependencies(event)
+            dependencies.update(inputs)
+        added = {k for k in dependencies if k in after.records} - closure
+        closure.update(added)
+        pending.extend(sorted(added))
+    return closure
+
+
 def _candidate(change: dict, reference: dict, paths: list[list[dict]],
                comparisons_by_path: list[list[dict]], before: Revision, after: Revision,
                budget: Budget, all_records: dict, substitutions: dict) -> dict | None:
@@ -328,11 +364,7 @@ def _candidate(change: dict, reference: dict, paths: list[list[dict]],
     refs.update(s.key(v) for claim in claim_refs for v in after.supports.get(s.key(claim), []))
     refs.add(s.key(reference))
     refs.update(s.key(r) for r in (change['old'], change['new']) if r)
-    closure = set(refs)
-    for ref_key in sorted(refs):
-        if ref_key in after.records:
-            dependencies, _ = after.view.dependencies(after.records[ref_key])
-            closure.update(dependencies)
+    closure = _review_basis_refs(refs, after, budget)
     if len(closure) > 200:
         budget.hit.add('basis_refs')
     refs = set(sorted(closure)[:200])
