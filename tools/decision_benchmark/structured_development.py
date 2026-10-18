@@ -147,11 +147,16 @@ def _capture(path: Path, sources: list[dict], rows: dict) -> dict:
     if any(item['state']['workflow'] != 'proposed' or item['events'] for item in inspected):
         raise ValueError('Observation capture must never manufacture a review')
     context = inspected[1]['record']['payload']['context'] if evidence else None
-    official = compare_context(context, context, RecordView(brain, read_file(brain)))
+    view = RecordView(brain, read_file(brain))
+    official = compare_context(context, context, view)
+    # Keep the complete immutable source records as well as their references.
+    # Temporary test brains disappear; the journal must still permit exact
+    # source-version/hash and citation verification without trusting a rerun.
+    source_records = [view.get(item[-1])['record'] for items in chunks.values() for item in items]
     return dict(revision=revision, profile=profile, evidence=references,
         proposed_profiles=1, proposed_evidence=len(evidence), review_events=0,
         official_comparability=official,
-        independence='not inferred', inspected=inspected)
+        independence='not inferred', inspected=inspected, source_records=source_records)
 
 
 def run(output: Path, *, capture: bool = False) -> dict:

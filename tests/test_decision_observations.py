@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from graph_engine.brain import Brain
+from graph_engine import decision_schema as schema
 from graph_engine.decision_service import DecisionService
 from tools.decision_benchmark import observations as o, structured_development as d
 from tools.decision_benchmark.annotation_packets import BUNDLE
@@ -129,6 +130,9 @@ def test_production_capture_keeps_all_proposals_unreviewed_with_exact_source_quo
     result=d._capture(tmp_path/'brain',selected,by)
     assert result['review_events']==0 and result['proposed_evidence']==2
     assert result['official_comparability']['status']=='unknown'
+    for record in result['source_records']:
+        assert schema.hash_record(record)==record['version_id']
+        assert schema.text_hash(record['payload']['text'])==record['payload']['source_ref']['text_sha256']
     service=DecisionService(Brain(str(tmp_path/'brain'),mode='git'))
     assert service.inspect(result['profile'])['state']['workflow']=='proposed'
     for item in result['inspected']:
