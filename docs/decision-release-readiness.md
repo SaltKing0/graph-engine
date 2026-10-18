@@ -204,6 +204,31 @@ matched completed agent decisions, independent final scoring, actual users and
 measured benefit remain absent. No additional acceptance checkbox is completed;
 #90–#93 and #73 stay open and Decision Memory stays experimental.
 
+## Source audit of the known withdrawal (18 October 2026)
+
+The [withdrawal audit](decision-evaluation-results/false-alert-development-v1/withdrawal-v1/README.md)
+checks one already exposed fictional development event. Y1's declared recall
+0.8 satisfies the stated >=0.7 fraction condition under the explicit common
+context, and Y1 is declared still available. This is source-declared predicate
+satisfaction, not independently reviewed measurement validity or accepted
+runtime sufficiency. No statistical threshold, independent run or reviewer is
+invented. X1's withdrawal still changes the old aggregate basis, and the
+normative contract requires a candidate explaining loss plus remaining support.
+The original runtime's one curated warning remains; no alert is suppressed.
+
+Both original dependency profiles replay without errors and preserve the old
+input hash/normalized alerts. Journals retain 71 versions and 10 scripted wiring
+events; both contexts remain truncated within the unchanged budget/k. The
+source assessment and 13 adversarial checks pass, as do 99 focused regressions
+and five historical evidence verifiers at their appropriate report heads.
+Runtime/tools/tests/CI/frozen data are byte-unchanged; this is a documentation
+and source-audit delivery. Prior full-suite/matrix counts remain historical,
+not newly executed measurements. Current semantic scores and human benefit
+remain null; the historical 5/95 failure and 0/0/0 independent coverage persist.
+No additional acceptance checkbox is completed. Next is explicit X1/Y1 support
+and availability modeling with review of the changed basis; independent-run
+credit requires human review of actual execution/dataset provenance.
+
 ## Executed measurements (16 October 2026)
 
 Raw reports, source/code/config manifests, prompts, errors, timings and baseline

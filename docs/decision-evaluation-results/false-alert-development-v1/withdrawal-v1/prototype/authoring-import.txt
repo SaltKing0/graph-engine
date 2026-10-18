@@ -1,0 +1,4 @@
+Initial invocation: .venv/bin/python /tmp/issue91-withdrawal-work/build_packet.py
+Exit 1: ModuleNotFoundError: No module named 'tools'
+Corrected invocation: PYTHONPATH=. .venv/bin/python /tmp/issue91-withdrawal-work/build_packet.py
+Exit 0. This was authoring setup, not a runtime/semantic-gate failure.

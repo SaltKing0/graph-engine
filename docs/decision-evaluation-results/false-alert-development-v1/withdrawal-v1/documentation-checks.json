@@ -1,0 +1,24 @@
+[
+  {
+    "name": "evidence",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/withdrawal-v1/verify.py"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "exit_code": 0,
+    "log": "verification.log",
+    "scope": "Documentation/source audit only; no runtime code change"
+  },
+  {
+    "name": "references",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/withdrawal-v1/check_references.py"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "exit_code": 0,
+    "log": "references.log",
+    "scope": "Documentation/source audit only; no runtime code change"
+  }
+]

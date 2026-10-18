@@ -1,0 +1,36 @@
+{
+  "original-basis.txt": {
+    "id": "controls-v2/surviving-support-basis",
+    "text_sha256": "079b7acb941c5992583093e0c6d6a4d5d81ad217bea51fcd535dcb0f0330b031",
+    "available_at": "2026-01-01T00:00:00Z",
+    "origin": {
+      "bundle": "controls-v2",
+      "id": "surviving-support-basis",
+      "file": "sources/surviving-support-basis.txt",
+      "available_at": "2026-01-01T00:00:00Z",
+      "split": "development",
+      "lineage": "fictional-surviving-support-basis",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    }
+  },
+  "original-update.txt": {
+    "id": "controls-v2/surviving-support-update",
+    "text_sha256": "bbfdc5e54a02a1dce66d5364fdfb152450e6dd1d320c1f2245ba1385fae22379",
+    "available_at": "2026-01-06T00:00:00Z",
+    "origin": {
+      "bundle": "controls-v2",
+      "id": "surviving-support-update",
+      "file": "sources/surviving-support-update.txt",
+      "available_at": "2026-01-06T00:00:00Z",
+      "split": "development",
+      "lineage": "fictional-surviving-support-update",
+      "license": "MIT",
+      "conditions": {
+        "synthetic": true
+      }
+    }
+  }
+}

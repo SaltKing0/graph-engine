@@ -54,3 +54,21 @@ The runner separately verifies all twelve existing JSON means by full dataset/ad
 The output retains all thirteen known development cases and both dependency profiles, input/code/review/source hashes, raw production impact/queue/context outputs, retained basis and captured update references, and all errors. It has no final/evaluation option and no semantic scoring. Independent acceptance/coverage and user measurements remain absent. Historical reports and frozen thresholds remain unchanged; a development reduction in raw alerts does not replace the still-failed historical gate or satisfy the independent final gates.
 
 The reviewed replay journals preserve every authorized immutable version and original scripted dependency event. Original input hashes and stored-node hashes stay separate: the existing Markdown serializer adds a terminal LF to each chunk. The verifier reconstructs that exact serialization; it does not normalize text or infer measurement roots from either hash.
+
+
+## Known withdrawal and remaining support
+
+The [source-bound withdrawal audit](decision-evaluation-results/false-alert-development-v1/withdrawal-v1/README.md)
+resolves Y1's explicit same-conditions reference and declared metric unit:
+0.8 >=0.7 meets the sole condition stated in that fictional source, and the
+update says Y1 remains available. It does not prove reviewed measurement
+independence, statistical validity or general decision sufficiency. No original
+transcription/proposal is changed or accepted retroactively.
+
+The contract retains a candidate that explains the loss and remaining support;
+it does not silently preserve the old X1/Y1 basis after X1's withdrawal. The
+current aggregate diagnostic lacks individual X1/Y1 evidence/support paths and
+reports unknown comparability. Its warning remains. Next is explicit
+per-observation support/availability and review/versioning of the remaining
+basis, with independent human/provenance acceptance still open. The audit and
+replay are documentation checks, never an alert filter or new runtime input.

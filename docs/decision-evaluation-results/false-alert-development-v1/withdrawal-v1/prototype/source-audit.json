@@ -1,0 +1,223 @@
+{
+  "schema": "dm.withdrawal-source-audit/1",
+  "author": {
+    "role": "implementing-agent",
+    "human": false,
+    "independent": false
+  },
+  "exposure": "previously-exposed-development-only",
+  "case_id": "controls-v2/event-surviving-support",
+  "sources": {
+    "controls-v2/surviving-support-basis": {
+      "text_sha256": "079b7acb941c5992583093e0c6d6a4d5d81ad217bea51fcd535dcb0f0330b031",
+      "available_at": "2026-01-01T00:00:00Z"
+    },
+    "controls-v2/surviving-support-update": {
+      "text_sha256": "bbfdc5e54a02a1dce66d5364fdfb152450e6dd1d320c1f2245ba1385fae22379",
+      "available_at": "2026-01-06T00:00:00Z"
+    }
+  },
+  "rule": {
+    "source_id": "controls-v2/surviving-support-basis",
+    "statement": {
+      "type": "id",
+      "value": "Choose mode A when recall >=0.7 fraction.",
+      "start": 11,
+      "end": 52,
+      "quote": "Choose mode A when recall >=0.7 fraction."
+    },
+    "action": {
+      "type": "id",
+      "value": "Choose mode A",
+      "start": 11,
+      "end": 24,
+      "quote": "Choose mode A"
+    },
+    "metric": {
+      "type": "id",
+      "value": "recall",
+      "start": 30,
+      "end": 36,
+      "quote": "recall"
+    },
+    "operator": {
+      "type": "id",
+      "value": ">=",
+      "start": 37,
+      "end": 39,
+      "quote": ">="
+    },
+    "threshold": {
+      "type": "decimal",
+      "value": "0.7",
+      "start": 39,
+      "end": 42,
+      "quote": "0.7"
+    },
+    "unit": {
+      "type": "id",
+      "value": "fraction",
+      "start": 43,
+      "end": 51,
+      "quote": "fraction"
+    }
+  },
+  "remaining": {
+    "source_id": "controls-v2/surviving-support-basis",
+    "statement": {
+      "type": "id",
+      "value": "Separate support Y1: recall=0.8 under the same conditions, independent lineage run-Y1.",
+      "start": 154,
+      "end": 240,
+      "quote": "Separate support Y1: recall=0.8 under the same conditions, independent lineage run-Y1."
+    },
+    "subject": {
+      "type": "id",
+      "value": "Y1",
+      "start": 171,
+      "end": 173,
+      "quote": "Y1"
+    },
+    "metric": {
+      "type": "id",
+      "value": "recall",
+      "start": 175,
+      "end": 181,
+      "quote": "recall"
+    },
+    "value": {
+      "type": "decimal",
+      "value": "0.8",
+      "start": 182,
+      "end": 185,
+      "quote": "0.8"
+    },
+    "unit_from_rule": true,
+    "conditions_reference": {
+      "type": "id",
+      "value": "under the same conditions",
+      "start": 186,
+      "end": 211,
+      "quote": "under the same conditions"
+    },
+    "conditions_referent": {
+      "type": "id",
+      "value": "X1",
+      "start": 65,
+      "end": 67,
+      "quote": "X1"
+    },
+    "conditions": {
+      "workload": {
+        "type": "id",
+        "value": "W",
+        "start": 90,
+        "end": 91,
+        "quote": "W"
+      },
+      "environment": {
+        "type": "id",
+        "value": "E",
+        "start": 105,
+        "end": 106,
+        "quote": "E"
+      },
+      "code": {
+        "type": "id",
+        "value": "C",
+        "start": 113,
+        "end": 114,
+        "quote": "C"
+      },
+      "corpus": {
+        "type": "id",
+        "value": "H",
+        "start": 123,
+        "end": 124,
+        "quote": "H"
+      },
+      "protocol": {
+        "type": "id",
+        "value": "P",
+        "start": 135,
+        "end": 136,
+        "quote": "P"
+      }
+    },
+    "measurement_root": {
+      "type": "id",
+      "value": "run-Y1",
+      "start": 233,
+      "end": 239,
+      "quote": "run-Y1"
+    }
+  },
+  "withdrawn": {
+    "source_id": "controls-v2/surviving-support-basis",
+    "subject": {
+      "type": "id",
+      "value": "X1",
+      "start": 65,
+      "end": 67,
+      "quote": "X1"
+    },
+    "measurement_root": {
+      "type": "id",
+      "value": "run-X1",
+      "start": 146,
+      "end": 152,
+      "quote": "run-X1"
+    }
+  },
+  "update": {
+    "source_id": "controls-v2/surviving-support-update",
+    "statement": {
+      "type": "id",
+      "value": "SYNTHETIC UPDATE: Availability update: support X1 withdrawn by its author. Independent support Y1 remains available; Y1 was a separate run with known protocol and dataset provenance.",
+      "start": 0,
+      "end": 182,
+      "quote": "SYNTHETIC UPDATE: Availability update: support X1 withdrawn by its author. Independent support Y1 remains available; Y1 was a separate run with known protocol and dataset provenance."
+    },
+    "withdrawn_subject": {
+      "type": "id",
+      "value": "X1",
+      "start": 47,
+      "end": 49,
+      "quote": "X1"
+    },
+    "withdrawal": {
+      "type": "id",
+      "value": "withdrawn",
+      "start": 50,
+      "end": 59,
+      "quote": "withdrawn"
+    },
+    "remaining_subject": {
+      "type": "id",
+      "value": "Y1",
+      "start": 95,
+      "end": 97,
+      "quote": "Y1"
+    },
+    "remaining_availability": {
+      "type": "id",
+      "value": "available",
+      "start": 106,
+      "end": 115,
+      "quote": "available"
+    },
+    "separate_run_statement": {
+      "type": "id",
+      "value": "Y1 was a separate run with known protocol and dataset provenance.",
+      "start": 117,
+      "end": 182,
+      "quote": "Y1 was a separate run with known protocol and dataset provenance."
+    }
+  },
+  "interpretation_notes": [
+    "The sole explicit decision predicate is recall >=0.7 fraction; no minimum study count, confidence interval or statistical-independence threshold is declared. No such rule is invented.",
+    "The unit is resolved from the metric declaration, not a conversion. The explicit same-conditions phrase refers to the preceding X1 context in this fictional source. This is a new implementing-agent interpretation, not a mutation of the older partial transcription.",
+    "Only X1 support is withdrawn. The source separately states Y1 remains available. Source hashes/code IDs do not establish measurement independence, and distinct recorded roots alone do not prove independence.",
+    "Meeting the stated numerical predicate does not establish reviewed runtime sufficiency, real-world validity, statistical sufficiency or product benefit. The changed old X1/Y1 basis must not be silently retained as unchanged."
+  ]
+}

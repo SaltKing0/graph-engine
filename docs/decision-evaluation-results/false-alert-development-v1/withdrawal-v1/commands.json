@@ -1,0 +1,44 @@
+[
+  {
+    "name": "source-audit",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "docs/decision-evaluation-results/false-alert-development-v1/withdrawal-v1/check_audit.py"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "exit_code": 0,
+    "elapsed_seconds": 0.7061719580087811,
+    "log": "source-audit.log"
+  },
+  {
+    "name": "replay",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "docs/decision-evaluation-results/false-alert-development-v1/withdrawal-v1/verify.py",
+      "--replay",
+      "/tmp/issue91-withdrawal-final/replay"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "exit_code": 0,
+    "elapsed_seconds": 7.18585291702766,
+    "log": "replay.log"
+  },
+  {
+    "name": "focused",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "-m",
+      "pytest",
+      "tests/test_decision_reviewed_observations.py",
+      "tests/test_decision_observations.py",
+      "tests/test_decision_source_updates.py",
+      "tests/test_decision_workflow.py",
+      "tests/test_decision_solo.py",
+      "-q"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "exit_code": 0,
+    "elapsed_seconds": 85.78287470899522,
+    "log": "focused.log"
+  }
+]

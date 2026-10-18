@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/private/tmp/issue91-withdrawal-history-3090863/docs/decision-evaluation-results/false-alert-development-v1/verify_evidence.py", line 95, in <module>
+    main()
+  File "/private/tmp/issue91-withdrawal-history-3090863/docs/decision-evaluation-results/false-alert-development-v1/verify_evidence.py", line 41, in main
+    assert digest((ROOT / name).read_bytes()) == expected, name
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: tools/decision_benchmark/production.py
