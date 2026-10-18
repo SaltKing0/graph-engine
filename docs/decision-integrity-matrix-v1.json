@@ -85,7 +85,8 @@
       "scope": "Real Chromium DOM interaction against a real authenticated/local HTTP server",
       "applicable": true,
       "tests": [
-        "tests/test_frontend_xss.py::test_decision_review_restricted_evidence_is_hidden_by_real_authenticated_api"
+        "tests/test_frontend_xss.py::test_decision_review_restricted_evidence_is_hidden_by_real_authenticated_api",
+        "tests/test_frontend_xss.py::test_decision_integrity_second_source_revocation_clears_derived_ui"
       ],
       "not_applicable_reason": null
     },

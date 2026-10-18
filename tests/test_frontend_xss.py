@@ -858,6 +858,46 @@ def test_decision_integrity_tombstone_clears_historical_ui(server, page, tmp_pat
     assert refs['source']['id'] not in html
 
 
+@pytest.mark.parametrize('server', [{'mode': 'git', 'secure': True}], indirect=True, ids=['git-secure'])
+def test_decision_integrity_second_source_revocation_clears_derived_ui(server, page, tmp_path):
+    from graph_engine.decision_service import DecisionService
+    from test_decision_impact import commit, change_source, comparison, link
+    from test_decision_memory import claim, draft, files
+    from test_decision_service import save
+    service = DecisionService(Brain(str(tmp_path / 'brain'), mode='git'))
+    service.brain.write_node(Node('Publicly authorized observation', id='source'))
+    service.brain.write_node(Node('SECOND_SOURCE_SECRET qualifying evidence', id='private-aux'))
+    public, = save(service, draft('source', service.source('source'), anchor='source'))
+    private, = save(service, draft('source', service.source('private-aux'), anchor='private-aux'))
+    c, = save(service, claim('SECOND_SOURCE_SECRET derived claim', inputs=[public, private]))
+    d, = save(service, draft('decision', dict(action='Keep opt-in', rationale='SECOND_SOURCE_SECRET rationale',
+        alternatives=[], context=None, revisit_checks=[]), inputs=[c]))
+    link(service, 'depends_on', d, c, None)
+    before = commit(service)
+    change_source(service)
+    comp = comparison(before, commit(service))
+    page.set_extra_http_headers({'Authorization': 'Bearer reviewer-token'})
+    open_decision_comparison(page, server, comp)
+    expect(page.locator('#dm-detail')).to_contain_text('SECOND_SOURCE_SECRET')
+    policy_path = tmp_path / 'browser-policy.json'
+    policy = json.loads(policy_path.read_text())
+    policy['graphs']['default']['nodes']['private-aux'] = {'read': []}
+    policy_path.write_text(json.dumps(policy))
+    original = files(service.brain)
+    page.get_by_role('button', name='Refresh evidence', exact=True).click()
+    expect(page.locator('#dm-message')).to_contain_text('No accessible pending')
+    page.get_by_label('Include acknowledged, resolved and dismissed history').check()
+    expect(page.locator('#dm-queue button')).to_have_count(0)
+    assert 'SECOND_SOURCE_SECRET' not in page.locator('body').inner_html()
+    for ref in (private, c, d):
+        assert ref['id'] not in page.locator('body').inner_html()
+    response = page.request.post(f'{server}/api/decision-memory/read/review-queue',
+        data={'comparison': comp, 'history': True}, headers={'Authorization': 'Bearer reviewer-token'})
+    assert response.status == 200 and response.json()['items'] == []
+    assert private['id'] not in response.text() and 'SECOND_SOURCE_SECRET' not in response.text()
+    assert files(service.brain) == original
+
+
 @pytest.mark.parametrize('server', [{'mode': 'git'}], indirect=True, ids=['git'])
 def test_decision_integrity_brief_keeps_selected_revision_after_later_edit(server, page, tmp_path):
     from test_decision_impact import change_source, commit
