@@ -10,6 +10,8 @@ import subprocess
 import tempfile
 
 from graph_engine import decision_schema as s
+from graph_engine.brain import Brain
+from graph_engine.decision_memory import RecordView, read_file
 from .corpus import DATA, canonical, digest
 from .observations import validate, value
 from .json_source_fields import spans
@@ -19,6 +21,13 @@ from .solo import ROOT
 from .structured_development import development_inputs, TRANSCRIPTIONS
 
 REVIEWS = Path(__file__).with_name('development_field_reviews.json')
+
+
+def journal(path: Path) -> dict:
+    """Retain authorized immutable versions/events, excluding retry receipts."""
+    brain = Brain(str(path), mode='git')
+    brain.authorize('read')
+    return RecordView(brain, read_file(brain)).export()
 
 
 def review_inputs(sources: dict, packet: dict, inventory: dict) -> dict:
@@ -123,9 +132,11 @@ def run(output: Path) -> dict:
                        eligible_pairs=len(case['runtime']['decisions']), review=review, profiles={})
             for mode in ('curated', 'proposed'):
                 trace: dict = {}
+                path = Path(temp) / case['id'] / mode
                 try:
-                    trace = execute(deepcopy(case['runtime']), case['event'], Path(temp) / case['id'] / mode,
+                    trace = execute(deepcopy(case['runtime']), case['event'], path,
                                     mode, budget=4000, k=5, trace=trace, observation_review=review)
+                    trace['journal'] = journal(path)
                     trace['error'] = None
                 except Exception as exc:
                     trace['error'] = dict(type=type(exc).__name__, message=str(exc))

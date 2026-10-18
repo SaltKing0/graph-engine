@@ -24,13 +24,14 @@ def assess(review: dict | None, update: dict, *, available_at: str) -> dict:
     interpreted facts. They do not prove semantic correctness or independence.
     """
     result = dict(schema='dm.reviewed-source-assessment/1', retain_basis=False,
-                  author=AUTHOR, independent_acceptance=False, facts=[],
+                  author=None, independent_acceptance=False, facts=[],
                   reason='No complete developer field review')
     if review is None:
         return result
     s.fields(review, {'schema', 'author', 'sources'})
     s.need(review['schema'] == 'dm.development.field-review/1' and review['author'] == AUTHOR)
     s.need(all(type(review['author'][k]) is bool for k in ('human', 'independent')))
+    result['author'] = review['author']
     s.need(isinstance(review['sources'], list) and len(review['sources']) == 2)
     indexed = {}
     for row in review['sources']:

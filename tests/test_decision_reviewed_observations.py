@@ -42,7 +42,8 @@ def test_reviewed_known_sources(prepared, family, retained, status):
     assert result['retain_basis'] is retained
     assert result['facts'][0]['status'] == status
     assert not result['independent_acceptance'] and not result['author']['human']
-    assert not assess(None, update, available_at=case['event']['at'])['retain_basis']
+    missing = assess(None, update, available_at=case['event']['at'])
+    assert not missing['retain_basis'] and missing['author'] is None
 
 
 @pytest.mark.parametrize('mutation', ['unit', 'dimension', 'metric', 'sample', 'namespace', 'complete',
@@ -97,6 +98,17 @@ def test_actual_production_preparation_preserves_updates_and_reviews(prepared, t
     assert len(comparison['candidates']) == alerts
     events = [o['output'] for o in result['raw_outputs'] if o['stage'] == 'scripted_review']
     assert len(events) == 1  # Only original curated dependency wiring acceptance.
+    from tools.decision_benchmark.reviewed_development import journal
+    from graph_engine.decision_schema import hash_record
+    snapshot = journal(tmp_path / family)
+    assert snapshot['versions'] and snapshot['events']
+    assert all(hash_record(record) == record['version_id'] for record in snapshot['versions'])
+    assert all(event['axis'] == 'workflow' and event['to'] == 'accepted' for event in snapshot['events'])
+    by_ref = {(v['id'], v['version_id']): v for v in snapshot['versions']}
+    for ref in result['source_update']['captured_update_refs']:
+        assert by_ref[(ref['id'], ref['version_id'])]['kind'] == 'source'
+    for ref in result['source_update']['retained_basis_refs']:
+        assert by_ref[(ref['id'], ref['version_id'])]['previous'] is None
 
 
 def test_report_paths_and_unknown_units(prepared):
@@ -181,6 +193,7 @@ def test_runner_keeps_all_attempts_errors_and_missing_acceptance(tmp_path, monke
             raise RuntimeError('deliberate development execution failure')
         return dict(alerts=[], complete=True, context_within_budget=True)
     monkeypatch.setattr(runner, 'execute', fake)
+    monkeypatch.setattr(runner, 'journal', lambda path: dict(versions=[], events=[]))
     output = tmp_path / 'new'
     report = runner.run(output)
     assert len(calls) == 26 and report['status'] == 'completed_with_errors'
@@ -190,3 +203,16 @@ def test_runner_keeps_all_attempts_errors_and_missing_acceptance(tmp_path, monke
     assert not report['independent_acceptance'] and not report['release_ready']
     assert sum(report['independent_final_coverage'].values()) == 0
     with pytest.raises(FileExistsError): runner.run(output)
+
+
+def test_root_annotation_cannot_override_changed_value(prepared):
+    case, review, update = inputs(prepared, 'comparable')
+    # A root assertion cannot override actual measurement kind/value. Reuse an
+    # existing exact source-bound subject as the token; it is not the old root.
+    new = review['sources'][1]
+    new['observations']['facts'][0]['measurement_lineage'] = deepcopy(
+        new['observations']['facts'][0]['subject'])
+    new['facts_sha256'] = digest(canonical(new['observations']['facts']))
+    result = assess(review, update, available_at=case['event']['at'])
+    assert not result['retain_basis']
+    assert result['facts'][0]['status'] == 'changed_value_or_sample'
