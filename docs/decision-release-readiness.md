@@ -491,3 +491,25 @@ pass at their original snapshots. All 13 known development input hashes and
 normalized alert outputs, and the original scores/gates/thresholds, match the
 prior report. Full commands/logs and the restored-bundle proof remain separate
 from independent acceptance and product benefit.
+
+## Remaining Y1 candidates reviewed without adoption
+
+The [claim-change and proposed-dependency review](decision-evaluation-results/false-alert-development-v1/y1-candidate-review-v1/README.md)
+restores the prior exact state and records two diagnostic dispositions through
+the public API: claim change **confirmed/open**, proposed dependency
+**inconclusive/workflow null**. Both remain pending, alongside the unchanged open
+withdrawal finding. The 16-version/17-event prefix is unchanged; the final journal
+has 18 versions / 19 events. All three candidates are still emitted with their
+original IDs and qualifications. The proposal's context is source-consistent;
+this does not accept the dependency, activate the decision or resolve the old
+investigation. No engine, tool, test, CI or threshold change was required.
+
+Fresh checks: 32 focused tests pass with one existing Starlette warning; exact
+source/version review, prior evidence verification at its original commit and
+the new offline restore/idempotency/history checks are recorded. Full local
+2,186/10-skip and 41/41-cell matrix results above remain historical, not new runs.
+The standard 5/95 (5.26%) false-alert gate still fails; independent final coverage
+is 0/0/0. No new acceptance checkbox is completed. Independent annotation/final
+evaluation, real provenance, final sign-off and actual user sessions/product
+benefit remain absent; successor adoption/activation remain open. PR #96 remains
+Draft and Decision Memory experimental. No merge or release.

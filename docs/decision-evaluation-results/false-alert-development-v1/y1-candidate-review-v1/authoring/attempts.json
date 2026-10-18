@@ -1,0 +1,46 @@
+{
+  "exposure": "All attempts use the same known development case; no independent cases or scores",
+  "attempts": [
+    {
+      "name": "path-revision assertion",
+      "log": "authoring.log",
+      "report": "authoring-report.json.gz",
+      "runner": "authoring-review.py",
+      "exit_code": 1,
+      "versions": 16,
+      "events": 17,
+      "classification": "authoring failure before writes; selected path revision differs"
+    },
+    {
+      "name": "immutable bundle origin",
+      "log": "checked.log",
+      "report": "checked-report.json.gz",
+      "runner": "checked-review.py",
+      "exit_code": 1,
+      "versions": 16,
+      "events": 17,
+      "classification": "scratch clone pull rejected before writes; bundle has no main"
+    },
+    {
+      "name": "inconclusive workflow assertion",
+      "log": "local.log",
+      "report": "local-report.json.gz",
+      "runner": "local-review.py",
+      "journal": "local-journal.json.gz",
+      "exit_code": 1,
+      "versions": 18,
+      "events": 19,
+      "classification": "authoring failure after two valid diagnostic writes; workflow null is existing contract"
+    },
+    {
+      "name": "successful preflight before annotation-only runner cleanup",
+      "log": "preflight.log",
+      "report": "preflight-report.json.gz",
+      "runner": "preflight-review.py",
+      "exit_code": 0,
+      "versions": 18,
+      "events": 19,
+      "classification": "Same case restored and reviewed; superseded by frozen typed-runner execution, not independent evidence"
+    }
+  ]
+}

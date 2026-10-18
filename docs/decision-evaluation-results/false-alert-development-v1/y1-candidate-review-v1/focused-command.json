@@ -1,0 +1,19 @@
+{
+  "label": "focused",
+  "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+  "argv": [
+    ".venv/bin/python",
+    "-m",
+    "pytest",
+    "tests/test_decision_review.py",
+    "tests/test_decision_refresh_basis.py",
+    "tests/test_decision_support_paths.py",
+    "-q",
+    "-rs"
+  ],
+  "started_at": "2026-10-18T18:36:23.408579+00:00",
+  "ended_at": "2026-10-18T18:37:42.885300+00:00",
+  "elapsed_seconds": 79.474,
+  "exit_code": 0,
+  "log": "focused.log"
+}

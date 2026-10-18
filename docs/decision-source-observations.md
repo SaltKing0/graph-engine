@@ -168,3 +168,23 @@ historical. The replay has 16 versions / 17 events, with the prior 15/16 prefix
 unchanged. The successor decision and dependency stay proposed, the old decision
 needs investigation, and activation, resolution and independent acceptance stay
 open. This is not a new independent case, false-alert score or human sign-off.
+
+## Review of the remaining claim and proposed dependency
+
+The [two-candidate source and version review](decision-evaluation-results/false-alert-development-v1/y1-candidate-review-v1/README.md)
+continues the exact restored Y1 state. The claim change is **confirmed/open** as
+a material old-basis change. The proposed dependency is **inconclusive**, with
+workflow null under the existing contract; it remains in the pending queue.
+Its exact endpoints/context match the source-qualified Y1 basis, but neither it
+nor the successor decision is accepted or activated. Raw `comparability_unknown`
+and `proposed_preview` qualifications are preserved. A direct dependency path
+without an evidential scope comparison is not proof of a source contradiction.
+
+Exactly two scripted developer finding dispositions extend the journal from
+16 versions / 17 events to 18/19, retaining the old prefix and withdrawal finding
+unchanged. All three pending findings remain unresolved. The report, exact Git
+bundle and source/read/retry guards are reproducible. Fresh focused verification:
+32 tests passed, with one existing Starlette warning. This same known synthetic
+case supplies no new independent case, semantic score or human judgment. Frozen
+thresholds and the failed historical gate remain unchanged; independent
+acceptance, decision/dependency adoption and activation remain open.

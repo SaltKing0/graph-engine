@@ -1,0 +1,1 @@
+{"status": "complete_two_diagnostics_unresolved", "findings": {"claim_change": {"finding_disposition": "confirmed", "finding_workflow": "open"}, "proposed_dependency": {"finding_disposition": "inconclusive", "finding_workflow": null}}, "activation": false, "independent_acceptance": false}

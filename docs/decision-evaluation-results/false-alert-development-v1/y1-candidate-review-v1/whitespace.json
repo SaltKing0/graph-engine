@@ -1,0 +1,29 @@
+{
+  "reason": "Preserve exact raw diagnostic failure log, including its final blank line",
+  "checks": [
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--check",
+        "08f55ea"
+      ],
+      "exit_code": 2,
+      "stdout": "docs/decision-evaluation-results/false-alert-development-v1/y1-candidate-review-v1/authoring/checked.log:31: new blank line at EOF.\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "-c",
+        "core.whitespace=-blank-at-eof",
+        "diff",
+        "--check",
+        "08f55ea"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+Exact 16/17 prior state restored; source bindings, both candidates and raw qualifications reproduced.
+18 versions / 19 events: claim confirmed/open; proposed dependency inconclusive/workflow null; withdrawal unchanged/open.
+Three unresolved queue entries; exact successor bundle restored; retry/duplicate guards pass without writes.
+No activation, dependency acceptance, resolution, independent evaluation or frozen-data/runtime change.
