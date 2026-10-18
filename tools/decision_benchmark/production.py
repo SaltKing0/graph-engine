@@ -1,9 +1,11 @@
 """Conservative production-interface diagnostic; no extraction or semantic oracle.
 
-Only source-only inputs reach execute(). A declared basis claim is versioned to
+Source-only task inputs and optional field reviews reach execute(). A basis is versioned to
 attach a changed or unknown update; exact/CRLF-only task-text equality retains
 the original basis. Accepted dependencies retain their exact old target.
 This measures review alerts, not an invented interpretation of prose.
+An optional, hash-bound developer field review can retain an unchanged basis
+before impact analysis; the default diagnostic has no such interpretation.
 """
 from __future__ import annotations
 
@@ -23,6 +25,7 @@ from .corpus import DATA, canonical, digest, load_bundle, visible_inputs
 from .runner import run as baseline_run, TASK
 from .scoring import score
 from .readiness import assess
+from .reviewed_observations import assess as assess_observations
 
 MAPPING = {
     'version': 'dm.source-change-diagnostic/2',
@@ -67,7 +70,8 @@ def source_update(documents: list[dict], event: dict) -> dict:
                 old=old_info, new=new_info, semantic_assessment=None)
 
 
-def execute(visible: dict, event: dict, path: Path, mode: str, *, budget: int, k: int, trace: dict | None = None) -> dict:
+def execute(visible: dict, event: dict, path: Path, mode: str, *, budget: int, k: int,
+            trace: dict | None = None, observation_review: dict | None = None) -> dict:
     """Production execution boundary. Never accepts labels, gold paths or rationales."""
     trace = trace if trace is not None else {}
     times: dict[str, list[float]] = trace.setdefault('latency_ms', {})
@@ -139,6 +143,13 @@ def execute(visible: dict, event: dict, path: Path, mode: str, *, budget: int, k
     if not update_refs:
         raise ValueError('Update has no visible source chunks')
     update = source_update(visible['documents'], event)
+    bound_update = deepcopy(update)
+    for side in ('old', 'new'):
+        item = bound_update[side]
+        chunks = {d['id']: d for d in visible['documents'] if d['source_id'] == item['source_id']}
+        item['text'] = ''.join(chunks[key]['text'] for key in item['chunk_ids']) if item['well_formed_task_chunks'] else ''
+    observation_assessment = assess_observations(observation_review, bound_update, available_at=event['at'])
+    outputs.append(dict(stage='reviewed_observations', output=observation_assessment))
     update['captured_update_refs'] = update_refs
     update['retained_basis_refs'] = []
     outputs.append(dict(stage='source_update', output=update))
@@ -146,8 +157,9 @@ def execute(visible: dict, event: dict, path: Path, mode: str, *, budget: int, k
     for dep in selected:
         if dep['source_id'] != event['changed_source_id']:
             continue
-        if update['classification'] in ('identical', 'crlf_only'):
-            # No successor claim, inherited review or invented semantic verdict.
+        if update['classification'] in ('identical', 'crlf_only') or observation_assessment['retain_basis']:
+            # No successor claim or inherited review. The optional field audit
+            # is a developer configuration, never a manufactured human review.
             # The separately captured update and exact hashes stay in the trace.
             update['retained_basis_refs'].append(claims[dep['id']])
             continue
@@ -180,6 +192,7 @@ def execute(visible: dict, event: dict, path: Path, mode: str, *, budget: int, k
                 uncertainty_reason='Structured comparability is unknown' if 'comparability_unknown' in candidate['reasons'] else None,
                 candidate_id=candidate['candidate_id']))
     return dict(alerts=alerts, latency_ms=times, raw_outputs=outputs, comparison=comp, source_update=update,
+        observation_assessment=observation_assessment,
         ids=dict(decisions=decisions, claims=claims, dependencies=links),
         complete=not comparison['completeness']['truncated'] and not queue['truncated'],
         context_within_budget=context['tokens'] <= budget)

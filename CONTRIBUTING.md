@@ -251,3 +251,16 @@ retained source-version journal. All new profiles/evidence remain unreviewed
 proposals; structural comparisons never filter the original runtime alerts or
 establish independent semantic acceptance. No final/evaluation-data option is
 provided, and no existing sources, labels, freezes or results are replaced.
+
+For the explicit implementing-agent field-review development configuration:
+
+```bash
+.venv/bin/python -m tools.decision_benchmark.reviewed_development --output /tmp/decision-reviewed-development-new
+.venv/bin/python -m pytest tests/test_decision_reviewed_observations.py -q
+```
+
+The [observation guide](docs/decision-source-observations.md#explicit-developer-field-review-and-source-preparation)
+explains the separate trusted interpretation input, exact source/field binding,
+conservative pre-impact basis retention and missing independent acceptance.
+Ordinary diagnostics remain unchanged; this tool supplies no reserved data or
+expected outcomes and does not change frozen thresholds.
