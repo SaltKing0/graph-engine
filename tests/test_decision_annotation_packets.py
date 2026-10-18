@@ -103,6 +103,35 @@ def test_source_freeze_tampering_is_rejected_without_opening_labels(monkeypatch)
         prepare_development()
 
 
+@pytest.mark.parametrize('mutation', ['revision', 'path', 'lineage', 'license', 'origin',
+                                     'case', 'cutoff', 'missing-case', 'missing-source', 'missing-pair'])
+def test_packet_validation_binds_provenance_and_inventory_to_frozen_inputs(mutation):
+    packet, _ = prepare_development()
+    case = packet['cases'][-1]
+    source = next(s for s in case['sources'] if s['id'] == case['update_source_id'])
+    if mutation in ('revision', 'path', 'lineage'):
+        source[mutation] = 'changed-without-changing-the-source-text'
+    elif mutation == 'license':
+        source['license_text'] = 'A different license notice'
+        source['license_sha256'] = digest(source['license_text'].encode())
+    elif mutation == 'origin':
+        packet['origin_inputs_sha256'] = '0' * 64
+    elif mutation == 'case':
+        case['id'] = 'not-the-frozen-event'
+    elif mutation == 'cutoff':
+        case['at'] = '2099-01-01T00:00:00Z'
+    elif mutation == 'missing-case':
+        packet['cases'].pop()
+    elif mutation == 'missing-source':
+        required = {case['update_source_id'], case['changed_source_id'],
+                    *(d['source_id'] for d in case['decisions'])}
+        case['sources'].remove(next(s for s in case['sources'] if s['id'] not in required))
+    else:
+        case['decisions'].pop()
+    with pytest.raises(ValueError):
+        validate_packet(packet)
+
+
 @pytest.mark.parametrize("kind", ["family", "lineage"])
 def test_export_rejects_cross_split_families_and_duplicate_lineage(monkeypatch, kind):
     original = Path.read_bytes
