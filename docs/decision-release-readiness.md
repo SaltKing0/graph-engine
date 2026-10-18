@@ -458,3 +458,36 @@ separately. The 5/95 (5.26%) >5% failure, empty-profile 3/3 misses, independent
 0/0/0 coverage and missing human/final-candidate/user evidence remain open.
 No additional checkbox is completed; keep #90–#93/#73 open and the PR Draft.
 No merge, release or threshold change.
+
+## Fresh Y1 comparison and finding freshness correction
+
+The [same-case development replay](decision-evaluation-results/false-alert-development-v1/y1-refresh-v1/README.md)
+now retains an offline-restorable Git bundle and maps original/replayed content
+and review semantics explicitly. Fresh initial-to-Y1 and post-withdrawal
+comparisons yield three and two raw candidates; a Y1 self-comparison yields zero.
+Y1 remains available, but its old support endpoint is stale; its new support is
+on the successor claim. Unknown-comparability/proposed-preview qualifications
+remain visible, without inferring independent support or accepting a decision.
+
+A bug omitted successor-head review events/inputs from candidate freshness
+pinning, causing the writer to reject a newly regenerated finding. The fix
+includes those recorded inputs within the existing bounds; stale-candidate,
+source, review, support and permission guards remain enforced. Four regressions
+reproduce the defect on the old snapshot and pass after correction. An explicit
+synthetic finding review now appends a fresh **open** finding version, preserving
+all prior versions/events. The old decision needs investigation; successor
+decision/dependency stay proposed. No activation, resolution, independent
+acceptance or semantic/product-benefit claim is made. The original 5/95 (5.26%)
+>5% failure, 3/3 proposed-profile misses, 0/0/0 independent coverage and missing
+human/final-candidate/user evidence remain open. No threshold or frozen input,
+label, historical result or review is replaced. Keep #90–#93/#73 open and #96
+Draft. No merge or release.
+
+Measured frozen fix `5b53693`: **2,186 local tests passed / 10 optional model
+skips / 1 existing Starlette warning**; **182 focused tests**; strict matrix
+**55 tests / 41 applicable cells**, 13 technical N/A. All 15 fix CI checks pass,
+including model/trust and seven advisory profiles. Eight historical verifiers
+pass at their original snapshots. All 13 known development input hashes and
+normalized alert outputs, and the original scores/gates/thresholds, match the
+prior report. Full commands/logs and the restored-bundle proof remain separate
+from independent acceptance and product benefit.

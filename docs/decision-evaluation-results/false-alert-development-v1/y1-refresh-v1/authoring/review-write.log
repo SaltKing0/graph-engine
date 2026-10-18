@@ -1,0 +1,24 @@
+Traceback (most recent call last):
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-refresh-v1/refresh.py", line 235, in <module>
+    main()
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-refresh-v1/refresh.py", line 228, in main
+    result = run(args.output)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-refresh-v1/refresh.py", line 186, in run
+    receipt = service.record_finding(request, commit=False)['receipt']
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/graph_engine/write_guard.py", line 143, in guarded
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/graph_engine/decision_service.py", line 33, in checked
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/graph_engine/decision_service.py", line 196, in record_finding
+    result = self.store.transact(request, dry_run=dry_run, commit=commit)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/graph_engine/write_guard.py", line 143, in guarded
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/graph_engine/decision_memory.py", line 529, in transact
+    raise s.RecordConflict('Review basis is stale; refresh the content and basis')
+graph_engine.decision_schema.RecordConflict: Review basis is stale; refresh the content and basis

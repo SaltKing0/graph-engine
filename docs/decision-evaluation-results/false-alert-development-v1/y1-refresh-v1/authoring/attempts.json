@@ -1,0 +1,32 @@
+[
+  {
+    "stage": "mapping-check",
+    "status": "failed",
+    "reason": "Overly strict authoring assertion compared per-iteration shared/distinct display tags across random replay IDs. Exact roots, source identity, statuses and non-inferred independence match. Raw tags and failure retained; final mapping reports their scope explicitly."
+  },
+  {
+    "stage": "review-write",
+    "status": "failed",
+    "reason": "The fresh candidate was regenerated, but the public writer rejected its stale old-decision target. Final runner records this SAME rejection as an open gate, not as a successful review."
+  },
+  {
+    "stage": "fingerprint-completion",
+    "status": "complete_with_review_blocked",
+    "reason": "Successful blocked-review capture before adding complete transitive tool/example/doc-validator fingerprints. Retained as authoring; final-v4 is the measured run."
+  },
+  {
+    "stage": "probe",
+    "status": "exploratory",
+    "reason": "Read-only exploration of the same case after scripted replay; not a new independent case."
+  },
+  {
+    "stage": "blocked-baseline",
+    "status": "complete_with_review_blocked",
+    "reason": "Pre-fix comparator capture with complete fingerprints. The writer refusal is retained as actual failed review evidence; later diagnosis identifies missing successor review pins, not a required activation."
+  },
+  {
+    "stage": "after-fix-probe",
+    "status": "complete_finding_open",
+    "reason": "Same-case probe confirms fresh open finding after the comparator fix; dirty-code authoring only, not the final frozen validation."
+  }
+]

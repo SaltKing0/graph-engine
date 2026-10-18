@@ -1,0 +1,47 @@
+[
+  {
+    "name": "references",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-refresh-v1/check_references.py"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "exit_code": 0,
+    "elapsed_seconds": 0.06385074998252094,
+    "log": "references.log"
+  },
+  {
+    "name": "replay-comparison",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-refresh-v1/compare_replays.py"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "exit_code": 0,
+    "elapsed_seconds": 0.19727449998026714,
+    "log": "replay-comparison.log"
+  },
+  {
+    "name": "diff-check",
+    "argv": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "exit_code": 0,
+    "elapsed_seconds": 0.02846462494926527,
+    "log": "diff-check.log"
+  },
+  {
+    "name": "verification",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-refresh-v1/verify.py"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "exit_code": 0,
+    "elapsed_seconds": 3.03650899999775,
+    "log": "verification.log"
+  }
+]

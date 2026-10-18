@@ -147,3 +147,24 @@ proposals; the stale finding remains unresolved and the old decision needs
 investigation. Independent acceptance and the original failed/unmeasured gates
 remain open. A fresh comparison and explicit authorized review would be needed
 before any resolution or activation.
+
+## Fresh comparison and open withdrawal finding
+
+The [fresh comparison](decision-evaluation-results/false-alert-development-v1/y1-refresh-v1/README.md)
+replays the same known case, explicitly maps its new references to the immutable
+prior archive, and preserves the replay's actual Git state in a bundle. It
+exposed and corrects missing successor review inputs in candidate freshness
+pinning; the freshness/permission guards and all evaluation thresholds remain
+unchanged. New assessments, source versions and support withdrawals still
+invalidate the refreshed finding.
+
+The initial-to-Y1 comparison yields three raw candidates; the post-withdrawal
+interval yields two; the identical-Y1 interval yields zero. Old Y1 support is
+stale at the old claim endpoint, while Y1 evidence remains available on the new
+claim. Existing unknown-comparability/proposed-preview qualifications remain
+visible. An explicit synthetic diagnostic review appends a fresh finding
+version with workflow **open**; its old confirmed/acknowledged version remains
+historical. The replay has 16 versions / 17 events, with the prior 15/16 prefix
+unchanged. The successor decision and dependency stay proposed, the old decision
+needs investigation, and activation, resolution and independent acceptance stay
+open. This is not a new independent case, false-alert score or human sign-off.

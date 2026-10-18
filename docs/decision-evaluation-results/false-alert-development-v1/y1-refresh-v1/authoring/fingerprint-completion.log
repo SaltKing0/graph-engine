@@ -1,0 +1,1 @@
+{"status": "complete_with_review_blocked", "case_id": "controls-v2/event-surviving-support", "comparisons": {"initial_to_y1": 3, "withdrawal_to_y1": 2, "y1_self": 0}, "finding_workflow": "acknowledged", "activation": false}

@@ -1,0 +1,99 @@
+{
+  "status": "pass",
+  "compared_to": "30908637cf94bacd75d69e783fef222ea38944db",
+  "development_cases": [
+    {
+      "case_id": "controls-v2/event-comparable",
+      "alerts": {
+        "curated": 1,
+        "proposed": 0
+      }
+    },
+    {
+      "case_id": "controls-v2/event-changed-conditions",
+      "alerts": {
+        "curated": 0,
+        "proposed": 0
+      }
+    },
+    {
+      "case_id": "controls-v2/event-time-only",
+      "alerts": {
+        "curated": 0,
+        "proposed": 0
+      }
+    },
+    {
+      "case_id": "controls-v2/event-duplicate-citation",
+      "alerts": {
+        "curated": 0,
+        "proposed": 0
+      }
+    },
+    {
+      "case_id": "controls-v2/event-surviving-support",
+      "alerts": {
+        "curated": 1,
+        "proposed": 0
+      }
+    },
+    {
+      "case_id": "project-v1/event-graph-1",
+      "alerts": {
+        "curated": 1,
+        "proposed": 0
+      }
+    },
+    {
+      "case_id": "project-v1/event-graph-2",
+      "alerts": {
+        "curated": 1,
+        "proposed": 0
+      }
+    },
+    {
+      "case_id": "project-v1/event-documents-1",
+      "alerts": {
+        "curated": 1,
+        "proposed": 0
+      }
+    },
+    {
+      "case_id": "project-v1/event-context-1",
+      "alerts": {
+        "curated": 1,
+        "proposed": 0
+      }
+    },
+    {
+      "case_id": "project-v1/event-documents-2",
+      "alerts": {
+        "curated": 1,
+        "proposed": 0
+      }
+    },
+    {
+      "case_id": "project-v1/event-cache-1",
+      "alerts": {
+        "curated": 1,
+        "proposed": 0
+      }
+    },
+    {
+      "case_id": "project-v1/event-cache-2",
+      "alerts": {
+        "curated": 1,
+        "proposed": 0
+      }
+    },
+    {
+      "case_id": "project-v1/event-context-2",
+      "alerts": {
+        "curated": 1,
+        "proposed": 0
+      }
+    }
+  ],
+  "original_scores_and_gates_unchanged": true,
+  "independent_acceptance": false
+}

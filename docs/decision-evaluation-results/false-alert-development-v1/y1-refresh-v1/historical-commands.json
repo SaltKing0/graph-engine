@@ -1,0 +1,98 @@
+[
+  {
+    "name": "historical-0",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "docs/decision-evaluation-results/false-alert-development-v1/verify_evidence.py"
+    ],
+    "cwd": "/tmp/issue91-historical-evidence-fb2fff2",
+    "source_commit": "fb2fff2eee39c8d3a57360e934a09613fcab0e33",
+    "exit_code": 0,
+    "elapsed_seconds": 0.6932282920461148,
+    "log": "historical-0.log"
+  },
+  {
+    "name": "historical-1",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "docs/decision-evaluation-results/false-alert-development-v1/structured-v1/verify_evidence.py"
+    ],
+    "cwd": "/tmp/issue91-historical-evidence-fb2fff2",
+    "source_commit": "fb2fff2eee39c8d3a57360e934a09613fcab0e33",
+    "exit_code": 0,
+    "elapsed_seconds": 5.719166916969698,
+    "log": "historical-1.log"
+  },
+  {
+    "name": "historical-2",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "docs/decision-evaluation-results/false-alert-development-v1/reviewed-v1/verify_evidence.py"
+    ],
+    "cwd": "/tmp/issue91-withdrawal-history-3090863",
+    "source_commit": "30908637cf94bacd75d69e783fef222ea38944db",
+    "exit_code": 0,
+    "elapsed_seconds": 6.612902916967869,
+    "log": "historical-2.log"
+  },
+  {
+    "name": "historical-3",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "docs/decision-evaluation-results/pr-review-v1/verify_review.py"
+    ],
+    "cwd": "/tmp/issue91-withdrawal-history-3090863",
+    "source_commit": "30908637cf94bacd75d69e783fef222ea38944db",
+    "exit_code": 0,
+    "elapsed_seconds": 8.206800166983157,
+    "log": "historical-3.log"
+  },
+  {
+    "name": "historical-4",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "docs/decision-evaluation-results/solo-development-v1/verify_artifacts.py"
+    ],
+    "cwd": "/tmp/issue91-withdrawal-history-3090863",
+    "source_commit": "30908637cf94bacd75d69e783fef222ea38944db",
+    "exit_code": 0,
+    "elapsed_seconds": 7.8929262919700705,
+    "log": "historical-4.log"
+  },
+  {
+    "name": "historical-5",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "docs/decision-evaluation-results/false-alert-development-v1/withdrawal-v1/verify.py"
+    ],
+    "cwd": "/tmp/issue91-support-paths-history-ad757775",
+    "source_commit": "ad757775ff6a03af46dcf6ac6872fc81b4f8ae08",
+    "exit_code": 0,
+    "elapsed_seconds": 0.9564171659876592,
+    "log": "historical-5.log"
+  },
+  {
+    "name": "historical-6",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "docs/decision-evaluation-results/false-alert-development-v1/support-paths-v1/verify.py"
+    ],
+    "cwd": "/tmp/issue91-y1-refresh/history-75",
+    "source_commit": "75b319445d8976ce3f74c7875f686e12cb8eba85",
+    "exit_code": 0,
+    "elapsed_seconds": 5.618390167015605,
+    "log": "historical-6.log"
+  },
+  {
+    "name": "historical-7",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "docs/decision-evaluation-results/false-alert-development-v1/y1-basis-review-v1/review.py"
+    ],
+    "cwd": "/tmp/issue91-y1-refresh/history-22",
+    "source_commit": "22e398a572397ca378a25ac93dc4a3b71666dd98",
+    "exit_code": 0,
+    "elapsed_seconds": 5.592867041006684,
+    "log": "historical-7.log"
+  }
+]

@@ -1,0 +1,196 @@
+[
+  {
+    "name": "full",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "-m",
+      "pytest",
+      "tests/",
+      "-q",
+      "-rs"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "environment": {
+      "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+      "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+    },
+    "exit_code": 0,
+    "elapsed_seconds": 816.5142057079938,
+    "log": "full.log"
+  },
+  {
+    "name": "focused",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "-m",
+      "pytest",
+      "tests/test_decision_refresh_basis.py",
+      "tests/test_decision_support_paths.py",
+      "tests/test_decision_review.py",
+      "tests/test_decision_impact.py",
+      "tests/test_decision_reviewed_observations.py",
+      "tests/test_decision_observations.py",
+      "tests/test_decision_source_updates.py",
+      "tests/test_decision_workflow.py",
+      "tests/test_decision_solo.py",
+      "-q"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "environment": {
+      "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+      "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+    },
+    "exit_code": 0,
+    "elapsed_seconds": 318.9393452089862,
+    "log": "focused.log"
+  },
+  {
+    "name": "refresh",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "docs/decision-evaluation-results/false-alert-development-v1/y1-refresh-v1/refresh.py",
+      "--output",
+      "/tmp/issue91-y1-refresh/final-checks/refresh"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "environment": {
+      "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+      "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+    },
+    "exit_code": 0,
+    "elapsed_seconds": 25.40433279197896,
+    "log": "refresh.log"
+  },
+  {
+    "name": "reviewed-development",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "-m",
+      "tools.decision_benchmark.reviewed_development",
+      "--output",
+      "/tmp/issue91-y1-refresh/final-checks/reviewed"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "environment": {
+      "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+      "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+    },
+    "exit_code": 0,
+    "elapsed_seconds": 210.85879295802442,
+    "log": "reviewed-development.log"
+  },
+  {
+    "name": "memory-smoke",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "-m",
+      "tools.memory_benchmark",
+      "--smoke",
+      "--check",
+      "--output",
+      "/tmp/issue91-y1-refresh/final-checks/memory-smoke.json"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "environment": {
+      "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+      "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+    },
+    "exit_code": 0,
+    "elapsed_seconds": 0.6556482919841073,
+    "log": "memory-smoke.log"
+  },
+  {
+    "name": "decision-controls",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "-m",
+      "tools.decision_benchmark",
+      "--split",
+      "all",
+      "--check",
+      "--output",
+      "/tmp/issue91-y1-refresh/final-checks/decision-controls.json"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "environment": {
+      "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+      "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+    },
+    "exit_code": 0,
+    "elapsed_seconds": 0.9783854580018669,
+    "log": "decision-controls.log"
+  },
+  {
+    "name": "workflow",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "-m",
+      "examples.decision_workflow",
+      "--output",
+      "/tmp/issue91-y1-refresh/final-checks/workflow.json"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "environment": {
+      "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+      "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+    },
+    "exit_code": 0,
+    "elapsed_seconds": 5.912193540949374,
+    "log": "workflow.log"
+  },
+  {
+    "name": "production-controls",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "-m",
+      "tools.decision_benchmark.production",
+      "--split",
+      "all",
+      "--output",
+      "/tmp/issue91-y1-refresh/final-checks/production-controls.json"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "environment": {
+      "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+      "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+    },
+    "exit_code": 0,
+    "elapsed_seconds": 66.14629729103763,
+    "log": "production-controls.log"
+  },
+  {
+    "name": "integrity",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "-m",
+      "tools.decision_integrity",
+      "--output",
+      "/tmp/issue91-y1-refresh/final-checks/integrity"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "environment": {
+      "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+      "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+    },
+    "exit_code": 0,
+    "elapsed_seconds": 129.55953991605202,
+    "log": "integrity.log"
+  },
+  {
+    "name": "pip-check",
+    "argv": [
+      "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+      "-m",
+      "pip",
+      "check"
+    ],
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "environment": {
+      "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+      "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+    },
+    "exit_code": 0,
+    "elapsed_seconds": 0.723941707983613,
+    "log": "pip-check.log"
+  }
+]

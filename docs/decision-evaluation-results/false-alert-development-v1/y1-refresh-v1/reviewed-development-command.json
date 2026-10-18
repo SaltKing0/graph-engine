@@ -1,0 +1,18 @@
+{
+  "name": "reviewed-development",
+  "argv": [
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+    "-m",
+    "tools.decision_benchmark.reviewed_development",
+    "--output",
+    "/tmp/issue91-y1-refresh/final-checks/reviewed"
+  ],
+  "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+  "environment": {
+    "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+    "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+  },
+  "exit_code": 0,
+  "elapsed_seconds": 210.85879295802442,
+  "log": "reviewed-development.log"
+}
