@@ -1,0 +1,30 @@
+{
+  "schema": "dm.artifact-inventory/1",
+  "files": {
+    "README.md": "36eff8ed6c2a2fc5b31bc61396e1c91a25e22587dd3bc5f94177cd981f47d4d9",
+    "authoring/attempts.json": "fa9c54bd5051874210a698105b1ca72f4a218c6828791f206daab3537ff12ca1",
+    "authoring/context-span-before-fix-command.json": "6b9a073ce5f525b19ee68105ae9ff785843d73856b2fd613e0d22abbbf675218",
+    "authoring/context-span-before-fix.log": "3c46b7e7d4ab1364ef7658a061925f733a5a325043b72aaf1964b4f2c49fa6db",
+    "authoring/context-span-before-fix.py.gz": "70bf4505e1809e1c5638259cf0141fcaca194fa0fc21003837f60ab64a881577",
+    "check_references.py": "e9302c31069c01dc7f57a7c8f5cff3c123aaa86c4e02077c7ecb97ff13bb9e81",
+    "commands.json": "1349e24a2908ea500d2f1daa26afa85b2b26fd7976355445a36b681255dbe195",
+    "decision.json": "0549ad7e97b22db697d5ece31d435073bb435f68b3f2696015555a029799de51",
+    "historical_check.py": "fa0ee143d08bdd71e226aa8894d712e99c69bb96887ec9b8ef45ae597957691c",
+    "lifecycle-regressions-command.json": "fddf6efe50a7d722a58fa3631b7f6611db0b7b7f809614b4ee849d956ab57203",
+    "lifecycle-regressions.log": "964ca6b97369074902f81b50f7fcdd26ee2b9f5faca63de9e08fb47476e4254c",
+    "metadata.json": "b61ab99b9393bdb27e9e7560105383dfaa2208b16523d94246aba17778485c29",
+    "prior-verifier-command.json": "f9a1f17e15b3d590c588f75d45829030002ccf3bc792de1e44e86f26b944b403",
+    "prior-verifier.log": "e22ef90ac4c675b8d9b5a7250e027b7b65bd76bf32861ef93798fd25458aaf31",
+    "references-command.json": "db110d075e8f3106cbf092c414ac365d57e233e4156b986c7d032bbf7e8cba01",
+    "references.log": "410cc24dd0ee65fa125e7e7f54b4a03f2b3b9491219371c6765eaa198627ecad",
+    "review-command.json": "9839f49388d90ca5b6ec15fa22e8bf37ac43739e5f906089feb71c90ecbf9e30",
+    "review.json": "837b11995e1bca6ff29723dbd6fec2074c184a1a21dd1d661f23e29027dc566a",
+    "review.log": "c60fe7fa9e38d2a95c2f794374366032f2edfb7338abfdfaf6bab9ffc5daa84f",
+    "review.py": "849a48a9e80beb7a6d1d0c1f02fba6affab64d8992244cbc7ff68af3157f6cfd",
+    "verifier-command.json": "76679f8f47dcba8cd2ed27a925da5536ab7e7d729f188f26bcd360caf3f57aae",
+    "verifier-final-command.json": "2c52fc80ca8e2267c7fccd8d90a7c53c7b19f00c63f8da8912cb248d28662617",
+    "verifier-final.log": "36722724809d514e24c811559b1f29a7448e61daab592a7bc875a63465e8ac37",
+    "verifier.log": "36722724809d514e24c811559b1f29a7448e61daab592a7bc875a63465e8ac37",
+    "verify.py": "096f346735039ff503c75b5e2b64d69dc559add5ef506cd20c2514e73e8d7684"
+  }
+}

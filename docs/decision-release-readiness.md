@@ -534,3 +534,24 @@ thresholds, results and reviews remain unchanged. Independent feature acceptance
 real provenance/final evaluation, user sessions/product benefit and a later
 explicit authorization to activate are still open. PR #96 stays Draft and the
 feature experimental. No merge or release.
+
+## Source/protocol review of the unsigned Y1 choice
+
+The [reviewed unsigned preparation version 2](decision-evaluation-results/false-alert-development-v1/y1-adoption-review-v1/README.md)
+retains the original plan and all existing reviews, while making fictional-event
+time, inherited unit/context interpretation and required positive future review
+outcomes explicit. Required outcome enums are protocol conditions, not measured
+or invented reviewer judgments. Actual outcomes, event IDs, scope confirmation,
+authorization and owner assignments remain unfilled; execution remains forbidden.
+Real present-world availability and execution/dataset validity remain unknown.
+
+Fresh source/identity reconstruction preserves the exact 18 versions / 19 events
+and three unresolved findings. Five existing lifecycle regressions pass and 11
+malformed in-memory plan variants are rejected; no new cases or independent
+scores are created. The original artifact verifier passes at its original head.
+No engine/tool/test/CI/dependency change or threshold adjustment was required.
+The historical false-alert gate still fails 5/95 (5.26%) >5%; proposed profile
+misses 3/3 positives and independent coverage remains 0/0/0. No acceptance checkbox
+is added. Independent annotation/final evaluation, actual provenance, final
+sign-off and users/product benefit remain absent. Activation, resolution, merge
+and release remain unperformed; PR #96 stays Draft and the feature experimental.

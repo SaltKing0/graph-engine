@@ -1,0 +1,872 @@
+{
+  "schema": "dm.development.y1-adoption-plan/2",
+  "status": "unsigned_non_executable_preparation",
+  "author": {
+    "role": "implementing-agent",
+    "human": false,
+    "independent": false
+  },
+  "case_id": "controls-v2/event-surviving-support",
+  "reviewed_repository_snapshot": "bf27c81d7c03c6483359c979603dd56c9bd2de06",
+  "brain_revision": "5faf261f3d9a292c901b06f9ed45c1ff8721e60b",
+  "prior_report_sha256": "bfaa2c51789bcb38fb9f14efefacf12f00c3e86b16f654afe436639dbaa9c54d",
+  "prior_bundle_sha256": "ad2c397eb4770193dd65b952d453817315e533e073cac1c410033f314acf972b",
+  "exposure": "Same already exposed fictional development case; no new independent cases or scores.",
+  "recommendation_now": "Defer execution; present conditional adoption of the exact Y1-only successor.",
+  "conditional_choice": "Adopt this exact successor only for the source-declared fictional rule and five conditions after separate authorization and reviews.",
+  "alternatives": [
+    {
+      "option": "defer",
+      "recommended_now": true,
+      "effect": "No state change; old decision current/needs_investigation, successor proposed."
+    },
+    {
+      "option": "bounded_development_adoption",
+      "recommended_now": false,
+      "effect": "Future authorized reviews followed by atomic old supersession/new activation; no release or independent acceptance."
+    },
+    {
+      "option": "broader_or_real_world_adoption",
+      "recommended_now": false,
+      "supported_by_known_sources": false,
+      "effect": "Do not authorize from this evidence: real execution, dataset validity and statistical sufficiency are unavailable."
+    }
+  ],
+  "approval": {
+    "selected_option": null,
+    "authorizer": null,
+    "reviewer": null,
+    "authorized_at": null,
+    "activation_authorized": false,
+    "independent_acceptance": false
+  },
+  "snapshot_observation": {
+    "preview": {
+      "schema": "graph-engine.decision-memory/1",
+      "generation": 33,
+      "heads": {
+        "9ea81ee8-bd76-40c5-b492-08f5454263d4": "sha256:44a832e4c88e17b9e58a30c5dc21f19e608ff752df45e9acf317a2b9a9db6c1c",
+        "b5c806b3-3c86-4e73-9650-68b56598c214": "sha256:78d3abfba44b8da7187760d451d4067cbe954b4aca957f82b552986967331f39",
+        "72b45328-4eee-44b2-b77c-dba05a6ef048": "sha256:32c12f495967b0d06a0f9660fbe8be46f9d3b84f7cdd506b7df26068dd1ed09f",
+        "f31ef390-3e7c-4f6a-8f95-c5eec6605baa": "sha256:76ef8da7149e90a6e2bba9e64558aa1c37cddcf816d77b4c417a4199846a86ef",
+        "5a29e2e4-eaa0-4789-b57d-907c4f1b257b": "sha256:57613a94c02a57e440b0289c74094d4b8f6cff61bc8546b4688bf66f4a0a3e93",
+        "f3518a9e-a4b5-4d98-b8f4-2ad575840b1f": "sha256:a662246f3bb1b7ec0187565bf6daaa5ee6c9893473fb160bb504bbfbdd773515",
+        "719bbe68-a5c7-49f9-8bcd-38c6f3a147f5": "sha256:8f471b2306610ec370d78424e557c1d363ba9b486e2f4758bfe4f5f0b54b9b57",
+        "74a5d198-ea9a-4a19-9c94-851b4875780d": "sha256:c1768ee0ab25ec004c972d57c9df69215a5b3c2cb8bfa08ee47dae08acdc1332",
+        "776432a7-3c6a-4a15-aeb9-104ab88e96f5": "sha256:fb71003274ba0388f58a520cb392af3f0f9fd4731b2d8261a2fa976c2cf0bf15",
+        "ae189ef4-52ca-4046-8952-0333e1e0a992": "sha256:98c8051b56227f5261346c6d45294039da4d90133282cdcf5c7d56a06f215e44",
+        "dd60c12a-d3b1-581f-9aa1-7a6459812fe0": "sha256:2d582f7134cd61e68b71111d10d02220d36c7f39f66ea091dff867ca885bef70",
+        "32b185f5-9dfc-4f2a-a882-58eeb7b702ca": "sha256:a9142f8d609e706fddc980d9fdbc6b7eb327f4c7b607514b76ba41ec889f087c",
+        "e3e8b09b-36bb-4b9c-92e0-c281c423b3d1": "sha256:f8e0a8b236e7008db58ccdb7499404f248eaa20b077402739a70a838eeadf971",
+        "4bb7f26f-1da6-526c-a08e-edfa473db82f": "sha256:01d2958d2054db0a398a72f06fcdc7f8a74a6d8a79f856efc7baa934a642652c",
+        "49ceb5f2-5903-5fab-a91f-2e9e2fbb448f": "sha256:d1109a920e2a14956295d837b05dab14ac56e203f352e927d431934ab1cdcdc2",
+        "event:b5c806b3-3c86-4e73-9650-68b56598c214:sha256:78d3abfba44b8da7187760d451d4067cbe954b4aca957f82b552986967331f39:workflow": "ca39ad7a-16bb-58a0-b4a8-a5ef02f28a9e",
+        "event:72b45328-4eee-44b2-b77c-dba05a6ef048:sha256:32c12f495967b0d06a0f9660fbe8be46f9d3b84f7cdd506b7df26068dd1ed09f:workflow": "7b124018-6c72-5f3c-a343-fbf17cecbf49",
+        "event:f31ef390-3e7c-4f6a-8f95-c5eec6605baa:sha256:76ef8da7149e90a6e2bba9e64558aa1c37cddcf816d77b4c417a4199846a86ef:workflow": "e3cd08fd-66bf-597d-b9cf-7269aa69e504",
+        "event:f3518a9e-a4b5-4d98-b8f4-2ad575840b1f:sha256:a662246f3bb1b7ec0187565bf6daaa5ee6c9893473fb160bb504bbfbdd773515:workflow": "386da0c6-fad3-5043-8aee-59cfcc1fa902",
+        "event:719bbe68-a5c7-49f9-8bcd-38c6f3a147f5:sha256:8f471b2306610ec370d78424e557c1d363ba9b486e2f4758bfe4f5f0b54b9b57:workflow": "c7f9717f-d907-5864-9b5e-ecaa2b3d152b",
+        "event:5a29e2e4-eaa0-4789-b57d-907c4f1b257b:sha256:45ab552911fabe64a79934d51d1270e22cd410c8a8090a27d4d1dc564a063b6b:workflow": "effb7a86-d10f-5dc0-93df-073a1b76a9ea",
+        "event:5a29e2e4-eaa0-4789-b57d-907c4f1b257b:sha256:45ab552911fabe64a79934d51d1270e22cd410c8a8090a27d4d1dc564a063b6b:epistemic": "fa199d7d-651c-5520-9434-fc03320e4495",
+        "event:776432a7-3c6a-4a15-aeb9-104ab88e96f5:sha256:fb71003274ba0388f58a520cb392af3f0f9fd4731b2d8261a2fa976c2cf0bf15:workflow": "df95f4d7-4de7-53d5-b425-a782d4b17902",
+        "event:74a5d198-ea9a-4a19-9c94-851b4875780d:sha256:c3466b05e8ae71bed498c06152fb672949c1df66e48ccca9aaf5ebe6a7472579:decision": "d9909b62-88c8-535e-a211-6785f4d4d66d",
+        "event:72b45328-4eee-44b2-b77c-dba05a6ef048:sha256:32c12f495967b0d06a0f9660fbe8be46f9d3b84f7cdd506b7df26068dd1ed09f:availability": "d78da009-934b-56d9-b8ae-c4a5b6d193f7",
+        "event:dd60c12a-d3b1-581f-9aa1-7a6459812fe0:sha256:c2576bbc90109b39a18a0baa706d3c59260ab6610cb82adec33eba2bd2cdbf13:finding_disposition": "dedfc646-ba4c-509f-8df3-cbf0f084d596",
+        "event:dd60c12a-d3b1-581f-9aa1-7a6459812fe0:sha256:c2576bbc90109b39a18a0baa706d3c59260ab6610cb82adec33eba2bd2cdbf13:finding_workflow": "7989bd67-3cb0-56e6-a8a4-730d1c1c1e52",
+        "event:74a5d198-ea9a-4a19-9c94-851b4875780d:sha256:c3466b05e8ae71bed498c06152fb672949c1df66e48ccca9aaf5ebe6a7472579:decision_conclusion": "c9210114-d35b-58a0-a8cc-09065116d835",
+        "event:5a29e2e4-eaa0-4789-b57d-907c4f1b257b:sha256:57613a94c02a57e440b0289c74094d4b8f6cff61bc8546b4688bf66f4a0a3e93:workflow": "7fa7c596-dc69-50e7-bbba-832c04e0c943",
+        "event:32b185f5-9dfc-4f2a-a882-58eeb7b702ca:sha256:a9142f8d609e706fddc980d9fdbc6b7eb327f4c7b607514b76ba41ec889f087c:workflow": "8526305f-a8cd-5fc4-94f5-d638871499bb",
+        "event:5a29e2e4-eaa0-4789-b57d-907c4f1b257b:sha256:57613a94c02a57e440b0289c74094d4b8f6cff61bc8546b4688bf66f4a0a3e93:epistemic": "1a4a8f36-1cca-5d2f-9588-fd9bc8515a15",
+        "event:dd60c12a-d3b1-581f-9aa1-7a6459812fe0:sha256:2d582f7134cd61e68b71111d10d02220d36c7f39f66ea091dff867ca885bef70:finding_disposition": "7d2ba4b9-e16a-5bc1-8f54-8151887e0b4c",
+        "event:4bb7f26f-1da6-526c-a08e-edfa473db82f:sha256:01d2958d2054db0a398a72f06fcdc7f8a74a6d8a79f856efc7baa934a642652c:finding_disposition": "66162cfb-87f0-5f44-9aa2-e185b71d8850",
+        "event:49ceb5f2-5903-5fab-a91f-2e9e2fbb448f:sha256:d1109a920e2a14956295d837b05dab14ac56e203f352e927d431934ab1cdcdc2:finding_disposition": "e5c39855-216b-53a2-852a-c9338538b541",
+        "source:surviving-support-basis": "8e55345935135ea55ff8183bbb6673c6323b4f6d66773e6c9a13ff572cb6ac80",
+        "source:surviving-support-update": "80fbace184517e9b6df2cc697ffdfe8246e18c03d60711193210d54c2ffaca34"
+      }
+    },
+    "not_an_execution_token": true,
+    "references": {
+      "old_claim": {
+        "id": "5a29e2e4-eaa0-4789-b57d-907c4f1b257b",
+        "version_id": "sha256:45ab552911fabe64a79934d51d1270e22cd410c8a8090a27d4d1dc564a063b6b"
+      },
+      "claim": {
+        "id": "5a29e2e4-eaa0-4789-b57d-907c4f1b257b",
+        "version_id": "sha256:57613a94c02a57e440b0289c74094d4b8f6cff61bc8546b4688bf66f4a0a3e93"
+      },
+      "old_dependency": {
+        "id": "776432a7-3c6a-4a15-aeb9-104ab88e96f5",
+        "version_id": "sha256:fb71003274ba0388f58a520cb392af3f0f9fd4731b2d8261a2fa976c2cf0bf15"
+      },
+      "dependency": {
+        "id": "e3e8b09b-36bb-4b9c-92e0-c281c423b3d1",
+        "version_id": "sha256:f8e0a8b236e7008db58ccdb7499404f248eaa20b077402739a70a838eeadf971"
+      },
+      "support": {
+        "id": "32b185f5-9dfc-4f2a-a882-58eeb7b702ca",
+        "version_id": "sha256:a9142f8d609e706fddc980d9fdbc6b7eb327f4c7b607514b76ba41ec889f087c"
+      },
+      "old_decision": {
+        "id": "74a5d198-ea9a-4a19-9c94-851b4875780d",
+        "version_id": "sha256:c3466b05e8ae71bed498c06152fb672949c1df66e48ccca9aaf5ebe6a7472579"
+      },
+      "decision": {
+        "id": "74a5d198-ea9a-4a19-9c94-851b4875780d",
+        "version_id": "sha256:c1768ee0ab25ec004c972d57c9df69215a5b3c2cb8bfa08ee47dae08acdc1332"
+      },
+      "X1": {
+        "id": "72b45328-4eee-44b2-b77c-dba05a6ef048",
+        "version_id": "sha256:32c12f495967b0d06a0f9660fbe8be46f9d3b84f7cdd506b7df26068dd1ed09f"
+      },
+      "Y1": {
+        "id": "f31ef390-3e7c-4f6a-8f95-c5eec6605baa",
+        "version_id": "sha256:76ef8da7149e90a6e2bba9e64558aa1c37cddcf816d77b4c417a4199846a86ef"
+      },
+      "findings": {
+        "claim_change": {
+          "ref": {
+            "id": "4bb7f26f-1da6-526c-a08e-edfa473db82f",
+            "version_id": "sha256:01d2958d2054db0a398a72f06fcdc7f8a74a6d8a79f856efc7baa934a642652c"
+          },
+          "state": {
+            "finding_workflow": "open",
+            "finding_disposition": "confirmed"
+          }
+        },
+        "proposed_dependency": {
+          "ref": {
+            "id": "49ceb5f2-5903-5fab-a91f-2e9e2fbb448f",
+            "version_id": "sha256:d1109a920e2a14956295d837b05dab14ac56e203f352e927d431934ab1cdcdc2"
+          },
+          "state": {
+            "finding_workflow": null,
+            "finding_disposition": "inconclusive"
+          }
+        },
+        "withdrawal": {
+          "ref": {
+            "id": "dd60c12a-d3b1-581f-9aa1-7a6459812fe0",
+            "version_id": "sha256:2d582f7134cd61e68b71111d10d02220d36c7f39f66ea091dff867ca885bef70"
+          },
+          "state": {
+            "finding_disposition": "confirmed",
+            "finding_workflow": "open"
+          }
+        }
+      },
+      "basis_source": {
+        "id": "9ea81ee8-bd76-40c5-b492-08f5454263d4",
+        "version_id": "sha256:44a832e4c88e17b9e58a30c5dc21f19e608ff752df45e9acf317a2b9a9db6c1c"
+      },
+      "withdrawal_update": {
+        "id": "ae189ef4-52ca-4046-8952-0333e1e0a992",
+        "version_id": "sha256:98c8051b56227f5261346c6d45294039da4d90133282cdcf5c7d56a06f215e44"
+      }
+    },
+    "observed_event_heads": {
+      "old_claim": {
+        "workflow": "effb7a86-d10f-5dc0-93df-073a1b76a9ea",
+        "epistemic": "fa199d7d-651c-5520-9434-fc03320e4495"
+      },
+      "claim": {
+        "workflow": "7fa7c596-dc69-50e7-bbba-832c04e0c943",
+        "epistemic": "1a4a8f36-1cca-5d2f-9588-fd9bc8515a15"
+      },
+      "old_dependency": {
+        "workflow": "df95f4d7-4de7-53d5-b425-a782d4b17902"
+      },
+      "dependency": {},
+      "support": {
+        "workflow": "8526305f-a8cd-5fc4-94f5-d638871499bb"
+      },
+      "old_decision": {
+        "decision": "d9909b62-88c8-535e-a211-6785f4d4d66d",
+        "decision_conclusion": "c9210114-d35b-58a0-a8cc-09065116d835"
+      },
+      "decision": {},
+      "X1": {
+        "workflow": "7b124018-6c72-5f3c-a343-fbf17cecbf49",
+        "availability": "d78da009-934b-56d9-b8ae-c4a5b6d193f7"
+      },
+      "Y1": {
+        "workflow": "e3cd08fd-66bf-597d-b9cf-7269aa69e504"
+      }
+    },
+    "source_manifest": {
+      "controls-v2/surviving-support-basis": {
+        "text_sha256": "079b7acb941c5992583093e0c6d6a4d5d81ad217bea51fcd535dcb0f0330b031",
+        "available_at": "2026-01-01T00:00:00Z"
+      },
+      "controls-v2/surviving-support-update": {
+        "text_sha256": "bbfdc5e54a02a1dce66d5364fdfb152450e6dd1d320c1f2245ba1385fae22379",
+        "available_at": "2026-01-06T00:00:00Z"
+      }
+    }
+  },
+  "source_facts": {
+    "predicate": {
+      "value": "0.8",
+      "operator": ">=",
+      "threshold": "0.7",
+      "unit": "fraction",
+      "met": true
+    },
+    "dimensions": {
+      "workload": {
+        "type": "id",
+        "value": "W"
+      },
+      "environment": {
+        "type": "id",
+        "value": "E"
+      },
+      "code": {
+        "type": "id",
+        "value": "C"
+      },
+      "corpus": {
+        "type": "id",
+        "value": "H"
+      },
+      "protocol": {
+        "type": "id",
+        "value": "P"
+      }
+    },
+    "citations": [
+      {
+        "source_id": "controls-v2/surviving-support-basis",
+        "ref": {
+          "id": "9ea81ee8-bd76-40c5-b492-08f5454263d4",
+          "version_id": "sha256:44a832e4c88e17b9e58a30c5dc21f19e608ff752df45e9acf317a2b9a9db6c1c"
+        },
+        "field": "statement",
+        "start": 11,
+        "end": 52,
+        "quote": "Choose mode A when recall >=0.7 fraction."
+      },
+      {
+        "source_id": "controls-v2/surviving-support-basis",
+        "ref": {
+          "id": "9ea81ee8-bd76-40c5-b492-08f5454263d4",
+          "version_id": "sha256:44a832e4c88e17b9e58a30c5dc21f19e608ff752df45e9acf317a2b9a9db6c1c"
+        },
+        "field": "statement",
+        "start": 154,
+        "end": 240,
+        "quote": "Separate support Y1: recall=0.8 under the same conditions, independent lineage run-Y1."
+      },
+      {
+        "source_id": "controls-v2/surviving-support-basis",
+        "ref": {
+          "id": "9ea81ee8-bd76-40c5-b492-08f5454263d4",
+          "version_id": "sha256:44a832e4c88e17b9e58a30c5dc21f19e608ff752df45e9acf317a2b9a9db6c1c"
+        },
+        "field": "conditions_reference",
+        "start": 186,
+        "end": 211,
+        "quote": "under the same conditions"
+      },
+      {
+        "source_id": "controls-v2/surviving-support-update",
+        "ref": {
+          "id": "ae189ef4-52ca-4046-8952-0333e1e0a992",
+          "version_id": "sha256:98c8051b56227f5261346c6d45294039da4d90133282cdcf5c7d56a06f215e44"
+        },
+        "field": "withdrawal_statement",
+        "start": 39,
+        "end": 74,
+        "quote": "support X1 withdrawn by its author."
+      },
+      {
+        "source_id": "controls-v2/surviving-support-update",
+        "ref": {
+          "id": "ae189ef4-52ca-4046-8952-0333e1e0a992",
+          "version_id": "sha256:98c8051b56227f5261346c6d45294039da4d90133282cdcf5c7d56a06f215e44"
+        },
+        "field": "availability_statement",
+        "start": 75,
+        "end": 116,
+        "quote": "Independent support Y1 remains available;"
+      },
+      {
+        "source_id": "controls-v2/surviving-support-update",
+        "ref": {
+          "id": "ae189ef4-52ca-4046-8952-0333e1e0a992",
+          "version_id": "sha256:98c8051b56227f5261346c6d45294039da4d90133282cdcf5c7d56a06f215e44"
+        },
+        "field": "separate_run_statement",
+        "start": 117,
+        "end": 182,
+        "quote": "Y1 was a separate run with known protocol and dataset provenance."
+      }
+    ],
+    "document_roots": [
+      "document-sha256:079b7acb941c5992583093e0c6d6a4d5d81ad217bea51fcd535dcb0f0330b031"
+    ],
+    "source_bindings": {
+      "basis_source": {
+        "ref": {
+          "id": "9ea81ee8-bd76-40c5-b492-08f5454263d4",
+          "version_id": "sha256:44a832e4c88e17b9e58a30c5dc21f19e608ff752df45e9acf317a2b9a9db6c1c"
+        },
+        "original_artifact_sha256": "079b7acb941c5992583093e0c6d6a4d5d81ad217bea51fcd535dcb0f0330b031",
+        "captured_text_sha256": "8e55345935135ea55ff8183bbb6673c6323b4f6d66773e6c9a13ff572cb6ac80",
+        "original_characters": 241,
+        "captured_characters": 242,
+        "transformation": "Existing Node Markdown serialization adds exactly one final newline; raw body is verified, not the whitespace-stripping display parser. Neither representation is rewritten."
+      },
+      "withdrawal_update": {
+        "ref": {
+          "id": "ae189ef4-52ca-4046-8952-0333e1e0a992",
+          "version_id": "sha256:98c8051b56227f5261346c6d45294039da4d90133282cdcf5c7d56a06f215e44"
+        },
+        "original_artifact_sha256": "bbfdc5e54a02a1dce66d5364fdfb152450e6dd1d320c1f2245ba1385fae22379",
+        "captured_text_sha256": "80fbace184517e9b6df2cc697ffdfe8246e18c03d60711193210d54c2ffaca34",
+        "original_characters": 183,
+        "captured_characters": 184,
+        "transformation": "Existing Node Markdown serialization adds exactly one final newline; raw body is verified, not the whitespace-stripping display parser. Neither representation is rewritten."
+      }
+    },
+    "measurement_independence": null,
+    "statistical_sufficiency": null,
+    "real_execution_validity": null
+  },
+  "future_steps": [
+    {
+      "id": "refresh",
+      "action": "Re-read exact heads, sources, reviews, availability and current authorization; regenerate comparison.",
+      "required_before": [
+        "dependency_review",
+        "decision_review",
+        "successor_conclusion",
+        "atomic_lifecycle_pair"
+      ]
+    },
+    {
+      "id": "dependency_review",
+      "subject_role": "dependency",
+      "axis": "workflow",
+      "observed_from": "proposed",
+      "conditional_recommendation": "accepted",
+      "permitted_outcomes": [
+        "accepted",
+        "rejected"
+      ],
+      "observed_previous_event_id": null,
+      "basis_roles": [
+        "claim",
+        "support",
+        "Y1",
+        "basis_source",
+        "withdrawal_update"
+      ],
+      "basis_event_ids": [
+        "1a4a8f36-1cca-5d2f-9588-fd9bc8515a15",
+        "8526305f-a8cd-5fc4-94f5-d638871499bb"
+      ],
+      "future_review_event_id": null,
+      "actual_outcome": null,
+      "condition": "Separate authorized review of this exact dependency; source consistency alone is not approval."
+    },
+    {
+      "id": "decision_review",
+      "subject_role": "decision",
+      "axis": "workflow",
+      "observed_from": "proposed",
+      "conditional_recommendation": "accepted",
+      "permitted_outcomes": [
+        "accepted",
+        "rejected"
+      ],
+      "observed_previous_event_id": null,
+      "basis_roles": [
+        "claim",
+        "support",
+        "dependency",
+        "withdrawal_update"
+      ],
+      "required_future_events": [
+        "dependency_review"
+      ],
+      "future_review_event_id": null,
+      "actual_outcome": null,
+      "condition": "Separate authorized acceptance of the successor within the stated fictional scope."
+    },
+    {
+      "id": "successor_conclusion",
+      "subject_role": "decision",
+      "axis": "decision_conclusion",
+      "observed_from": null,
+      "conditional_recommendation": "remains_justified",
+      "permitted_outcomes": [
+        "remains_justified",
+        "needs_investigation",
+        "revise"
+      ],
+      "observed_previous_event_id": null,
+      "basis_roles": [
+        "claim",
+        "support",
+        "Y1",
+        "basis_source",
+        "withdrawal_update"
+      ],
+      "required_future_events": [
+        "dependency_review",
+        "decision_review"
+      ],
+      "future_review_event_id": null,
+      "actual_outcome": null,
+      "condition": "Only if the authorized reviewer accepts source-declared fictional sufficiency; otherwise defer adoption."
+    },
+    {
+      "id": "atomic_lifecycle_pair",
+      "action": "One public transaction, never two separate lifecycle writes.",
+      "requires": [
+        "refresh",
+        "dependency_review",
+        "decision_review",
+        "successor_conclusion"
+      ],
+      "members": [
+        {
+          "subject_role": "old_decision",
+          "axis": "decision",
+          "observed_from": "current",
+          "desired_to": "superseded",
+          "observed_previous_event_id": "d9909b62-88c8-535e-a211-6785f4d4d66d",
+          "basis_roles": [
+            "decision"
+          ]
+        },
+        {
+          "subject_role": "decision",
+          "axis": "decision",
+          "observed_from": "proposed",
+          "desired_to": "current",
+          "observed_previous_event_id": null,
+          "basis_roles": [
+            "claim",
+            "support",
+            "dependency",
+            "withdrawal_update"
+          ],
+          "required_future_events": [
+            "dependency_review",
+            "decision_review",
+            "successor_conclusion"
+          ]
+        }
+      ],
+      "actual_outcome": null,
+      "condition": "Later explicit lifecycle authorization, fresh preview and actual prior review IDs required."
+    },
+    {
+      "id": "refresh_findings",
+      "action": "After any future review, regenerate comparison and inspect all three finding bases.",
+      "automatic_resolution": false,
+      "preserve_dispositions": true,
+      "condition": "Review/basis changes can stale current finding versions. New candidate IDs require explicit review; never reuse stale IDs."
+    }
+  ],
+  "old_history": {
+    "preserve_old_conclusion": "needs_investigation",
+    "append_new_old_conclusion": false,
+    "undo_existing_reviews": false,
+    "explanation": "The old decision is not the content head. Fresh nonterminal reviews of it are rejected; only explicit paired terminalization is exempt."
+  },
+  "findings": {
+    "disposition_changes": [],
+    "workflow_changes": [],
+    "resolution_authorized": false,
+    "unresolved_references": [
+      {
+        "id": "4bb7f26f-1da6-526c-a08e-edfa473db82f",
+        "version_id": "sha256:01d2958d2054db0a398a72f06fcdc7f8a74a6d8a79f856efc7baa934a642652c"
+      },
+      {
+        "id": "49ceb5f2-5903-5fab-a91f-2e9e2fbb448f",
+        "version_id": "sha256:d1109a920e2a14956295d837b05dab14ac56e203f352e927d431934ab1cdcdc2"
+      },
+      {
+        "id": "dd60c12a-d3b1-581f-9aa1-7a6459812fe0",
+        "version_id": "sha256:2d582f7134cd61e68b71111d10d02220d36c7f39f66ea091dff867ca885bef70"
+      }
+    ],
+    "explanation": "All three remain unresolved. A successor outcome cannot resolve a finding targeting the old version; resolution must pin the exact target outcome and meet follow-up guards."
+  },
+  "independent_acceptance": false,
+  "activation": false,
+  "resolution": false,
+  "release_ready": false,
+  "human_review": null,
+  "semantic_scores": null,
+  "user_sessions": null,
+  "product_benefit": null,
+  "independent_final_coverage": {
+    "positive": 0,
+    "negative": 0,
+    "inconclusive": 0
+  },
+  "failed_or_unmeasured_gates": {
+    "historical_false_alerts": {
+      "numerator": 5,
+      "denominator": 95,
+      "threshold_percent": "5",
+      "passed": false
+    },
+    "proposed_profile_missed_positives": {
+      "numerator": 3,
+      "denominator": 3
+    },
+    "independent_final_evaluation": null,
+    "matched_completed_baselines": null,
+    "final_sign_off": null,
+    "measured_benefit": null
+  },
+  "independent_work": {
+    "actual_execution_dataset_artifacts": null,
+    "separate_reviewers": [],
+    "evaluator_custodian": null,
+    "requirement": "Assign qualified separate reviewers and evaluator-controlled final storage for independent acceptance; none are invented here."
+  },
+  "temporal_scope": {
+    "fictional_event_at": "2026-01-06T00:00:00Z",
+    "evidence_available_at": {
+      "controls-v2/surviving-support-basis": "2026-01-01T00:00:00Z",
+      "controls-v2/surviving-support-update": "2026-01-06T00:00:00Z"
+    },
+    "applicability": "Only the known fictional event and declared five-condition rule; no assertion about a real present-day experiment.",
+    "present_world_availability": null,
+    "actual_execution_or_dataset_validity": null
+  },
+  "source_mapping": {
+    "metric": {
+      "subject": "Y1",
+      "metric": "recall",
+      "value": "0.8",
+      "evidence_ref": {
+        "id": "f31ef390-3e7c-4f6a-8f95-c5eec6605baa",
+        "version_id": "sha256:76ef8da7149e90a6e2bba9e64558aa1c37cddcf816d77b4c417a4199846a86ef"
+      },
+      "subject_binding": {
+        "source_id": "controls-v2/surviving-support-basis",
+        "ref": {
+          "id": "9ea81ee8-bd76-40c5-b492-08f5454263d4",
+          "version_id": "sha256:44a832e4c88e17b9e58a30c5dc21f19e608ff752df45e9acf317a2b9a9db6c1c"
+        },
+        "start": 171,
+        "end": 173,
+        "quote": "Y1"
+      },
+      "metric_binding": {
+        "source_id": "controls-v2/surviving-support-basis",
+        "ref": {
+          "id": "9ea81ee8-bd76-40c5-b492-08f5454263d4",
+          "version_id": "sha256:44a832e4c88e17b9e58a30c5dc21f19e608ff752df45e9acf317a2b9a9db6c1c"
+        },
+        "start": 175,
+        "end": 181,
+        "quote": "recall"
+      },
+      "value_binding": {
+        "source_id": "controls-v2/surviving-support-basis",
+        "ref": {
+          "id": "9ea81ee8-bd76-40c5-b492-08f5454263d4",
+          "version_id": "sha256:44a832e4c88e17b9e58a30c5dc21f19e608ff752df45e9acf317a2b9a9db6c1c"
+        },
+        "start": 182,
+        "end": 185,
+        "quote": "0.8"
+      },
+      "statement": {
+        "source_id": "controls-v2/surviving-support-basis",
+        "ref": {
+          "id": "9ea81ee8-bd76-40c5-b492-08f5454263d4",
+          "version_id": "sha256:44a832e4c88e17b9e58a30c5dc21f19e608ff752df45e9acf317a2b9a9db6c1c"
+        },
+        "start": 154,
+        "end": 240,
+        "quote": "Separate support Y1: recall=0.8 under the same conditions, independent lineage run-Y1."
+      }
+    },
+    "rule": {
+      "operator": ">=",
+      "threshold": "0.7",
+      "statement": {
+        "source_id": "controls-v2/surviving-support-basis",
+        "ref": {
+          "id": "9ea81ee8-bd76-40c5-b492-08f5454263d4",
+          "version_id": "sha256:44a832e4c88e17b9e58a30c5dc21f19e608ff752df45e9acf317a2b9a9db6c1c"
+        },
+        "start": 11,
+        "end": 52,
+        "quote": "Choose mode A when recall >=0.7 fraction."
+      },
+      "threshold_binding": {
+        "source_id": "controls-v2/surviving-support-basis",
+        "ref": {
+          "id": "9ea81ee8-bd76-40c5-b492-08f5454263d4",
+          "version_id": "sha256:44a832e4c88e17b9e58a30c5dc21f19e608ff752df45e9acf317a2b9a9db6c1c"
+        },
+        "start": 39,
+        "end": 42,
+        "quote": "0.7"
+      }
+    },
+    "unit": {
+      "value": "fraction",
+      "interpretation": "inherited_from_the_same_declared_recall_rule",
+      "separately_repeated_in_y1": false,
+      "binding": {
+        "source_id": "controls-v2/surviving-support-basis",
+        "ref": {
+          "id": "9ea81ee8-bd76-40c5-b492-08f5454263d4",
+          "version_id": "sha256:44a832e4c88e17b9e58a30c5dc21f19e608ff752df45e9acf317a2b9a9db6c1c"
+        },
+        "start": 43,
+        "end": 51,
+        "quote": "fraction"
+      }
+    },
+    "conditions": {
+      "interpretation": "explicit_same_conditions_reference_to_preceding_X1_context_fields_only",
+      "reference": {
+        "source_id": "controls-v2/surviving-support-basis",
+        "ref": {
+          "id": "9ea81ee8-bd76-40c5-b492-08f5454263d4",
+          "version_id": "sha256:44a832e4c88e17b9e58a30c5dc21f19e608ff752df45e9acf317a2b9a9db6c1c"
+        },
+        "start": 186,
+        "end": 211,
+        "quote": "under the same conditions"
+      },
+      "referent": {
+        "source_id": "controls-v2/surviving-support-basis",
+        "ref": {
+          "id": "9ea81ee8-bd76-40c5-b492-08f5454263d4",
+          "version_id": "sha256:44a832e4c88e17b9e58a30c5dc21f19e608ff752df45e9acf317a2b9a9db6c1c"
+        },
+        "start": 65,
+        "end": 67,
+        "quote": "X1"
+      },
+      "referent_statement": {
+        "source_id": "controls-v2/surviving-support-basis",
+        "ref": {
+          "id": "9ea81ee8-bd76-40c5-b492-08f5454263d4",
+          "version_id": "sha256:44a832e4c88e17b9e58a30c5dc21f19e608ff752df45e9acf317a2b9a9db6c1c"
+        },
+        "start": 53,
+        "end": 153,
+        "quote": "Observation X1: recall=0.8, workload W, environment E, code C, corpus H, protocol P, lineage run-X1."
+      },
+      "dimensions": {
+        "workload": {
+          "value": "W",
+          "binding": {
+            "source_id": "controls-v2/surviving-support-basis",
+            "ref": {
+              "id": "9ea81ee8-bd76-40c5-b492-08f5454263d4",
+              "version_id": "sha256:44a832e4c88e17b9e58a30c5dc21f19e608ff752df45e9acf317a2b9a9db6c1c"
+            },
+            "start": 90,
+            "end": 91,
+            "quote": "W"
+          }
+        },
+        "environment": {
+          "value": "E",
+          "binding": {
+            "source_id": "controls-v2/surviving-support-basis",
+            "ref": {
+              "id": "9ea81ee8-bd76-40c5-b492-08f5454263d4",
+              "version_id": "sha256:44a832e4c88e17b9e58a30c5dc21f19e608ff752df45e9acf317a2b9a9db6c1c"
+            },
+            "start": 105,
+            "end": 106,
+            "quote": "E"
+          }
+        },
+        "code": {
+          "value": "C",
+          "binding": {
+            "source_id": "controls-v2/surviving-support-basis",
+            "ref": {
+              "id": "9ea81ee8-bd76-40c5-b492-08f5454263d4",
+              "version_id": "sha256:44a832e4c88e17b9e58a30c5dc21f19e608ff752df45e9acf317a2b9a9db6c1c"
+            },
+            "start": 113,
+            "end": 114,
+            "quote": "C"
+          }
+        },
+        "corpus": {
+          "value": "H",
+          "binding": {
+            "source_id": "controls-v2/surviving-support-basis",
+            "ref": {
+              "id": "9ea81ee8-bd76-40c5-b492-08f5454263d4",
+              "version_id": "sha256:44a832e4c88e17b9e58a30c5dc21f19e608ff752df45e9acf317a2b9a9db6c1c"
+            },
+            "start": 123,
+            "end": 124,
+            "quote": "H"
+          }
+        },
+        "protocol": {
+          "value": "P",
+          "binding": {
+            "source_id": "controls-v2/surviving-support-basis",
+            "ref": {
+              "id": "9ea81ee8-bd76-40c5-b492-08f5454263d4",
+              "version_id": "sha256:44a832e4c88e17b9e58a30c5dc21f19e608ff752df45e9acf317a2b9a9db6c1c"
+            },
+            "start": 135,
+            "end": 136,
+            "quote": "P"
+          }
+        }
+      },
+      "measurement_transferred_from_x1": false,
+      "actual_execution_artifacts_verified": null
+    },
+    "availability": {
+      "withdrawal_statement": {
+        "source_id": "controls-v2/surviving-support-update",
+        "ref": {
+          "id": "ae189ef4-52ca-4046-8952-0333e1e0a992",
+          "version_id": "sha256:98c8051b56227f5261346c6d45294039da4d90133282cdcf5c7d56a06f215e44"
+        },
+        "start": 39,
+        "end": 74,
+        "quote": "support X1 withdrawn by its author."
+      },
+      "availability_statement": {
+        "source_id": "controls-v2/surviving-support-update",
+        "ref": {
+          "id": "ae189ef4-52ca-4046-8952-0333e1e0a992",
+          "version_id": "sha256:98c8051b56227f5261346c6d45294039da4d90133282cdcf5c7d56a06f215e44"
+        },
+        "start": 75,
+        "end": 116,
+        "quote": "Independent support Y1 remains available;"
+      }
+    },
+    "lineage": {
+      "independence_established": null,
+      "y1_run_binding": {
+        "source_id": "controls-v2/surviving-support-basis",
+        "ref": {
+          "id": "9ea81ee8-bd76-40c5-b492-08f5454263d4",
+          "version_id": "sha256:44a832e4c88e17b9e58a30c5dc21f19e608ff752df45e9acf317a2b9a9db6c1c"
+        },
+        "start": 233,
+        "end": 239,
+        "quote": "run-Y1"
+      },
+      "shared_document_not_independent_votes": true
+    }
+  },
+  "revises_plan_sha256": "6210d9238953c51d95c15e08f18f418a737422e4d7560d0526e2d7c9217d8497",
+  "reviewed_at_repository_snapshot": "a02f6eb9fdc8704e38d47f97c4f32b7e1dc2a7ca",
+  "adoption_gate": {
+    "mode": "declarative_unsigned_protocol_not_an_executor",
+    "execution_permitted": false,
+    "future_transaction_validated": false,
+    "requirements_satisfied": false,
+    "required_approval": {
+      "selected_option": "bounded_development_adoption",
+      "activation_authorized": true,
+      "authorizer": "actual_authorized_identity_required",
+      "authorized_at": "actual_authorization_time_required"
+    },
+    "observed_approval": {
+      "selected_option": null,
+      "authorizer": null,
+      "reviewer": null,
+      "authorized_at": null,
+      "activation_authorized": false,
+      "independent_acceptance": false
+    },
+    "scope_confirmation": null,
+    "authorization_verified_for_execution": null,
+    "required_source_state": {
+      "exact_scope_and_source_bytes": true,
+      "y1_available": true,
+      "claim_accepted_and_supported_and_fresh": true,
+      "support_accepted_available_comparable_and_fresh": true,
+      "old_current_new_proposed": true,
+      "current_authorization_and_fresh_event_heads_required": true
+    },
+    "review_requirements": {
+      "dependency_review": {
+        "required_outcome": "accepted",
+        "nonempty_actual_returned_event_id_required": true,
+        "observed_outcome": null,
+        "observed_event_id": null,
+        "satisfied": false
+      },
+      "decision_review": {
+        "required_outcome": "accepted",
+        "nonempty_actual_returned_event_id_required": true,
+        "observed_outcome": null,
+        "observed_event_id": null,
+        "satisfied": false
+      },
+      "successor_conclusion": {
+        "required_outcome": "remains_justified",
+        "nonempty_actual_returned_event_id_required": true,
+        "observed_outcome": null,
+        "observed_event_id": null,
+        "satisfied": false
+      }
+    },
+    "negative_or_unknown_or_missing_requirement": "defer_execution_without_lifecycle_or_finding_write"
+  },
+  "freshness_protocol": {
+    "before_each_future_write": "Re-read current authorization, exact heads, raw source bytes, availability and event predecessors.",
+    "unplanned_change": "Stop and prepare a new unsigned version; do not silently replace the pinned scope or evidence.",
+    "planned_review_addition": "Use actual returned event IDs, recompare and revalidate the next stage on current state; saved observations are not execution tokens.",
+    "raw_qualifications": "Preserve comparability_unknown/proposed_preview and stale flags until actual comparison/review changes them.",
+    "future_transaction_validation": "Not attempted here; actual signed transaction still requires fresh validation before any separately authorized execution."
+  },
+  "finding_followup": [
+    {
+      "ref": {
+        "id": "4bb7f26f-1da6-526c-a08e-edfa473db82f",
+        "version_id": "sha256:01d2958d2054db0a398a72f06fcdc7f8a74a6d8a79f856efc7baa934a642652c"
+      },
+      "preserved_state": {
+        "finding_workflow": "open",
+        "finding_disposition": "confirmed"
+      },
+      "assigned_owner": null,
+      "required_action": "Keep unresolved; after any future review recompare and inspect exact-target basis. Separate resolution authorization is required."
+    },
+    {
+      "ref": {
+        "id": "49ceb5f2-5903-5fab-a91f-2e9e2fbb448f",
+        "version_id": "sha256:d1109a920e2a14956295d837b05dab14ac56e203f352e927d431934ab1cdcdc2"
+      },
+      "preserved_state": {
+        "finding_workflow": null,
+        "finding_disposition": "inconclusive"
+      },
+      "assigned_owner": null,
+      "required_action": "Keep unresolved; after any future review recompare and inspect exact-target basis. Separate resolution authorization is required."
+    },
+    {
+      "ref": {
+        "id": "dd60c12a-d3b1-581f-9aa1-7a6459812fe0",
+        "version_id": "sha256:2d582f7134cd61e68b71111d10d02220d36c7f39f66ea091dff867ca885bef70"
+      },
+      "preserved_state": {
+        "finding_disposition": "confirmed",
+        "finding_workflow": "open"
+      },
+      "assigned_owner": null,
+      "required_action": "Keep unresolved; after any future review recompare and inspect exact-target basis. Separate resolution authorization is required."
+    }
+  ]
+}

@@ -207,3 +207,24 @@ blocked during preparation; the exact 18-version/19-event state remains intact.
 Original artifact and captured-node hashes are checked separately with the exact
 serializer-added newline retained. Independent acceptance, activation, resolution
 and measured benefit remain open; no threshold or historical review is changed.
+
+## Reviewed Y1 adoption scope and outcome conditions
+
+The [source/protocol review and unsigned version 2](decision-evaluation-results/false-alert-development-v1/y1-adoption-review-v1/README.md)
+address three preparation gaps without changing the archived original plan:
+explicit scope at the fictional 2026-01-06 event, exact Y1 metric/unit/context
+bindings, and explicit required future review outcomes with actual returned
+event IDs. The unit comes from the same rule; condition fields come from the
+explicit reference to the preceding context, not withdrawn X1 measurement data.
+Current real-world availability and actual execution validity remain unknown.
+
+The gate requires accepted dependency/successor workflow, a source-bounded
+`remains_justified` conclusion, scope confirmation, actual authorization and fresh
+heads. None is fabricated as an actual future review; all outcome/ID/authority
+slots remain unfilled and execution prohibited. Unplanned changes stop the
+process; planned review additions still require live comparison/revalidation.
+Three explicit finding handoffs preserve their exact unresolved states and leave
+owner assignments null. Five existing regressions pass and 11 malformed-plan
+variants are rejected; these are engineering checks, not new independent cases.
+The exact 18-version/19-event brain, sources, old reviews and thresholds remain
+unchanged. Independent acceptance, activation, resolution and benefit stay open.

@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-adoption-review-v1/review.py", line 249, in <module>
+    main()
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-adoption-review-v1/review.py", line 242, in main
+    plan, audit = build()
+                  ^^^^^^^
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-adoption-review-v1/review.py", line 221, in build
+    validate(plan, original, mapping, temporal)
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-adoption-review-v1/review.py", line 111, in validate
+    assert referent['start'] <= row['binding']['start'] < row['binding']['end'] <= referent['end']
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

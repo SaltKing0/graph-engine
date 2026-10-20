@@ -1,0 +1,7 @@
+Cloning into '/tmp/issue91-y1-adoption-review/history-a02'...
+done.
+HEAD is now at a02f6eb Prepare unsigned Y1 successor adoption decision without activation (#91)
+Unsigned Y1 adoption plan reproduced exactly from the existing bundle; actual reviewer outcomes and signers remain unfilled.
+18 versions / 19 events, exact existing reviews and three unresolved findings unchanged; no domain write/dry run/activation.
+Source rule, exact endpoints, event heads, atomic lifecycle constraints and non-executable plan verified.
+Historical sources/results/thresholds preserved; independent acceptance, actual future transaction validation and benefit unmeasured.
