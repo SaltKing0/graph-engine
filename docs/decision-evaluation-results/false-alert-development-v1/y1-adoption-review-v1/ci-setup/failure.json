@@ -1,0 +1,36 @@
+{
+  "failed_head": "0c7e0a8db5ca412f7c29c60e4db651d99b0544f6",
+  "failed_run": "https://github.com/SaltKing0/graph-engine/actions/runs/39431579366",
+  "jobs": [
+    {
+      "job_id": 118657687026,
+      "name": "test (3.12, Chromium)",
+      "failed_step": "Install browser dependencies"
+    },
+    {
+      "job_id": 118657687170,
+      "name": "test (3.12, Decision Memory integrity matrix)",
+      "failed_step": "Install matrix transports and browser"
+    }
+  ],
+  "error": "ERROR: Playwright does not support chromium on ubuntu26.04-x64",
+  "tests_executed_in_failed_jobs": false,
+  "compatibility_fix": {
+    "workflow": ".github/workflows/ci.yml",
+    "job_ids": [
+      "test-browser",
+      "decision-integrity"
+    ],
+    "old_runner": "ubuntu-latest",
+    "new_runner": "ubuntu-24.04",
+    "playwright": "1.58.0",
+    "installed_registry_evidence": "playwright/driver/package/lib/server/registry/index.js contains ubuntu24.04-x64",
+    "test_commands_changed": false,
+    "skip_failure_guards_changed": false,
+    "thresholds_changed": false
+  },
+  "independent_acceptance": false,
+  "activation": false,
+  "note": "Failed setup is not a passed browser or integrity gate. Fresh compatible-runner results are tracked on the PR.",
+  "raw_patch_storage": "workflow.diff.gz preserves exact patch context spaces. A plain staged whitespace check first flagged those context-only spaces; compression preserves bytes while allowing the unchanged whitespace rules to pass."
+}

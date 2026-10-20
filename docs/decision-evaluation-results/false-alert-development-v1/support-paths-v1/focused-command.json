@@ -1,0 +1,23 @@
+{
+  "name": "focused",
+  "argv": [
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+    "-m",
+    "pytest",
+    "tests/test_decision_support_paths.py",
+    "tests/test_decision_reviewed_observations.py",
+    "tests/test_decision_observations.py",
+    "tests/test_decision_source_updates.py",
+    "tests/test_decision_workflow.py",
+    "tests/test_decision_solo.py",
+    "-q"
+  ],
+  "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+  "environment": {
+    "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+    "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+  },
+  "exit_code": 0,
+  "elapsed_seconds": 139.21780704101548,
+  "log": "focused.log"
+}

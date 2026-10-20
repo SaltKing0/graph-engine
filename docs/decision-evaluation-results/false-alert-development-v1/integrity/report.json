@@ -1,0 +1,2434 @@
+{
+  "schema": "dm.integrity.engineering-run/1",
+  "source_commit": "f506e6694bbc9a9c19390c2e7c33f60216b8cf6c",
+  "dirty": false,
+  "invocation_directory": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+  "python": "3.12.14 (main, Aug 12 2026, 13:57:54) [Clang 21.0.0 (clang-2100.1.1.101)]",
+  "platform": "macOS-26.7.1-arm64-arm-64bit",
+  "dependencies": {
+    "PyJWT": "2.15.1",
+    "PyYAML": "6.0.3",
+    "Pygments": "2.21.0",
+    "annotated-doc": "0.0.5",
+    "annotated-types": "0.8.0",
+    "anyio": "4.15.1",
+    "attrs": "26.1.0",
+    "certifi": "2026.7.22",
+    "cffi": "2.1.1",
+    "click": "8.5.0",
+    "cryptography": "50.0.2",
+    "fastapi": "0.141.1",
+    "graph-engine-memory": "0.7.0",
+    "greenlet": "3.5.6",
+    "h11": "0.16.0",
+    "httpcore": "1.0.9",
+    "httptools": "0.9.0",
+    "httpx": "0.28.1",
+    "httpx-sse": "0.4.3",
+    "idna": "3.20",
+    "iniconfig": "2.3.1",
+    "jsonschema": "4.26.0",
+    "jsonschema-specifications": "2025.9.1",
+    "mcp": "1.30.0",
+    "numpy": "2.3.1",
+    "packaging": "26.3",
+    "pip": "26.2.1",
+    "playwright": "1.58.0",
+    "pluggy": "1.7.0",
+    "pycparser": "3.11",
+    "pydantic": "2.14.1",
+    "pydantic-settings": "2.16.0",
+    "pydantic_core": "2.50.1",
+    "pyee": "13.0.1",
+    "pypdf": "6.21.1",
+    "pytest": "9.0.3",
+    "python-dotenv": "1.2.4",
+    "python-multipart": "0.0.32",
+    "referencing": "0.37.0",
+    "rpds-py": "2026.9.1",
+    "sse-starlette": "2.4.1",
+    "starlette": "1.8.0",
+    "typing-inspection": "0.4.4",
+    "typing_extensions": "4.16.0",
+    "uvicorn": "0.35.0",
+    "uvloop": "0.23.0",
+    "watchfiles": "1.3.0",
+    "websockets": "17.2"
+  },
+  "environment": {
+    "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+    "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+  },
+  "matrix_sha256": "4be07b14c54a811191a216e5758dbd0d32c045c3acb9ef407c4004c69a73a048",
+  "code_manifest": {
+    ".github/workflows/ci.yml": "9aeda8ea7a4ba52227e412f2c95aa06821537ed2f197020ccb9fb8d93cfa5f2c",
+    "docs/decision-integrity-matrix-v1.json": "4be07b14c54a811191a216e5758dbd0d32c045c3acb9ef407c4004c69a73a048",
+    "docs/decision-memory-v1.md": "a272e747c85262090eb4f2bcfb8332558de498d0efdecf8d050ccdf46df94829",
+    "graph_engine/__init__.py": "8a8d8c7b6d82373e8288533d448f7809f1d7402ae942b8e39238050f6b3904cd",
+    "graph_engine/__main__.py": "422df2f2ca3ab4e2da0567c7c50045d6c445249619cdc138f38ed44baf464ed8",
+    "graph_engine/access.py": "3f517bad19590d5e2a237c0c8faa3f0fcdd3e6bf46f03fe7067373fb33c172b2",
+    "graph_engine/agent_memory.py": "5371149e2eefd7a89b48d11834b11dc8f6a82cf5b44cd96b95046d6acf790240",
+    "graph_engine/brain.py": "daed44ddfbc070a6b7d801af740fe3c797f4969cf70664321170744029a3e992",
+    "graph_engine/brain_engine.py": "dd05cec10d0e06b3dc8b58fc4638ead70d91f8b565190f9570798b88209f108f",
+    "graph_engine/communities.py": "85eb3e66b3c0e0385e108f6ccadc16646bbc38f2f0acee379eaaef7d9547e958",
+    "graph_engine/consolidation.py": "9ee178a7f5ca2d7aa218e05d1f1e6d93eadefeeccb0b6b57bf7e6ae25dbf276b",
+    "graph_engine/consolidation_protocol.py": "015ef7cccd4b4d53aa5d76463a926c26513124abfb1892400718f0875f6aea0d",
+    "graph_engine/context.py": "def373d0bace62e2b59bff048b0df66c69635c6f5dd90a935442fe944962f133",
+    "graph_engine/decay.py": "4f8d18e6193120b8a6c8696bf7bc6448f2578ffd4a3acfbcecf903bebf3a0822",
+    "graph_engine/decision_brief.py": "8208b4612b6807040687ed5dc1f92b5954d3c25d73506b128203d417be309256",
+    "graph_engine/decision_impact.py": "343f17849627c38384776d2361e3cd1fc2fdb51968d2a4d215ff21c2cc85855b",
+    "graph_engine/decision_memory.py": "4f859f750e393fdffb1dee9150bceb7cd7715824c19cc16ebb031e50a695984a",
+    "graph_engine/decision_review.py": "68c270c137a40daadfba53714879b4fa74dffb29f1a7370df5b949b9dab84c70",
+    "graph_engine/decision_schema.py": "81ab5831b2165006910fc78f014ed3ac9913e662c327c07979751727e049b291",
+    "graph_engine/decision_service.py": "ff77fa33e7d99e25ada4d0650d229abbf04f3c0d57ef665233b581e6cbebd123",
+    "graph_engine/demo.py": "5f433788e7b7e37f511a8dd4976e37a70844c8be39e2d7449e9213dc9b964333",
+    "graph_engine/document_import.py": "df9788af1e0cfd26c79f5a73ecea79dec0cc78b93b81c19c493c093290afa66d",
+    "graph_engine/dream.py": "d542521b417321e3ec7b16a4dfad96e4b201bdd3a133f10fde6758d59137d487",
+    "graph_engine/embedder.py": "249b80e4f1eee10c6a684515a88f515a1a46f757c4290fc6af0f5e8cecfe0262",
+    "graph_engine/engine.py": "afd83939e362af9ca9f6fcbfce76c7b964a8ac74a5dca497af248b3ebe11b071",
+    "graph_engine/entities.py": "a2f522a9261daa98f0e55fcb321f759a977cba3481acbc0e9b7111267ae9bf77",
+    "graph_engine/evals.py": "89707e51401bb893b91d3209a2fd63b9b7d21b0ac1241b5d64718d9881b76d96",
+    "graph_engine/feedback.py": "1e4962e08365449ac7ad2b43c4f36fb43f0f03340b984bb9b2d8ea366fd20935",
+    "graph_engine/gaps.py": "55157c66838aa66383aee65a06c6c4ee8aafdf308146335cc7a31cbdefa624a8",
+    "graph_engine/graph.py": "05ef8ae744842ccff02c523cc620c91b1a4f905c394a897520461d5127a2f40d",
+    "graph_engine/graph_retrieval.py": "2a4b2d5dce255054fb83816a3478dc9aac6c919682c3aa0ae9b537485989c769",
+    "graph_engine/hygiene.py": "9bf533e606cb6cd7abe6e5e2791b6ad312d96fba88fe90b43a9e3c70ffa4d812",
+    "graph_engine/inference.py": "547494fcd8060ca94188d0de032952bc04a032e6b1dace72c5eb943616081269",
+    "graph_engine/intent.py": "42bcd85e156ee3433135b3f9286fbd47036649f25022d5fa93b54636c6b772a5",
+    "graph_engine/maintenance.py": "8f3ff8701b6994ab2e30b42f9cdb73891de47f5ca869aa0d0be4dfdef05b0d62",
+    "graph_engine/mcp/__init__.py": "8d44f4694966bc465fae60344c86a8d7436e2c6de9faaa7119694c9cb67ac649",
+    "graph_engine/mcp/agent/instructions.md": "3b747f291a77d7457a7b961cfbe205d22415a2150a9652aedf7cf5f6da6dffc4",
+    "graph_engine/mcp/format.py": "c89cfeedc39fbb4adb20c897590123084b94411ce04ee964c295117d8b8cb937",
+    "graph_engine/mcp/server.py": "d3c15481bc184710a39cc9a193a4f36f60e86d4f1c75c80ad3a00850074811b0",
+    "graph_engine/merge.py": "28adf9621bcb1d95c07619904a9e3d85a7d51b8495776d84b25efd066e094fd1",
+    "graph_engine/model.py": "ff001150b344b9207552180d873c2c2dad492b11fc8e8a23d856c12ba97af60b",
+    "graph_engine/namespaces.py": "04117225ed38c2d4dfa466aff6014af681e9336d07ae8aeacdfaace6528c8dcb",
+    "graph_engine/recall.py": "af8d139631e2d1d87fdf0449ec3e7413d8597916e1c673d74aa289d6a0b9c6fd",
+    "graph_engine/replacements.py": "4401a4bb6ea06c6f9409dd5109c52011cbadb8b39aca55dbd01eb6ae9282fdb9",
+    "graph_engine/report.py": "3f1ee4be9ecc1bd43f981fc7960dd00d6875d5221a11d49651989c8bde63253f",
+    "graph_engine/reranker.py": "c2139f2fef02d3818cec7555ebcdb28781f7c1441977fd12b7a44621c1456dc7",
+    "graph_engine/retrieval.py": "aeefb80f9818247a2879263d438fda755802622a1bb0ca87919651fa96ad177d",
+    "graph_engine/review.py": "866475018dea7babdd1c160703139e71444facf0026af99e4b91f495fca88f1f",
+    "graph_engine/runtime.py": "63ba83979a6b7990c27dbddd387a3eee338376895f24c9584837d9c027b80f3b",
+    "graph_engine/search_index.py": "2910dd74fb065d205bcb5c5c1233c4c4bfd99a82ee0359c5d2e574ccb815884e",
+    "graph_engine/server.py": "7a93d128846768a184c78be3c29a212db4c5c45b658d83c21a795796c00ea577",
+    "graph_engine/similarity.py": "9ffd20d70bdc45b7358858ae34d7d31977db02b72a153d1034195cf7b2b1f82f",
+    "graph_engine/snapshots.py": "8199a5032a70e0d6fb777eaf8bab3a234cb18eed45445efb455681302b6cdfbe",
+    "graph_engine/store.py": "e9b478a3ccea228d76c9867d297e9632866865f2fd9b14d39f74b9a26b0f078e",
+    "graph_engine/suggester.py": "39043e874b0fd9d3e8ff51f4815a6f99bf00430038b6ec632344dcaa94c94808",
+    "graph_engine/temporal.py": "83002c390232dcc45983588138c4354b043474fd4e582c5e3f7aeef16d0d44e9",
+    "graph_engine/tiers.py": "96fab08fc6a2358587e0deff0d5541a602387ae2b385dc91ac12f339c8f177f8",
+    "graph_engine/timestamps.py": "18a83710d2d5219941b55e7c7c765c8d51f2e81eed4b5e7222f6c3ba2d73423e",
+    "graph_engine/vector_cache.py": "c5d8139848d88e8b552343fb060b7f082fa6036ae2f6526353f93c6694c27d96",
+    "graph_engine/web/app.js": "9aad56a29f004aecb282e6e12bb8d014142b56a08201d347b5efd32af26120d8",
+    "graph_engine/web/decision-review.js": "61f6ff30bd96d19f41ae05f7c6151e47738561ef3a73a6c7bfac15cf33751ab2",
+    "graph_engine/web/index.html": "fcb57cc2463840d7c1e03f0f6bf2e44f7a270c39d7f96272ab88631f157d9946",
+    "graph_engine/web/report.html": "ccfa5230706673f1429783137ba30f2f58eaeb35a84a507fd2594b925cd6dc94",
+    "graph_engine/web/report.js": "3f037e635524e7901225c4708b6194b0f24cffa01262d4a70e21da8eceebd22f",
+    "graph_engine/web/review.html": "60a5c68db3f38b4014e9d161e34bc58c32415960535e30ba1c24a5b4d7c63f8a",
+    "graph_engine/web/review.js": "95100c8461f64f6ab73c5c6535f752b85e1dbd448aa648640a746a80d3defb4a",
+    "graph_engine/write_guard.py": "9b589bd35ca3a97db4f9432dcfbe8cdb5d82aa3c5b349cb136bb3b4ea7ab2e3f",
+    "pyproject.toml": "a07f58b0ac430e638a1fea0a25844c076097268616733c9ad7558a4a665d5cc7",
+    "tests/conftest.py": "bb0cc77297b1d2cf994317d9046da0c5e8d5511d7a16eb12adee413f49a71525",
+    "tests/test_access_namespaces.py": "e75c377488730e70fa20511e5d854cf1f1c1c0c27fd5565dee428a0d77a714a8",
+    "tests/test_agent_example.py": "6fe1a292b0b73d697ff992b19f8a748cf950a4a048faada3a9a76f28a4f36dd6",
+    "tests/test_agent_memory.py": "956408dadd466458d394c99255ef184376df3d416f192d6877db1e1a09197b28",
+    "tests/test_audit_fixes.py": "df33d12a6649a5cea84c6d517af145698a9ee7a65554d20de30c821267ce230e",
+    "tests/test_brain.py": "76f87e706cbbf8e7bf76e92e90f91fa5be6b4a0d0a9f8e6446e2746849286f90",
+    "tests/test_cli.py": "ec6627f26a77b66fca9a6a454aae5102780c62d5d4f2289dd58500814bf2c1e2",
+    "tests/test_communities.py": "d0fd61eb03a5f51eef328068e7252bb508911a0faa22082bf93b1abd720c3cc9",
+    "tests/test_consolidation.py": "f05fe8f7fe674d40ef942b42a23bf683ffd1fbcb487aa360e58fb0a0790a5157",
+    "tests/test_consolidation_protocol.py": "ac23e578ea019b3753fd01a18baaaefa3a40f23e1c61549093489f23849616e4",
+    "tests/test_context.py": "b9775f9eee070d826a30972d4f39485c02987516f5958c4b28554b275c94475b",
+    "tests/test_decay.py": "7965c437815becc329cc300c4a2b76ec0e63f8d3ba8f1faa6b4d9c8a76241247",
+    "tests/test_decision_annotation_packets.py": "5ec1a8e647c64a5e4dfac9c12c82254832471f3eb939f3ddb458349b5a4e5a61",
+    "tests/test_decision_benchmark.py": "7e67075536e75708d55b5428f4228e383cb0de93a54e2312df2acc4b330002d5",
+    "tests/test_decision_brief.py": "8b0cc95857ad54bff8e561d5f013ede83ba1f56307c0c0fb8e899426fcf74e40",
+    "tests/test_decision_impact.py": "87918d40b908df5703539682f019f995b1fb0b0beb3d4d8c19005835b9a0f62e",
+    "tests/test_decision_integrity.py": "2c3e9dd7cb9e3927fb66a5791fc3b52a379a2bb770396de41e620ba6aa952fe1",
+    "tests/test_decision_integrity_matrix.py": "a5ce28661f9b475f6598e046b867de6f80f53a778aaf5fcbfed8fd6ba11f2d3b",
+    "tests/test_decision_memory.py": "5fff41b86e787da7dd76e2b7ff804d75943ea0d518d54420922445229b3271ea",
+    "tests/test_decision_review.py": "8d8e4246a9ba84f84c981a85f57154afc2ae3d958de6267ba66e733894e2f9fc",
+    "tests/test_decision_service.py": "3ff480ade1bd3b3c014d7a7e41ab310fcd5d1f30e5333d7edf8192164a5a4d50",
+    "tests/test_decision_solo.py": "477fa39798fba292582303807e47ed9d96b347d788ee133733cea0bd67da713a",
+    "tests/test_decision_source_updates.py": "527d83f4ec68eca06fde8d4a8e65b059033fd6e3912628db0c34b04b7e095ec9",
+    "tests/test_decision_workflow.py": "668aebb2c9c20f479732f54de5507274417e529c7c86be16a5e04209c2aaa8b0",
+    "tests/test_demo.py": "c7d9c24eee3b328144e0772e1a9c21b44906cd4b38014079e7c7483398bf7a3b",
+    "tests/test_dependency_audit.py": "450cbdd4297fdcda84541dbf0c58216881e9d5701abd94c09925942c97ec5951",
+    "tests/test_document_import.py": "5902911f73463c8e77e8dd3ee156c6bae81f634b1613af1e356aa4204138867b",
+    "tests/test_dream.py": "bd96fb32acffcaeaf75851a0e6cfa82c9918bbda4966f6b1ea235ca225123939",
+    "tests/test_entities.py": "8e03dd8f60170d010392d0229ff53cb7d3e3b0615c5efa634696c83bb00c3e61",
+    "tests/test_episodic.py": "8337056f9201cd95a3071a79c05ddcdb9da23c08c25bf91adb06eb817d4a5f9c",
+    "tests/test_evals.py": "5692fdb76c828659c758016f7447d3672b740d19f564768e181afde6828b1023",
+    "tests/test_explain.py": "2515078f9ad04c415de3452727edbe8db7d8f0afaac0efb9c3587b91b25ee447",
+    "tests/test_fact_replacements.py": "f7b84fcb61369dbff5b8e1fdfad96bc46a2bc85edf8072091cac09716a4177a5",
+    "tests/test_fact_validity.py": "818344a4fe30b7a03009ce77fad54bb369013d057cdb36315a8e64f46ce3c132",
+    "tests/test_feedback.py": "0018830dba0c98dda287daf49fa22dd356432c09a94b20b802b22b753cbaf447",
+    "tests/test_frontend_xss.py": "81f7ef564be14e1df6f1a0d2276a270a968b736f8de409d5d2e55b2e77713ed1",
+    "tests/test_gaps.py": "782afecc3a88d4e2f6dced3192b71ddcc72c4ea907b7a27cf1723458fd4e04aa",
+    "tests/test_git_mode.py": "d177540253e4d56f7c2e0f60c1a2bca0f204a639ea7d2d53edae866477b451de",
+    "tests/test_graph.py": "3696f113d88abddd027bfb64d5d893424b4fbae197bb04c4e85e97fabdbf17ab",
+    "tests/test_graph_retrieval.py": "4c9817c6a40d6f2330f46e7f6cbacf4be346d9cb10ca488af0d414866a73c9b6",
+    "tests/test_hygiene.py": "0ee9c7a0fe09ad421fb42ec03f6ab2af924ad11a8ba39cdcceab1f4ae7a0202a",
+    "tests/test_hygiene_reports.py": "10e8691cc940376c1efec8a2e94000701fa7a1c9f999d5ae899f5db4f1d381a7",
+    "tests/test_ig_cycle_gate.py": "a53bc4666de95e5733c9de0c5a6f70c35ce7bab45f75140c33f16cde5a69bb92",
+    "tests/test_inference.py": "a14f0d934434540ee7b587d1c783e92be0f2c07dc85bcd3817bfb7acd58f5fd0",
+    "tests/test_ingest_extraction.py": "8ada07f18ab6f55820febd824916d493f3511b3509176f7cfceed0487547026e",
+    "tests/test_ingest_validation.py": "d1235b9e32dc18d1c2af93d3ec886b305ee0201e40d3afc510a08a93f5910909",
+    "tests/test_intent.py": "dc3b6bd3fed6f0a7ec256aef33405688eee25ab04b440f388247b1520a7bfa7a",
+    "tests/test_maintenance.py": "3d3e71344af22e6bbe212dd8d98f1efad9b881e875020b31c22f128265dbec38",
+    "tests/test_mcp.py": "96b15aeeae54d4c71c99b243ea01d5fc4ddddd4d2fea1bc21b0d9f4cdaf39ade",
+    "tests/test_memory_benchmark.py": "a682e1c92a1ddeecca214c90a3610045a02b4c9da06b4503cc8aa9f55654c20e",
+    "tests/test_memory_tiers.py": "997e12aadedc5816266f0180245950a8c64c12cf74caeb488a05ef2d5c664dd7",
+    "tests/test_merge.py": "8c4b63d95c7afca45245a8f2732787f593f3480197fe9321f73888f02b81d487",
+    "tests/test_model_resources.py": "090236663d14c14fcb81339077d92ac41d785376f926171a010a12028b054c4a",
+    "tests/test_model_trust.py": "7d63c0789f8c84f1f94321b69cdf799330eb1a8d1334773e81f633625c21b67b",
+    "tests/test_recall.py": "8806f563f4008f07d5b18ad7a9f7ba2a6cc4bc19258c874039bc911ac1d83416",
+    "tests/test_recall_idempotency.py": "970ca71e77b8b3ed14ecba378d3d9179a63018619dd99b8ff0d9035bf55d5626",
+    "tests/test_report.py": "1ae179abe99e28b032205da1e001da058d38733cf6e69da1c33df94af99db38b",
+    "tests/test_retrieval.py": "40343a238ee0090ab26e244670c781132b5849faf6ac44d481236bc50d574c37",
+    "tests/test_review.py": "42c8823c0ea6dc0abf17185604b8c5903888a36b8cb1f192c45e462a94dd5217",
+    "tests/test_search.py": "1dccd2c3980559c36f5564dcfb435637f9216fcf0ec70effe978a538ab5bdff3",
+    "tests/test_search_index.py": "09545feefcc1fa0791acf580a9f56f49f41f13765fcd749dd6e8c7f7d82a217f",
+    "tests/test_server.py": "ac4f17ec0f335d0785dda95c5f9979717a2975bf6fb8a66d977a66a07f44c7da",
+    "tests/test_server_errors.py": "c48c23ded91876d163c95fef8538ebdfe61717b6c7d6df3f4115ed189f97e2fd",
+    "tests/test_snapshots.py": "33eb97bfeb083cc400103d89852d4930319bf87cc2258c220cd68d13b14647e6",
+    "tests/test_temporal.py": "d2ce91892dc364dcc4e5971d8f02e1141ae514f823db3823009559ce1985b40b",
+    "tests/test_tools.py": "335c069e709e2b2ab75baf8a342ff0353de274b761d049d57f298916d54d70f9",
+    "tests/test_write_guard.py": "6beec0af8d29b33597c7edde529d24fee8f1579bea17c26bd3e5a09f546966c9",
+    "tools/backfill_origin.py": "345cb6deb585d791438c9186b3bafdfe8b4fbfec5daf3291709f232b24bd82d3",
+    "tools/decision_benchmark/__init__.py": "b4fe842811829eb9c9966c8707bb1af33a4cf382d31cab1c91bbc2728a8e7b78",
+    "tools/decision_benchmark/__main__.py": "2bac4fa31396aaf4324368f82acd8fa1b3c35a76597d7afb9929b95470790b97",
+    "tools/decision_benchmark/annotation_packets.py": "944d2c36b2f984e95758b08204923c1b43e8d5a78e1d8102f4e8f57a4a9c7cee",
+    "tools/decision_benchmark/corpus.py": "46f1cef375c0ada4b18ffbdeec300c648b68af59adf7ed44ade358fdace58d8a",
+    "tools/decision_benchmark/freeze_sources.py": "6177bfc0d0cae4f6127c585f365bb1863a3fae9b562cf1cd9f20a1a460804166",
+    "tools/decision_benchmark/production.py": "9b87ebdb86102a37d8aebe279f2129258bce63e961d5b29d423493c7fa374886",
+    "tools/decision_benchmark/readiness.py": "0629caa2a3cfa0399d32a752d3c201f6012ab465ffecf5977d32d1c1bbd075e2",
+    "tools/decision_benchmark/runner.py": "13d65a992eec0d4168e65172ad5ea4bb47fc9b176980f8f9c7c09e9aaf20da71",
+    "tools/decision_benchmark/scoring.py": "7d13a59d21202dac2b9fe2bb21f9e97ee7b9ca0bf9774f28c3b51e72f5c6366f",
+    "tools/decision_benchmark/solo.py": "08e212b4c8eebb6cc4c46ee1645582e345d662cbe3bc1e070ec075626b0e7f2f",
+    "tools/decision_benchmark/synthetic.py": "96f0b1db91b05de5be9c49c9e238b64c0e2202a54259c89c302c183142d7df82",
+    "tools/decision_integrity.py": "b2fc4c87241b6d70c1661ef33ea9455d674dc80c7fc925c04256496ba4a41fa9",
+    "tools/dependency_audit.py": "afac399f661286c3e98e2a1ba6867eb07c137aa628817943c5789d878e6968c4",
+    "tools/ig_adapt.py": "972a62a2f9e09d1bcf062efb68ad12936f696f76800b1712b1357a8bc6120298",
+    "tools/ig_cycle.py": "7574c79afc4a67894fd963ade1a040806eb521a639e0a606e3312f15fd5dc5ee",
+    "tools/ig_evolve.py": "f49d227b2e6e198d07c22b34ec6f3d3c37c7b8d607546e1a1dd30fb8bb46539d",
+    "tools/memory_benchmark/__init__.py": "4697afa15d32363557e9e5a66f6625a291d33a04eadca592c682b3b747ecb17f",
+    "tools/memory_benchmark/__main__.py": "6e90c6a8f91b02854c6068a68cc39c6f1718aab4cf24c8067cf0ae252c930d84",
+    "tools/memory_benchmark/adapters.py": "146b187e10dc96409facc39f99e8dc8f092c5014b7b8982c42be3445204d2be4",
+    "tools/memory_benchmark/answers.py": "7334a046def3dc42ebe38cc2e96b47c2f4c3fa7921318a6d58f1a19d39bff3bf",
+    "tools/memory_benchmark/dataset.py": "bfe01cede6465347dfd569ef950a614cbe39317e09d988c9aeded3e7685af122",
+    "tools/memory_benchmark/embeddings.py": "bfdc69edc0ee75f9845b5338a7adc6545a38ed69fa117485f3861142bf217be8",
+    "tools/memory_benchmark/runner.py": "c09feaffc9b8c2d2e3b5f27246ba98f0c03992c51b04ae1069ecd5d55dfd3eb5",
+    "tools/memory_benchmark/scoring.py": "a2e53fb042c443a0a8e15a393c10624734596cb99e77fe26d4f799b5ecfc539e",
+    "tools/migrate_kinds.py": "ad6ee5366717ae88cdb0edc2a6488ee40595490ddc46e5e4ca2f370c6bbae9c1",
+    "tools/retrieval_benchmark.py": "71bdf3e6aca9502424dbddca27d1018281adfe65e9884377c248c541c1769bcc"
+  },
+  "code_sha256": "8082856238f4b42718f89624afc0d455903bacd2b2ca7427b231a2b08a9cd897",
+  "pytest_args": [
+    "--rootdir",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_cli_cannot_merge_version_pinned_source_or_reassign_reviews",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-cli]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-exports]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-http]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-mcp]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-service]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-cli]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-exports]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-http]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-mcp]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-service]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-cli]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-exports]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-http]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-mcp]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-service]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-cli]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-exports]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-http]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-mcp]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-service]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[commit-cli]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[commit-http]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[index-cli]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[index-http]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[dependent-undo-cli]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[dependent-undo-http]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[fresh-undo-cli]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[fresh-undo-http]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[stale-cli]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[stale-http]",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_simultaneous_cli_proposals_have_one_winner_and_lossless_retry",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_integrity.py::test_simultaneous_http_proposals_share_generation_and_preserve_both_on_retry",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_memory.py::test_claim_wording_and_context_edit_never_transfer_review",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_memory.py::test_commit_failure_preserves_authoritative_receipt",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_memory.py::test_interrupted_sidecar_publication_leaves_only_reusable_anchors",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_memory.py::test_missing_and_cyclic_node_lineage_fail_closed",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_memory.py::test_pinned_merge_refuses_before_any_changes",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_memory.py::test_sidecar_reference_acl_checks_basis_anchor_as_well_as_source",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_memory.py::test_source_edit_versions_exact_bytes_and_marks_basis_changed",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_memory.py::test_stale_generation_and_source_hash_previews_conflict",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_service.py::test_explicit_revise_and_guarded_undo",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_service.py::test_import_propose_review_changed_source_and_stale_review",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_service.py::test_post_publication_failure_returns_durable_retry",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_decision_service.py::test_undo_fails_after_dependent_review",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_frontend_xss.py::test_decision_impact_full_browser_flow_and_pinned_brief",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_frontend_xss.py::test_decision_integrity_brief_keeps_selected_revision_after_later_edit",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_frontend_xss.py::test_decision_integrity_published_finding_failure_preserves_receipt_and_history",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_frontend_xss.py::test_decision_integrity_second_source_revocation_clears_derived_ui",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_frontend_xss.py::test_decision_integrity_tombstone_clears_historical_ui",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_frontend_xss.py::test_decision_integrity_two_browser_reviews_have_one_winner_without_duplicate_effects",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_frontend_xss.py::test_decision_review_restricted_evidence_is_hidden_by_real_authenticated_api",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_frontend_xss.py::test_decision_review_stale_submission_refreshes_without_overwriting",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/tests/test_mcp.py::test_write_mode_registers_exactly_the_write_tools",
+    "-q",
+    "--fail-on-skip",
+    "--junitxml=/private/tmp/issue91-validation/integrity/junit.xml"
+  ],
+  "status": "completed_with_errors",
+  "human_reviewers": null,
+  "release_ready": false,
+  "cells": [
+    {
+      "scenario_id": "ACL-01",
+      "category": "acl_revocation",
+      "surface": "service",
+      "operation": "Revoke one direct or second derivation source before current/historical reads",
+      "preconditions": "A versioned decision/evidence graph exists; one source permission is removed while graph read remains allowed.",
+      "invariant": "No unauthorized source bytes or IDs, including multi-source derivatives, paths and historical/context exports.",
+      "scope": "Shared typed service over exact Git revisions",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-service]",
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-service]",
+        "tests/test_decision_memory.py::test_sidecar_reference_acl_checks_basis_anchor_as_well_as_source",
+        "tests/test_decision_memory.py::test_missing_and_cyclic_node_lineage_fail_closed"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-service]",
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-service]",
+        "tests/test_decision_memory.py::test_sidecar_reference_acl_checks_basis_anchor_as_well_as_source",
+        "tests/test_decision_memory.py::test_missing_and_cyclic_node_lineage_fail_closed[lineage0]",
+        "tests/test_decision_memory.py::test_missing_and_cyclic_node_lineage_fail_closed[lineage1]"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-service]",
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-service]",
+        "tests/test_decision_memory.py::test_sidecar_reference_acl_checks_basis_anchor_as_well_as_source",
+        "tests/test_decision_memory.py::test_missing_and_cyclic_node_lineage_fail_closed[lineage0]",
+        "tests/test_decision_memory.py::test_missing_and_cyclic_node_lineage_fail_closed[lineage1]"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "ACL-01",
+      "category": "acl_revocation",
+      "surface": "cli",
+      "operation": "Revoke one direct or second derivation source before current/historical reads",
+      "preconditions": "A versioned decision/evidence graph exists; one source permission is removed while graph read remains allowed.",
+      "invariant": "No unauthorized source bytes or IDs, including multi-source derivatives, paths and historical/context exports.",
+      "scope": "Actual CLI subprocess / JSON stdin and stdout",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-cli]",
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-cli]"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-cli]",
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-cli]"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-cli]",
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-cli]"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "ACL-01",
+      "category": "acl_revocation",
+      "surface": "http",
+      "operation": "Revoke one direct or second derivation source before current/historical reads",
+      "preconditions": "A versioned decision/evidence graph exists; one source permission is removed while graph read remains allowed.",
+      "invariant": "No unauthorized source bytes or IDs, including multi-source derivatives, paths and historical/context exports.",
+      "scope": "ASGI HTTP request/response and authorization middleware; real TCP UI cases are separate",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-http]",
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-http]"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-http]",
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-http]"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-http]",
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-http]"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "ACL-01",
+      "category": "acl_revocation",
+      "surface": "mcp",
+      "operation": "Revoke one direct or second derivation source before current/historical reads",
+      "preconditions": "A versioned decision/evidence graph exists; one source permission is removed while graph read remains allowed.",
+      "invariant": "No unauthorized source bytes or IDs, including multi-source derivatives, paths and historical/context exports.",
+      "scope": "Actual CLI stdio JSON-RPC session",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-mcp]",
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-mcp]",
+        "tests/test_mcp.py::test_write_mode_registers_exactly_the_write_tools"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-mcp]",
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-mcp]",
+        "tests/test_mcp.py::test_write_mode_registers_exactly_the_write_tools"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-mcp]",
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-mcp]",
+        "tests/test_mcp.py::test_write_mode_registers_exactly_the_write_tools"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "ACL-01",
+      "category": "acl_revocation",
+      "surface": "browser",
+      "operation": "Revoke one direct or second derivation source before current/historical reads",
+      "preconditions": "A versioned decision/evidence graph exists; one source permission is removed while graph read remains allowed.",
+      "invariant": "No unauthorized source bytes or IDs, including multi-source derivatives, paths and historical/context exports.",
+      "scope": "Real Chromium DOM interaction against a real authenticated/local HTTP server",
+      "applicable": true,
+      "tests": [
+        "tests/test_frontend_xss.py::test_decision_review_restricted_evidence_is_hidden_by_real_authenticated_api",
+        "tests/test_frontend_xss.py::test_decision_integrity_second_source_revocation_clears_derived_ui"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_frontend_xss.py::test_decision_review_restricted_evidence_is_hidden_by_real_authenticated_api[server0]",
+        "tests/test_frontend_xss.py::test_decision_integrity_second_source_revocation_clears_derived_ui[git-secure]"
+      ],
+      "expected_nodes": [
+        "tests/test_frontend_xss.py::test_decision_review_restricted_evidence_is_hidden_by_real_authenticated_api[server0]",
+        "tests/test_frontend_xss.py::test_decision_integrity_second_source_revocation_clears_derived_ui[git-secure]"
+      ],
+      "missing_nodes": [],
+      "result": "unverified_or_failed"
+    },
+    {
+      "scenario_id": "ACL-01",
+      "category": "acl_revocation",
+      "surface": "exports",
+      "operation": "Revoke one direct or second derivation source before current/historical reads",
+      "preconditions": "A versioned decision/evidence graph exists; one source permission is removed while graph read remains allowed.",
+      "invariant": "No unauthorized source bytes or IDs, including multi-source derivatives, paths and historical/context exports.",
+      "scope": "Actual bounded context JSON and rendered Markdown brief",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-exports]",
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-exports]"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-exports]",
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-exports]"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-exports]",
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-exports]"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "FORGET-01",
+      "category": "tombstones",
+      "surface": "service",
+      "operation": "Forget a captured source, then query the historical decision and live review/context views",
+      "preconditions": "A stored source and decision have a historical revision and an explained update.",
+      "invariant": "No live/context/brief resurrection of forgotten source bytes or IDs; explicit forensic snapshot semantics remain separate.",
+      "scope": "Shared typed service over exact Git revisions",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-service]"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-service]"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-service]"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "FORGET-01",
+      "category": "tombstones",
+      "surface": "cli",
+      "operation": "Forget a captured source, then query the historical decision and live review/context views",
+      "preconditions": "A stored source and decision have a historical revision and an explained update.",
+      "invariant": "No live/context/brief resurrection of forgotten source bytes or IDs; explicit forensic snapshot semantics remain separate.",
+      "scope": "Actual CLI subprocess / JSON stdin and stdout",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-cli]"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-cli]"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-cli]"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "FORGET-01",
+      "category": "tombstones",
+      "surface": "http",
+      "operation": "Forget a captured source, then query the historical decision and live review/context views",
+      "preconditions": "A stored source and decision have a historical revision and an explained update.",
+      "invariant": "No live/context/brief resurrection of forgotten source bytes or IDs; explicit forensic snapshot semantics remain separate.",
+      "scope": "ASGI HTTP request/response and authorization middleware; real TCP UI cases are separate",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-http]"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-http]"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-http]"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "FORGET-01",
+      "category": "tombstones",
+      "surface": "mcp",
+      "operation": "Forget a captured source, then query the historical decision and live review/context views",
+      "preconditions": "A stored source and decision have a historical revision and an explained update.",
+      "invariant": "No live/context/brief resurrection of forgotten source bytes or IDs; explicit forensic snapshot semantics remain separate.",
+      "scope": "Actual CLI stdio JSON-RPC session",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-mcp]"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-mcp]"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-mcp]"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "FORGET-01",
+      "category": "tombstones",
+      "surface": "browser",
+      "operation": "Forget a captured source, then query the historical decision and live review/context views",
+      "preconditions": "A stored source and decision have a historical revision and an explained update.",
+      "invariant": "No live/context/brief resurrection of forgotten source bytes or IDs; explicit forensic snapshot semantics remain separate.",
+      "scope": "Real Chromium DOM interaction against a real authenticated/local HTTP server",
+      "applicable": true,
+      "tests": [
+        "tests/test_frontend_xss.py::test_decision_integrity_tombstone_clears_historical_ui"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_frontend_xss.py::test_decision_integrity_tombstone_clears_historical_ui[git]"
+      ],
+      "expected_nodes": [
+        "tests/test_frontend_xss.py::test_decision_integrity_tombstone_clears_historical_ui[git]"
+      ],
+      "missing_nodes": [],
+      "result": "unverified_or_failed"
+    },
+    {
+      "scenario_id": "FORGET-01",
+      "category": "tombstones",
+      "surface": "exports",
+      "operation": "Forget a captured source, then query the historical decision and live review/context views",
+      "preconditions": "A stored source and decision have a historical revision and an explained update.",
+      "invariant": "No live/context/brief resurrection of forgotten source bytes or IDs; explicit forensic snapshot semantics remain separate.",
+      "scope": "Actual bounded context JSON and rendered Markdown brief",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-exports]"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-exports]"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-exports]"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "EDIT-01",
+      "category": "source_edit",
+      "surface": "service",
+      "operation": "Capture a successor source; read old versions and explained review candidates",
+      "preconditions": "Old source, evidence, dependencies and decision are pinned before a later edit.",
+      "invariant": "Exact old versions remain resolvable; successor review/assessment is not silently inherited; reads do not write brain state.",
+      "scope": "Shared typed service over exact Git revisions",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-service]",
+        "tests/test_decision_memory.py::test_claim_wording_and_context_edit_never_transfer_review",
+        "tests/test_decision_memory.py::test_source_edit_versions_exact_bytes_and_marks_basis_changed"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-service]",
+        "tests/test_decision_memory.py::test_claim_wording_and_context_edit_never_transfer_review",
+        "tests/test_decision_memory.py::test_source_edit_versions_exact_bytes_and_marks_basis_changed"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-service]",
+        "tests/test_decision_memory.py::test_claim_wording_and_context_edit_never_transfer_review",
+        "tests/test_decision_memory.py::test_source_edit_versions_exact_bytes_and_marks_basis_changed"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "EDIT-01",
+      "category": "source_edit",
+      "surface": "cli",
+      "operation": "Capture a successor source; read old versions and explained review candidates",
+      "preconditions": "Old source, evidence, dependencies and decision are pinned before a later edit.",
+      "invariant": "Exact old versions remain resolvable; successor review/assessment is not silently inherited; reads do not write brain state.",
+      "scope": "Actual CLI subprocess / JSON stdin and stdout",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-cli]"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-cli]"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-cli]"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "EDIT-01",
+      "category": "source_edit",
+      "surface": "http",
+      "operation": "Capture a successor source; read old versions and explained review candidates",
+      "preconditions": "Old source, evidence, dependencies and decision are pinned before a later edit.",
+      "invariant": "Exact old versions remain resolvable; successor review/assessment is not silently inherited; reads do not write brain state.",
+      "scope": "ASGI HTTP request/response and authorization middleware; real TCP UI cases are separate",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-http]"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-http]"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-http]"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "EDIT-01",
+      "category": "source_edit",
+      "surface": "mcp",
+      "operation": "Capture a successor source; read old versions and explained review candidates",
+      "preconditions": "Old source, evidence, dependencies and decision are pinned before a later edit.",
+      "invariant": "Exact old versions remain resolvable; successor review/assessment is not silently inherited; reads do not write brain state.",
+      "scope": "Actual CLI stdio JSON-RPC session",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-mcp]"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-mcp]"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-mcp]"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "EDIT-01",
+      "category": "source_edit",
+      "surface": "browser",
+      "operation": "Capture a successor source; read old versions and explained review candidates",
+      "preconditions": "Old source, evidence, dependencies and decision are pinned before a later edit.",
+      "invariant": "Exact old versions remain resolvable; successor review/assessment is not silently inherited; reads do not write brain state.",
+      "scope": "Real Chromium DOM interaction against a real authenticated/local HTTP server",
+      "applicable": true,
+      "tests": [
+        "tests/test_frontend_xss.py::test_decision_impact_full_browser_flow_and_pinned_brief"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_frontend_xss.py::test_decision_impact_full_browser_flow_and_pinned_brief[server0]"
+      ],
+      "expected_nodes": [
+        "tests/test_frontend_xss.py::test_decision_impact_full_browser_flow_and_pinned_brief[server0]"
+      ],
+      "missing_nodes": [],
+      "result": "unverified_or_failed"
+    },
+    {
+      "scenario_id": "EDIT-01",
+      "category": "source_edit",
+      "surface": "exports",
+      "operation": "Capture a successor source; read old versions and explained review candidates",
+      "preconditions": "Old source, evidence, dependencies and decision are pinned before a later edit.",
+      "invariant": "Exact old versions remain resolvable; successor review/assessment is not silently inherited; reads do not write brain state.",
+      "scope": "Actual bounded context JSON and rendered Markdown brief",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-exports]"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-exports]"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-exports]"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "MERGE-01",
+      "category": "merge",
+      "surface": "service",
+      "operation": "Attempt an explicit generic merge involving a version-pinned source",
+      "preconditions": "Decision Memory provenance pins a source node; an unrelated node is the other operand.",
+      "invariant": "Reject before any node/edge/history mutation; do not retarget reviews or source identity.",
+      "scope": "Actual generic merge_nodes service boundary",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_memory.py::test_pinned_merge_refuses_before_any_changes"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_memory.py::test_pinned_merge_refuses_before_any_changes"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_memory.py::test_pinned_merge_refuses_before_any_changes"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "MERGE-01",
+      "category": "merge",
+      "surface": "cli",
+      "operation": "Attempt an explicit generic merge involving a version-pinned source",
+      "preconditions": "Decision Memory provenance pins a source node; an unrelated node is the other operand.",
+      "invariant": "Reject before any node/edge/history mutation; do not retarget reviews or source identity.",
+      "scope": "Actual generic ig merge subprocess",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_cli_cannot_merge_version_pinned_source_or_reassign_reviews"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_cli_cannot_merge_version_pinned_source_or_reassign_reviews"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_cli_cannot_merge_version_pinned_source_or_reassign_reviews"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "MERGE-01",
+      "category": "merge",
+      "surface": "http",
+      "operation": "Attempt an explicit generic merge involving a version-pinned source",
+      "preconditions": "Decision Memory provenance pins a source node; an unrelated node is the other operand.",
+      "invariant": "Reject before any node/edge/history mutation; do not retarget reviews or source identity.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "This scenario is explicit generic node merge. No merge operation exists on this typed http surface; read projections are separately covered in ACL/EDIT/HISTORY rows.",
+      "observed_nodes": [],
+      "expected_nodes": [],
+      "missing_nodes": [],
+      "result": "not_applicable_declared"
+    },
+    {
+      "scenario_id": "MERGE-01",
+      "category": "merge",
+      "surface": "mcp",
+      "operation": "Attempt an explicit generic merge involving a version-pinned source",
+      "preconditions": "Decision Memory provenance pins a source node; an unrelated node is the other operand.",
+      "invariant": "Reject before any node/edge/history mutation; do not retarget reviews or source identity.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "This scenario is explicit generic node merge. No merge operation exists on this typed mcp surface; read projections are separately covered in ACL/EDIT/HISTORY rows.",
+      "observed_nodes": [],
+      "expected_nodes": [],
+      "missing_nodes": [],
+      "result": "not_applicable_declared"
+    },
+    {
+      "scenario_id": "MERGE-01",
+      "category": "merge",
+      "surface": "browser",
+      "operation": "Attempt an explicit generic merge involving a version-pinned source",
+      "preconditions": "Decision Memory provenance pins a source node; an unrelated node is the other operand.",
+      "invariant": "Reject before any node/edge/history mutation; do not retarget reviews or source identity.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "This scenario is explicit generic node merge. No merge operation exists on this typed browser surface; read projections are separately covered in ACL/EDIT/HISTORY rows.",
+      "observed_nodes": [],
+      "expected_nodes": [],
+      "missing_nodes": [],
+      "result": "not_applicable_declared"
+    },
+    {
+      "scenario_id": "MERGE-01",
+      "category": "merge",
+      "surface": "exports",
+      "operation": "Attempt an explicit generic merge involving a version-pinned source",
+      "preconditions": "Decision Memory provenance pins a source node; an unrelated node is the other operand.",
+      "invariant": "Reject before any node/edge/history mutation; do not retarget reviews or source identity.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "This scenario is explicit generic node merge. No merge operation exists on this typed exports surface; read projections are separately covered in ACL/EDIT/HISTORY rows.",
+      "observed_nodes": [],
+      "expected_nodes": [],
+      "missing_nodes": [],
+      "result": "not_applicable_declared"
+    },
+    {
+      "scenario_id": "HISTORY-01",
+      "category": "snapshot",
+      "surface": "service",
+      "operation": "Resolve explicit historical inspect/brief revisions after a later source change",
+      "preconditions": "A selected historical revision differs from current HEAD; source remains authorized and live.",
+      "invariant": "Historical payloads use their selected version and review state; current ACLs still apply; UI comparison brief uses comparison.after.",
+      "scope": "Shared typed service over exact Git revisions",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-service]"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-service]"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-service]"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "HISTORY-01",
+      "category": "snapshot",
+      "surface": "cli",
+      "operation": "Resolve explicit historical inspect/brief revisions after a later source change",
+      "preconditions": "A selected historical revision differs from current HEAD; source remains authorized and live.",
+      "invariant": "Historical payloads use their selected version and review state; current ACLs still apply; UI comparison brief uses comparison.after.",
+      "scope": "Actual CLI subprocess / JSON stdin and stdout",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-cli]"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-cli]"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-cli]"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "HISTORY-01",
+      "category": "snapshot",
+      "surface": "http",
+      "operation": "Resolve explicit historical inspect/brief revisions after a later source change",
+      "preconditions": "A selected historical revision differs from current HEAD; source remains authorized and live.",
+      "invariant": "Historical payloads use their selected version and review state; current ACLs still apply; UI comparison brief uses comparison.after.",
+      "scope": "ASGI HTTP request/response and authorization middleware; real TCP UI cases are separate",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-http]"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-http]"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-http]"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "HISTORY-01",
+      "category": "snapshot",
+      "surface": "mcp",
+      "operation": "Resolve explicit historical inspect/brief revisions after a later source change",
+      "preconditions": "A selected historical revision differs from current HEAD; source remains authorized and live.",
+      "invariant": "Historical payloads use their selected version and review state; current ACLs still apply; UI comparison brief uses comparison.after.",
+      "scope": "Actual CLI stdio JSON-RPC session",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-mcp]"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-mcp]"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-mcp]"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "HISTORY-01",
+      "category": "snapshot",
+      "surface": "browser",
+      "operation": "Resolve explicit historical inspect/brief revisions after a later source change",
+      "preconditions": "A selected historical revision differs from current HEAD; source remains authorized and live.",
+      "invariant": "Historical payloads use their selected version and review state; current ACLs still apply; UI comparison brief uses comparison.after.",
+      "scope": "Real Chromium DOM interaction against a real authenticated/local HTTP server",
+      "applicable": true,
+      "tests": [
+        "tests/test_frontend_xss.py::test_decision_integrity_brief_keeps_selected_revision_after_later_edit"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_frontend_xss.py::test_decision_integrity_brief_keeps_selected_revision_after_later_edit[git]"
+      ],
+      "expected_nodes": [
+        "tests/test_frontend_xss.py::test_decision_integrity_brief_keeps_selected_revision_after_later_edit[git]"
+      ],
+      "missing_nodes": [],
+      "result": "unverified_or_failed"
+    },
+    {
+      "scenario_id": "HISTORY-01",
+      "category": "snapshot",
+      "surface": "exports",
+      "operation": "Resolve explicit historical inspect/brief revisions after a later source change",
+      "preconditions": "A selected historical revision differs from current HEAD; source remains authorized and live.",
+      "invariant": "Historical payloads use their selected version and review state; current ACLs still apply; UI comparison brief uses comparison.after.",
+      "scope": "Actual bounded context JSON and rendered Markdown brief",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-exports]"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-exports]"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-exports]"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "STALE-01",
+      "category": "stale_review",
+      "surface": "service",
+      "operation": "Submit a review after its captured generation or source basis changes",
+      "preconditions": "A review envelope was prepared before intervening source/content/review activity.",
+      "invariant": "Reject stale submission without overwriting newer content/reviews; UI refreshes evidence and retains explicit version targets.",
+      "scope": "Source and generation preconditions in typed review/store service",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_service.py::test_import_propose_review_changed_source_and_stale_review",
+        "tests/test_decision_memory.py::test_stale_generation_and_source_hash_previews_conflict"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_service.py::test_import_propose_review_changed_source_and_stale_review",
+        "tests/test_decision_memory.py::test_stale_generation_and_source_hash_previews_conflict"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_service.py::test_import_propose_review_changed_source_and_stale_review",
+        "tests/test_decision_memory.py::test_stale_generation_and_source_hash_previews_conflict"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "STALE-01",
+      "category": "stale_review",
+      "surface": "cli",
+      "operation": "Submit a review after its captured generation or source basis changes",
+      "preconditions": "A review envelope was prepared before intervening source/content/review activity.",
+      "invariant": "Reject stale submission without overwriting newer content/reviews; UI refreshes evidence and retains explicit version targets.",
+      "scope": "Actual CLI subprocess",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[stale-cli]"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[stale-cli]"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[stale-cli]"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "STALE-01",
+      "category": "stale_review",
+      "surface": "http",
+      "operation": "Submit a review after its captured generation or source basis changes",
+      "preconditions": "A review envelope was prepared before intervening source/content/review activity.",
+      "invariant": "Reject stale submission without overwriting newer content/reviews; UI refreshes evidence and retains explicit version targets.",
+      "scope": "Actual ASGI HTTP review endpoint",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[stale-http]"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[stale-http]"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[stale-http]"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "STALE-01",
+      "category": "stale_review",
+      "surface": "mcp",
+      "operation": "Submit a review after its captured generation or source basis changes",
+      "preconditions": "A review envelope was prepared before intervening source/content/review activity.",
+      "invariant": "Reject stale submission without overwriting newer content/reviews; UI refreshes evidence and retains explicit version targets.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "Typed Decision Memory review writes are not exposed by mcp. This is a mutation scenario; historical read behavior is covered separately.",
+      "observed_nodes": [],
+      "expected_nodes": [],
+      "missing_nodes": [],
+      "result": "not_applicable_declared"
+    },
+    {
+      "scenario_id": "STALE-01",
+      "category": "stale_review",
+      "surface": "browser",
+      "operation": "Submit a review after its captured generation or source basis changes",
+      "preconditions": "A review envelope was prepared before intervening source/content/review activity.",
+      "invariant": "Reject stale submission without overwriting newer content/reviews; UI refreshes evidence and retains explicit version targets.",
+      "scope": "Actual Chromium stale submission and evidence refresh",
+      "applicable": true,
+      "tests": [
+        "tests/test_frontend_xss.py::test_decision_review_stale_submission_refreshes_without_overwriting"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_frontend_xss.py::test_decision_review_stale_submission_refreshes_without_overwriting[server0]"
+      ],
+      "expected_nodes": [
+        "tests/test_frontend_xss.py::test_decision_review_stale_submission_refreshes_without_overwriting[server0]"
+      ],
+      "missing_nodes": [],
+      "result": "unverified_or_failed"
+    },
+    {
+      "scenario_id": "STALE-01",
+      "category": "stale_review",
+      "surface": "exports",
+      "operation": "Submit a review after its captured generation or source basis changes",
+      "preconditions": "A review envelope was prepared before intervening source/content/review activity.",
+      "invariant": "Reject stale submission without overwriting newer content/reviews; UI refreshes evidence and retains explicit version targets.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "Typed Decision Memory review writes are not exposed by exports. This is a mutation scenario; historical read behavior is covered separately.",
+      "observed_nodes": [],
+      "expected_nodes": [],
+      "missing_nodes": [],
+      "result": "not_applicable_declared"
+    },
+    {
+      "scenario_id": "UNDO-01",
+      "category": "undo",
+      "surface": "service",
+      "operation": "Correct an unconsumed review and reject correction after a decision consumed it",
+      "preconditions": "An accepted review exists; optionally a subsequent decision cites that exact review event.",
+      "invariant": "Fresh correction retains original history; dependent correction is refused without silent review reassignment.",
+      "scope": "Exact review correction and downstream event-basis guard",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_service.py::test_explicit_revise_and_guarded_undo",
+        "tests/test_decision_service.py::test_undo_fails_after_dependent_review"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_service.py::test_explicit_revise_and_guarded_undo",
+        "tests/test_decision_service.py::test_undo_fails_after_dependent_review"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_service.py::test_explicit_revise_and_guarded_undo",
+        "tests/test_decision_service.py::test_undo_fails_after_dependent_review"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "UNDO-01",
+      "category": "undo",
+      "surface": "cli",
+      "operation": "Correct an unconsumed review and reject correction after a decision consumed it",
+      "preconditions": "An accepted review exists; optionally a subsequent decision cites that exact review event.",
+      "invariant": "Fresh correction retains original history; dependent correction is refused without silent review reassignment.",
+      "scope": "Actual CLI subprocess correction envelope",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[fresh-undo-cli]",
+        "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[dependent-undo-cli]"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[fresh-undo-cli]",
+        "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[dependent-undo-cli]"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[fresh-undo-cli]",
+        "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[dependent-undo-cli]"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "UNDO-01",
+      "category": "undo",
+      "surface": "http",
+      "operation": "Correct an unconsumed review and reject correction after a decision consumed it",
+      "preconditions": "An accepted review exists; optionally a subsequent decision cites that exact review event.",
+      "invariant": "Fresh correction retains original history; dependent correction is refused without silent review reassignment.",
+      "scope": "Actual ASGI HTTP correction envelope",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[fresh-undo-http]",
+        "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[dependent-undo-http]"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[fresh-undo-http]",
+        "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[dependent-undo-http]"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[fresh-undo-http]",
+        "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[dependent-undo-http]"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "UNDO-01",
+      "category": "undo",
+      "surface": "mcp",
+      "operation": "Correct an unconsumed review and reject correction after a decision consumed it",
+      "preconditions": "An accepted review exists; optionally a subsequent decision cites that exact review event.",
+      "invariant": "Fresh correction retains original history; dependent correction is refused without silent review reassignment.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "No correction/undo of typed assessment events is exposed on mcp. Ordinary-memory edge undo is a different operation and is not counted as evidence.",
+      "observed_nodes": [],
+      "expected_nodes": [],
+      "missing_nodes": [],
+      "result": "not_applicable_declared"
+    },
+    {
+      "scenario_id": "UNDO-01",
+      "category": "undo",
+      "surface": "browser",
+      "operation": "Correct an unconsumed review and reject correction after a decision consumed it",
+      "preconditions": "An accepted review exists; optionally a subsequent decision cites that exact review event.",
+      "invariant": "Fresh correction retains original history; dependent correction is refused without silent review reassignment.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "No correction/undo of typed assessment events is exposed on browser. Ordinary-memory edge undo is a different operation and is not counted as evidence.",
+      "observed_nodes": [],
+      "expected_nodes": [],
+      "missing_nodes": [],
+      "result": "not_applicable_declared"
+    },
+    {
+      "scenario_id": "UNDO-01",
+      "category": "undo",
+      "surface": "exports",
+      "operation": "Correct an unconsumed review and reject correction after a decision consumed it",
+      "preconditions": "An accepted review exists; optionally a subsequent decision cites that exact review event.",
+      "invariant": "Fresh correction retains original history; dependent correction is refused without silent review reassignment.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "No correction/undo of typed assessment events is exposed on exports. Ordinary-memory edge undo is a different operation and is not counted as evidence.",
+      "observed_nodes": [],
+      "expected_nodes": [],
+      "missing_nodes": [],
+      "result": "not_applicable_declared"
+    },
+    {
+      "scenario_id": "RECOVERY-01",
+      "category": "crash_retry",
+      "surface": "service",
+      "operation": "Inject failure after authoritative publication at index rebuild and commit boundaries",
+      "preconditions": "A structured proposal has a stable idempotency key; index/commit raises after local publication.",
+      "invariant": "Return an explicit published-locally receipt; identical retry returns the durable receipt without duplicate records; sync may remain required.",
+      "scope": "Actual storage publication, index and commit failure boundaries",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_memory.py::test_interrupted_sidecar_publication_leaves_only_reusable_anchors",
+        "tests/test_decision_memory.py::test_commit_failure_preserves_authoritative_receipt",
+        "tests/test_decision_service.py::test_post_publication_failure_returns_durable_retry"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_memory.py::test_interrupted_sidecar_publication_leaves_only_reusable_anchors",
+        "tests/test_decision_memory.py::test_commit_failure_preserves_authoritative_receipt",
+        "tests/test_decision_service.py::test_post_publication_failure_returns_durable_retry"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_memory.py::test_interrupted_sidecar_publication_leaves_only_reusable_anchors",
+        "tests/test_decision_memory.py::test_commit_failure_preserves_authoritative_receipt",
+        "tests/test_decision_service.py::test_post_publication_failure_returns_durable_retry"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "RECOVERY-01",
+      "category": "crash_retry",
+      "surface": "cli",
+      "operation": "Inject failure after authoritative publication at index rebuild and commit boundaries",
+      "preconditions": "A structured proposal has a stable idempotency key; index/commit raises after local publication.",
+      "invariant": "Return an explicit published-locally receipt; identical retry returns the durable receipt without duplicate records; sync may remain required.",
+      "scope": "Actual CLI parser/output with injected local index/commit failures (in process)",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[index-cli]",
+        "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[commit-cli]"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[index-cli]",
+        "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[commit-cli]"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[index-cli]",
+        "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[commit-cli]"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "RECOVERY-01",
+      "category": "crash_retry",
+      "surface": "http",
+      "operation": "Inject failure after authoritative publication at index rebuild and commit boundaries",
+      "preconditions": "A structured proposal has a stable idempotency key; index/commit raises after local publication.",
+      "invariant": "Return an explicit published-locally receipt; identical retry returns the durable receipt without duplicate records; sync may remain required.",
+      "scope": "Actual ASGI HTTP 502/receipt/retry responses at index/commit boundaries",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[index-http]",
+        "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[commit-http]"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[index-http]",
+        "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[commit-http]"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[index-http]",
+        "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[commit-http]"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "RECOVERY-01",
+      "category": "crash_retry",
+      "surface": "mcp",
+      "operation": "Inject failure after authoritative publication at index rebuild and commit boundaries",
+      "preconditions": "A structured proposal has a stable idempotency key; index/commit raises after local publication.",
+      "invariant": "Return an explicit published-locally receipt; identical retry returns the durable receipt without duplicate records; sync may remain required.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "No raw structured-version proposal operation exists on mcp. This scenario concerns that proposal publication boundary; browser finding-review failure paths require separate future scenarios.",
+      "observed_nodes": [],
+      "expected_nodes": [],
+      "missing_nodes": [],
+      "result": "not_applicable_declared"
+    },
+    {
+      "scenario_id": "RECOVERY-UI-01",
+      "category": "crash_retry",
+      "surface": "browser",
+      "operation": "Publish a finding review while the real server fails its first post-publication index rebuild",
+      "preconditions": "A browser displays a source-change candidate; a test-only server hook fails once after finding publication.",
+      "invariant": "UI explicitly reports published-locally/incomplete sync, refreshes the stored finding, and does not duplicate the review or receipt.",
+      "scope": "Real Chromium click, real HTTP 502 response, actual durable sidecar and history after refresh",
+      "applicable": true,
+      "tests": [
+        "tests/test_frontend_xss.py::test_decision_integrity_published_finding_failure_preserves_receipt_and_history"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_frontend_xss.py::test_decision_integrity_published_finding_failure_preserves_receipt_and_history[git-fault]"
+      ],
+      "expected_nodes": [
+        "tests/test_frontend_xss.py::test_decision_integrity_published_finding_failure_preserves_receipt_and_history[git-fault]"
+      ],
+      "missing_nodes": [],
+      "result": "unverified_or_failed"
+    },
+    {
+      "scenario_id": "RECOVERY-01",
+      "category": "crash_retry",
+      "surface": "exports",
+      "operation": "Inject failure after authoritative publication at index rebuild and commit boundaries",
+      "preconditions": "A structured proposal has a stable idempotency key; index/commit raises after local publication.",
+      "invariant": "Return an explicit published-locally receipt; identical retry returns the durable receipt without duplicate records; sync may remain required.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "No raw structured-version proposal operation exists on exports. This scenario concerns that proposal publication boundary; browser finding-review failure paths require separate future scenarios.",
+      "observed_nodes": [],
+      "expected_nodes": [],
+      "missing_nodes": [],
+      "result": "not_applicable_declared"
+    },
+    {
+      "scenario_id": "WRITERS-01",
+      "category": "two_writers",
+      "surface": "service",
+      "operation": "Start concurrent same-generation structured proposals, then retry the losing request",
+      "preconditions": "Two CLI processes or HTTP workers share one brain and captured generation, using distinct idempotency keys.",
+      "invariant": "Exactly one initial transaction wins; loser gets a conflict, then a fresh-preview retry retains both records without forks or duplicates.",
+      "scope": "Two actual CLI processes from a common start barrier; inspect persisted generations, receipts and Git state",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_simultaneous_cli_proposals_have_one_winner_and_lossless_retry"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_simultaneous_cli_proposals_have_one_winner_and_lossless_retry"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_simultaneous_cli_proposals_have_one_winner_and_lossless_retry"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "WRITERS-01",
+      "category": "two_writers",
+      "surface": "cli",
+      "operation": "Start concurrent same-generation structured proposals, then retry the losing request",
+      "preconditions": "Two CLI processes or HTTP workers share one brain and captured generation, using distinct idempotency keys.",
+      "invariant": "Exactly one initial transaction wins; loser gets a conflict, then a fresh-preview retry retains both records without forks or duplicates.",
+      "scope": "Two actual CLI processes from a common start barrier; inspect persisted generations, receipts and Git state",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_simultaneous_cli_proposals_have_one_winner_and_lossless_retry"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_simultaneous_cli_proposals_have_one_winner_and_lossless_retry"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_simultaneous_cli_proposals_have_one_winner_and_lossless_retry"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "WRITERS-01",
+      "category": "two_writers",
+      "surface": "http",
+      "operation": "Start concurrent same-generation structured proposals, then retry the losing request",
+      "preconditions": "Two CLI processes or HTTP workers share one brain and captured generation, using distinct idempotency keys.",
+      "invariant": "Exactly one initial transaction wins; loser gets a conflict, then a fresh-preview retry retains both records without forks or duplicates.",
+      "scope": "Two synchronized actual ASGI HTTP workers, conflict and fresh-preview retry",
+      "applicable": true,
+      "tests": [
+        "tests/test_decision_integrity.py::test_simultaneous_http_proposals_share_generation_and_preserve_both_on_retry"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_decision_integrity.py::test_simultaneous_http_proposals_share_generation_and_preserve_both_on_retry"
+      ],
+      "expected_nodes": [
+        "tests/test_decision_integrity.py::test_simultaneous_http_proposals_share_generation_and_preserve_both_on_retry"
+      ],
+      "missing_nodes": [],
+      "result": "passed"
+    },
+    {
+      "scenario_id": "WRITERS-01",
+      "category": "two_writers",
+      "surface": "mcp",
+      "operation": "Start concurrent same-generation structured proposals, then retry the losing request",
+      "preconditions": "Two CLI processes or HTTP workers share one brain and captured generation, using distinct idempotency keys.",
+      "invariant": "Exactly one initial transaction wins; loser gets a conflict, then a fresh-preview retry retains both records without forks or duplicates.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "Concurrent raw structured-version proposals are not exposed on mcp. This cell does not assert coverage of every other possible write concurrency pattern.",
+      "observed_nodes": [],
+      "expected_nodes": [],
+      "missing_nodes": [],
+      "result": "not_applicable_declared"
+    },
+    {
+      "scenario_id": "WRITERS-UI-01",
+      "category": "two_writers",
+      "surface": "browser",
+      "operation": "Release two actual browser finding-review requests from the same captured generation",
+      "preconditions": "Two tabs display the same candidate and each prepares a distinct review request; request routing supplies a common start barrier only.",
+      "invariant": "One review wins, the other displays a stale-review conflict; only one finding transaction/receipt is stored and both tabs refresh.",
+      "scope": "Two real Chromium tabs and actual server responses; request bodies and responses are not mocked",
+      "applicable": true,
+      "tests": [
+        "tests/test_frontend_xss.py::test_decision_integrity_two_browser_reviews_have_one_winner_without_duplicate_effects"
+      ],
+      "not_applicable_reason": null,
+      "observed_nodes": [
+        "tests/test_frontend_xss.py::test_decision_integrity_two_browser_reviews_have_one_winner_without_duplicate_effects[git]"
+      ],
+      "expected_nodes": [
+        "tests/test_frontend_xss.py::test_decision_integrity_two_browser_reviews_have_one_winner_without_duplicate_effects[git]"
+      ],
+      "missing_nodes": [],
+      "result": "unverified_or_failed"
+    },
+    {
+      "scenario_id": "WRITERS-01",
+      "category": "two_writers",
+      "surface": "exports",
+      "operation": "Start concurrent same-generation structured proposals, then retry the losing request",
+      "preconditions": "Two CLI processes or HTTP workers share one brain and captured generation, using distinct idempotency keys.",
+      "invariant": "Exactly one initial transaction wins; loser gets a conflict, then a fresh-preview retry retains both records without forks or duplicates.",
+      "scope": "Declared operation capability boundary; not an executed pass",
+      "applicable": false,
+      "tests": [],
+      "not_applicable_reason": "Concurrent raw structured-version proposals are not exposed on exports. This cell does not assert coverage of every other possible write concurrency pattern.",
+      "observed_nodes": [],
+      "expected_nodes": [],
+      "missing_nodes": [],
+      "result": "not_applicable_declared"
+    }
+  ],
+  "counts": {
+    "defined_cells": 54,
+    "applicable_cells": 41,
+    "observed_passed_cells": 34,
+    "unverified_or_failed_cells": 7,
+    "declared_not_applicable_cells": 13
+  },
+  "software_matrix_complete": false,
+  "independent_sign_off": null,
+  "final_candidate": null,
+  "final_integrity_gate": {
+    "status": "unmeasured",
+    "reason": "This bounded engineering inventory is not an exhaustive independent sign-off. #90/#91 final semantic evidence and the final candidate are absent; scenario sufficiency and inapplicability declarations still need review."
+  },
+  "pytest_exit_code": 1,
+  "phase_reports": {
+    "tests/test_decision_integrity.py::test_cli_cannot_merge_version_pinned_source_or_reassign_reviews": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.1467285419930704,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.979274625016842,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0005134579841978848,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-cli]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.14809229102684185,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 2.5682795419706963,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.00028012500843033195,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-exports]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.13611662498442456,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 1.1275175419868901,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.00036866602022200823,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-http]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.1374143339926377,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 1.552550166961737,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0002741249627433717,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-mcp]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.1585655829985626,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 2.66849812498549,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0004965420230291784,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-service]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.18995825003366917,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 1.7190660829655826,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0037594589521177113,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-cli]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.15635695902165025,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 2.28697708400432,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0003005000180564821,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-exports]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.16303462500218302,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.973513417004142,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0002925409935414791,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-http]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.1430183329503052,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 1.3127198750153184,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0003090000245720148,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-mcp]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.16571983398171142,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 2.4122821249766275,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0003530829562805593,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-service]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.15159212501021102,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 1.1804434999939986,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.00047345797065645456,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-cli]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.15169070899719372,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 2.5276442500180565,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0003961669863201678,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-exports]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.16489874996477738,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 1.272876625007484,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0003028339706361294,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-http]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.19921654096106067,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 2.5723479579901323,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0003571659908629954,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-mcp]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.16463037504581735,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 2.747978957952,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0006701670354232192,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-service]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.16989520797505975,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 1.6616670000366867,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.00027125002816319466,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-cli]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.1437017500284128,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 2.651623791025486,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0002728750114329159,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-exports]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.1613200840074569,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 1.2478090000222437,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0004057090263813734,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-http]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.15064779203385115,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 1.7292886250070296,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.000495915999636054,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-mcp]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.15993841702584177,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 3.658377667015884,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0004735420225188136,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-service]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.14619316603057086,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 1.5853864590171725,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0002506250166334212,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[commit-cli]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.16198216698830947,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.14138516696402803,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0003119580214843154,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[commit-http]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.1700720830122009,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.046272708976175636,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.00036104099126532674,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[index-cli]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.15673200000310317,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.03420508396811783,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0005922080017626286,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[index-http]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.14397133298916742,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.04430379200493917,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0004066660185344517,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[dependent-undo-cli]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.14588579104747623,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.5692879580310546,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.00025874999118968844,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[dependent-undo-http]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.1872545420192182,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.3145124170114286,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0002007500152103603,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[fresh-undo-cli]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.16149533301359043,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.6624289579922333,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.00033362500835210085,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[fresh-undo-http]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.151552791998256,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.35940770799061283,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0002217080327682197,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[stale-cli]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.1532611669972539,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.5008878749795258,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.00022587500279769301,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[stale-http]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.15065629099262878,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.2886936659924686,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0003765419824048877,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_simultaneous_cli_proposals_have_one_winner_and_lossless_retry": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.1615286250016652,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.7622786250431091,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.00039366702549159527,
+        "detail": null
+      }
+    },
+    "tests/test_decision_integrity.py::test_simultaneous_http_proposals_share_generation_and_preserve_both_on_retry": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.18933462497079745,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.43632645800244063,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.00023962499108165503,
+        "detail": null
+      }
+    },
+    "tests/test_decision_memory.py::test_claim_wording_and_context_edit_never_transfer_review": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.004002625006251037,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.12965900002745911,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.00015245896065607667,
+        "detail": null
+      }
+    },
+    "tests/test_decision_memory.py::test_commit_failure_preserves_authoritative_receipt": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.0037217920180410147,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.006167666986584663,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.00014525000005960464,
+        "detail": null
+      }
+    },
+    "tests/test_decision_memory.py::test_interrupted_sidecar_publication_leaves_only_reusable_anchors": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.005258458026219159,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.012347416020929813,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.00014691700926050544,
+        "detail": null
+      }
+    },
+    "tests/test_decision_memory.py::test_missing_and_cyclic_node_lineage_fail_closed[lineage0]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.005835708987433463,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.009274707990698516,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.00012312503531575203,
+        "detail": null
+      }
+    },
+    "tests/test_decision_memory.py::test_missing_and_cyclic_node_lineage_fail_closed[lineage1]": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.0035223339800722897,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.00842395902145654,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.00033012498170137405,
+        "detail": null
+      }
+    },
+    "tests/test_decision_memory.py::test_pinned_merge_refuses_before_any_changes": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.0036984580219723284,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.02290041698142886,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.00012174999574199319,
+        "detail": null
+      }
+    },
+    "tests/test_decision_memory.py::test_sidecar_reference_acl_checks_basis_anchor_as_well_as_source": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.0037192500312812626,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.0611746659851633,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.00022508297115564346,
+        "detail": null
+      }
+    },
+    "tests/test_decision_memory.py::test_source_edit_versions_exact_bytes_and_marks_basis_changed": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.003676332999020815,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.26160120900021866,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0001853749854490161,
+        "detail": null
+      }
+    },
+    "tests/test_decision_memory.py::test_stale_generation_and_source_hash_previews_conflict": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.006661833031103015,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.09015387500403449,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.00015600002370774746,
+        "detail": null
+      }
+    },
+    "tests/test_decision_service.py::test_explicit_revise_and_guarded_undo": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.004722625017166138,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.15923212503548712,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.00014179199934005737,
+        "detail": null
+      }
+    },
+    "tests/test_decision_service.py::test_import_propose_review_changed_source_and_stale_review": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.0036338749923743308,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.641068791039288,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.00016320898430421948,
+        "detail": null
+      }
+    },
+    "tests/test_decision_service.py::test_post_publication_failure_returns_durable_retry": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.004004667047411203,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.010037333995569497,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.00014279200695455074,
+        "detail": null
+      }
+    },
+    "tests/test_decision_service.py::test_undo_fails_after_dependent_review": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.0029121250263415277,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.0759917080285959,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.00015824998263269663,
+        "detail": null
+      }
+    },
+    "tests/test_frontend_xss.py::test_decision_impact_full_browser_flow_and_pinned_brief[server0]": {
+      "setup": {
+        "outcome": "failed",
+        "duration_seconds": 0.16500308399554342,
+        "detail": "tmp_path = PosixPath('/private/var/folders/sj/799zmzcs10n9pm_vhxx4typc0000gn/T/pytest-of-niklas/pytest-820/test_decision_impact_full_brow0')\nrequest = <SubRequest 'server' for <Function test_decision_impact_full_browser_flow_and_pinned_brief[server0]>>\n\n    @pytest.fixture\n    def server(tmp_path, request):\n        \"\"\"Each workflow gets a fresh brain and a real HTTP/WebSocket server.\"\"\"\n        options = getattr(request, 'param', {})\n        brain = Brain(str(tmp_path / \"brain\"), mode=options.get('mode', 'local'))\n        if options.get('mode') == 'git':\n            brain.init()\n        else:\n            brain.ensure_ready()\n        brain.write_node(Node(id=\"hostile\", text=NODE_TEXT))\n        brain.write_node(Node(id=\"safe\", text=\"A second idea about memory\"))\n        brain.write_edges([Edge(id=\"suggestion\", source=\"hostile\", target=\"safe\",\n                               kind=\"fact\", predicate=HOSTILE, pending=True,\n                               evidence=[{\"node_id\": \"hostile\", \"text\": HOSTILE}])])\n        env = {k: v for k, v in os.environ.items()\n               if not k.startswith((\"IG_\", \"IDEAGRAPH_\"))}\n        env.update(IG_BRAIN_MODE=brain.mode, IG_BRAIN_PATH=str(brain.path),\n                   IDEAGRAPH_EMBEDDER=\"hash\", PYTHONPATH=str(REPO))\n        headers = {}\n        if options.get('secure'):\n            policy = tmp_path / 'browser-policy.json'\n            policy.write_text(json.dumps({'graphs': {'default': {\n                'roles': {'reviewer': 'editor', 'reader': 'viewer'},\n                'nodes': {'source': {'read': ['reviewer'], 'write': ['reviewer']}}}},\n                'tokens': {hashlib.sha256(token.encode()).hexdigest(): identity for token, identity in\n                           [('reviewer-token', 'reviewer'), ('reader-token', 'reader')]}}))\n            env['IG_ACCESS_POLICY'] = str(policy)\n            headers['Authorization'] = 'Bearer reviewer-token'\n        with socket.socket() as sock:\n>           sock.bind((\"127.0.0.1\", 0))\nE           PermissionError: [Errno 1] Operation not permitted\n\ntests/test_frontend_xss.py:71: PermissionError"
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.00020641699666157365,
+        "detail": null
+      }
+    },
+    "tests/test_frontend_xss.py::test_decision_integrity_brief_keeps_selected_revision_after_later_edit[git]": {
+      "setup": {
+        "outcome": "failed",
+        "duration_seconds": 0.15184904099442065,
+        "detail": "tmp_path = PosixPath('/private/var/folders/sj/799zmzcs10n9pm_vhxx4typc0000gn/T/pytest-of-niklas/pytest-820/test_decision_integrity_brief_0')\nrequest = <SubRequest 'server' for <Function test_decision_integrity_brief_keeps_selected_revision_after_later_edit[git]>>\n\n    @pytest.fixture\n    def server(tmp_path, request):\n        \"\"\"Each workflow gets a fresh brain and a real HTTP/WebSocket server.\"\"\"\n        options = getattr(request, 'param', {})\n        brain = Brain(str(tmp_path / \"brain\"), mode=options.get('mode', 'local'))\n        if options.get('mode') == 'git':\n            brain.init()\n        else:\n            brain.ensure_ready()\n        brain.write_node(Node(id=\"hostile\", text=NODE_TEXT))\n        brain.write_node(Node(id=\"safe\", text=\"A second idea about memory\"))\n        brain.write_edges([Edge(id=\"suggestion\", source=\"hostile\", target=\"safe\",\n                               kind=\"fact\", predicate=HOSTILE, pending=True,\n                               evidence=[{\"node_id\": \"hostile\", \"text\": HOSTILE}])])\n        env = {k: v for k, v in os.environ.items()\n               if not k.startswith((\"IG_\", \"IDEAGRAPH_\"))}\n        env.update(IG_BRAIN_MODE=brain.mode, IG_BRAIN_PATH=str(brain.path),\n                   IDEAGRAPH_EMBEDDER=\"hash\", PYTHONPATH=str(REPO))\n        headers = {}\n        if options.get('secure'):\n            policy = tmp_path / 'browser-policy.json'\n            policy.write_text(json.dumps({'graphs': {'default': {\n                'roles': {'reviewer': 'editor', 'reader': 'viewer'},\n                'nodes': {'source': {'read': ['reviewer'], 'write': ['reviewer']}}}},\n                'tokens': {hashlib.sha256(token.encode()).hexdigest(): identity for token, identity in\n                           [('reviewer-token', 'reviewer'), ('reader-token', 'reader')]}}))\n            env['IG_ACCESS_POLICY'] = str(policy)\n            headers['Authorization'] = 'Bearer reviewer-token'\n        with socket.socket() as sock:\n>           sock.bind((\"127.0.0.1\", 0))\nE           PermissionError: [Errno 1] Operation not permitted\n\ntests/test_frontend_xss.py:71: PermissionError"
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0004524160176515579,
+        "detail": null
+      }
+    },
+    "tests/test_frontend_xss.py::test_decision_integrity_published_finding_failure_preserves_receipt_and_history[git-fault]": {
+      "setup": {
+        "outcome": "failed",
+        "duration_seconds": 0.16872383398003876,
+        "detail": "tmp_path = PosixPath('/private/var/folders/sj/799zmzcs10n9pm_vhxx4typc0000gn/T/pytest-of-niklas/pytest-820/test_decision_integrity_publis0')\nrequest = <SubRequest 'server' for <Function test_decision_integrity_published_finding_failure_preserves_receipt_and_history[git-fault]>>\n\n    @pytest.fixture\n    def server(tmp_path, request):\n        \"\"\"Each workflow gets a fresh brain and a real HTTP/WebSocket server.\"\"\"\n        options = getattr(request, 'param', {})\n        brain = Brain(str(tmp_path / \"brain\"), mode=options.get('mode', 'local'))\n        if options.get('mode') == 'git':\n            brain.init()\n        else:\n            brain.ensure_ready()\n        brain.write_node(Node(id=\"hostile\", text=NODE_TEXT))\n        brain.write_node(Node(id=\"safe\", text=\"A second idea about memory\"))\n        brain.write_edges([Edge(id=\"suggestion\", source=\"hostile\", target=\"safe\",\n                               kind=\"fact\", predicate=HOSTILE, pending=True,\n                               evidence=[{\"node_id\": \"hostile\", \"text\": HOSTILE}])])\n        env = {k: v for k, v in os.environ.items()\n               if not k.startswith((\"IG_\", \"IDEAGRAPH_\"))}\n        env.update(IG_BRAIN_MODE=brain.mode, IG_BRAIN_PATH=str(brain.path),\n                   IDEAGRAPH_EMBEDDER=\"hash\", PYTHONPATH=str(REPO))\n        headers = {}\n        if options.get('secure'):\n            policy = tmp_path / 'browser-policy.json'\n            policy.write_text(json.dumps({'graphs': {'default': {\n                'roles': {'reviewer': 'editor', 'reader': 'viewer'},\n                'nodes': {'source': {'read': ['reviewer'], 'write': ['reviewer']}}}},\n                'tokens': {hashlib.sha256(token.encode()).hexdigest(): identity for token, identity in\n                           [('reviewer-token', 'reviewer'), ('reader-token', 'reader')]}}))\n            env['IG_ACCESS_POLICY'] = str(policy)\n            headers['Authorization'] = 'Bearer reviewer-token'\n        with socket.socket() as sock:\n>           sock.bind((\"127.0.0.1\", 0))\nE           PermissionError: [Errno 1] Operation not permitted\n\ntests/test_frontend_xss.py:71: PermissionError"
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.000220040965359658,
+        "detail": null
+      }
+    },
+    "tests/test_frontend_xss.py::test_decision_integrity_second_source_revocation_clears_derived_ui[git-secure]": {
+      "setup": {
+        "outcome": "failed",
+        "duration_seconds": 0.1635713329887949,
+        "detail": "tmp_path = PosixPath('/private/var/folders/sj/799zmzcs10n9pm_vhxx4typc0000gn/T/pytest-of-niklas/pytest-820/test_decision_integrity_second0')\nrequest = <SubRequest 'server' for <Function test_decision_integrity_second_source_revocation_clears_derived_ui[git-secure]>>\n\n    @pytest.fixture\n    def server(tmp_path, request):\n        \"\"\"Each workflow gets a fresh brain and a real HTTP/WebSocket server.\"\"\"\n        options = getattr(request, 'param', {})\n        brain = Brain(str(tmp_path / \"brain\"), mode=options.get('mode', 'local'))\n        if options.get('mode') == 'git':\n            brain.init()\n        else:\n            brain.ensure_ready()\n        brain.write_node(Node(id=\"hostile\", text=NODE_TEXT))\n        brain.write_node(Node(id=\"safe\", text=\"A second idea about memory\"))\n        brain.write_edges([Edge(id=\"suggestion\", source=\"hostile\", target=\"safe\",\n                               kind=\"fact\", predicate=HOSTILE, pending=True,\n                               evidence=[{\"node_id\": \"hostile\", \"text\": HOSTILE}])])\n        env = {k: v for k, v in os.environ.items()\n               if not k.startswith((\"IG_\", \"IDEAGRAPH_\"))}\n        env.update(IG_BRAIN_MODE=brain.mode, IG_BRAIN_PATH=str(brain.path),\n                   IDEAGRAPH_EMBEDDER=\"hash\", PYTHONPATH=str(REPO))\n        headers = {}\n        if options.get('secure'):\n            policy = tmp_path / 'browser-policy.json'\n            policy.write_text(json.dumps({'graphs': {'default': {\n                'roles': {'reviewer': 'editor', 'reader': 'viewer'},\n                'nodes': {'source': {'read': ['reviewer'], 'write': ['reviewer']}}}},\n                'tokens': {hashlib.sha256(token.encode()).hexdigest(): identity for token, identity in\n                           [('reviewer-token', 'reviewer'), ('reader-token', 'reader')]}}))\n            env['IG_ACCESS_POLICY'] = str(policy)\n            headers['Authorization'] = 'Bearer reviewer-token'\n        with socket.socket() as sock:\n>           sock.bind((\"127.0.0.1\", 0))\nE           PermissionError: [Errno 1] Operation not permitted\n\ntests/test_frontend_xss.py:71: PermissionError"
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.00023083295673131943,
+        "detail": null
+      }
+    },
+    "tests/test_frontend_xss.py::test_decision_integrity_tombstone_clears_historical_ui[git]": {
+      "setup": {
+        "outcome": "failed",
+        "duration_seconds": 0.16071095899678767,
+        "detail": "tmp_path = PosixPath('/private/var/folders/sj/799zmzcs10n9pm_vhxx4typc0000gn/T/pytest-of-niklas/pytest-820/test_decision_integrity_tombst0')\nrequest = <SubRequest 'server' for <Function test_decision_integrity_tombstone_clears_historical_ui[git]>>\n\n    @pytest.fixture\n    def server(tmp_path, request):\n        \"\"\"Each workflow gets a fresh brain and a real HTTP/WebSocket server.\"\"\"\n        options = getattr(request, 'param', {})\n        brain = Brain(str(tmp_path / \"brain\"), mode=options.get('mode', 'local'))\n        if options.get('mode') == 'git':\n            brain.init()\n        else:\n            brain.ensure_ready()\n        brain.write_node(Node(id=\"hostile\", text=NODE_TEXT))\n        brain.write_node(Node(id=\"safe\", text=\"A second idea about memory\"))\n        brain.write_edges([Edge(id=\"suggestion\", source=\"hostile\", target=\"safe\",\n                               kind=\"fact\", predicate=HOSTILE, pending=True,\n                               evidence=[{\"node_id\": \"hostile\", \"text\": HOSTILE}])])\n        env = {k: v for k, v in os.environ.items()\n               if not k.startswith((\"IG_\", \"IDEAGRAPH_\"))}\n        env.update(IG_BRAIN_MODE=brain.mode, IG_BRAIN_PATH=str(brain.path),\n                   IDEAGRAPH_EMBEDDER=\"hash\", PYTHONPATH=str(REPO))\n        headers = {}\n        if options.get('secure'):\n            policy = tmp_path / 'browser-policy.json'\n            policy.write_text(json.dumps({'graphs': {'default': {\n                'roles': {'reviewer': 'editor', 'reader': 'viewer'},\n                'nodes': {'source': {'read': ['reviewer'], 'write': ['reviewer']}}}},\n                'tokens': {hashlib.sha256(token.encode()).hexdigest(): identity for token, identity in\n                           [('reviewer-token', 'reviewer'), ('reader-token', 'reader')]}}))\n            env['IG_ACCESS_POLICY'] = str(policy)\n            headers['Authorization'] = 'Bearer reviewer-token'\n        with socket.socket() as sock:\n>           sock.bind((\"127.0.0.1\", 0))\nE           PermissionError: [Errno 1] Operation not permitted\n\ntests/test_frontend_xss.py:71: PermissionError"
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.00019408302614465356,
+        "detail": null
+      }
+    },
+    "tests/test_frontend_xss.py::test_decision_integrity_two_browser_reviews_have_one_winner_without_duplicate_effects[git]": {
+      "setup": {
+        "outcome": "failed",
+        "duration_seconds": 0.1691694589680992,
+        "detail": "tmp_path = PosixPath('/private/var/folders/sj/799zmzcs10n9pm_vhxx4typc0000gn/T/pytest-of-niklas/pytest-820/test_decision_integrity_two_br0')\nrequest = <SubRequest 'server' for <Function test_decision_integrity_two_browser_reviews_have_one_winner_without_duplicate_effects[git]>>\n\n    @pytest.fixture\n    def server(tmp_path, request):\n        \"\"\"Each workflow gets a fresh brain and a real HTTP/WebSocket server.\"\"\"\n        options = getattr(request, 'param', {})\n        brain = Brain(str(tmp_path / \"brain\"), mode=options.get('mode', 'local'))\n        if options.get('mode') == 'git':\n            brain.init()\n        else:\n            brain.ensure_ready()\n        brain.write_node(Node(id=\"hostile\", text=NODE_TEXT))\n        brain.write_node(Node(id=\"safe\", text=\"A second idea about memory\"))\n        brain.write_edges([Edge(id=\"suggestion\", source=\"hostile\", target=\"safe\",\n                               kind=\"fact\", predicate=HOSTILE, pending=True,\n                               evidence=[{\"node_id\": \"hostile\", \"text\": HOSTILE}])])\n        env = {k: v for k, v in os.environ.items()\n               if not k.startswith((\"IG_\", \"IDEAGRAPH_\"))}\n        env.update(IG_BRAIN_MODE=brain.mode, IG_BRAIN_PATH=str(brain.path),\n                   IDEAGRAPH_EMBEDDER=\"hash\", PYTHONPATH=str(REPO))\n        headers = {}\n        if options.get('secure'):\n            policy = tmp_path / 'browser-policy.json'\n            policy.write_text(json.dumps({'graphs': {'default': {\n                'roles': {'reviewer': 'editor', 'reader': 'viewer'},\n                'nodes': {'source': {'read': ['reviewer'], 'write': ['reviewer']}}}},\n                'tokens': {hashlib.sha256(token.encode()).hexdigest(): identity for token, identity in\n                           [('reviewer-token', 'reviewer'), ('reader-token', 'reader')]}}))\n            env['IG_ACCESS_POLICY'] = str(policy)\n            headers['Authorization'] = 'Bearer reviewer-token'\n        with socket.socket() as sock:\n>           sock.bind((\"127.0.0.1\", 0))\nE           PermissionError: [Errno 1] Operation not permitted\n\ntests/test_frontend_xss.py:71: PermissionError"
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0002079999540001154,
+        "detail": null
+      }
+    },
+    "tests/test_frontend_xss.py::test_decision_review_restricted_evidence_is_hidden_by_real_authenticated_api[server0]": {
+      "setup": {
+        "outcome": "failed",
+        "duration_seconds": 0.1783751670154743,
+        "detail": "tmp_path = PosixPath('/private/var/folders/sj/799zmzcs10n9pm_vhxx4typc0000gn/T/pytest-of-niklas/pytest-820/test_decision_review_restricte0')\nrequest = <SubRequest 'server' for <Function test_decision_review_restricted_evidence_is_hidden_by_real_authenticated_api[server0]>>\n\n    @pytest.fixture\n    def server(tmp_path, request):\n        \"\"\"Each workflow gets a fresh brain and a real HTTP/WebSocket server.\"\"\"\n        options = getattr(request, 'param', {})\n        brain = Brain(str(tmp_path / \"brain\"), mode=options.get('mode', 'local'))\n        if options.get('mode') == 'git':\n            brain.init()\n        else:\n            brain.ensure_ready()\n        brain.write_node(Node(id=\"hostile\", text=NODE_TEXT))\n        brain.write_node(Node(id=\"safe\", text=\"A second idea about memory\"))\n        brain.write_edges([Edge(id=\"suggestion\", source=\"hostile\", target=\"safe\",\n                               kind=\"fact\", predicate=HOSTILE, pending=True,\n                               evidence=[{\"node_id\": \"hostile\", \"text\": HOSTILE}])])\n        env = {k: v for k, v in os.environ.items()\n               if not k.startswith((\"IG_\", \"IDEAGRAPH_\"))}\n        env.update(IG_BRAIN_MODE=brain.mode, IG_BRAIN_PATH=str(brain.path),\n                   IDEAGRAPH_EMBEDDER=\"hash\", PYTHONPATH=str(REPO))\n        headers = {}\n        if options.get('secure'):\n            policy = tmp_path / 'browser-policy.json'\n            policy.write_text(json.dumps({'graphs': {'default': {\n                'roles': {'reviewer': 'editor', 'reader': 'viewer'},\n                'nodes': {'source': {'read': ['reviewer'], 'write': ['reviewer']}}}},\n                'tokens': {hashlib.sha256(token.encode()).hexdigest(): identity for token, identity in\n                           [('reviewer-token', 'reviewer'), ('reader-token', 'reader')]}}))\n            env['IG_ACCESS_POLICY'] = str(policy)\n            headers['Authorization'] = 'Bearer reviewer-token'\n        with socket.socket() as sock:\n>           sock.bind((\"127.0.0.1\", 0))\nE           PermissionError: [Errno 1] Operation not permitted\n\ntests/test_frontend_xss.py:71: PermissionError"
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0002037500380538404,
+        "detail": null
+      }
+    },
+    "tests/test_frontend_xss.py::test_decision_review_stale_submission_refreshes_without_overwriting[server0]": {
+      "setup": {
+        "outcome": "failed",
+        "duration_seconds": 0.17031941597815603,
+        "detail": "tmp_path = PosixPath('/private/var/folders/sj/799zmzcs10n9pm_vhxx4typc0000gn/T/pytest-of-niklas/pytest-820/test_decision_review_stale_sub0')\nrequest = <SubRequest 'server' for <Function test_decision_review_stale_submission_refreshes_without_overwriting[server0]>>\n\n    @pytest.fixture\n    def server(tmp_path, request):\n        \"\"\"Each workflow gets a fresh brain and a real HTTP/WebSocket server.\"\"\"\n        options = getattr(request, 'param', {})\n        brain = Brain(str(tmp_path / \"brain\"), mode=options.get('mode', 'local'))\n        if options.get('mode') == 'git':\n            brain.init()\n        else:\n            brain.ensure_ready()\n        brain.write_node(Node(id=\"hostile\", text=NODE_TEXT))\n        brain.write_node(Node(id=\"safe\", text=\"A second idea about memory\"))\n        brain.write_edges([Edge(id=\"suggestion\", source=\"hostile\", target=\"safe\",\n                               kind=\"fact\", predicate=HOSTILE, pending=True,\n                               evidence=[{\"node_id\": \"hostile\", \"text\": HOSTILE}])])\n        env = {k: v for k, v in os.environ.items()\n               if not k.startswith((\"IG_\", \"IDEAGRAPH_\"))}\n        env.update(IG_BRAIN_MODE=brain.mode, IG_BRAIN_PATH=str(brain.path),\n                   IDEAGRAPH_EMBEDDER=\"hash\", PYTHONPATH=str(REPO))\n        headers = {}\n        if options.get('secure'):\n            policy = tmp_path / 'browser-policy.json'\n            policy.write_text(json.dumps({'graphs': {'default': {\n                'roles': {'reviewer': 'editor', 'reader': 'viewer'},\n                'nodes': {'source': {'read': ['reviewer'], 'write': ['reviewer']}}}},\n                'tokens': {hashlib.sha256(token.encode()).hexdigest(): identity for token, identity in\n                           [('reviewer-token', 'reviewer'), ('reader-token', 'reader')]}}))\n            env['IG_ACCESS_POLICY'] = str(policy)\n            headers['Authorization'] = 'Bearer reviewer-token'\n        with socket.socket() as sock:\n>           sock.bind((\"127.0.0.1\", 0))\nE           PermissionError: [Errno 1] Operation not permitted\n\ntests/test_frontend_xss.py:71: PermissionError"
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0003096250002272427,
+        "detail": null
+      }
+    },
+    "tests/test_mcp.py::test_write_mode_registers_exactly_the_write_tools": {
+      "setup": {
+        "outcome": "passed",
+        "duration_seconds": 0.002421042008791119,
+        "detail": null
+      },
+      "call": {
+        "outcome": "passed",
+        "duration_seconds": 0.8740313749876805,
+        "detail": null
+      },
+      "teardown": {
+        "outcome": "passed",
+        "duration_seconds": 0.0009456670377403498,
+        "detail": null
+      }
+    }
+  },
+  "expected_nodes": [
+    "tests/test_decision_integrity.py::test_cli_cannot_merge_version_pinned_source_or_reassign_reviews",
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-cli]",
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-exports]",
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-http]",
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-mcp]",
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-service]",
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-cli]",
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-exports]",
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-http]",
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-mcp]",
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-service]",
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-cli]",
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-exports]",
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-http]",
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-mcp]",
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-service]",
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-cli]",
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-exports]",
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-http]",
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-mcp]",
+    "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-service]",
+    "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[commit-cli]",
+    "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[commit-http]",
+    "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[index-cli]",
+    "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[index-http]",
+    "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[dependent-undo-cli]",
+    "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[dependent-undo-http]",
+    "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[fresh-undo-cli]",
+    "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[fresh-undo-http]",
+    "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[stale-cli]",
+    "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[stale-http]",
+    "tests/test_decision_integrity.py::test_simultaneous_cli_proposals_have_one_winner_and_lossless_retry",
+    "tests/test_decision_integrity.py::test_simultaneous_http_proposals_share_generation_and_preserve_both_on_retry",
+    "tests/test_decision_memory.py::test_claim_wording_and_context_edit_never_transfer_review",
+    "tests/test_decision_memory.py::test_commit_failure_preserves_authoritative_receipt",
+    "tests/test_decision_memory.py::test_interrupted_sidecar_publication_leaves_only_reusable_anchors",
+    "tests/test_decision_memory.py::test_missing_and_cyclic_node_lineage_fail_closed[lineage0]",
+    "tests/test_decision_memory.py::test_missing_and_cyclic_node_lineage_fail_closed[lineage1]",
+    "tests/test_decision_memory.py::test_pinned_merge_refuses_before_any_changes",
+    "tests/test_decision_memory.py::test_sidecar_reference_acl_checks_basis_anchor_as_well_as_source",
+    "tests/test_decision_memory.py::test_source_edit_versions_exact_bytes_and_marks_basis_changed",
+    "tests/test_decision_memory.py::test_stale_generation_and_source_hash_previews_conflict",
+    "tests/test_decision_service.py::test_explicit_revise_and_guarded_undo",
+    "tests/test_decision_service.py::test_import_propose_review_changed_source_and_stale_review",
+    "tests/test_decision_service.py::test_post_publication_failure_returns_durable_retry",
+    "tests/test_decision_service.py::test_undo_fails_after_dependent_review",
+    "tests/test_frontend_xss.py::test_decision_impact_full_browser_flow_and_pinned_brief[server0]",
+    "tests/test_frontend_xss.py::test_decision_integrity_brief_keeps_selected_revision_after_later_edit[git]",
+    "tests/test_frontend_xss.py::test_decision_integrity_published_finding_failure_preserves_receipt_and_history[git-fault]",
+    "tests/test_frontend_xss.py::test_decision_integrity_second_source_revocation_clears_derived_ui[git-secure]",
+    "tests/test_frontend_xss.py::test_decision_integrity_tombstone_clears_historical_ui[git]",
+    "tests/test_frontend_xss.py::test_decision_integrity_two_browser_reviews_have_one_winner_without_duplicate_effects[git]",
+    "tests/test_frontend_xss.py::test_decision_review_restricted_evidence_is_hidden_by_real_authenticated_api[server0]",
+    "tests/test_frontend_xss.py::test_decision_review_stale_submission_refreshes_without_overwriting[server0]",
+    "tests/test_mcp.py::test_write_mode_registers_exactly_the_write_tools"
+  ],
+  "deselected_nodes": [],
+  "execution_passed": false
+}

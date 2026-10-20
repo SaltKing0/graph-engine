@@ -1,8 +1,11 @@
 """Conservative production-interface diagnostic; no extraction or semantic oracle.
 
-Only source-only inputs reach execute(). A declared basis claim is versioned to
-attach the available update; accepted dependencies retain their exact old target.
-This deliberately measures review alerts, not an invented interpretation of prose.
+Source-only task inputs and optional field reviews reach execute(). A basis is versioned to
+attach a changed or unknown update; exact/CRLF-only task-text equality retains
+the original basis. Accepted dependencies retain their exact old target.
+This measures review alerts, not an invented interpretation of prose.
+An optional, hash-bound developer field review can retain an unchanged basis
+before impact analysis; the default diagnostic has no such interpretation.
 """
 from __future__ import annotations
 
@@ -22,19 +25,53 @@ from .corpus import DATA, canonical, digest, load_bundle, visible_inputs
 from .runner import run as baseline_run, TASK
 from .scoring import score
 from .readiness import assess
+from .reviewed_observations import assess as assess_observations
 
 MAPPING = {
-    'version': 'dm.source-change-diagnostic/1',
+    'version': 'dm.source-change-diagnostic/2',
     'claim': 'Declared source basis; no truth assessment or structured conditions',
     'update': 'New claim version with exact original source and current update as provenance inputs',
     'dependency': 'Curated links explicitly accepted; proposed profile uses only supplied proposed links, left proposed',
     'normalization': 'Verified old claim -> accepted depends_on -> exact decision maps to update/source/dependency/decision',
     'uncertainty': 'comparability_unknown becomes explicit uncertainty, including on known pairs',
     'interpretation': 'No prose-to-opposition/withdrawal/conditions inference; no source artifact is overwritten',
+    'no_op': 'Exact complete supplied source text or CRLF-only equality retains the original basis; update sources remain captured',
 }
 
 
-def execute(visible: dict, event: dict, path: Path, mode: str, *, budget: int, k: int, trace: dict | None = None) -> dict:
+def source_update(documents: list[dict], event: dict) -> dict:
+    """Compare complete task-input chunks, never a prose claim of equivalence.
+
+    The chronological loader supplies the entire source, in 800-character
+    slices. Refuse malformed/missing chunks rather than interpreting a prefix
+    or reordered text as a no-op. This does not assess scope, truth or lineage.
+    """
+    def assemble(source_id: str) -> tuple[str | None, dict]:
+        chunks = [d for d in documents if d['source_id'] == source_id]
+        # Reconstruct numeric chunk order, including sources over 1000 chunks.
+        by_id = {d['id']: d for d in chunks}
+        expected = [f'{source_id}-c{i:03}' for i in range(len(chunks))]
+        valid = bool(chunks) and len(by_id) == len(chunks) and set(by_id) == set(expected)
+        ordered = [by_id[key] for key in expected] if valid else []
+        valid = valid and all(isinstance(d['text'], str) and 0 < len(d['text']) <= 800 for d in ordered)
+        valid = valid and all(len(d['text']) == 800 for d in ordered[:-1])
+        text = ''.join(d['text'] for d in ordered) if valid else None
+        return text, dict(source_id=source_id, chunk_ids=expected if valid else sorted(by_id),
+            well_formed_task_chunks=bool(valid),
+            text_sha256=digest(text.encode()) if text is not None else None,
+            normalized_sha256=digest(text.replace('\r\n', '\n').encode()) if text is not None else None)
+
+    old, old_info = assemble(event['changed_source_id'])
+    new, new_info = assemble(event['source_id'])
+    classification = ('unavailable' if old is None or new is None else
+                      'identical' if old == new else
+                      'crlf_only' if old.replace('\r\n', '\n') == new.replace('\r\n', '\n') else 'changed')
+    return dict(rule='complete-task-text-exact-or-crlf/1', classification=classification,
+                old=old_info, new=new_info, semantic_assessment=None)
+
+
+def execute(visible: dict, event: dict, path: Path, mode: str, *, budget: int, k: int,
+            trace: dict | None = None, observation_review: dict | None = None) -> dict:
     """Production execution boundary. Never accepts labels, gold paths or rationales."""
     trace = trace if trace is not None else {}
     times: dict[str, list[float]] = trace.setdefault('latency_ms', {})
@@ -105,9 +142,26 @@ def execute(visible: dict, event: dict, path: Path, mode: str, *, budget: int, k
     update_refs = sources(current)
     if not update_refs:
         raise ValueError('Update has no visible source chunks')
+    update = source_update(visible['documents'], event)
+    bound_update = deepcopy(update)
+    for side in ('old', 'new'):
+        item = bound_update[side]
+        chunks = {d['id']: d for d in visible['documents'] if d['source_id'] == item['source_id']}
+        item['text'] = ''.join(chunks[key]['text'] for key in item['chunk_ids']) if item['well_formed_task_chunks'] else ''
+    observation_assessment = assess_observations(observation_review, bound_update, available_at=event['at'])
+    outputs.append(dict(stage='reviewed_observations', output=observation_assessment))
+    update['captured_update_refs'] = update_refs
+    update['retained_basis_refs'] = []
+    outputs.append(dict(stage='source_update', output=update))
     drafts = []
     for dep in selected:
         if dep['source_id'] != event['changed_source_id']:
+            continue
+        if update['classification'] in ('identical', 'crlf_only') or observation_assessment['retain_basis']:
+            # No successor claim or inherited review. The optional field audit
+            # is a developer configuration, never a manufactured human review.
+            # The separately captured update and exact hashes stay in the trace.
+            update['retained_basis_refs'].append(claims[dep['id']])
             continue
         old = service.inspect(claims[dep['id']])['record']
         draft = {key: deepcopy(old[key]) for key in ('id', 'kind', 'anchor_node_id', 'provenance', 'payload')}
@@ -137,7 +191,8 @@ def execute(visible: dict, event: dict, path: Path, mode: str, *, budget: int, k
                 dep['id'], dep['decision_id']], reason=candidate['judgment'],
                 uncertainty_reason='Structured comparability is unknown' if 'comparability_unknown' in candidate['reasons'] else None,
                 candidate_id=candidate['candidate_id']))
-    return dict(alerts=alerts, latency_ms=times, raw_outputs=outputs, comparison=comp,
+    return dict(alerts=alerts, latency_ms=times, raw_outputs=outputs, comparison=comp, source_update=update,
+        observation_assessment=observation_assessment,
         ids=dict(decisions=decisions, claims=claims, dependencies=links),
         complete=not comparison['completeness']['truncated'] and not queue['truncated'],
         context_within_budget=context['tokens'] <= budget)

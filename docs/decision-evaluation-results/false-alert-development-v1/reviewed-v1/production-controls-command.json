@@ -1,0 +1,20 @@
+{
+  "name": "production-controls",
+  "argv": [
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+    "-m",
+    "tools.decision_benchmark.production",
+    "--split",
+    "all",
+    "--output",
+    "/tmp/issue91-reviewed-final-v2/production-controls.json"
+  ],
+  "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+  "environment": {
+    "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+    "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+  },
+  "exit_code": 0,
+  "elapsed_seconds": 52.71521512500476,
+  "log": "production-controls.log"
+}

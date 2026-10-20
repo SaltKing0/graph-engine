@@ -1,0 +1,88 @@
+[
+  {
+    "label": "review",
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "argv": [
+      ".venv/bin/python",
+      "docs/decision-evaluation-results/false-alert-development-v1/y1-candidate-review-v1/review.py",
+      "--output",
+      "/tmp/issue91-y1-candidates/validated-run"
+    ],
+    "started_at": "2026-10-18T18:39:44.534775+00:00",
+    "ended_at": "2026-10-18T18:39:58.643628+00:00",
+    "elapsed_seconds": 14.108,
+    "exit_code": 0,
+    "log": "review.log"
+  },
+  {
+    "label": "focused",
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "argv": [
+      ".venv/bin/python",
+      "-m",
+      "pytest",
+      "tests/test_decision_review.py",
+      "tests/test_decision_refresh_basis.py",
+      "tests/test_decision_support_paths.py",
+      "-q",
+      "-rs"
+    ],
+    "started_at": "2026-10-18T18:36:23.408579+00:00",
+    "ended_at": "2026-10-18T18:37:42.885300+00:00",
+    "elapsed_seconds": 79.474,
+    "exit_code": 0,
+    "log": "focused.log"
+  },
+  {
+    "label": "prior-verifier",
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "argv": [
+      ".venv/bin/python",
+      "/tmp/issue91-y1-candidates/historical_check.py"
+    ],
+    "started_at": "2026-10-18T18:37:24.309653+00:00",
+    "ended_at": "2026-10-18T18:37:28.726626+00:00",
+    "elapsed_seconds": 4.417,
+    "exit_code": 0,
+    "log": "prior-verifier.log"
+  },
+  {
+    "label": "verifier",
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "argv": [
+      ".venv/bin/python",
+      "docs/decision-evaluation-results/false-alert-development-v1/y1-candidate-review-v1/verify.py"
+    ],
+    "started_at": "2026-10-18T18:39:05.480958+00:00",
+    "ended_at": "2026-10-18T18:39:16.920854+00:00",
+    "elapsed_seconds": 11.439,
+    "exit_code": 0,
+    "log": "verifier.log"
+  },
+  {
+    "label": "references",
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "argv": [
+      ".venv/bin/python",
+      "docs/decision-evaluation-results/false-alert-development-v1/y1-candidate-review-v1/check_references.py"
+    ],
+    "started_at": "2026-10-18T18:39:12.586557+00:00",
+    "ended_at": "2026-10-18T18:39:12.681334+00:00",
+    "elapsed_seconds": 0.095,
+    "exit_code": 0,
+    "log": "references.log"
+  },
+  {
+    "label": "verifier-final",
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "argv": [
+      ".venv/bin/python",
+      "docs/decision-evaluation-results/false-alert-development-v1/y1-candidate-review-v1/verify.py"
+    ],
+    "started_at": "2026-10-18T18:40:25.643286+00:00",
+    "ended_at": "2026-10-18T18:40:36.055774+00:00",
+    "elapsed_seconds": 10.412,
+    "exit_code": 0,
+    "log": "verifier-final.log"
+  }
+]

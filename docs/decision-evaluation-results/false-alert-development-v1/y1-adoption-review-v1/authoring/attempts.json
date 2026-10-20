@@ -1,0 +1,23 @@
+{
+  "exposure": "Same known case throughout; no new independent cases, reviewer judgments or scores.",
+  "failed_check": {
+    "command_file": "context-span-before-fix-command.json",
+    "archived_log": "context-span-before-fix.log",
+    "runner": "context-span-before-fix.py.gz",
+    "exit_code": 1,
+    "domain_writes": 0,
+    "reason": "Authoring assertion mistook the X1 identifier span for the full antecedent sentence; fixed by binding both separately."
+  },
+  "successful_preflight": {
+    "output": "/tmp/issue91-y1-adoption-review/checked-review",
+    "exit_code": 0,
+    "elapsed_seconds": 1.947,
+    "output_sha256": {
+      "decision.json": "0549ad7e97b22db697d5ece31d435073bb435f68b3f2696015555a029799de51",
+      "review.json": "837b11995e1bca6ff29723dbd6fec2074c184a1a21dd1d661f23e29027dc566a"
+    },
+    "same_bytes_as_final_outputs": true,
+    "independent": false,
+    "note": "Before final validator assertions were added; source runner hash was not recorded. Not a separate final measurement."
+  }
+}

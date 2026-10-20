@@ -1,0 +1,13 @@
+{
+  "label": "verifier-final",
+  "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+  "argv": [
+    ".venv/bin/python",
+    "docs/decision-evaluation-results/false-alert-development-v1/y1-adoption-plan-v1/verify.py"
+  ],
+  "started_at": "2026-10-18T19:01:34.439074+00:00",
+  "ended_at": "2026-10-18T19:01:36.694753+00:00",
+  "elapsed_seconds": 2.255,
+  "exit_code": 0,
+  "log": "verifier-final.log"
+}

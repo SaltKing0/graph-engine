@@ -1,0 +1,14 @@
+source-hash: rejected
+missing-unit: rejected
+wrong-numeric-value: rejected
+threshold-from-measurement: rejected
+value-from-X1: rejected
+missing-condition: rejected
+swapped-condition: rejected
+root-from-X1: rejected
+wrong-subject: rejected
+fabricated-human: rejected
+fabricated-independence: rejected
+gold-key: rejected
+unit-role: rejected
+Declared-rule assessment passed; all 13 adversarial source/role/acceptance mutations rejected.

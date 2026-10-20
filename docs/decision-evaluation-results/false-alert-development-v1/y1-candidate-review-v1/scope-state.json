@@ -1,0 +1,15 @@
+{
+  "source_commit": "08f55ea4120336db83ada29ea2c305f777186fab",
+  "source_dirty": true,
+  "protected_paths": [
+    "graph_engine",
+    "tools",
+    "tests",
+    "examples",
+    ".github",
+    "pyproject.toml",
+    "CONTRIBUTING.md"
+  ],
+  "protected_diff_empty": true,
+  "note": "Only the new artifact directory and appended observation/readiness guides are authored; historical evidence is immutable."
+}

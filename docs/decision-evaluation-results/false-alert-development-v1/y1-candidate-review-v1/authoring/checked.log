@@ -1,0 +1,31 @@
+Traceback (most recent call last):
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-candidate-review-v1/review.py", line 307, in <module>
+    main()
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-candidate-review-v1/review.py", line 301, in main
+    result = run(args.output)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-candidate-review-v1/review.py", line 257, in run
+    result = service.record_finding(request, commit=False)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/graph_engine/write_guard.py", line 143, in guarded
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/graph_engine/decision_service.py", line 33, in checked
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/graph_engine/decision_service.py", line 196, in record_finding
+    result = self.store.transact(request, dry_run=dry_run, commit=commit)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/graph_engine/write_guard.py", line 143, in guarded
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/graph_engine/decision_memory.py", line 416, in transact
+    b.pull()
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/graph_engine/write_guard.py", line 143, in guarded
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/graph_engine/brain.py", line 503, in pull
+    raise RuntimeError(
+RuntimeError: git pull failed (brain repo needs manual attention; local changes were stashed via autostash):
+fatal: couldn't find remote ref main
+

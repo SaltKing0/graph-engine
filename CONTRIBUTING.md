@@ -236,3 +236,44 @@ For explicitly exposed, development-only engineering source review:
 
 This runner never opens labels or evaluation-source files, never scores its own
 notes, and preserves missing independent semantic and human measurements.
+
+For source-bound observation proposals from the fixed, already exposed
+development cases:
+
+```bash
+.venv/bin/python -m tools.decision_benchmark.structured_development --capture --output /tmp/decision-observations-new
+.venv/bin/python -m pytest tests/test_decision_observations.py -q
+```
+
+Use a new output directory. The [observation guide](docs/decision-source-observations.md)
+explains exact source/value bindings, units, conditions, root lineage and the
+retained source-version journal. All new profiles/evidence remain unreviewed
+proposals; structural comparisons never filter the original runtime alerts or
+establish independent semantic acceptance. No final/evaluation-data option is
+provided, and no existing sources, labels, freezes or results are replaced.
+
+For the explicit implementing-agent field-review development configuration:
+
+```bash
+.venv/bin/python -m tools.decision_benchmark.reviewed_development --output /tmp/decision-reviewed-development-new
+.venv/bin/python -m pytest tests/test_decision_reviewed_observations.py -q
+```
+
+The [observation guide](docs/decision-source-observations.md#explicit-developer-field-review-and-source-preparation)
+explains the separate trusted interpretation input, exact source/field binding,
+conservative pre-impact basis retention and missing independent acceptance.
+Ordinary diagnostics remain unchanged; this tool supplies no reserved data or
+expected outcomes and does not change frozen thresholds.
+
+For the one already exposed synthetic withdrawal case, separate evidence paths
+and a freshly reviewed successor basis can be exercised explicitly:
+
+```bash
+.venv/bin/python -m tools.decision_benchmark.support_paths --output /tmp/decision-support-paths-new
+.venv/bin/python -m pytest tests/test_decision_support_paths.py -q
+```
+
+This developer wiring run preserves exact sources, old versions and reviews,
+marks X1 withdrawn and Y1 remaining, and leaves the successor decision proposed.
+Its scripted source-level assessment is not independent acceptance or a new
+false-alert score. See the [observation guide](docs/decision-source-observations.md#separate-paths-and-a-versioned-remaining-basis).

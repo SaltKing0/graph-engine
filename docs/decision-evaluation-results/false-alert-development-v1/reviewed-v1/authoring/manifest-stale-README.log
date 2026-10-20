@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/reviewed-v1/verify_evidence.py", line 142, in <module>
+    if __name__=='__main__': main()
+                             ^^^^^^
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/reviewed-v1/verify_evidence.py", line 32, in main
+    assert digest(raw)==hashes['sha256'],name
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: README.md

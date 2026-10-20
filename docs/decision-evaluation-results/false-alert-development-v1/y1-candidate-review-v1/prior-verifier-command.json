@@ -1,0 +1,13 @@
+{
+  "label": "prior-verifier",
+  "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+  "argv": [
+    ".venv/bin/python",
+    "/tmp/issue91-y1-candidates/historical_check.py"
+  ],
+  "started_at": "2026-10-18T18:37:24.309653+00:00",
+  "ended_at": "2026-10-18T18:37:28.726626+00:00",
+  "elapsed_seconds": 4.417,
+  "exit_code": 0,
+  "log": "prior-verifier.log"
+}

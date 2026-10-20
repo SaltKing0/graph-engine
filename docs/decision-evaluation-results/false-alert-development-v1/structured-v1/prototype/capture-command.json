@@ -1,0 +1,15 @@
+{
+  "name": "capture",
+  "argv": [
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+    "-m",
+    "tools.decision_benchmark.structured_development",
+    "--capture",
+    "--output",
+    "/tmp/issue91-structured/capture"
+  ],
+  "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+  "exit_code": 0,
+  "elapsed_seconds": 247.31421795900678,
+  "log": "capture.log"
+}

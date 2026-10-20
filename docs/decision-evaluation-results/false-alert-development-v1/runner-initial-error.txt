@@ -1,0 +1,1 @@
+Initial validation orchestration exited 1 before starting diagnostics: FileExistsError for existing source-updates.log. Prior evidence was not overwritten. Continued with a new focused-final log path. Full-suite process was unaffected.

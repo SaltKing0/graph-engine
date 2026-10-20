@@ -1,0 +1,291 @@
+{
+  "schema": "dm.development.y1-source-review/1",
+  "author": {
+    "role": "implementing-agent",
+    "human": false,
+    "independent": false
+  },
+  "review_kind": "source-consistency analysis; not independent annotation or acceptance",
+  "reviewed_snapshot_commit": "75b319445d8976ce3f74c7875f686e12cb8eba85",
+  "case_id": "controls-v2/event-surviving-support",
+  "temporal_scope": {
+    "event_at": "2026-01-06T00:00:00Z",
+    "limitation": "Availability is declared at this fictional event, not verified for real-world use today."
+  },
+  "source_manifest": {
+    "controls-v2/surviving-support-basis": {
+      "text_sha256": "079b7acb941c5992583093e0c6d6a4d5d81ad217bea51fcd535dcb0f0330b031",
+      "available_at": "2026-01-01T00:00:00Z"
+    },
+    "controls-v2/surviving-support-update": {
+      "text_sha256": "bbfdc5e54a02a1dce66d5364fdfb152450e6dd1d320c1f2245ba1385fae22379",
+      "available_at": "2026-01-06T00:00:00Z"
+    }
+  },
+  "recorded_report_sha256": "6231799a3f5774f846e9fa13999bafaf4bd222ef16914366ca6f8a9a8c7ac1b2",
+  "reviewed_references": {
+    "claim": {
+      "id": "ce3e1293-0eb9-464f-99ac-583980e9d6e3",
+      "version_id": "sha256:d83b6deed154008db1179d90c95299d1a265517231ea0ee4776c650015a48352"
+    },
+    "support": {
+      "id": "fe2211de-dce0-4796-baa3-14d6ab6a689d",
+      "version_id": "sha256:cc9107f0554d76eb103271c017f0b9acb478d9754eb6b04cadaaedd963c0841b"
+    },
+    "decision": {
+      "id": "2f58a961-e940-4d00-9abe-93b7d119b4a2",
+      "version_id": "sha256:7da60154e762252e502ba9ba036c7bc900a92a451781eff5f98b9e7410c6ee02"
+    },
+    "dependency": {
+      "id": "db18e01d-b72d-4c74-8cca-956e5c85b38d",
+      "version_id": "sha256:ad67679e79bb87da8bdfbe6df8857bebf0e5b0b82244d41ec968954f9cc8aac0"
+    },
+    "finding": {
+      "id": "7508080b-e195-58d6-8daf-c3c0e910902c",
+      "version_id": "sha256:90baafde8f8b955571c2238580dd30aacbbda6715f39519f5ae16718f6b3aec8"
+    }
+  },
+  "preserved_journal": {
+    "versions": 15,
+    "events": 16,
+    "versions_sha256": "85c7f2548143f6cba40a2c30c79eb7001cdf4c4b93d3ff1845b74ed70ad9b96d",
+    "events_sha256": "687cb19aff16dc22f030dfb7421271bc683bcb8b5c91983983a62d40b181fa21"
+  },
+  "findings": [
+    {
+      "id": "rule",
+      "status": "direct_source_statement",
+      "conclusion": "The declared fictional action rule is mode A when recall >=0.7 fraction.",
+      "citations": [
+        {
+          "source_id": "controls-v2/surviving-support-basis",
+          "start": 11,
+          "end": 52,
+          "quote": "Choose mode A when recall >=0.7 fraction."
+        }
+      ]
+    },
+    {
+      "id": "measurement",
+      "status": "direct_source_statement",
+      "metric": "recall",
+      "value": "0.8",
+      "conclusion": "0.8 belongs to Y1, not the withdrawn X1 measurement.",
+      "citations": [
+        {
+          "source_id": "controls-v2/surviving-support-basis",
+          "start": 154,
+          "end": 240,
+          "quote": "Separate support Y1: recall=0.8 under the same conditions, independent lineage run-Y1."
+        },
+        {
+          "source_id": "controls-v2/surviving-support-basis",
+          "start": 171,
+          "end": 173,
+          "quote": "Y1"
+        },
+        {
+          "source_id": "controls-v2/surviving-support-basis",
+          "start": 175,
+          "end": 181,
+          "quote": "recall"
+        },
+        {
+          "source_id": "controls-v2/surviving-support-basis",
+          "start": 182,
+          "end": 185,
+          "quote": "0.8"
+        }
+      ]
+    },
+    {
+      "id": "unit",
+      "status": "explicit_interpretation",
+      "unit": "fraction",
+      "conclusion": "Fraction is resolved from the same declared recall rule. Y1 has no separately written unit; no conversion or outside recall convention is used.",
+      "citations": [
+        {
+          "source_id": "controls-v2/surviving-support-basis",
+          "start": 43,
+          "end": 51,
+          "quote": "fraction"
+        },
+        {
+          "source_id": "controls-v2/surviving-support-basis",
+          "start": 30,
+          "end": 36,
+          "quote": "recall"
+        },
+        {
+          "source_id": "controls-v2/surviving-support-basis",
+          "start": 175,
+          "end": 181,
+          "quote": "recall"
+        }
+      ]
+    },
+    {
+      "id": "conditions",
+      "status": "explicit_interpretation",
+      "dimensions": {
+        "workload": "W",
+        "environment": "E",
+        "code": "C",
+        "corpus": "H",
+        "protocol": "P"
+      },
+      "conclusion": "The explicit same-conditions reference resolves to the preceding X1 conditions. Their source fields are retained; X1 availability withdrawal is not a blanket retraction of this document or of those fields.",
+      "citations": [
+        {
+          "source_id": "controls-v2/surviving-support-basis",
+          "start": 186,
+          "end": 211,
+          "quote": "under the same conditions"
+        },
+        {
+          "source_id": "controls-v2/surviving-support-basis",
+          "start": 65,
+          "end": 67,
+          "quote": "X1"
+        },
+        {
+          "source_id": "controls-v2/surviving-support-basis",
+          "start": 90,
+          "end": 91,
+          "quote": "W"
+        },
+        {
+          "source_id": "controls-v2/surviving-support-basis",
+          "start": 105,
+          "end": 106,
+          "quote": "E"
+        },
+        {
+          "source_id": "controls-v2/surviving-support-basis",
+          "start": 113,
+          "end": 114,
+          "quote": "C"
+        },
+        {
+          "source_id": "controls-v2/surviving-support-basis",
+          "start": 123,
+          "end": 124,
+          "quote": "H"
+        },
+        {
+          "source_id": "controls-v2/surviving-support-basis",
+          "start": 135,
+          "end": 136,
+          "quote": "P"
+        }
+      ]
+    },
+    {
+      "id": "availability",
+      "status": "direct_source_statement",
+      "conclusion": "The update withdraws X1 support and separately leaves Y1 available; it does not withdraw Y1.",
+      "citations": [
+        {
+          "source_id": "controls-v2/surviving-support-update",
+          "start": 39,
+          "end": 74,
+          "quote": "support X1 withdrawn by its author."
+        },
+        {
+          "source_id": "controls-v2/surviving-support-update",
+          "start": 75,
+          "end": 116,
+          "quote": "Independent support Y1 remains available;"
+        }
+      ]
+    },
+    {
+      "id": "lineage",
+      "status": "not_independently_established",
+      "recorded_run_labels": [
+        "run-X1",
+        "run-Y1"
+      ],
+      "shared_document_roots": [
+        "document-sha256:079b7acb941c5992583093e0c6d6a4d5d81ad217bea51fcd535dcb0f0330b031"
+      ],
+      "conclusion": "Distinct run labels and the source assertion of a separate run do not supply reviewed execution/dataset artifacts. Separate paths are not independent votes.",
+      "citations": [
+        {
+          "source_id": "controls-v2/surviving-support-basis",
+          "start": 146,
+          "end": 152,
+          "quote": "run-X1"
+        },
+        {
+          "source_id": "controls-v2/surviving-support-basis",
+          "start": 233,
+          "end": 239,
+          "quote": "run-Y1"
+        },
+        {
+          "source_id": "controls-v2/surviving-support-update",
+          "start": 117,
+          "end": 182,
+          "quote": "Y1 was a separate run with known protocol and dataset provenance."
+        }
+      ]
+    },
+    {
+      "id": "sufficiency",
+      "status": "conditional_source_consistency",
+      "numerical_predicate": {
+        "value": "0.8",
+        "operator": ">=",
+        "threshold": "0.7",
+        "unit": "fraction",
+        "met": true
+      },
+      "conclusion": "Y1 suffices for the sole rule stated in this fictional source under the documented unit/context interpretation. No run-count/statistical threshold is invented. Real measurement validity, statistical sufficiency and general decision sufficiency remain unknown.",
+      "citations": [
+        {
+          "source_id": "controls-v2/surviving-support-basis",
+          "start": 11,
+          "end": 52,
+          "quote": "Choose mode A when recall >=0.7 fraction."
+        },
+        {
+          "source_id": "controls-v2/surviving-support-basis",
+          "start": 154,
+          "end": 240,
+          "quote": "Separate support Y1: recall=0.8 under the same conditions, independent lineage run-Y1."
+        }
+      ]
+    },
+    {
+      "id": "review_and_lifecycle",
+      "status": "preserved_and_open",
+      "conclusion": "The source-qualified claim is consistent with its limitations and existing scripted reviews. No correction/new basis version is required by these sources. Existing reviews are untouched; the decision/dependency remain proposed, the old decision needs investigation, and the stale finding remains unresolved.",
+      "citations": []
+    }
+  ],
+  "conclusion": "consistent_with_the_declared_fictional_rule_only",
+  "code_or_basis_correction_required": false,
+  "new_engine_events": 0,
+  "independent_acceptance": false,
+  "independently_reviewed_measurement_independence": null,
+  "statistical_sufficiency": null,
+  "general_decision_sufficiency": null,
+  "semantic_scores": null,
+  "human_review": null,
+  "user_sessions": null,
+  "product_benefit": null,
+  "independent_final_coverage": {
+    "positive": 0,
+    "negative": 0,
+    "inconclusive": 0
+  },
+  "release_ready": false,
+  "provider_calls": 0,
+  "open_requirements": [
+    "Actual execution/dataset artifacts and qualified separate review before independent-run credit.",
+    "Independent final annotation/adjudication, protected corpus/freeze and final-candidate sign-off.",
+    "Actual controlled user sessions before any benefit or review-time claim.",
+    "A fresh comparison and explicit authorized review before resolving the stale finding or activating a successor."
+  ]
+}

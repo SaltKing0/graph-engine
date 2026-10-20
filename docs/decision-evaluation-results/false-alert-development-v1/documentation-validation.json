@@ -1,0 +1,55 @@
+{
+  "local_references": [
+    {
+      "document": "docs/decision-evaluation-results/false-alert-development-v1/README.md",
+      "target": "commands.json"
+    },
+    {
+      "document": "docs/decision-evaluation-results/false-alert-development-v1/README.md",
+      "target": "manifest.json"
+    },
+    {
+      "document": "docs/decision-evaluation-results/false-alert-development-v1/README.md",
+      "target": "production-controls.json.gz"
+    },
+    {
+      "document": "docs/decision-evaluation-results/false-alert-development-v1/README.md",
+      "target": "solo-development.json.gz"
+    },
+    {
+      "document": "docs/decision-evaluation-results/false-alert-development-v1/README.md",
+      "target": "commands.json"
+    },
+    {
+      "document": "docs/decision-release-readiness.md",
+      "target": "decision-solo-development.md"
+    },
+    {
+      "document": "docs/decision-release-readiness.md",
+      "target": "decision-memory-v1.md#evaluation-gates-frozen-before-tuning"
+    },
+    {
+      "document": "docs/decision-release-readiness.md",
+      "target": "decision-workflow.md"
+    },
+    {
+      "document": "docs/decision-release-readiness.md",
+      "target": "decision-annotation-handbook.md"
+    },
+    {
+      "document": "docs/decision-release-readiness.md",
+      "target": "decision-evaluation-results/solo-development-v1/README.md"
+    },
+    {
+      "document": "docs/decision-release-readiness.md",
+      "target": "decision-evaluation-results/false-alert-development-v1/README.md"
+    },
+    {
+      "document": "docs/decision-release-readiness.md",
+      "target": "decision-evaluation-results/workflow-v1/README.md"
+    }
+  ],
+  "reference_check_passed": true,
+  "runtime_tool_test_ci_diff_from_measured_code": "",
+  "new_independent_acceptance": false
+}

@@ -1,0 +1,18 @@
+{
+  "schema": "dm.development.y1-adoption-readcheck/1",
+  "domain_write_attempts": 0,
+  "journal_unchanged": true,
+  "preview_unchanged": true,
+  "git_head_unchanged": true,
+  "git_worktree_clean": true,
+  "versions": 18,
+  "events": 19,
+  "unresolved_findings": 3,
+  "comparison_deltas": 10,
+  "comparison_candidates": 3,
+  "truncated": false,
+  "independent_acceptance": false,
+  "activation": false,
+  "reviewer_outcomes_recorded": 0,
+  "limitation": "Read-only plan and allowed-transition checks, not a full future transaction execution or approval."
+}

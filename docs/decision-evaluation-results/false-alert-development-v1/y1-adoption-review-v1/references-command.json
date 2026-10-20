@@ -1,0 +1,13 @@
+{
+  "label": "references",
+  "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+  "argv": [
+    ".venv/bin/python",
+    "docs/decision-evaluation-results/false-alert-development-v1/y1-adoption-review-v1/check_references.py"
+  ],
+  "started_at": "2026-10-20T13:32:18.186597+00:00",
+  "ended_at": "2026-10-20T13:32:18.232472+00:00",
+  "elapsed_seconds": 0.046,
+  "exit_code": 0,
+  "log": "references.log"
+}

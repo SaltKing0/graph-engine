@@ -1,0 +1,61 @@
+{
+  "exposure": "Every attempt uses the same already exposed development case, all read-only; not independent cases or scores.",
+  "failed_checks": [
+    {
+      "argv": [
+        ".venv/bin/python",
+        "docs/decision-evaluation-results/false-alert-development-v1/y1-adoption-plan-v1/prepare.py",
+        "--output",
+        "/tmp/issue91-y1-adoption/verified-prepared"
+      ],
+      "exit_code": 1,
+      "elapsed_seconds": 2.069,
+      "log": "source-binding-before-fix.log",
+      "runner": "source-binding-before-fix.py.gz",
+      "domain_writes": 0,
+      "reason": "Original artifact text is not identical to the captured Markdown body; exact serializer adds one newline."
+    },
+    {
+      "argv": [
+        ".venv/bin/python",
+        "docs/decision-evaluation-results/false-alert-development-v1/y1-adoption-plan-v1/prepare.py",
+        "--output",
+        "/tmp/issue91-y1-adoption/final-verified-prepared"
+      ],
+      "exit_code": 1,
+      "elapsed_seconds": 2.694,
+      "log": "display-parser-before-fix.log",
+      "runner": "display-parser-before-fix.py.gz",
+      "domain_writes": 0,
+      "reason": "Node display parser strips terminal whitespace; raw source body is required."
+    }
+  ],
+  "successful_preflights": [
+    {
+      "argv": [
+        ".venv/bin/python",
+        "docs/decision-evaluation-results/false-alert-development-v1/y1-adoption-plan-v1/prepare.py",
+        "--output",
+        "/tmp/issue91-y1-adoption/prepared"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": null,
+      "archive": "prepared.json.gz",
+      "domain_writes": 0,
+      "note": "Initial authoring draft; duration not measured."
+    },
+    {
+      "argv": [
+        ".venv/bin/python",
+        "docs/decision-evaluation-results/false-alert-development-v1/y1-adoption-plan-v1/prepare.py",
+        "--output",
+        "/tmp/issue91-y1-adoption/final-prepared"
+      ],
+      "exit_code": 0,
+      "elapsed_seconds": 2.773,
+      "archive": "final-prepared.json.gz",
+      "domain_writes": 0,
+      "note": "Read-only draft before additional exact source/body checks; not the final plan."
+    }
+  ]
+}

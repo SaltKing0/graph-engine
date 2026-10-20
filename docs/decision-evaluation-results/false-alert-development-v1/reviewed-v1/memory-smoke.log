@@ -1,0 +1,152 @@
+{
+  "status": "complete",
+  "summary": {
+    "graph-engine": {
+      "questions": 4,
+      "recall_at_k": {
+        "mean": 1.0,
+        "n": 2
+      },
+      "mrr": {
+        "mean": 1.0,
+        "n": 2
+      },
+      "evidence_coverage": {
+        "mean": 1.0,
+        "n": 2
+      },
+      "answer_correct_exact": {
+        "mean": null,
+        "n": 0
+      },
+      "abstention_correct": {
+        "mean": null,
+        "n": 0
+      },
+      "false_memory_detected": {
+        "mean": null,
+        "n": 0
+      },
+      "errors": 0,
+      "latency_ms_mean": {
+        "retrieval": 3.653916748589836,
+        "context": 0.49459350702818483,
+        "generation": 0.0,
+        "scoring": 0.011624739272519946
+      },
+      "estimated_tokens": {
+        "context": 418,
+        "prompt": 1007,
+        "completion": 0
+      },
+      "actual_tokens": {
+        "prompt_tokens": {
+          "total": null,
+          "n": 0
+        },
+        "completion_tokens": {
+          "total": null,
+          "n": 0
+        }
+      }
+    },
+    "lexical": {
+      "questions": 4,
+      "recall_at_k": {
+        "mean": 1.0,
+        "n": 2
+      },
+      "mrr": {
+        "mean": 1.0,
+        "n": 2
+      },
+      "evidence_coverage": {
+        "mean": 1.0,
+        "n": 2
+      },
+      "answer_correct_exact": {
+        "mean": null,
+        "n": 0
+      },
+      "abstention_correct": {
+        "mean": null,
+        "n": 0
+      },
+      "false_memory_detected": {
+        "mean": null,
+        "n": 0
+      },
+      "errors": 0,
+      "latency_ms_mean": {
+        "retrieval": 0.017635247786529362,
+        "context": 0.017426995327696204,
+        "generation": 0.0,
+        "scoring": 0.006968490197323263
+      },
+      "estimated_tokens": {
+        "context": 251,
+        "prompt": 837,
+        "completion": 0
+      },
+      "actual_tokens": {
+        "prompt_tokens": {
+          "total": null,
+          "n": 0
+        },
+        "completion_tokens": {
+          "total": null,
+          "n": 0
+        }
+      }
+    },
+    "vector": {
+      "questions": 4,
+      "recall_at_k": {
+        "mean": 1.0,
+        "n": 2
+      },
+      "mrr": {
+        "mean": 0.6666666666666666,
+        "n": 2
+      },
+      "evidence_coverage": {
+        "mean": 1.0,
+        "n": 2
+      },
+      "answer_correct_exact": {
+        "mean": null,
+        "n": 0
+      },
+      "abstention_correct": {
+        "mean": null,
+        "n": 0
+      },
+      "false_memory_detected": {
+        "mean": null,
+        "n": 0
+      },
+      "errors": 0,
+      "latency_ms_mean": {
+        "retrieval": 0.1987919822568074,
+        "context": 0.02372924063820392,
+        "generation": 0.0,
+        "scoring": 0.013781260349787772
+      },
+      "estimated_tokens": {
+        "context": 359,
+        "prompt": 946,
+        "completion": 0
+      },
+      "actual_tokens": {
+        "prompt_tokens": {
+          "total": null,
+          "n": 0
+        },
+        "completion_tokens": {
+          "total": null,
+          "n": 0
+        }
+      }
+    }
+  }
+}

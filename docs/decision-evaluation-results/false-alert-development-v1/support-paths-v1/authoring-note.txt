@@ -1,0 +1,2 @@
+A preliminary artifact-copy command requested withdrawal-v1/controls-v2-LICENSE.txt, which does not exist, and raised FileNotFoundError. The source license is withdrawal-v1/LICENSE.txt; it was copied without changing its bytes. Runtime/test execution was unaffected.
+An early reference check was run before commands.json had been collected, and correctly rejected the then-missing README target commands.json. The final check is run after collection; no link checker rule is weakened.

@@ -1,0 +1,555 @@
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+________ test_successor_reviews_are_pinned_and_finding_history_survives ________
+
+refreshed = (<graph_engine.decision_service.DecisionService object at 0x107e9fef0>, {'assessment': {'accepted_runtime_sufficiency'...7cc153a7a28b3'}, ...], 'candidate_id': 'sha256:4815146ced798d1a07ea4c23822f5f229916596c9f196957c9f14ee11353b880', ...})
+
+    def test_successor_reviews_are_pinned_and_finding_history_survives(refreshed):
+        service, replay, comp, candidate = refreshed
+        refs = replay['references']
+        successor_events = {e['event_id'] for e in service.inspect(refs['claim'])['events']}
+>       assert successor_events <= set(candidate['basis_event_ids'])
+E       AssertionError: assert {'71556122-06...17ccabc18fe0'} <= {'10fa81af-c7...cd30475', ...}
+E         
+E         Extra items in the left set:
+E         '936cec44-2bc1-5280-af8e-17ccabc18fe0'
+E         '71556122-0619-518e-abc4-128074ebc06e'
+
+tests/test_decision_refresh_basis.py:37: AssertionError
+_ test_fresh_review_stales_on_current_head_review_or_basis_change[assessment] __
+
+refreshed = (<graph_engine.decision_service.DecisionService object at 0x107ee5a30>, {'assessment': {'accepted_runtime_sufficiency'...81d3d7c7a4cf9'}, ...], 'candidate_id': 'sha256:98131caedf40174c2ed11e306824a89ce1e81dd0a942dcb550f1735d58cda2dd', ...})
+changed = 'assessment'
+
+    @pytest.mark.parametrize('changed', ['assessment', 'source', 'support'])
+    def test_fresh_review_stales_on_current_head_review_or_basis_change(refreshed, changed):
+        service, replay, comp, candidate = refreshed
+        refs = replay['references']
+>       finding = confirm(service, comp, candidate)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_decision_refresh_basis.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_decision_refresh_basis.py:26: in confirm
+    return service.record_finding(dict(schema='dm.finding-review/1', idempotency_key=str(uuid4()),
+graph_engine/write_guard.py:143: in guarded
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+graph_engine/decision_service.py:33: in checked
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+graph_engine/decision_service.py:196: in record_finding
+    result = self.store.transact(request, dry_run=dry_run, commit=commit)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+graph_engine/write_guard.py:143: in guarded
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <graph_engine.decision_memory.DecisionMemory object at 0x1064a22d0>
+request = {'events': [{'axis': 'finding_disposition', 'basis': [{'ref': {'id': '0993a03f-a00e-4fa9-8992-8ffcf3c41ce5', 'version_...67b192b9c2fd425cbf7c70d1c382e409f4140ae9650be0a', ...}, 'idempotency_key': '2860ba64-7895-46bf-975e-4418f16e6b4a', ...}
+
+    @write_operation
+    def transact(self, request: dict, *, commit: bool = True, dry_run: bool = False) -> dict:
+        """Append drafts/events and a durable receipt in one guarded publication.
+    
+        Callers supply UUIDs and exact predecessor refs; server supplies actor,
+        clock, hashes and event IDs. A request's previews are part of its retry
+        identity. Never retry a changed request under the same key.
+        """
+        b = self.brain
+        b.authorize('write')
+        s.fields(request, {'schema', 'idempotency_key', 'expected_generation', 'expected_heads', 'versions', 'events'})
+        if request['schema'] != s.SCHEMA:
+            raise s.UnsupportedSchema('Unsupported write schema')
+        s.string(request['idempotency_key'], limit=200)
+        s.need(type(request['expected_generation']) is int and isinstance(request['expected_heads'], dict))
+        s.sequence(request['versions'])
+        s.sequence(request['events'])
+        s.need(bool(request['versions'] or request['events']), 'Empty transaction')
+        request_hash = s.hash_record(request)
+        # An already published local receipt takes precedence over pull/sync.
+        # Even a failed commit must not duplicate accepted records on retry.
+        data = read_file(b)
+        replay = self._replay(data, request, request_hash)
+        if replay is not None:
+            return replay
+        if not dry_run:
+            b.ensure_ready()
+            b.pull()
+        data = read_file(b)
+        replay = self._replay(data, request, request_hash)
+        if replay is not None:
+            return replay
+        preview = self.preview()
+        if (preview['generation'] != request['expected_generation']
+                or preview['heads'] != request['expected_heads']):
+            raise s.RecordConflict('Decision Memory preview changed; refresh before writing')
+        new = deepcopy(data)
+        timestamp, identity = now(), actor(b)
+        created = []
+        local = {}
+        for draft in request['versions']:
+            s.fields(draft, {'id', 'kind', 'anchor_node_id', 'previous', 'provenance', 'payload'})
+            draft = resolve_local(draft, local)
+            version = dict(schema='dm.content/1', recorded_at=timestamp, recorded_by=identity, **deepcopy(draft))
+            version['version_id'] = s.hash_record(version)
+            new['versions'].append(version)
+            created.append(s.reference(version))
+            local[version['id']] = s.reference(version)
+        event_ids = []
+        by_ref = {s.key(v): v for v in new['versions']}
+        heads = _heads(new)
+        for draft in request['events']:
+            s.fields(draft, {'subject', 'axis', 'from', 'to', 'previous_event_id', 'basis', 'reason', 'supersedes_event_id'})
+            draft = resolve_local(draft, local)
+            e = dict(schema='dm.event/1', reviewer=identity, reviewed_at=timestamp,
+                     expected_heads={}, **deepcopy(draft))
+            s.ref(e['subject'])
+            # Never embed the full preview: unrelated records may later be
+            # revoked while this event remains readable.
+            e['event_id'] = 'pending'
+            try:
+                dependencies, source_nodes = RecordView(b, new).dependencies(e)
+            except (KeyError, TypeError, AttributeError) as exc:
+                raise s.RecordError('Malformed or unavailable event basis') from exc
+            ids = {vid for vid, _ in dependencies}
+            e['expected_heads'] = {k: val for k, val in preview['heads'].items()
+                                   if k in ids or k == 'authorization'
+                                   or k.startswith('source:') and k[7:] in source_nodes
+                                   or k.startswith('event:') and any(k.startswith('event:' + vid + ':') for vid in ids)}
+            e['event_id'] = event_identity(e)
+            new['events'].append(e)
+            event_ids.append(e['event_id'])
+            # New review of an old head is stale even when it was just explicitly
+            # requested. History is immutable; users must review the successor.
+            subject = by_ref.get(s.key(e['subject']))
+            terminal = e['axis'] == 'decision' and e['from'] == 'current' and e['to'] in ('superseded', 'withdrawn')
+            if subject is not None and heads[subject['id']] != subject and not terminal:
+                raise s.RecordConflict('Review target is no longer the content head')
+        new['generation'] += 1
+        receipt = dict(key=request['idempotency_key'], request_hash=request_hash, actor=identity,
+                       refs=created, event_ids=event_ids, generation=new['generation'])
+        new['receipts'].append(receipt)
+        s.validate(new)  # Validate before changing ANY anchor or file.
+        view = RecordView(b, new)
+        changed = [by_ref[s.key(r)] for r in created] + [view.events[eid] for eid in event_ids]
+        # A review may introduce source restrictions to an already-referenced
+        # claim. Propagate that new union to existing dependent anchors in this
+        # same publication; otherwise even authorized readers could no longer
+        # inspect/review those dependents. Never repair pre-existing tampering.
+        before_view = RecordView(b, data)
+        for old in data['versions']:
+            added = view.source_nodes(old) - before_view.source_nodes(old)
+            if added and old not in changed:
+                if not before_view.allowed(old, 'write'):
+                    raise BasisUnavailable('Record or basis unavailable')
+                changed.append(old)
+        planned = {}
+        # Construct all anchors before testing provenance, so no half-published
+        # review can reference an absent input. Nothing is written yet.
+        for v in (by_ref[s.key(r)] for r in created):
+            nid = v['anchor_node_id']
+            old = view.current.get(nid)
+            if v['kind'] == 'source':
+                if old is None or not view.node_allowed(nid, 'write'):
+                    raise BasisUnavailable('Record or basis unavailable')
+                if node_text(b, nid) != v['payload']['text']:
+                    raise s.RecordConflict('Source bytes changed')
+                if v['payload']['source_ref']['revision'] is not None:
+                    _check_revision(b, nid, v['payload']['text'], v['payload']['source_ref']['revision'])
+                n = deepcopy(old)
+                n.tags = sorted(set(n.tags) | {SOURCE_TAG})
+            else:
+                if old is not None and (TAG not in old.tags or old.text != anchor_text(v)):
+                    raise s.RecordConflict('Record anchor identity changed')
+                n = deepcopy(old) if old else Node(anchor_text(v), id=nid, tags=[TAG])
+            planned[nid] = n
+        # Reviews may introduce additional source restrictions; rejected or
+        # corrected events never remove dependencies already persisted.
+        for item in changed:
+            v = view.versions[s.key(item['subject'])] if 'event_id' in item else item
+            nid = v['anchor_node_id']
+            if nid not in planned:
+                old = view.current.get(nid)
+                if old is None:
+                    raise BasisUnavailable('Record or basis unavailable')
+                planned[nid] = deepcopy(old)
+            n = planned[nid]
+            sources = view.source_nodes(item) - {nid}
+            n.derived_from = sorted(set(n.derived_from) | sources)
+        view.current.update(planned)
+        view.nodes = view.current
+        from .access import derivation_parents
+        view.current_parents = derivation_parents(view.current, Brain.read_edges(b, include_rejected=True))
+        view.parents = view.current_parents
+        for item in changed:
+            if not view.allowed(item, 'write'):
+                raise BasisUnavailable('Record or basis unavailable')
+            if 'event_id' in item:
+                terminal = item['axis'] == 'decision' and item['from'] == 'current' and item['to'] in ('superseded', 'withdrawn')
+                if view.changed(item, terminal_decision=terminal):
+>                   raise s.RecordConflict('Review basis is stale; refresh the content and basis')
+E                   graph_engine.decision_schema.RecordConflict: Review basis is stale; refresh the content and basis
+
+graph_engine/decision_memory.py:529: RecordConflict
+___ test_fresh_review_stales_on_current_head_review_or_basis_change[source] ____
+
+refreshed = (<graph_engine.decision_service.DecisionService object at 0x108134770>, {'assessment': {'accepted_runtime_sufficiency'...6868a89b45c1e'}, ...], 'candidate_id': 'sha256:0ae258617c53abe78d81c21d9cabfdab9d09fddaa35c6cac12b4d4bce215fc9a', ...})
+changed = 'source'
+
+    @pytest.mark.parametrize('changed', ['assessment', 'source', 'support'])
+    def test_fresh_review_stales_on_current_head_review_or_basis_change(refreshed, changed):
+        service, replay, comp, candidate = refreshed
+        refs = replay['references']
+>       finding = confirm(service, comp, candidate)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_decision_refresh_basis.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_decision_refresh_basis.py:26: in confirm
+    return service.record_finding(dict(schema='dm.finding-review/1', idempotency_key=str(uuid4()),
+graph_engine/write_guard.py:143: in guarded
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+graph_engine/decision_service.py:33: in checked
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+graph_engine/decision_service.py:196: in record_finding
+    result = self.store.transact(request, dry_run=dry_run, commit=commit)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+graph_engine/write_guard.py:143: in guarded
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <graph_engine.decision_memory.DecisionMemory object at 0x108134ef0>
+request = {'events': [{'axis': 'finding_disposition', 'basis': [{'ref': {'id': '620c3695-023c-4f27-998b-141dfd6793f4', 'version_...98ff0f15cb5f7f8e4d719724af095a7bf5d9460c4abc6c9', ...}, 'idempotency_key': 'af0306fe-bf3d-43f7-aacc-b90634f3163c', ...}
+
+    @write_operation
+    def transact(self, request: dict, *, commit: bool = True, dry_run: bool = False) -> dict:
+        """Append drafts/events and a durable receipt in one guarded publication.
+    
+        Callers supply UUIDs and exact predecessor refs; server supplies actor,
+        clock, hashes and event IDs. A request's previews are part of its retry
+        identity. Never retry a changed request under the same key.
+        """
+        b = self.brain
+        b.authorize('write')
+        s.fields(request, {'schema', 'idempotency_key', 'expected_generation', 'expected_heads', 'versions', 'events'})
+        if request['schema'] != s.SCHEMA:
+            raise s.UnsupportedSchema('Unsupported write schema')
+        s.string(request['idempotency_key'], limit=200)
+        s.need(type(request['expected_generation']) is int and isinstance(request['expected_heads'], dict))
+        s.sequence(request['versions'])
+        s.sequence(request['events'])
+        s.need(bool(request['versions'] or request['events']), 'Empty transaction')
+        request_hash = s.hash_record(request)
+        # An already published local receipt takes precedence over pull/sync.
+        # Even a failed commit must not duplicate accepted records on retry.
+        data = read_file(b)
+        replay = self._replay(data, request, request_hash)
+        if replay is not None:
+            return replay
+        if not dry_run:
+            b.ensure_ready()
+            b.pull()
+        data = read_file(b)
+        replay = self._replay(data, request, request_hash)
+        if replay is not None:
+            return replay
+        preview = self.preview()
+        if (preview['generation'] != request['expected_generation']
+                or preview['heads'] != request['expected_heads']):
+            raise s.RecordConflict('Decision Memory preview changed; refresh before writing')
+        new = deepcopy(data)
+        timestamp, identity = now(), actor(b)
+        created = []
+        local = {}
+        for draft in request['versions']:
+            s.fields(draft, {'id', 'kind', 'anchor_node_id', 'previous', 'provenance', 'payload'})
+            draft = resolve_local(draft, local)
+            version = dict(schema='dm.content/1', recorded_at=timestamp, recorded_by=identity, **deepcopy(draft))
+            version['version_id'] = s.hash_record(version)
+            new['versions'].append(version)
+            created.append(s.reference(version))
+            local[version['id']] = s.reference(version)
+        event_ids = []
+        by_ref = {s.key(v): v for v in new['versions']}
+        heads = _heads(new)
+        for draft in request['events']:
+            s.fields(draft, {'subject', 'axis', 'from', 'to', 'previous_event_id', 'basis', 'reason', 'supersedes_event_id'})
+            draft = resolve_local(draft, local)
+            e = dict(schema='dm.event/1', reviewer=identity, reviewed_at=timestamp,
+                     expected_heads={}, **deepcopy(draft))
+            s.ref(e['subject'])
+            # Never embed the full preview: unrelated records may later be
+            # revoked while this event remains readable.
+            e['event_id'] = 'pending'
+            try:
+                dependencies, source_nodes = RecordView(b, new).dependencies(e)
+            except (KeyError, TypeError, AttributeError) as exc:
+                raise s.RecordError('Malformed or unavailable event basis') from exc
+            ids = {vid for vid, _ in dependencies}
+            e['expected_heads'] = {k: val for k, val in preview['heads'].items()
+                                   if k in ids or k == 'authorization'
+                                   or k.startswith('source:') and k[7:] in source_nodes
+                                   or k.startswith('event:') and any(k.startswith('event:' + vid + ':') for vid in ids)}
+            e['event_id'] = event_identity(e)
+            new['events'].append(e)
+            event_ids.append(e['event_id'])
+            # New review of an old head is stale even when it was just explicitly
+            # requested. History is immutable; users must review the successor.
+            subject = by_ref.get(s.key(e['subject']))
+            terminal = e['axis'] == 'decision' and e['from'] == 'current' and e['to'] in ('superseded', 'withdrawn')
+            if subject is not None and heads[subject['id']] != subject and not terminal:
+                raise s.RecordConflict('Review target is no longer the content head')
+        new['generation'] += 1
+        receipt = dict(key=request['idempotency_key'], request_hash=request_hash, actor=identity,
+                       refs=created, event_ids=event_ids, generation=new['generation'])
+        new['receipts'].append(receipt)
+        s.validate(new)  # Validate before changing ANY anchor or file.
+        view = RecordView(b, new)
+        changed = [by_ref[s.key(r)] for r in created] + [view.events[eid] for eid in event_ids]
+        # A review may introduce source restrictions to an already-referenced
+        # claim. Propagate that new union to existing dependent anchors in this
+        # same publication; otherwise even authorized readers could no longer
+        # inspect/review those dependents. Never repair pre-existing tampering.
+        before_view = RecordView(b, data)
+        for old in data['versions']:
+            added = view.source_nodes(old) - before_view.source_nodes(old)
+            if added and old not in changed:
+                if not before_view.allowed(old, 'write'):
+                    raise BasisUnavailable('Record or basis unavailable')
+                changed.append(old)
+        planned = {}
+        # Construct all anchors before testing provenance, so no half-published
+        # review can reference an absent input. Nothing is written yet.
+        for v in (by_ref[s.key(r)] for r in created):
+            nid = v['anchor_node_id']
+            old = view.current.get(nid)
+            if v['kind'] == 'source':
+                if old is None or not view.node_allowed(nid, 'write'):
+                    raise BasisUnavailable('Record or basis unavailable')
+                if node_text(b, nid) != v['payload']['text']:
+                    raise s.RecordConflict('Source bytes changed')
+                if v['payload']['source_ref']['revision'] is not None:
+                    _check_revision(b, nid, v['payload']['text'], v['payload']['source_ref']['revision'])
+                n = deepcopy(old)
+                n.tags = sorted(set(n.tags) | {SOURCE_TAG})
+            else:
+                if old is not None and (TAG not in old.tags or old.text != anchor_text(v)):
+                    raise s.RecordConflict('Record anchor identity changed')
+                n = deepcopy(old) if old else Node(anchor_text(v), id=nid, tags=[TAG])
+            planned[nid] = n
+        # Reviews may introduce additional source restrictions; rejected or
+        # corrected events never remove dependencies already persisted.
+        for item in changed:
+            v = view.versions[s.key(item['subject'])] if 'event_id' in item else item
+            nid = v['anchor_node_id']
+            if nid not in planned:
+                old = view.current.get(nid)
+                if old is None:
+                    raise BasisUnavailable('Record or basis unavailable')
+                planned[nid] = deepcopy(old)
+            n = planned[nid]
+            sources = view.source_nodes(item) - {nid}
+            n.derived_from = sorted(set(n.derived_from) | sources)
+        view.current.update(planned)
+        view.nodes = view.current
+        from .access import derivation_parents
+        view.current_parents = derivation_parents(view.current, Brain.read_edges(b, include_rejected=True))
+        view.parents = view.current_parents
+        for item in changed:
+            if not view.allowed(item, 'write'):
+                raise BasisUnavailable('Record or basis unavailable')
+            if 'event_id' in item:
+                terminal = item['axis'] == 'decision' and item['from'] == 'current' and item['to'] in ('superseded', 'withdrawn')
+                if view.changed(item, terminal_decision=terminal):
+>                   raise s.RecordConflict('Review basis is stale; refresh the content and basis')
+E                   graph_engine.decision_schema.RecordConflict: Review basis is stale; refresh the content and basis
+
+graph_engine/decision_memory.py:529: RecordConflict
+___ test_fresh_review_stales_on_current_head_review_or_basis_change[support] ___
+
+refreshed = (<graph_engine.decision_service.DecisionService object at 0x108005820>, {'assessment': {'accepted_runtime_sufficiency'...161732f7e42ff'}, ...], 'candidate_id': 'sha256:a611efccb39eccdd56cdb6450b6c79a4588505f03a6222816dea86600f4d42e3', ...})
+changed = 'support'
+
+    @pytest.mark.parametrize('changed', ['assessment', 'source', 'support'])
+    def test_fresh_review_stales_on_current_head_review_or_basis_change(refreshed, changed):
+        service, replay, comp, candidate = refreshed
+        refs = replay['references']
+>       finding = confirm(service, comp, candidate)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_decision_refresh_basis.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_decision_refresh_basis.py:26: in confirm
+    return service.record_finding(dict(schema='dm.finding-review/1', idempotency_key=str(uuid4()),
+graph_engine/write_guard.py:143: in guarded
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+graph_engine/decision_service.py:33: in checked
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+graph_engine/decision_service.py:196: in record_finding
+    result = self.store.transact(request, dry_run=dry_run, commit=commit)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+graph_engine/write_guard.py:143: in guarded
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <graph_engine.decision_memory.DecisionMemory object at 0x108004aa0>
+request = {'events': [{'axis': 'finding_disposition', 'basis': [{'ref': {'id': '156a6547-18df-42b1-9828-0d9673a068a4', 'version_...4963f3e48f7d663e172a5b680d895829bf6b11916184648', ...}, 'idempotency_key': 'f4d911e8-3ff8-4f83-a22f-7d1bb5317c84', ...}
+
+    @write_operation
+    def transact(self, request: dict, *, commit: bool = True, dry_run: bool = False) -> dict:
+        """Append drafts/events and a durable receipt in one guarded publication.
+    
+        Callers supply UUIDs and exact predecessor refs; server supplies actor,
+        clock, hashes and event IDs. A request's previews are part of its retry
+        identity. Never retry a changed request under the same key.
+        """
+        b = self.brain
+        b.authorize('write')
+        s.fields(request, {'schema', 'idempotency_key', 'expected_generation', 'expected_heads', 'versions', 'events'})
+        if request['schema'] != s.SCHEMA:
+            raise s.UnsupportedSchema('Unsupported write schema')
+        s.string(request['idempotency_key'], limit=200)
+        s.need(type(request['expected_generation']) is int and isinstance(request['expected_heads'], dict))
+        s.sequence(request['versions'])
+        s.sequence(request['events'])
+        s.need(bool(request['versions'] or request['events']), 'Empty transaction')
+        request_hash = s.hash_record(request)
+        # An already published local receipt takes precedence over pull/sync.
+        # Even a failed commit must not duplicate accepted records on retry.
+        data = read_file(b)
+        replay = self._replay(data, request, request_hash)
+        if replay is not None:
+            return replay
+        if not dry_run:
+            b.ensure_ready()
+            b.pull()
+        data = read_file(b)
+        replay = self._replay(data, request, request_hash)
+        if replay is not None:
+            return replay
+        preview = self.preview()
+        if (preview['generation'] != request['expected_generation']
+                or preview['heads'] != request['expected_heads']):
+            raise s.RecordConflict('Decision Memory preview changed; refresh before writing')
+        new = deepcopy(data)
+        timestamp, identity = now(), actor(b)
+        created = []
+        local = {}
+        for draft in request['versions']:
+            s.fields(draft, {'id', 'kind', 'anchor_node_id', 'previous', 'provenance', 'payload'})
+            draft = resolve_local(draft, local)
+            version = dict(schema='dm.content/1', recorded_at=timestamp, recorded_by=identity, **deepcopy(draft))
+            version['version_id'] = s.hash_record(version)
+            new['versions'].append(version)
+            created.append(s.reference(version))
+            local[version['id']] = s.reference(version)
+        event_ids = []
+        by_ref = {s.key(v): v for v in new['versions']}
+        heads = _heads(new)
+        for draft in request['events']:
+            s.fields(draft, {'subject', 'axis', 'from', 'to', 'previous_event_id', 'basis', 'reason', 'supersedes_event_id'})
+            draft = resolve_local(draft, local)
+            e = dict(schema='dm.event/1', reviewer=identity, reviewed_at=timestamp,
+                     expected_heads={}, **deepcopy(draft))
+            s.ref(e['subject'])
+            # Never embed the full preview: unrelated records may later be
+            # revoked while this event remains readable.
+            e['event_id'] = 'pending'
+            try:
+                dependencies, source_nodes = RecordView(b, new).dependencies(e)
+            except (KeyError, TypeError, AttributeError) as exc:
+                raise s.RecordError('Malformed or unavailable event basis') from exc
+            ids = {vid for vid, _ in dependencies}
+            e['expected_heads'] = {k: val for k, val in preview['heads'].items()
+                                   if k in ids or k == 'authorization'
+                                   or k.startswith('source:') and k[7:] in source_nodes
+                                   or k.startswith('event:') and any(k.startswith('event:' + vid + ':') for vid in ids)}
+            e['event_id'] = event_identity(e)
+            new['events'].append(e)
+            event_ids.append(e['event_id'])
+            # New review of an old head is stale even when it was just explicitly
+            # requested. History is immutable; users must review the successor.
+            subject = by_ref.get(s.key(e['subject']))
+            terminal = e['axis'] == 'decision' and e['from'] == 'current' and e['to'] in ('superseded', 'withdrawn')
+            if subject is not None and heads[subject['id']] != subject and not terminal:
+                raise s.RecordConflict('Review target is no longer the content head')
+        new['generation'] += 1
+        receipt = dict(key=request['idempotency_key'], request_hash=request_hash, actor=identity,
+                       refs=created, event_ids=event_ids, generation=new['generation'])
+        new['receipts'].append(receipt)
+        s.validate(new)  # Validate before changing ANY anchor or file.
+        view = RecordView(b, new)
+        changed = [by_ref[s.key(r)] for r in created] + [view.events[eid] for eid in event_ids]
+        # A review may introduce source restrictions to an already-referenced
+        # claim. Propagate that new union to existing dependent anchors in this
+        # same publication; otherwise even authorized readers could no longer
+        # inspect/review those dependents. Never repair pre-existing tampering.
+        before_view = RecordView(b, data)
+        for old in data['versions']:
+            added = view.source_nodes(old) - before_view.source_nodes(old)
+            if added and old not in changed:
+                if not before_view.allowed(old, 'write'):
+                    raise BasisUnavailable('Record or basis unavailable')
+                changed.append(old)
+        planned = {}
+        # Construct all anchors before testing provenance, so no half-published
+        # review can reference an absent input. Nothing is written yet.
+        for v in (by_ref[s.key(r)] for r in created):
+            nid = v['anchor_node_id']
+            old = view.current.get(nid)
+            if v['kind'] == 'source':
+                if old is None or not view.node_allowed(nid, 'write'):
+                    raise BasisUnavailable('Record or basis unavailable')
+                if node_text(b, nid) != v['payload']['text']:
+                    raise s.RecordConflict('Source bytes changed')
+                if v['payload']['source_ref']['revision'] is not None:
+                    _check_revision(b, nid, v['payload']['text'], v['payload']['source_ref']['revision'])
+                n = deepcopy(old)
+                n.tags = sorted(set(n.tags) | {SOURCE_TAG})
+            else:
+                if old is not None and (TAG not in old.tags or old.text != anchor_text(v)):
+                    raise s.RecordConflict('Record anchor identity changed')
+                n = deepcopy(old) if old else Node(anchor_text(v), id=nid, tags=[TAG])
+            planned[nid] = n
+        # Reviews may introduce additional source restrictions; rejected or
+        # corrected events never remove dependencies already persisted.
+        for item in changed:
+            v = view.versions[s.key(item['subject'])] if 'event_id' in item else item
+            nid = v['anchor_node_id']
+            if nid not in planned:
+                old = view.current.get(nid)
+                if old is None:
+                    raise BasisUnavailable('Record or basis unavailable')
+                planned[nid] = deepcopy(old)
+            n = planned[nid]
+            sources = view.source_nodes(item) - {nid}
+            n.derived_from = sorted(set(n.derived_from) | sources)
+        view.current.update(planned)
+        view.nodes = view.current
+        from .access import derivation_parents
+        view.current_parents = derivation_parents(view.current, Brain.read_edges(b, include_rejected=True))
+        view.parents = view.current_parents
+        for item in changed:
+            if not view.allowed(item, 'write'):
+                raise BasisUnavailable('Record or basis unavailable')
+            if 'event_id' in item:
+                terminal = item['axis'] == 'decision' and item['from'] == 'current' and item['to'] in ('superseded', 'withdrawn')
+                if view.changed(item, terminal_decision=terminal):
+>                   raise s.RecordConflict('Review basis is stale; refresh the content and basis')
+E                   graph_engine.decision_schema.RecordConflict: Review basis is stale; refresh the content and basis
+
+graph_engine/decision_memory.py:529: RecordConflict
+=========================== short test summary info ============================
+FAILED tests/test_decision_refresh_basis.py::test_successor_reviews_are_pinned_and_finding_history_survives
+FAILED tests/test_decision_refresh_basis.py::test_fresh_review_stales_on_current_head_review_or_basis_change[assessment]
+FAILED tests/test_decision_refresh_basis.py::test_fresh_review_stales_on_current_head_review_or_basis_change[source]
+FAILED tests/test_decision_refresh_basis.py::test_fresh_review_stales_on_current_head_review_or_basis_change[support]
+4 failed in 42.30s

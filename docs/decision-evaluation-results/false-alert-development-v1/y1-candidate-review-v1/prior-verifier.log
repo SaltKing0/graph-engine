@@ -1,0 +1,5 @@
+Cloning into '/tmp/issue91-y1-candidates/history-08'...
+done.
+HEAD is now at 08f55ea Record fresh Y1 comparisons, preserved finding history and restorable state (#91)
+Git bundle restored: exact revisions, references, deltas and candidates reproduced; stale candidate rejected.
+Fresh comparison and open finding successor verified. Original archives unchanged; no activation/independent acceptance.

@@ -1,0 +1,20 @@
+{
+  "name": "memory-smoke",
+  "argv": [
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+    "-m",
+    "tools.memory_benchmark",
+    "--smoke",
+    "--check",
+    "--output",
+    "/tmp/issue91-support-paths-final/memory-smoke.json"
+  ],
+  "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+  "environment": {
+    "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+    "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+  },
+  "exit_code": 0,
+  "elapsed_seconds": 1.7529608749900945,
+  "log": "memory-smoke.log"
+}

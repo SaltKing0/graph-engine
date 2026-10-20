@@ -1,0 +1,10 @@
+{
+  "source_commit": "c857997d5aeb66538f8fa1708dde83f48d8d7513",
+  "dirty": false,
+  "python": "3.12.14 (main, Aug 12 2026, 13:57:54) [Clang 21.0.0 (clang-2100.1.1.101)]",
+  "platform": "macOS-26.7.1-arm64-arm-64bit",
+  "environment": {
+    "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+    "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+  }
+}

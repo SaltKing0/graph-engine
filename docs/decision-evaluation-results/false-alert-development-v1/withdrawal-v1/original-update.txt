@@ -1,0 +1,1 @@
+SYNTHETIC UPDATE: Availability update: support X1 withdrawn by its author. Independent support Y1 remains available; Y1 was a separate run with known protocol and dataset provenance.

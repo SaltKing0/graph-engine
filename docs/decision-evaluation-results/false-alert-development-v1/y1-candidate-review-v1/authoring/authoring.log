@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-candidate-review-v1/review.py", line 289, in <module>
+    main()
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-candidate-review-v1/review.py", line 283, in main
+    result = run(args.output)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-candidate-review-v1/review.py", line 227, in run
+    report['analysis'] = examine(service, prior, comparison)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-candidate-review-v1/review.py", line 83, in examine
+    assert compare_fields(rows) == compare_fields(prior['comparisons']['initial_to_y1']['output'])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

@@ -1,0 +1,13 @@
+{
+  "name": "replay",
+  "argv": [
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+    "docs/decision-evaluation-results/false-alert-development-v1/withdrawal-v1/verify.py",
+    "--replay",
+    "/tmp/issue91-withdrawal-final/replay"
+  ],
+  "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+  "exit_code": 0,
+  "elapsed_seconds": 7.18585291702766,
+  "log": "replay.log"
+}

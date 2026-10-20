@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-refresh-v1/refresh.py", line 222, in <module>
+    main()
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-refresh-v1/refresh.py", line 215, in main
+    result = run(args.output)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-refresh-v1/refresh.py", line 133, in run
+    report['mapping'] = replay_mapping(prior, replay)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-refresh-v1/refresh.py", line 94, in replay_mapping
+    assert values[0] == values[1], 'Replay withdrawal meaning differs: ' + field
+           ^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Replay withdrawal meaning differs: support

@@ -1,0 +1,93 @@
+{
+  "schema": "dm.development.y1-adoption-review/1",
+  "author": {
+    "role": "implementing-agent",
+    "human": false,
+    "independent": false
+  },
+  "reviewed_snapshot": "a02f6eb9fdc8704e38d47f97c4f32b7e1dc2a7ca",
+  "original_plan_sha256": "6210d9238953c51d95c15e08f18f418a737422e4d7560d0526e2d7c9217d8497",
+  "original_omissions": [
+    "No explicit fictional-event time / unknown present-world availability.",
+    "Unit inheritance and exact metric/condition field roles not explicit in the JSON.",
+    "Future stage dependencies lack explicit required-outcome and unfilled-authority predicates."
+  ],
+  "original_scope_conclusion": "Consistent with the sole declared fictional rule; not real-world or statistical sufficiency.",
+  "revision": "Explicit temporal/interpretation scope, required outcome/authority predicates and unresolved finding handoff; no existing recommendation or source threshold changed.",
+  "exact_state_checks": {
+    "schema": "dm.development.y1-adoption-readcheck/1",
+    "domain_write_attempts": 0,
+    "journal_unchanged": true,
+    "preview_unchanged": true,
+    "git_head_unchanged": true,
+    "git_worktree_clean": true,
+    "versions": 18,
+    "events": 19,
+    "unresolved_findings": 3,
+    "comparison_deltas": 10,
+    "comparison_candidates": 3,
+    "truncated": false,
+    "independent_acceptance": false,
+    "activation": false,
+    "reviewer_outcomes_recorded": 0,
+    "limitation": "Read-only plan and allowed-transition checks, not a full future transaction execution or approval."
+  },
+  "counterchecks": [
+    {
+      "check": "missing_temporal_scope",
+      "result": "rejected_invalid_plan_variant"
+    },
+    {
+      "check": "missing_source_mapping",
+      "result": "rejected_invalid_plan_variant"
+    },
+    {
+      "check": "missing_adoption_gate",
+      "result": "rejected_invalid_plan_variant"
+    },
+    {
+      "check": "unsupported_present_world_availability",
+      "result": "rejected_invalid_plan_variant"
+    },
+    {
+      "check": "unit_claimed_directly_in_y1",
+      "result": "rejected_invalid_plan_variant"
+    },
+    {
+      "check": "equal_number_bound_to_withdrawn_x1",
+      "result": "rejected_invalid_plan_variant"
+    },
+    {
+      "check": "missing_required_outcome_dependency_review",
+      "result": "rejected_invalid_plan_variant"
+    },
+    {
+      "check": "missing_required_outcome_decision_review",
+      "result": "rejected_invalid_plan_variant"
+    },
+    {
+      "check": "missing_required_outcome_successor_conclusion",
+      "result": "rejected_invalid_plan_variant"
+    },
+    {
+      "check": "missing_atomic_old_terminalization",
+      "result": "rejected_invalid_plan_variant"
+    },
+    {
+      "check": "implicit_finding_resolution",
+      "result": "rejected_invalid_plan_variant"
+    }
+  ],
+  "code_or_basis_correction": false,
+  "domain_writes": 0,
+  "activation": false,
+  "independent_acceptance": false,
+  "human_review": null,
+  "semantic_scores": null,
+  "product_benefit": null,
+  "independent_final_coverage": {
+    "positive": 0,
+    "negative": 0,
+    "inconclusive": 0
+  }
+}

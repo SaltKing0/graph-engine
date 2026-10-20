@@ -1,0 +1,11 @@
+{
+  "name": "references-before-command-collection",
+  "argv": [
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-basis-review-v1/check_references.py"
+  ],
+  "exit_code": 1,
+  "elapsed_seconds": 0.0610207500285469,
+  "log": "references-early.log",
+  "cause": "README referenced commands.json before the command inventory was written. Final checks write that inventory first; no reference-check rule was relaxed."
+}

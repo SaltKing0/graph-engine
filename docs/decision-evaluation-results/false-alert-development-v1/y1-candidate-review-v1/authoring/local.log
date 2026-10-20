@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-candidate-review-v1/review.py", line 310, in <module>
+    main()
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-candidate-review-v1/review.py", line 304, in main
+    result = run(args.output)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-candidate-review-v1/review.py", line 267, in run
+    assert_preserved(service, prior, before, final, finding_refs)
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/false-alert-development-v1/y1-candidate-review-v1/review.py", line 205, in assert_preserved
+    assert item['state'] == dict(finding_disposition=DISPOSITIONS[role], finding_workflow='open')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/.venv/bin/python",
+    "-m",
+    "pytest",
+    "tests/test_decision_refresh_basis.py",
+    "-q"
+  ],
+  "cwd": "/tmp/issue91-y1-refresh/history-22",
+  "source_commit": "22e398a572397ca378a25ac93dc4a3b71666dd98",
+  "environment": {
+    "PYTHONPATH": "/tmp/issue91-y1-refresh/history-22"
+  },
+  "exit_code": 1,
+  "elapsed_seconds": 43.80346133298008,
+  "expected_failure": true
+}

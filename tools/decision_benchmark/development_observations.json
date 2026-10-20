@@ -1,0 +1,1877 @@
+{
+  "schema": "dm.development.observations/1",
+  "author": {
+    "role": "implementing-agent",
+    "human": false,
+    "independent": false,
+    "review": "pending"
+  },
+  "exposure": "previously-exposed-development-only",
+  "sources": [
+    {
+      "source_id": "controls-v2/comparable-basis",
+      "text_sha256": "94fadfaa18438c6ba805547241c1e7f7058d44c1c0cab06d5c527faee6978861",
+      "facts": [
+        {
+          "id": "observation-X1",
+          "kind": "measurement",
+          "subject": {
+            "type": "id",
+            "value": "X1",
+            "start": 65,
+            "end": 67,
+            "quote": "X1"
+          },
+          "metric": {
+            "name": {
+              "type": "id",
+              "value": "recall",
+              "start": 30,
+              "end": 36,
+              "quote": "recall"
+            },
+            "value": {
+              "type": "decimal",
+              "value": "0.8",
+              "start": 76,
+              "end": 79,
+              "quote": "0.8"
+            },
+            "unit": {
+              "type": "id",
+              "value": "fraction",
+              "start": 43,
+              "end": 51,
+              "quote": "fraction"
+            },
+            "sample_count": null
+          },
+          "conditions": {
+            "workload": {
+              "type": "id",
+              "value": "W",
+              "start": 90,
+              "end": 91,
+              "quote": "W"
+            },
+            "environment": {
+              "type": "id",
+              "value": "E",
+              "start": 105,
+              "end": 106,
+              "quote": "E"
+            },
+            "code": {
+              "type": "id",
+              "value": "C",
+              "start": 113,
+              "end": 114,
+              "quote": "C"
+            },
+            "corpus": {
+              "type": "id",
+              "value": "H",
+              "start": 123,
+              "end": 124,
+              "quote": "H"
+            },
+            "protocol": {
+              "type": "id",
+              "value": "P",
+              "start": 135,
+              "end": 136,
+              "quote": "P"
+            }
+          },
+          "measurement_lineage": {
+            "type": "id",
+            "value": "run-X1",
+            "start": 146,
+            "end": 152,
+            "quote": "run-X1"
+          },
+          "observed_at": null,
+          "availability": null,
+          "limitations": [
+            "Selected source transcription by implementing agent; semantic role and completeness need review."
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "controls-v2/comparable-other",
+      "text_sha256": "6e8f103561f6bc62a3f3daa00156b8e21bbc18804e0d3660879f60ed1e4c59d4",
+      "facts": []
+    },
+    {
+      "source_id": "controls-v2/comparable-update",
+      "text_sha256": "d1bea7e35548f395cbb22bc1830a084da139468296b40e2fbb73a3d4ca16c4b3",
+      "facts": [
+        {
+          "id": "observation-X2",
+          "kind": "measurement",
+          "subject": {
+            "type": "id",
+            "value": "X2",
+            "start": 30,
+            "end": 32,
+            "quote": "X2"
+          },
+          "metric": {
+            "name": {
+              "type": "id",
+              "value": "recall",
+              "start": 34,
+              "end": 40,
+              "quote": "recall"
+            },
+            "value": {
+              "type": "decimal",
+              "value": "0.2",
+              "start": 41,
+              "end": 44,
+              "quote": "0.2"
+            },
+            "unit": {
+              "type": "id",
+              "value": "fraction",
+              "start": 45,
+              "end": 53,
+              "quote": "fraction"
+            },
+            "sample_count": null
+          },
+          "conditions": {
+            "workload": {
+              "type": "id",
+              "value": "W",
+              "start": 64,
+              "end": 65,
+              "quote": "W"
+            },
+            "environment": {
+              "type": "id",
+              "value": "E",
+              "start": 79,
+              "end": 80,
+              "quote": "E"
+            },
+            "code": {
+              "type": "id",
+              "value": "C",
+              "start": 87,
+              "end": 88,
+              "quote": "C"
+            },
+            "corpus": {
+              "type": "id",
+              "value": "H",
+              "start": 97,
+              "end": 98,
+              "quote": "H"
+            },
+            "protocol": {
+              "type": "id",
+              "value": "P",
+              "start": 164,
+              "end": 165,
+              "quote": "P"
+            }
+          },
+          "measurement_lineage": null,
+          "observed_at": null,
+          "availability": null,
+          "limitations": [
+            "Selected source transcription by implementing agent; semantic role and completeness need review."
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "controls-v2/changed-conditions-basis",
+      "text_sha256": "94fadfaa18438c6ba805547241c1e7f7058d44c1c0cab06d5c527faee6978861",
+      "facts": [
+        {
+          "id": "observation-X1",
+          "kind": "measurement",
+          "subject": {
+            "type": "id",
+            "value": "X1",
+            "start": 65,
+            "end": 67,
+            "quote": "X1"
+          },
+          "metric": {
+            "name": {
+              "type": "id",
+              "value": "recall",
+              "start": 30,
+              "end": 36,
+              "quote": "recall"
+            },
+            "value": {
+              "type": "decimal",
+              "value": "0.8",
+              "start": 76,
+              "end": 79,
+              "quote": "0.8"
+            },
+            "unit": {
+              "type": "id",
+              "value": "fraction",
+              "start": 43,
+              "end": 51,
+              "quote": "fraction"
+            },
+            "sample_count": null
+          },
+          "conditions": {
+            "workload": {
+              "type": "id",
+              "value": "W",
+              "start": 90,
+              "end": 91,
+              "quote": "W"
+            },
+            "environment": {
+              "type": "id",
+              "value": "E",
+              "start": 105,
+              "end": 106,
+              "quote": "E"
+            },
+            "code": {
+              "type": "id",
+              "value": "C",
+              "start": 113,
+              "end": 114,
+              "quote": "C"
+            },
+            "corpus": {
+              "type": "id",
+              "value": "H",
+              "start": 123,
+              "end": 124,
+              "quote": "H"
+            },
+            "protocol": {
+              "type": "id",
+              "value": "P",
+              "start": 135,
+              "end": 136,
+              "quote": "P"
+            }
+          },
+          "measurement_lineage": {
+            "type": "id",
+            "value": "run-X1",
+            "start": 146,
+            "end": 152,
+            "quote": "run-X1"
+          },
+          "observed_at": null,
+          "availability": null,
+          "limitations": [
+            "Selected source transcription by implementing agent; semantic role and completeness need review."
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "controls-v2/changed-conditions-other",
+      "text_sha256": "6e8f103561f6bc62a3f3daa00156b8e21bbc18804e0d3660879f60ed1e4c59d4",
+      "facts": []
+    },
+    {
+      "source_id": "controls-v2/time-only-basis",
+      "text_sha256": "94fadfaa18438c6ba805547241c1e7f7058d44c1c0cab06d5c527faee6978861",
+      "facts": [
+        {
+          "id": "observation-X1",
+          "kind": "measurement",
+          "subject": {
+            "type": "id",
+            "value": "X1",
+            "start": 65,
+            "end": 67,
+            "quote": "X1"
+          },
+          "metric": {
+            "name": {
+              "type": "id",
+              "value": "recall",
+              "start": 30,
+              "end": 36,
+              "quote": "recall"
+            },
+            "value": {
+              "type": "decimal",
+              "value": "0.8",
+              "start": 76,
+              "end": 79,
+              "quote": "0.8"
+            },
+            "unit": {
+              "type": "id",
+              "value": "fraction",
+              "start": 43,
+              "end": 51,
+              "quote": "fraction"
+            },
+            "sample_count": null
+          },
+          "conditions": {
+            "workload": {
+              "type": "id",
+              "value": "W",
+              "start": 90,
+              "end": 91,
+              "quote": "W"
+            },
+            "environment": {
+              "type": "id",
+              "value": "E",
+              "start": 105,
+              "end": 106,
+              "quote": "E"
+            },
+            "code": {
+              "type": "id",
+              "value": "C",
+              "start": 113,
+              "end": 114,
+              "quote": "C"
+            },
+            "corpus": {
+              "type": "id",
+              "value": "H",
+              "start": 123,
+              "end": 124,
+              "quote": "H"
+            },
+            "protocol": {
+              "type": "id",
+              "value": "P",
+              "start": 135,
+              "end": 136,
+              "quote": "P"
+            }
+          },
+          "measurement_lineage": {
+            "type": "id",
+            "value": "run-X1",
+            "start": 146,
+            "end": 152,
+            "quote": "run-X1"
+          },
+          "observed_at": null,
+          "availability": null,
+          "limitations": [
+            "Selected source transcription by implementing agent; semantic role and completeness need review."
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "controls-v2/time-only-other",
+      "text_sha256": "6e8f103561f6bc62a3f3daa00156b8e21bbc18804e0d3660879f60ed1e4c59d4",
+      "facts": []
+    },
+    {
+      "source_id": "controls-v2/duplicate-citation-basis",
+      "text_sha256": "94fadfaa18438c6ba805547241c1e7f7058d44c1c0cab06d5c527faee6978861",
+      "facts": [
+        {
+          "id": "observation-X1",
+          "kind": "measurement",
+          "subject": {
+            "type": "id",
+            "value": "X1",
+            "start": 65,
+            "end": 67,
+            "quote": "X1"
+          },
+          "metric": {
+            "name": {
+              "type": "id",
+              "value": "recall",
+              "start": 30,
+              "end": 36,
+              "quote": "recall"
+            },
+            "value": {
+              "type": "decimal",
+              "value": "0.8",
+              "start": 76,
+              "end": 79,
+              "quote": "0.8"
+            },
+            "unit": {
+              "type": "id",
+              "value": "fraction",
+              "start": 43,
+              "end": 51,
+              "quote": "fraction"
+            },
+            "sample_count": null
+          },
+          "conditions": {
+            "workload": {
+              "type": "id",
+              "value": "W",
+              "start": 90,
+              "end": 91,
+              "quote": "W"
+            },
+            "environment": {
+              "type": "id",
+              "value": "E",
+              "start": 105,
+              "end": 106,
+              "quote": "E"
+            },
+            "code": {
+              "type": "id",
+              "value": "C",
+              "start": 113,
+              "end": 114,
+              "quote": "C"
+            },
+            "corpus": {
+              "type": "id",
+              "value": "H",
+              "start": 123,
+              "end": 124,
+              "quote": "H"
+            },
+            "protocol": {
+              "type": "id",
+              "value": "P",
+              "start": 135,
+              "end": 136,
+              "quote": "P"
+            }
+          },
+          "measurement_lineage": {
+            "type": "id",
+            "value": "run-X1",
+            "start": 146,
+            "end": 152,
+            "quote": "run-X1"
+          },
+          "observed_at": null,
+          "availability": null,
+          "limitations": [
+            "Selected source transcription by implementing agent; semantic role and completeness need review."
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "controls-v2/duplicate-citation-other",
+      "text_sha256": "6e8f103561f6bc62a3f3daa00156b8e21bbc18804e0d3660879f60ed1e4c59d4",
+      "facts": []
+    },
+    {
+      "source_id": "controls-v2/surviving-support-basis",
+      "text_sha256": "079b7acb941c5992583093e0c6d6a4d5d81ad217bea51fcd535dcb0f0330b031",
+      "facts": [
+        {
+          "id": "observation-X1",
+          "kind": "measurement",
+          "subject": {
+            "type": "id",
+            "value": "X1",
+            "start": 65,
+            "end": 67,
+            "quote": "X1"
+          },
+          "metric": {
+            "name": {
+              "type": "id",
+              "value": "recall",
+              "start": 30,
+              "end": 36,
+              "quote": "recall"
+            },
+            "value": {
+              "type": "decimal",
+              "value": "0.8",
+              "start": 76,
+              "end": 79,
+              "quote": "0.8"
+            },
+            "unit": {
+              "type": "id",
+              "value": "fraction",
+              "start": 43,
+              "end": 51,
+              "quote": "fraction"
+            },
+            "sample_count": null
+          },
+          "conditions": {
+            "workload": {
+              "type": "id",
+              "value": "W",
+              "start": 90,
+              "end": 91,
+              "quote": "W"
+            },
+            "environment": {
+              "type": "id",
+              "value": "E",
+              "start": 105,
+              "end": 106,
+              "quote": "E"
+            },
+            "code": {
+              "type": "id",
+              "value": "C",
+              "start": 113,
+              "end": 114,
+              "quote": "C"
+            },
+            "corpus": {
+              "type": "id",
+              "value": "H",
+              "start": 123,
+              "end": 124,
+              "quote": "H"
+            },
+            "protocol": {
+              "type": "id",
+              "value": "P",
+              "start": 135,
+              "end": 136,
+              "quote": "P"
+            }
+          },
+          "measurement_lineage": {
+            "type": "id",
+            "value": "run-X1",
+            "start": 146,
+            "end": 152,
+            "quote": "run-X1"
+          },
+          "observed_at": null,
+          "availability": null,
+          "limitations": [
+            "Selected source transcription by implementing agent; semantic role and completeness need review."
+          ]
+        },
+        {
+          "id": "observation-Y1",
+          "kind": "measurement",
+          "subject": {
+            "type": "id",
+            "value": "Y1",
+            "start": 171,
+            "end": 173,
+            "quote": "Y1"
+          },
+          "metric": {
+            "name": {
+              "type": "id",
+              "value": "recall",
+              "start": 175,
+              "end": 181,
+              "quote": "recall"
+            },
+            "value": {
+              "type": "decimal",
+              "value": "0.8",
+              "start": 182,
+              "end": 185,
+              "quote": "0.8"
+            },
+            "unit": null,
+            "sample_count": null
+          },
+          "conditions": {
+            "workload": null,
+            "environment": null,
+            "code": null,
+            "corpus": null,
+            "protocol": null
+          },
+          "measurement_lineage": {
+            "type": "id",
+            "value": "run-Y1",
+            "start": 233,
+            "end": 239,
+            "quote": "run-Y1"
+          },
+          "observed_at": null,
+          "availability": null,
+          "limitations": [
+            "Selected source transcription by implementing agent; semantic role and completeness need review.",
+            "Same-conditions prose was not expanded into inherited dimensions or independent support."
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "controls-v2/surviving-support-other",
+      "text_sha256": "6e8f103561f6bc62a3f3daa00156b8e21bbc18804e0d3660879f60ed1e4c59d4",
+      "facts": []
+    },
+    {
+      "source_id": "controls-v2/changed-conditions-update",
+      "text_sha256": "882cb0f2977885a517aea285f0103e8d7185664a44ebee011a0f3917294656df",
+      "facts": [
+        {
+          "id": "observation-X2",
+          "kind": "measurement",
+          "subject": {
+            "type": "id",
+            "value": "X2",
+            "start": 30,
+            "end": 32,
+            "quote": "X2"
+          },
+          "metric": {
+            "name": {
+              "type": "id",
+              "value": "recall",
+              "start": 34,
+              "end": 40,
+              "quote": "recall"
+            },
+            "value": {
+              "type": "decimal",
+              "value": "0.2",
+              "start": 41,
+              "end": 44,
+              "quote": "0.2"
+            },
+            "unit": {
+              "type": "id",
+              "value": "fraction",
+              "start": 45,
+              "end": 53,
+              "quote": "fraction"
+            },
+            "sample_count": null
+          },
+          "conditions": {
+            "workload": {
+              "type": "id",
+              "value": "W2",
+              "start": 64,
+              "end": 66,
+              "quote": "W2"
+            },
+            "environment": {
+              "type": "id",
+              "value": "E",
+              "start": 80,
+              "end": 81,
+              "quote": "E"
+            },
+            "code": {
+              "type": "id",
+              "value": "C",
+              "start": 88,
+              "end": 89,
+              "quote": "C"
+            },
+            "corpus": {
+              "type": "id",
+              "value": "H2",
+              "start": 98,
+              "end": 100,
+              "quote": "H2"
+            },
+            "protocol": {
+              "type": "id",
+              "value": "P",
+              "start": 111,
+              "end": 112,
+              "quote": "P"
+            }
+          },
+          "measurement_lineage": null,
+          "observed_at": null,
+          "availability": null,
+          "limitations": [
+            "Selected source transcription by implementing agent; semantic role and completeness need review."
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "controls-v2/time-only-update",
+      "text_sha256": "db3de59cbd11651ec0933f9fe46c91076a49470d6f4ec69451a937cc3b9a5fe5",
+      "facts": [
+        {
+          "id": "observation-X2",
+          "kind": "measurement",
+          "subject": {
+            "type": "id",
+            "value": "X2",
+            "start": 30,
+            "end": 32,
+            "quote": "X2"
+          },
+          "metric": {
+            "name": {
+              "type": "id",
+              "value": "recall",
+              "start": 48,
+              "end": 54,
+              "quote": "recall"
+            },
+            "value": {
+              "type": "decimal",
+              "value": "0.8",
+              "start": 55,
+              "end": 58,
+              "quote": "0.8"
+            },
+            "unit": {
+              "type": "id",
+              "value": "fraction",
+              "start": 59,
+              "end": 67,
+              "quote": "fraction"
+            },
+            "sample_count": null
+          },
+          "conditions": {
+            "workload": {
+              "type": "id",
+              "value": "W",
+              "start": 78,
+              "end": 79,
+              "quote": "W"
+            },
+            "environment": {
+              "type": "id",
+              "value": "E",
+              "start": 93,
+              "end": 94,
+              "quote": "E"
+            },
+            "code": {
+              "type": "id",
+              "value": "C",
+              "start": 101,
+              "end": 102,
+              "quote": "C"
+            },
+            "corpus": {
+              "type": "id",
+              "value": "H",
+              "start": 111,
+              "end": 112,
+              "quote": "H"
+            },
+            "protocol": {
+              "type": "id",
+              "value": "P",
+              "start": 123,
+              "end": 124,
+              "quote": "P"
+            }
+          },
+          "measurement_lineage": null,
+          "observed_at": {
+            "type": "date",
+            "value": "2026-01-04",
+            "start": 36,
+            "end": 46,
+            "quote": "2026-01-04"
+          },
+          "availability": null,
+          "limitations": [
+            "Selected source transcription by implementing agent; semantic role and completeness need review."
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "controls-v2/duplicate-citation-update",
+      "text_sha256": "83ee61623b51412c9759abf92f65491e9b30f7776487f5a83653c22bf2a4a629",
+      "facts": [
+        {
+          "id": "citation-X1",
+          "kind": "citation",
+          "subject": {
+            "type": "id",
+            "value": "X1",
+            "start": 53,
+            "end": 55,
+            "quote": "X1"
+          },
+          "metric": null,
+          "conditions": {
+            "workload": null,
+            "environment": null,
+            "code": null,
+            "corpus": null,
+            "protocol": null
+          },
+          "measurement_lineage": {
+            "type": "id",
+            "value": "run-X1",
+            "start": 77,
+            "end": 83,
+            "quote": "run-X1"
+          },
+          "observed_at": null,
+          "availability": null,
+          "limitations": [
+            "Selected source transcription by implementing agent; semantic role and completeness need review."
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "controls-v2/surviving-support-update",
+      "text_sha256": "bbfdc5e54a02a1dce66d5364fdfb152450e6dd1d320c1f2245ba1385fae22379",
+      "facts": [
+        {
+          "id": "availability-X1",
+          "kind": "availability",
+          "subject": {
+            "type": "id",
+            "value": "X1",
+            "start": 47,
+            "end": 49,
+            "quote": "X1"
+          },
+          "metric": null,
+          "conditions": {
+            "workload": null,
+            "environment": null,
+            "code": null,
+            "corpus": null,
+            "protocol": null
+          },
+          "measurement_lineage": null,
+          "observed_at": null,
+          "availability": {
+            "type": "id",
+            "value": "withdrawn",
+            "start": 50,
+            "end": 59,
+            "quote": "withdrawn"
+          },
+          "limitations": [
+            "Selected source transcription by implementing agent; semantic role and completeness need review.",
+            "Availability statement captured only; no runtime support withdrawal or independence judgment is applied."
+          ]
+        },
+        {
+          "id": "availability-Y1",
+          "kind": "availability",
+          "subject": {
+            "type": "id",
+            "value": "Y1",
+            "start": 95,
+            "end": 97,
+            "quote": "Y1"
+          },
+          "metric": null,
+          "conditions": {
+            "workload": null,
+            "environment": null,
+            "code": null,
+            "corpus": null,
+            "protocol": null
+          },
+          "measurement_lineage": null,
+          "observed_at": null,
+          "availability": {
+            "type": "id",
+            "value": "available",
+            "start": 106,
+            "end": 115,
+            "quote": "available"
+          },
+          "limitations": [
+            "Selected source transcription by implementing agent; semantic role and completeness need review.",
+            "Availability statement captured only; no runtime support withdrawal or independence judgment is applied."
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "project-v1/graph-basis",
+      "text_sha256": "f8fd4889472a34e5a85da9bf18911cc122840b0be737cbaad29029109696692a",
+      "facts": []
+    },
+    {
+      "source_id": "project-v1/graph-update-1",
+      "text_sha256": "8c5180f68204316905f5e1015f5dbc58e66f852bbecf27101c1ad57313157c93",
+      "facts": []
+    },
+    {
+      "source_id": "project-v1/context-basis",
+      "text_sha256": "6b3aa6c55de240dc0b48980a6949ba44e9712ad2480af2fec4fe86f6fcb275f4",
+      "facts": []
+    },
+    {
+      "source_id": "project-v1/graph-report",
+      "text_sha256": "ffecd1b60acd57cb9b6a4b6be877a71f3ff539fe64ce44f267f5df1a293939c6",
+      "facts": [
+        {
+          "id": "measurements/0/graph-engine/recall_at_k/mean",
+          "kind": "measurement",
+          "subject": {
+            "type": "id",
+            "value": "graph-engine",
+            "start": 6075,
+            "end": 6087,
+            "quote": "graph-engine"
+          },
+          "metric": {
+            "name": {
+              "type": "id",
+              "value": "recall_at_k",
+              "start": 6103,
+              "end": 6114,
+              "quote": "recall_at_k"
+            },
+            "value": {
+              "type": "decimal",
+              "value": "0",
+              "start": 6139,
+              "end": 6142,
+              "quote": "0.0"
+            },
+            "unit": null,
+            "sample_count": {
+              "type": "decimal",
+              "value": "2",
+              "start": 6161,
+              "end": 6162,
+              "quote": "2"
+            }
+          },
+          "conditions": {
+            "workload": {
+              "type": "id",
+              "value": "graph-expansion-de-en-v1.0.0",
+              "start": 5868,
+              "end": 5896,
+              "quote": "graph-expansion-de-en-v1.0.0"
+            },
+            "environment": null,
+            "code": {
+              "type": "id",
+              "value": "981928c3b2f8de3bbdf5c19e96244525f666b4776755e98e948ca56de9cd8f9f",
+              "start": 259,
+              "end": 323,
+              "quote": "981928c3b2f8de3bbdf5c19e96244525f666b4776755e98e948ca56de9cd8f9f"
+            },
+            "corpus": {
+              "type": "id",
+              "value": "3e01f83419bc92afde7ec01093096dca2b5514738b9fe5fbc19d63a81fc7f718",
+              "start": 5924,
+              "end": 5988,
+              "quote": "3e01f83419bc92afde7ec01093096dca2b5514738b9fe5fbc19d63a81fc7f718"
+            },
+            "protocol": {
+              "type": "id",
+              "value": "One process, one discarded warm-up per dataset, ten alternating-order runs, nearest-rank p95; no answer model calls.",
+              "start": 15,
+              "end": 131,
+              "quote": "One process, one discarded warm-up per dataset, ten alternating-order runs, nearest-rank p95; no answer model calls."
+            }
+          },
+          "measurement_lineage": null,
+          "observed_at": null,
+          "availability": null,
+          "limitations": [
+            "Selected source transcription by implementing agent; semantic role and completeness need review.",
+            "Unit and environment absent from selected result fields; no comparability is inferred.",
+            "Report source_dirty is true; source commit alone is not the execution identity.",
+            "answer_correct_exact has no observed mean and is not converted to zero."
+          ]
+        },
+        {
+          "id": "measurements/0/graph-engine/mrr/mean",
+          "kind": "measurement",
+          "subject": {
+            "type": "id",
+            "value": "graph-engine",
+            "start": 6075,
+            "end": 6087,
+            "quote": "graph-engine"
+          },
+          "metric": {
+            "name": {
+              "type": "id",
+              "value": "mrr",
+              "start": 6187,
+              "end": 6190,
+              "quote": "mrr"
+            },
+            "value": {
+              "type": "decimal",
+              "value": "0",
+              "start": 6215,
+              "end": 6218,
+              "quote": "0.0"
+            },
+            "unit": null,
+            "sample_count": {
+              "type": "decimal",
+              "value": "2",
+              "start": 6237,
+              "end": 6238,
+              "quote": "2"
+            }
+          },
+          "conditions": {
+            "workload": {
+              "type": "id",
+              "value": "graph-expansion-de-en-v1.0.0",
+              "start": 5868,
+              "end": 5896,
+              "quote": "graph-expansion-de-en-v1.0.0"
+            },
+            "environment": null,
+            "code": {
+              "type": "id",
+              "value": "981928c3b2f8de3bbdf5c19e96244525f666b4776755e98e948ca56de9cd8f9f",
+              "start": 259,
+              "end": 323,
+              "quote": "981928c3b2f8de3bbdf5c19e96244525f666b4776755e98e948ca56de9cd8f9f"
+            },
+            "corpus": {
+              "type": "id",
+              "value": "3e01f83419bc92afde7ec01093096dca2b5514738b9fe5fbc19d63a81fc7f718",
+              "start": 5924,
+              "end": 5988,
+              "quote": "3e01f83419bc92afde7ec01093096dca2b5514738b9fe5fbc19d63a81fc7f718"
+            },
+            "protocol": {
+              "type": "id",
+              "value": "One process, one discarded warm-up per dataset, ten alternating-order runs, nearest-rank p95; no answer model calls.",
+              "start": 15,
+              "end": 131,
+              "quote": "One process, one discarded warm-up per dataset, ten alternating-order runs, nearest-rank p95; no answer model calls."
+            }
+          },
+          "measurement_lineage": null,
+          "observed_at": null,
+          "availability": null,
+          "limitations": [
+            "Selected source transcription by implementing agent; semantic role and completeness need review.",
+            "Unit and environment absent from selected result fields; no comparability is inferred.",
+            "Report source_dirty is true; source commit alone is not the execution identity.",
+            "answer_correct_exact has no observed mean and is not converted to zero."
+          ]
+        },
+        {
+          "id": "measurements/0/graph-engine/evidence_coverage/mean",
+          "kind": "measurement",
+          "subject": {
+            "type": "id",
+            "value": "graph-engine",
+            "start": 6075,
+            "end": 6087,
+            "quote": "graph-engine"
+          },
+          "metric": {
+            "name": {
+              "type": "id",
+              "value": "evidence_coverage",
+              "start": 6263,
+              "end": 6280,
+              "quote": "evidence_coverage"
+            },
+            "value": {
+              "type": "decimal",
+              "value": "0",
+              "start": 6305,
+              "end": 6308,
+              "quote": "0.0"
+            },
+            "unit": null,
+            "sample_count": {
+              "type": "decimal",
+              "value": "2",
+              "start": 6327,
+              "end": 6328,
+              "quote": "2"
+            }
+          },
+          "conditions": {
+            "workload": {
+              "type": "id",
+              "value": "graph-expansion-de-en-v1.0.0",
+              "start": 5868,
+              "end": 5896,
+              "quote": "graph-expansion-de-en-v1.0.0"
+            },
+            "environment": null,
+            "code": {
+              "type": "id",
+              "value": "981928c3b2f8de3bbdf5c19e96244525f666b4776755e98e948ca56de9cd8f9f",
+              "start": 259,
+              "end": 323,
+              "quote": "981928c3b2f8de3bbdf5c19e96244525f666b4776755e98e948ca56de9cd8f9f"
+            },
+            "corpus": {
+              "type": "id",
+              "value": "3e01f83419bc92afde7ec01093096dca2b5514738b9fe5fbc19d63a81fc7f718",
+              "start": 5924,
+              "end": 5988,
+              "quote": "3e01f83419bc92afde7ec01093096dca2b5514738b9fe5fbc19d63a81fc7f718"
+            },
+            "protocol": {
+              "type": "id",
+              "value": "One process, one discarded warm-up per dataset, ten alternating-order runs, nearest-rank p95; no answer model calls.",
+              "start": 15,
+              "end": 131,
+              "quote": "One process, one discarded warm-up per dataset, ten alternating-order runs, nearest-rank p95; no answer model calls."
+            }
+          },
+          "measurement_lineage": null,
+          "observed_at": null,
+          "availability": null,
+          "limitations": [
+            "Selected source transcription by implementing agent; semantic role and completeness need review.",
+            "Unit and environment absent from selected result fields; no comparability is inferred.",
+            "Report source_dirty is true; source commit alone is not the execution identity.",
+            "answer_correct_exact has no observed mean and is not converted to zero."
+          ]
+        },
+        {
+          "id": "measurements/0/graph-engine-expanded/recall_at_k/mean",
+          "kind": "measurement",
+          "subject": {
+            "type": "id",
+            "value": "graph-engine-expanded",
+            "start": 7994,
+            "end": 8015,
+            "quote": "graph-engine-expanded"
+          },
+          "metric": {
+            "name": {
+              "type": "id",
+              "value": "recall_at_k",
+              "start": 8031,
+              "end": 8042,
+              "quote": "recall_at_k"
+            },
+            "value": {
+              "type": "decimal",
+              "value": "1",
+              "start": 8067,
+              "end": 8070,
+              "quote": "1.0"
+            },
+            "unit": null,
+            "sample_count": {
+              "type": "decimal",
+              "value": "2",
+              "start": 8089,
+              "end": 8090,
+              "quote": "2"
+            }
+          },
+          "conditions": {
+            "workload": {
+              "type": "id",
+              "value": "graph-expansion-de-en-v1.0.0",
+              "start": 5868,
+              "end": 5896,
+              "quote": "graph-expansion-de-en-v1.0.0"
+            },
+            "environment": null,
+            "code": {
+              "type": "id",
+              "value": "981928c3b2f8de3bbdf5c19e96244525f666b4776755e98e948ca56de9cd8f9f",
+              "start": 259,
+              "end": 323,
+              "quote": "981928c3b2f8de3bbdf5c19e96244525f666b4776755e98e948ca56de9cd8f9f"
+            },
+            "corpus": {
+              "type": "id",
+              "value": "3e01f83419bc92afde7ec01093096dca2b5514738b9fe5fbc19d63a81fc7f718",
+              "start": 5924,
+              "end": 5988,
+              "quote": "3e01f83419bc92afde7ec01093096dca2b5514738b9fe5fbc19d63a81fc7f718"
+            },
+            "protocol": {
+              "type": "id",
+              "value": "One process, one discarded warm-up per dataset, ten alternating-order runs, nearest-rank p95; no answer model calls.",
+              "start": 15,
+              "end": 131,
+              "quote": "One process, one discarded warm-up per dataset, ten alternating-order runs, nearest-rank p95; no answer model calls."
+            }
+          },
+          "measurement_lineage": null,
+          "observed_at": null,
+          "availability": null,
+          "limitations": [
+            "Selected source transcription by implementing agent; semantic role and completeness need review.",
+            "Unit and environment absent from selected result fields; no comparability is inferred.",
+            "Report source_dirty is true; source commit alone is not the execution identity.",
+            "answer_correct_exact has no observed mean and is not converted to zero."
+          ]
+        },
+        {
+          "id": "measurements/0/graph-engine-expanded/mrr/mean",
+          "kind": "measurement",
+          "subject": {
+            "type": "id",
+            "value": "graph-engine-expanded",
+            "start": 7994,
+            "end": 8015,
+            "quote": "graph-engine-expanded"
+          },
+          "metric": {
+            "name": {
+              "type": "id",
+              "value": "mrr",
+              "start": 8115,
+              "end": 8118,
+              "quote": "mrr"
+            },
+            "value": {
+              "type": "decimal",
+              "value": "0.3333333333333333",
+              "start": 8143,
+              "end": 8161,
+              "quote": "0.3333333333333333"
+            },
+            "unit": null,
+            "sample_count": {
+              "type": "decimal",
+              "value": "2",
+              "start": 8180,
+              "end": 8181,
+              "quote": "2"
+            }
+          },
+          "conditions": {
+            "workload": {
+              "type": "id",
+              "value": "graph-expansion-de-en-v1.0.0",
+              "start": 5868,
+              "end": 5896,
+              "quote": "graph-expansion-de-en-v1.0.0"
+            },
+            "environment": null,
+            "code": {
+              "type": "id",
+              "value": "981928c3b2f8de3bbdf5c19e96244525f666b4776755e98e948ca56de9cd8f9f",
+              "start": 259,
+              "end": 323,
+              "quote": "981928c3b2f8de3bbdf5c19e96244525f666b4776755e98e948ca56de9cd8f9f"
+            },
+            "corpus": {
+              "type": "id",
+              "value": "3e01f83419bc92afde7ec01093096dca2b5514738b9fe5fbc19d63a81fc7f718",
+              "start": 5924,
+              "end": 5988,
+              "quote": "3e01f83419bc92afde7ec01093096dca2b5514738b9fe5fbc19d63a81fc7f718"
+            },
+            "protocol": {
+              "type": "id",
+              "value": "One process, one discarded warm-up per dataset, ten alternating-order runs, nearest-rank p95; no answer model calls.",
+              "start": 15,
+              "end": 131,
+              "quote": "One process, one discarded warm-up per dataset, ten alternating-order runs, nearest-rank p95; no answer model calls."
+            }
+          },
+          "measurement_lineage": null,
+          "observed_at": null,
+          "availability": null,
+          "limitations": [
+            "Selected source transcription by implementing agent; semantic role and completeness need review.",
+            "Unit and environment absent from selected result fields; no comparability is inferred.",
+            "Report source_dirty is true; source commit alone is not the execution identity.",
+            "answer_correct_exact has no observed mean and is not converted to zero."
+          ]
+        },
+        {
+          "id": "measurements/0/graph-engine-expanded/evidence_coverage/mean",
+          "kind": "measurement",
+          "subject": {
+            "type": "id",
+            "value": "graph-engine-expanded",
+            "start": 7994,
+            "end": 8015,
+            "quote": "graph-engine-expanded"
+          },
+          "metric": {
+            "name": {
+              "type": "id",
+              "value": "evidence_coverage",
+              "start": 8206,
+              "end": 8223,
+              "quote": "evidence_coverage"
+            },
+            "value": {
+              "type": "decimal",
+              "value": "1",
+              "start": 8248,
+              "end": 8251,
+              "quote": "1.0"
+            },
+            "unit": null,
+            "sample_count": {
+              "type": "decimal",
+              "value": "2",
+              "start": 8270,
+              "end": 8271,
+              "quote": "2"
+            }
+          },
+          "conditions": {
+            "workload": {
+              "type": "id",
+              "value": "graph-expansion-de-en-v1.0.0",
+              "start": 5868,
+              "end": 5896,
+              "quote": "graph-expansion-de-en-v1.0.0"
+            },
+            "environment": null,
+            "code": {
+              "type": "id",
+              "value": "981928c3b2f8de3bbdf5c19e96244525f666b4776755e98e948ca56de9cd8f9f",
+              "start": 259,
+              "end": 323,
+              "quote": "981928c3b2f8de3bbdf5c19e96244525f666b4776755e98e948ca56de9cd8f9f"
+            },
+            "corpus": {
+              "type": "id",
+              "value": "3e01f83419bc92afde7ec01093096dca2b5514738b9fe5fbc19d63a81fc7f718",
+              "start": 5924,
+              "end": 5988,
+              "quote": "3e01f83419bc92afde7ec01093096dca2b5514738b9fe5fbc19d63a81fc7f718"
+            },
+            "protocol": {
+              "type": "id",
+              "value": "One process, one discarded warm-up per dataset, ten alternating-order runs, nearest-rank p95; no answer model calls.",
+              "start": 15,
+              "end": 131,
+              "quote": "One process, one discarded warm-up per dataset, ten alternating-order runs, nearest-rank p95; no answer model calls."
+            }
+          },
+          "measurement_lineage": null,
+          "observed_at": null,
+          "availability": null,
+          "limitations": [
+            "Selected source transcription by implementing agent; semantic role and completeness need review.",
+            "Unit and environment absent from selected result fields; no comparability is inferred.",
+            "Report source_dirty is true; source commit alone is not the execution identity.",
+            "answer_correct_exact has no observed mean and is not converted to zero."
+          ]
+        },
+        {
+          "id": "measurements/1/graph-engine/recall_at_k/mean",
+          "kind": "measurement",
+          "subject": {
+            "type": "id",
+            "value": "graph-engine",
+            "start": 13733,
+            "end": 13745,
+            "quote": "graph-engine"
+          },
+          "metric": {
+            "name": {
+              "type": "id",
+              "value": "recall_at_k",
+              "start": 13761,
+              "end": 13772,
+              "quote": "recall_at_k"
+            },
+            "value": {
+              "type": "decimal",
+              "value": "1",
+              "start": 13797,
+              "end": 13800,
+              "quote": "1.0"
+            },
+            "unit": null,
+            "sample_count": {
+              "type": "decimal",
+              "value": "10",
+              "start": 13819,
+              "end": 13821,
+              "quote": "10"
+            }
+          },
+          "conditions": {
+            "workload": {
+              "type": "id",
+              "value": "de-en-memory-v1.0.0",
+              "start": 13535,
+              "end": 13554,
+              "quote": "de-en-memory-v1.0.0"
+            },
+            "environment": null,
+            "code": {
+              "type": "id",
+              "value": "981928c3b2f8de3bbdf5c19e96244525f666b4776755e98e948ca56de9cd8f9f",
+              "start": 259,
+              "end": 323,
+              "quote": "981928c3b2f8de3bbdf5c19e96244525f666b4776755e98e948ca56de9cd8f9f"
+            },
+            "corpus": {
+              "type": "id",
+              "value": "ecd55eef857eee0975f334b2e31ef6b658e245111c9712b0b9af19b43a37c6e3",
+              "start": 13582,
+              "end": 13646,
+              "quote": "ecd55eef857eee0975f334b2e31ef6b658e245111c9712b0b9af19b43a37c6e3"
+            },
+            "protocol": {
+              "type": "id",
+              "value": "One process, one discarded warm-up per dataset, ten alternating-order runs, nearest-rank p95; no answer model calls.",
+              "start": 15,
+              "end": 131,
+              "quote": "One process, one discarded warm-up per dataset, ten alternating-order runs, nearest-rank p95; no answer model calls."
+            }
+          },
+          "measurement_lineage": null,
+          "observed_at": null,
+          "availability": null,
+          "limitations": [
+            "Selected source transcription by implementing agent; semantic role and completeness need review.",
+            "Unit and environment absent from selected result fields; no comparability is inferred.",
+            "Report source_dirty is true; source commit alone is not the execution identity.",
+            "answer_correct_exact has no observed mean and is not converted to zero."
+          ]
+        },
+        {
+          "id": "measurements/1/graph-engine/mrr/mean",
+          "kind": "measurement",
+          "subject": {
+            "type": "id",
+            "value": "graph-engine",
+            "start": 13733,
+            "end": 13745,
+            "quote": "graph-engine"
+          },
+          "metric": {
+            "name": {
+              "type": "id",
+              "value": "mrr",
+              "start": 13846,
+              "end": 13849,
+              "quote": "mrr"
+            },
+            "value": {
+              "type": "decimal",
+              "value": "0.95",
+              "start": 13874,
+              "end": 13878,
+              "quote": "0.95"
+            },
+            "unit": null,
+            "sample_count": {
+              "type": "decimal",
+              "value": "10",
+              "start": 13897,
+              "end": 13899,
+              "quote": "10"
+            }
+          },
+          "conditions": {
+            "workload": {
+              "type": "id",
+              "value": "de-en-memory-v1.0.0",
+              "start": 13535,
+              "end": 13554,
+              "quote": "de-en-memory-v1.0.0"
+            },
+            "environment": null,
+            "code": {
+              "type": "id",
+              "value": "981928c3b2f8de3bbdf5c19e96244525f666b4776755e98e948ca56de9cd8f9f",
+              "start": 259,
+              "end": 323,
+              "quote": "981928c3b2f8de3bbdf5c19e96244525f666b4776755e98e948ca56de9cd8f9f"
+            },
+            "corpus": {
+              "type": "id",
+              "value": "ecd55eef857eee0975f334b2e31ef6b658e245111c9712b0b9af19b43a37c6e3",
+              "start": 13582,
+              "end": 13646,
+              "quote": "ecd55eef857eee0975f334b2e31ef6b658e245111c9712b0b9af19b43a37c6e3"
+            },
+            "protocol": {
+              "type": "id",
+              "value": "One process, one discarded warm-up per dataset, ten alternating-order runs, nearest-rank p95; no answer model calls.",
+              "start": 15,
+              "end": 131,
+              "quote": "One process, one discarded warm-up per dataset, ten alternating-order runs, nearest-rank p95; no answer model calls."
+            }
+          },
+          "measurement_lineage": null,
+          "observed_at": null,
+          "availability": null,
+          "limitations": [
+            "Selected source transcription by implementing agent; semantic role and completeness need review.",
+            "Unit and environment absent from selected result fields; no comparability is inferred.",
+            "Report source_dirty is true; source commit alone is not the execution identity.",
+            "answer_correct_exact has no observed mean and is not converted to zero."
+          ]
+        },
+        {
+          "id": "measurements/1/graph-engine/evidence_coverage/mean",
+          "kind": "measurement",
+          "subject": {
+            "type": "id",
+            "value": "graph-engine",
+            "start": 13733,
+            "end": 13745,
+            "quote": "graph-engine"
+          },
+          "metric": {
+            "name": {
+              "type": "id",
+              "value": "evidence_coverage",
+              "start": 13924,
+              "end": 13941,
+              "quote": "evidence_coverage"
+            },
+            "value": {
+              "type": "decimal",
+              "value": "1",
+              "start": 13966,
+              "end": 13969,
+              "quote": "1.0"
+            },
+            "unit": null,
+            "sample_count": {
+              "type": "decimal",
+              "value": "10",
+              "start": 13988,
+              "end": 13990,
+              "quote": "10"
+            }
+          },
+          "conditions": {
+            "workload": {
+              "type": "id",
+              "value": "de-en-memory-v1.0.0",
+              "start": 13535,
+              "end": 13554,
+              "quote": "de-en-memory-v1.0.0"
+            },
+            "environment": null,
+            "code": {
+              "type": "id",
+              "value": "981928c3b2f8de3bbdf5c19e96244525f666b4776755e98e948ca56de9cd8f9f",
+              "start": 259,
+              "end": 323,
+              "quote": "981928c3b2f8de3bbdf5c19e96244525f666b4776755e98e948ca56de9cd8f9f"
+            },
+            "corpus": {
+              "type": "id",
+              "value": "ecd55eef857eee0975f334b2e31ef6b658e245111c9712b0b9af19b43a37c6e3",
+              "start": 13582,
+              "end": 13646,
+              "quote": "ecd55eef857eee0975f334b2e31ef6b658e245111c9712b0b9af19b43a37c6e3"
+            },
+            "protocol": {
+              "type": "id",
+              "value": "One process, one discarded warm-up per dataset, ten alternating-order runs, nearest-rank p95; no answer model calls.",
+              "start": 15,
+              "end": 131,
+              "quote": "One process, one discarded warm-up per dataset, ten alternating-order runs, nearest-rank p95; no answer model calls."
+            }
+          },
+          "measurement_lineage": null,
+          "observed_at": null,
+          "availability": null,
+          "limitations": [
+            "Selected source transcription by implementing agent; semantic role and completeness need review.",
+            "Unit and environment absent from selected result fields; no comparability is inferred.",
+            "Report source_dirty is true; source commit alone is not the execution identity.",
+            "answer_correct_exact has no observed mean and is not converted to zero."
+          ]
+        },
+        {
+          "id": "measurements/1/graph-engine-expanded/recall_at_k/mean",
+          "kind": "measurement",
+          "subject": {
+            "type": "id",
+            "value": "graph-engine-expanded",
+            "start": 18357,
+            "end": 18378,
+            "quote": "graph-engine-expanded"
+          },
+          "metric": {
+            "name": {
+              "type": "id",
+              "value": "recall_at_k",
+              "start": 18394,
+              "end": 18405,
+              "quote": "recall_at_k"
+            },
+            "value": {
+              "type": "decimal",
+              "value": "1",
+              "start": 18430,
+              "end": 18433,
+              "quote": "1.0"
+            },
+            "unit": null,
+            "sample_count": {
+              "type": "decimal",
+              "value": "10",
+              "start": 18452,
+              "end": 18454,
+              "quote": "10"
+            }
+          },
+          "conditions": {
+            "workload": {
+              "type": "id",
+              "value": "de-en-memory-v1.0.0",
+              "start": 13535,
+              "end": 13554,
+              "quote": "de-en-memory-v1.0.0"
+            },
+            "environment": null,
+            "code": {
+              "type": "id",
+              "value": "981928c3b2f8de3bbdf5c19e96244525f666b4776755e98e948ca56de9cd8f9f",
+              "start": 259,
+              "end": 323,
+              "quote": "981928c3b2f8de3bbdf5c19e96244525f666b4776755e98e948ca56de9cd8f9f"
+            },
+            "corpus": {
+              "type": "id",
+              "value": "ecd55eef857eee0975f334b2e31ef6b658e245111c9712b0b9af19b43a37c6e3",
+              "start": 13582,
+              "end": 13646,
+              "quote": "ecd55eef857eee0975f334b2e31ef6b658e245111c9712b0b9af19b43a37c6e3"
+            },
+            "protocol": {
+              "type": "id",
+              "value": "One process, one discarded warm-up per dataset, ten alternating-order runs, nearest-rank p95; no answer model calls.",
+              "start": 15,
+              "end": 131,
+              "quote": "One process, one discarded warm-up per dataset, ten alternating-order runs, nearest-rank p95; no answer model calls."
+            }
+          },
+          "measurement_lineage": null,
+          "observed_at": null,
+          "availability": null,
+          "limitations": [
+            "Selected source transcription by implementing agent; semantic role and completeness need review.",
+            "Unit and environment absent from selected result fields; no comparability is inferred.",
+            "Report source_dirty is true; source commit alone is not the execution identity.",
+            "answer_correct_exact has no observed mean and is not converted to zero."
+          ]
+        },
+        {
+          "id": "measurements/1/graph-engine-expanded/mrr/mean",
+          "kind": "measurement",
+          "subject": {
+            "type": "id",
+            "value": "graph-engine-expanded",
+            "start": 18357,
+            "end": 18378,
+            "quote": "graph-engine-expanded"
+          },
+          "metric": {
+            "name": {
+              "type": "id",
+              "value": "mrr",
+              "start": 18479,
+              "end": 18482,
+              "quote": "mrr"
+            },
+            "value": {
+              "type": "decimal",
+              "value": "0.95",
+              "start": 18507,
+              "end": 18511,
+              "quote": "0.95"
+            },
+            "unit": null,
+            "sample_count": {
+              "type": "decimal",
+              "value": "10",
+              "start": 18530,
+              "end": 18532,
+              "quote": "10"
+            }
+          },
+          "conditions": {
+            "workload": {
+              "type": "id",
+              "value": "de-en-memory-v1.0.0",
+              "start": 13535,
+              "end": 13554,
+              "quote": "de-en-memory-v1.0.0"
+            },
+            "environment": null,
+            "code": {
+              "type": "id",
+              "value": "981928c3b2f8de3bbdf5c19e96244525f666b4776755e98e948ca56de9cd8f9f",
+              "start": 259,
+              "end": 323,
+              "quote": "981928c3b2f8de3bbdf5c19e96244525f666b4776755e98e948ca56de9cd8f9f"
+            },
+            "corpus": {
+              "type": "id",
+              "value": "ecd55eef857eee0975f334b2e31ef6b658e245111c9712b0b9af19b43a37c6e3",
+              "start": 13582,
+              "end": 13646,
+              "quote": "ecd55eef857eee0975f334b2e31ef6b658e245111c9712b0b9af19b43a37c6e3"
+            },
+            "protocol": {
+              "type": "id",
+              "value": "One process, one discarded warm-up per dataset, ten alternating-order runs, nearest-rank p95; no answer model calls.",
+              "start": 15,
+              "end": 131,
+              "quote": "One process, one discarded warm-up per dataset, ten alternating-order runs, nearest-rank p95; no answer model calls."
+            }
+          },
+          "measurement_lineage": null,
+          "observed_at": null,
+          "availability": null,
+          "limitations": [
+            "Selected source transcription by implementing agent; semantic role and completeness need review.",
+            "Unit and environment absent from selected result fields; no comparability is inferred.",
+            "Report source_dirty is true; source commit alone is not the execution identity.",
+            "answer_correct_exact has no observed mean and is not converted to zero."
+          ]
+        },
+        {
+          "id": "measurements/1/graph-engine-expanded/evidence_coverage/mean",
+          "kind": "measurement",
+          "subject": {
+            "type": "id",
+            "value": "graph-engine-expanded",
+            "start": 18357,
+            "end": 18378,
+            "quote": "graph-engine-expanded"
+          },
+          "metric": {
+            "name": {
+              "type": "id",
+              "value": "evidence_coverage",
+              "start": 18557,
+              "end": 18574,
+              "quote": "evidence_coverage"
+            },
+            "value": {
+              "type": "decimal",
+              "value": "1",
+              "start": 18599,
+              "end": 18602,
+              "quote": "1.0"
+            },
+            "unit": null,
+            "sample_count": {
+              "type": "decimal",
+              "value": "10",
+              "start": 18621,
+              "end": 18623,
+              "quote": "10"
+            }
+          },
+          "conditions": {
+            "workload": {
+              "type": "id",
+              "value": "de-en-memory-v1.0.0",
+              "start": 13535,
+              "end": 13554,
+              "quote": "de-en-memory-v1.0.0"
+            },
+            "environment": null,
+            "code": {
+              "type": "id",
+              "value": "981928c3b2f8de3bbdf5c19e96244525f666b4776755e98e948ca56de9cd8f9f",
+              "start": 259,
+              "end": 323,
+              "quote": "981928c3b2f8de3bbdf5c19e96244525f666b4776755e98e948ca56de9cd8f9f"
+            },
+            "corpus": {
+              "type": "id",
+              "value": "ecd55eef857eee0975f334b2e31ef6b658e245111c9712b0b9af19b43a37c6e3",
+              "start": 13582,
+              "end": 13646,
+              "quote": "ecd55eef857eee0975f334b2e31ef6b658e245111c9712b0b9af19b43a37c6e3"
+            },
+            "protocol": {
+              "type": "id",
+              "value": "One process, one discarded warm-up per dataset, ten alternating-order runs, nearest-rank p95; no answer model calls.",
+              "start": 15,
+              "end": 131,
+              "quote": "One process, one discarded warm-up per dataset, ten alternating-order runs, nearest-rank p95; no answer model calls."
+            }
+          },
+          "measurement_lineage": null,
+          "observed_at": null,
+          "availability": null,
+          "limitations": [
+            "Selected source transcription by implementing agent; semantic role and completeness need review.",
+            "Unit and environment absent from selected result fields; no comparability is inferred.",
+            "Report source_dirty is true; source commit alone is not the execution identity.",
+            "answer_correct_exact has no observed mean and is not converted to zero."
+          ]
+        }
+      ]
+    },
+    {
+      "source_id": "project-v1/graph-protocol",
+      "text_sha256": "f91efb0d4b0351d7bd9625042f994777df23bf3ed95c744e25af7ada0f8ebb99",
+      "facts": []
+    },
+    {
+      "source_id": "project-v1/graph-fixture",
+      "text_sha256": "3e01f83419bc92afde7ec01093096dca2b5514738b9fe5fbc19d63a81fc7f718",
+      "facts": []
+    },
+    {
+      "source_id": "project-v1/graph-update-2",
+      "text_sha256": "5497ae91315d1a8708efd819ba96a0019734118c45e68f893249b997424f0810",
+      "facts": []
+    },
+    {
+      "source_id": "project-v1/documents-basis",
+      "text_sha256": "0653ca0e07e351df9cac345d8a545a6f29b97d122db6f4c3f53ae4dca16ef3b7",
+      "facts": []
+    },
+    {
+      "source_id": "project-v1/documents-update-1",
+      "text_sha256": "2cf3ce4ca23a789498715d72bd66213998c313cd5c06b471ea9fae1809bf4e44",
+      "facts": []
+    },
+    {
+      "source_id": "project-v1/context-update-1",
+      "text_sha256": "4cbdfef5a0e22144daebb8ea826a022c10e137137d2fded2499bacbe7c4d7b2a",
+      "facts": []
+    },
+    {
+      "source_id": "project-v1/cache-basis",
+      "text_sha256": "a8278e3095044cf1e09819bab75d2b12bc83d241ad66968b909083d9295c14e0",
+      "facts": []
+    },
+    {
+      "source_id": "project-v1/documents-update-2",
+      "text_sha256": "a5e9a7c8bfd05987ef988b8fcd9106ac69a6a4f43bf30f1bd8c0c13f8708f1ae",
+      "facts": []
+    },
+    {
+      "source_id": "project-v1/cache-update-1",
+      "text_sha256": "b52a84d3f2f9bc6e2eaeaa4cbcd40a61c47e3d158a608b2e126726756cb54840",
+      "facts": []
+    },
+    {
+      "source_id": "project-v1/cache-update-2",
+      "text_sha256": "5ed9aaaa43f2d1a9fc57fe9820d2a16d7b218bc42e621d947f1791036c1c1fa5",
+      "facts": []
+    },
+    {
+      "source_id": "project-v1/context-update-2",
+      "text_sha256": "cc95dba7dd1f854e5b8c11986a88398dc28715a9f4e44b059b918d28b2ec8e9a",
+      "facts": []
+    }
+  ]
+}

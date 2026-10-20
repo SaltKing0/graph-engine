@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="8" failures="0" skipped="0" tests="55" time="54.628" timestamp="2026-10-18T16:12:32.145140+02:00" hostname="MacBook-Air.local"><testcase classname="tests.test_decision_integrity" name="test_cli_cannot_merge_version_pinned_source_or_reassign_reviews" time="1.127" /><testcase classname="tests.test_decision_integrity" name="test_historical_privacy_and_read_only_adapters[acl-cli]" time="2.717" /><testcase classname="tests.test_decision_integrity" name="test_historical_privacy_and_read_only_adapters[acl-exports]" time="1.264" /><testcase classname="tests.test_decision_integrity" name="test_historical_privacy_and_read_only_adapters[acl-http]" time="1.690" /><testcase classname="tests.test_decision_integrity" name="test_historical_privacy_and_read_only_adapters[acl-mcp]" time="2.828" /><testcase classname="tests.test_decision_integrity" name="test_historical_privacy_and_read_only_adapters[acl-service]" time="1.913" /><testcase classname="tests.test_decision_integrity" name="test_historical_privacy_and_read_only_adapters[multisource-acl-cli]" time="2.444" /><testcase classname="tests.test_decision_integrity" name="test_historical_privacy_and_read_only_adapters[multisource-acl-exports]" time="1.137" /><testcase classname="tests.test_decision_integrity" name="test_historical_privacy_and_read_only_adapters[multisource-acl-http]" time="1.456" /><testcase classname="tests.test_decision_integrity" name="test_historical_privacy_and_read_only_adapters[multisource-acl-mcp]" time="2.578" /><testcase classname="tests.test_decision_integrity" name="test_historical_privacy_and_read_only_adapters[multisource-acl-service]" time="1.333" /><testcase classname="tests.test_decision_integrity" name="test_historical_privacy_and_read_only_adapters[source-edit-cli]" time="2.680" /><testcase classname="tests.test_decision_integrity" name="test_historical_privacy_and_read_only_adapters[source-edit-exports]" time="1.438" /><testcase classname="tests.test_decision_integrity" name="test_historical_privacy_and_read_only_adapters[source-edit-http]" time="2.772" /><testcase classname="tests.test_decision_integrity" name="test_historical_privacy_and_read_only_adapters[source-edit-mcp]" time="2.913" /><testcase classname="tests.test_decision_integrity" name="test_historical_privacy_and_read_only_adapters[source-edit-service]" time="1.832" /><testcase classname="tests.test_decision_integrity" name="test_historical_privacy_and_read_only_adapters[tombstone-cli]" time="2.796" /><testcase classname="tests.test_decision_integrity" name="test_historical_privacy_and_read_only_adapters[tombstone-exports]" time="1.410" /><testcase classname="tests.test_decision_integrity" name="test_historical_privacy_and_read_only_adapters[tombstone-http]" time="1.880" /><testcase classname="tests.test_decision_integrity" name="test_historical_privacy_and_read_only_adapters[tombstone-mcp]" time="3.819" /><testcase classname="tests.test_decision_integrity" name="test_historical_privacy_and_read_only_adapters[tombstone-service]" time="1.732" /><testcase classname="tests.test_decision_integrity" name="test_post_publication_retry_through_adapters[commit-cli]" time="0.304" /><testcase classname="tests.test_decision_integrity" name="test_post_publication_retry_through_adapters[commit-http]" time="0.217" /><testcase classname="tests.test_decision_integrity" name="test_post_publication_retry_through_adapters[index-cli]" time="0.192" /><testcase classname="tests.test_decision_integrity" name="test_post_publication_retry_through_adapters[index-http]" time="0.189" /><testcase classname="tests.test_decision_integrity" name="test_review_preconditions_through_write_adapters[dependent-undo-cli]" time="0.715" /><testcase classname="tests.test_decision_integrity" name="test_review_preconditions_through_write_adapters[dependent-undo-http]" time="0.502" /><testcase classname="tests.test_decision_integrity" name="test_review_preconditions_through_write_adapters[fresh-undo-cli]" time="0.824" /><testcase classname="tests.test_decision_integrity" name="test_review_preconditions_through_write_adapters[fresh-undo-http]" time="0.511" /><testcase classname="tests.test_decision_integrity" name="test_review_preconditions_through_write_adapters[stale-cli]" time="0.654" /><testcase classname="tests.test_decision_integrity" name="test_review_preconditions_through_write_adapters[stale-http]" time="0.440" /><testcase classname="tests.test_decision_integrity" name="test_simultaneous_cli_proposals_have_one_winner_and_lossless_retry" time="0.924" /><testcase classname="tests.test_decision_integrity" name="test_simultaneous_http_proposals_share_generation_and_preserve_both_on_retry" time="0.626" /><testcase classname="tests.test_decision_memory" name="test_claim_wording_and_context_edit_never_transfer_review" time="0.134" /><testcase classname="tests.test_decision_memory" name="test_commit_failure_preserves_authoritative_receipt" time="0.010" /><testcase classname="tests.test_decision_memory" name="test_interrupted_sidecar_publication_leaves_only_reusable_anchors" time="0.018" /><testcase classname="tests.test_decision_memory" name="test_missing_and_cyclic_node_lineage_fail_closed[lineage0]" time="0.015" /><testcase classname="tests.test_decision_memory" name="test_missing_and_cyclic_node_lineage_fail_closed[lineage1]" time="0.012" /><testcase classname="tests.test_decision_memory" name="test_pinned_merge_refuses_before_any_changes" time="0.027" /><testcase classname="tests.test_decision_memory" name="test_sidecar_reference_acl_checks_basis_anchor_as_well_as_source" time="0.065" /><testcase classname="tests.test_decision_memory" name="test_source_edit_versions_exact_bytes_and_marks_basis_changed" time="0.265" /><testcase classname="tests.test_decision_memory" name="test_stale_generation_and_source_hash_previews_conflict" time="0.097" /><testcase classname="tests.test_decision_service" name="test_explicit_revise_and_guarded_undo" time="0.164" /><testcase classname="tests.test_decision_service" name="test_import_propose_review_changed_source_and_stale_review" time="0.645" /><testcase classname="tests.test_decision_service" name="test_post_publication_failure_returns_durable_retry" time="0.014" /><testcase classname="tests.test_decision_service" name="test_undo_fails_after_dependent_review" time="0.079" /><testcase classname="tests.test_frontend_xss" name="test_decision_impact_full_browser_flow_and_pinned_brief[server0]" time="0.165"><error message="failed on setup with &quot;PermissionError: [Errno 1] Operation not permitted&quot;">tmp_path = PosixPath('/private/var/folders/sj/799zmzcs10n9pm_vhxx4typc0000gn/T/pytest-of-niklas/pytest-820/test_decision_impact_full_brow0')
+request = &lt;SubRequest 'server' for &lt;Function test_decision_impact_full_browser_flow_and_pinned_brief[server0]&gt;&gt;
+
+    @pytest.fixture
+    def server(tmp_path, request):
+        """Each workflow gets a fresh brain and a real HTTP/WebSocket server."""
+        options = getattr(request, 'param', {})
+        brain = Brain(str(tmp_path / "brain"), mode=options.get('mode', 'local'))
+        if options.get('mode') == 'git':
+            brain.init()
+        else:
+            brain.ensure_ready()
+        brain.write_node(Node(id="hostile", text=NODE_TEXT))
+        brain.write_node(Node(id="safe", text="A second idea about memory"))
+        brain.write_edges([Edge(id="suggestion", source="hostile", target="safe",
+                               kind="fact", predicate=HOSTILE, pending=True,
+                               evidence=[{"node_id": "hostile", "text": HOSTILE}])])
+        env = {k: v for k, v in os.environ.items()
+               if not k.startswith(("IG_", "IDEAGRAPH_"))}
+        env.update(IG_BRAIN_MODE=brain.mode, IG_BRAIN_PATH=str(brain.path),
+                   IDEAGRAPH_EMBEDDER="hash", PYTHONPATH=str(REPO))
+        headers = {}
+        if options.get('secure'):
+            policy = tmp_path / 'browser-policy.json'
+            policy.write_text(json.dumps({'graphs': {'default': {
+                'roles': {'reviewer': 'editor', 'reader': 'viewer'},
+                'nodes': {'source': {'read': ['reviewer'], 'write': ['reviewer']}}}},
+                'tokens': {hashlib.sha256(token.encode()).hexdigest(): identity for token, identity in
+                           [('reviewer-token', 'reviewer'), ('reader-token', 'reader')]}}))
+            env['IG_ACCESS_POLICY'] = str(policy)
+            headers['Authorization'] = 'Bearer reviewer-token'
+        with socket.socket() as sock:
+&gt;           sock.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+tests/test_frontend_xss.py:71: PermissionError</error></testcase><testcase classname="tests.test_frontend_xss" name="test_decision_integrity_brief_keeps_selected_revision_after_later_edit[git]" time="0.152"><error message="failed on setup with &quot;PermissionError: [Errno 1] Operation not permitted&quot;">tmp_path = PosixPath('/private/var/folders/sj/799zmzcs10n9pm_vhxx4typc0000gn/T/pytest-of-niklas/pytest-820/test_decision_integrity_brief_0')
+request = &lt;SubRequest 'server' for &lt;Function test_decision_integrity_brief_keeps_selected_revision_after_later_edit[git]&gt;&gt;
+
+    @pytest.fixture
+    def server(tmp_path, request):
+        """Each workflow gets a fresh brain and a real HTTP/WebSocket server."""
+        options = getattr(request, 'param', {})
+        brain = Brain(str(tmp_path / "brain"), mode=options.get('mode', 'local'))
+        if options.get('mode') == 'git':
+            brain.init()
+        else:
+            brain.ensure_ready()
+        brain.write_node(Node(id="hostile", text=NODE_TEXT))
+        brain.write_node(Node(id="safe", text="A second idea about memory"))
+        brain.write_edges([Edge(id="suggestion", source="hostile", target="safe",
+                               kind="fact", predicate=HOSTILE, pending=True,
+                               evidence=[{"node_id": "hostile", "text": HOSTILE}])])
+        env = {k: v for k, v in os.environ.items()
+               if not k.startswith(("IG_", "IDEAGRAPH_"))}
+        env.update(IG_BRAIN_MODE=brain.mode, IG_BRAIN_PATH=str(brain.path),
+                   IDEAGRAPH_EMBEDDER="hash", PYTHONPATH=str(REPO))
+        headers = {}
+        if options.get('secure'):
+            policy = tmp_path / 'browser-policy.json'
+            policy.write_text(json.dumps({'graphs': {'default': {
+                'roles': {'reviewer': 'editor', 'reader': 'viewer'},
+                'nodes': {'source': {'read': ['reviewer'], 'write': ['reviewer']}}}},
+                'tokens': {hashlib.sha256(token.encode()).hexdigest(): identity for token, identity in
+                           [('reviewer-token', 'reviewer'), ('reader-token', 'reader')]}}))
+            env['IG_ACCESS_POLICY'] = str(policy)
+            headers['Authorization'] = 'Bearer reviewer-token'
+        with socket.socket() as sock:
+&gt;           sock.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+tests/test_frontend_xss.py:71: PermissionError</error></testcase><testcase classname="tests.test_frontend_xss" name="test_decision_integrity_published_finding_failure_preserves_receipt_and_history[git-fault]" time="0.169"><error message="failed on setup with &quot;PermissionError: [Errno 1] Operation not permitted&quot;">tmp_path = PosixPath('/private/var/folders/sj/799zmzcs10n9pm_vhxx4typc0000gn/T/pytest-of-niklas/pytest-820/test_decision_integrity_publis0')
+request = &lt;SubRequest 'server' for &lt;Function test_decision_integrity_published_finding_failure_preserves_receipt_and_history[git-fault]&gt;&gt;
+
+    @pytest.fixture
+    def server(tmp_path, request):
+        """Each workflow gets a fresh brain and a real HTTP/WebSocket server."""
+        options = getattr(request, 'param', {})
+        brain = Brain(str(tmp_path / "brain"), mode=options.get('mode', 'local'))
+        if options.get('mode') == 'git':
+            brain.init()
+        else:
+            brain.ensure_ready()
+        brain.write_node(Node(id="hostile", text=NODE_TEXT))
+        brain.write_node(Node(id="safe", text="A second idea about memory"))
+        brain.write_edges([Edge(id="suggestion", source="hostile", target="safe",
+                               kind="fact", predicate=HOSTILE, pending=True,
+                               evidence=[{"node_id": "hostile", "text": HOSTILE}])])
+        env = {k: v for k, v in os.environ.items()
+               if not k.startswith(("IG_", "IDEAGRAPH_"))}
+        env.update(IG_BRAIN_MODE=brain.mode, IG_BRAIN_PATH=str(brain.path),
+                   IDEAGRAPH_EMBEDDER="hash", PYTHONPATH=str(REPO))
+        headers = {}
+        if options.get('secure'):
+            policy = tmp_path / 'browser-policy.json'
+            policy.write_text(json.dumps({'graphs': {'default': {
+                'roles': {'reviewer': 'editor', 'reader': 'viewer'},
+                'nodes': {'source': {'read': ['reviewer'], 'write': ['reviewer']}}}},
+                'tokens': {hashlib.sha256(token.encode()).hexdigest(): identity for token, identity in
+                           [('reviewer-token', 'reviewer'), ('reader-token', 'reader')]}}))
+            env['IG_ACCESS_POLICY'] = str(policy)
+            headers['Authorization'] = 'Bearer reviewer-token'
+        with socket.socket() as sock:
+&gt;           sock.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+tests/test_frontend_xss.py:71: PermissionError</error></testcase><testcase classname="tests.test_frontend_xss" name="test_decision_integrity_second_source_revocation_clears_derived_ui[git-secure]" time="0.164"><error message="failed on setup with &quot;PermissionError: [Errno 1] Operation not permitted&quot;">tmp_path = PosixPath('/private/var/folders/sj/799zmzcs10n9pm_vhxx4typc0000gn/T/pytest-of-niklas/pytest-820/test_decision_integrity_second0')
+request = &lt;SubRequest 'server' for &lt;Function test_decision_integrity_second_source_revocation_clears_derived_ui[git-secure]&gt;&gt;
+
+    @pytest.fixture
+    def server(tmp_path, request):
+        """Each workflow gets a fresh brain and a real HTTP/WebSocket server."""
+        options = getattr(request, 'param', {})
+        brain = Brain(str(tmp_path / "brain"), mode=options.get('mode', 'local'))
+        if options.get('mode') == 'git':
+            brain.init()
+        else:
+            brain.ensure_ready()
+        brain.write_node(Node(id="hostile", text=NODE_TEXT))
+        brain.write_node(Node(id="safe", text="A second idea about memory"))
+        brain.write_edges([Edge(id="suggestion", source="hostile", target="safe",
+                               kind="fact", predicate=HOSTILE, pending=True,
+                               evidence=[{"node_id": "hostile", "text": HOSTILE}])])
+        env = {k: v for k, v in os.environ.items()
+               if not k.startswith(("IG_", "IDEAGRAPH_"))}
+        env.update(IG_BRAIN_MODE=brain.mode, IG_BRAIN_PATH=str(brain.path),
+                   IDEAGRAPH_EMBEDDER="hash", PYTHONPATH=str(REPO))
+        headers = {}
+        if options.get('secure'):
+            policy = tmp_path / 'browser-policy.json'
+            policy.write_text(json.dumps({'graphs': {'default': {
+                'roles': {'reviewer': 'editor', 'reader': 'viewer'},
+                'nodes': {'source': {'read': ['reviewer'], 'write': ['reviewer']}}}},
+                'tokens': {hashlib.sha256(token.encode()).hexdigest(): identity for token, identity in
+                           [('reviewer-token', 'reviewer'), ('reader-token', 'reader')]}}))
+            env['IG_ACCESS_POLICY'] = str(policy)
+            headers['Authorization'] = 'Bearer reviewer-token'
+        with socket.socket() as sock:
+&gt;           sock.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+tests/test_frontend_xss.py:71: PermissionError</error></testcase><testcase classname="tests.test_frontend_xss" name="test_decision_integrity_tombstone_clears_historical_ui[git]" time="0.161"><error message="failed on setup with &quot;PermissionError: [Errno 1] Operation not permitted&quot;">tmp_path = PosixPath('/private/var/folders/sj/799zmzcs10n9pm_vhxx4typc0000gn/T/pytest-of-niklas/pytest-820/test_decision_integrity_tombst0')
+request = &lt;SubRequest 'server' for &lt;Function test_decision_integrity_tombstone_clears_historical_ui[git]&gt;&gt;
+
+    @pytest.fixture
+    def server(tmp_path, request):
+        """Each workflow gets a fresh brain and a real HTTP/WebSocket server."""
+        options = getattr(request, 'param', {})
+        brain = Brain(str(tmp_path / "brain"), mode=options.get('mode', 'local'))
+        if options.get('mode') == 'git':
+            brain.init()
+        else:
+            brain.ensure_ready()
+        brain.write_node(Node(id="hostile", text=NODE_TEXT))
+        brain.write_node(Node(id="safe", text="A second idea about memory"))
+        brain.write_edges([Edge(id="suggestion", source="hostile", target="safe",
+                               kind="fact", predicate=HOSTILE, pending=True,
+                               evidence=[{"node_id": "hostile", "text": HOSTILE}])])
+        env = {k: v for k, v in os.environ.items()
+               if not k.startswith(("IG_", "IDEAGRAPH_"))}
+        env.update(IG_BRAIN_MODE=brain.mode, IG_BRAIN_PATH=str(brain.path),
+                   IDEAGRAPH_EMBEDDER="hash", PYTHONPATH=str(REPO))
+        headers = {}
+        if options.get('secure'):
+            policy = tmp_path / 'browser-policy.json'
+            policy.write_text(json.dumps({'graphs': {'default': {
+                'roles': {'reviewer': 'editor', 'reader': 'viewer'},
+                'nodes': {'source': {'read': ['reviewer'], 'write': ['reviewer']}}}},
+                'tokens': {hashlib.sha256(token.encode()).hexdigest(): identity for token, identity in
+                           [('reviewer-token', 'reviewer'), ('reader-token', 'reader')]}}))
+            env['IG_ACCESS_POLICY'] = str(policy)
+            headers['Authorization'] = 'Bearer reviewer-token'
+        with socket.socket() as sock:
+&gt;           sock.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+tests/test_frontend_xss.py:71: PermissionError</error></testcase><testcase classname="tests.test_frontend_xss" name="test_decision_integrity_two_browser_reviews_have_one_winner_without_duplicate_effects[git]" time="0.169"><error message="failed on setup with &quot;PermissionError: [Errno 1] Operation not permitted&quot;">tmp_path = PosixPath('/private/var/folders/sj/799zmzcs10n9pm_vhxx4typc0000gn/T/pytest-of-niklas/pytest-820/test_decision_integrity_two_br0')
+request = &lt;SubRequest 'server' for &lt;Function test_decision_integrity_two_browser_reviews_have_one_winner_without_duplicate_effects[git]&gt;&gt;
+
+    @pytest.fixture
+    def server(tmp_path, request):
+        """Each workflow gets a fresh brain and a real HTTP/WebSocket server."""
+        options = getattr(request, 'param', {})
+        brain = Brain(str(tmp_path / "brain"), mode=options.get('mode', 'local'))
+        if options.get('mode') == 'git':
+            brain.init()
+        else:
+            brain.ensure_ready()
+        brain.write_node(Node(id="hostile", text=NODE_TEXT))
+        brain.write_node(Node(id="safe", text="A second idea about memory"))
+        brain.write_edges([Edge(id="suggestion", source="hostile", target="safe",
+                               kind="fact", predicate=HOSTILE, pending=True,
+                               evidence=[{"node_id": "hostile", "text": HOSTILE}])])
+        env = {k: v for k, v in os.environ.items()
+               if not k.startswith(("IG_", "IDEAGRAPH_"))}
+        env.update(IG_BRAIN_MODE=brain.mode, IG_BRAIN_PATH=str(brain.path),
+                   IDEAGRAPH_EMBEDDER="hash", PYTHONPATH=str(REPO))
+        headers = {}
+        if options.get('secure'):
+            policy = tmp_path / 'browser-policy.json'
+            policy.write_text(json.dumps({'graphs': {'default': {
+                'roles': {'reviewer': 'editor', 'reader': 'viewer'},
+                'nodes': {'source': {'read': ['reviewer'], 'write': ['reviewer']}}}},
+                'tokens': {hashlib.sha256(token.encode()).hexdigest(): identity for token, identity in
+                           [('reviewer-token', 'reviewer'), ('reader-token', 'reader')]}}))
+            env['IG_ACCESS_POLICY'] = str(policy)
+            headers['Authorization'] = 'Bearer reviewer-token'
+        with socket.socket() as sock:
+&gt;           sock.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+tests/test_frontend_xss.py:71: PermissionError</error></testcase><testcase classname="tests.test_frontend_xss" name="test_decision_review_restricted_evidence_is_hidden_by_real_authenticated_api[server0]" time="0.179"><error message="failed on setup with &quot;PermissionError: [Errno 1] Operation not permitted&quot;">tmp_path = PosixPath('/private/var/folders/sj/799zmzcs10n9pm_vhxx4typc0000gn/T/pytest-of-niklas/pytest-820/test_decision_review_restricte0')
+request = &lt;SubRequest 'server' for &lt;Function test_decision_review_restricted_evidence_is_hidden_by_real_authenticated_api[server0]&gt;&gt;
+
+    @pytest.fixture
+    def server(tmp_path, request):
+        """Each workflow gets a fresh brain and a real HTTP/WebSocket server."""
+        options = getattr(request, 'param', {})
+        brain = Brain(str(tmp_path / "brain"), mode=options.get('mode', 'local'))
+        if options.get('mode') == 'git':
+            brain.init()
+        else:
+            brain.ensure_ready()
+        brain.write_node(Node(id="hostile", text=NODE_TEXT))
+        brain.write_node(Node(id="safe", text="A second idea about memory"))
+        brain.write_edges([Edge(id="suggestion", source="hostile", target="safe",
+                               kind="fact", predicate=HOSTILE, pending=True,
+                               evidence=[{"node_id": "hostile", "text": HOSTILE}])])
+        env = {k: v for k, v in os.environ.items()
+               if not k.startswith(("IG_", "IDEAGRAPH_"))}
+        env.update(IG_BRAIN_MODE=brain.mode, IG_BRAIN_PATH=str(brain.path),
+                   IDEAGRAPH_EMBEDDER="hash", PYTHONPATH=str(REPO))
+        headers = {}
+        if options.get('secure'):
+            policy = tmp_path / 'browser-policy.json'
+            policy.write_text(json.dumps({'graphs': {'default': {
+                'roles': {'reviewer': 'editor', 'reader': 'viewer'},
+                'nodes': {'source': {'read': ['reviewer'], 'write': ['reviewer']}}}},
+                'tokens': {hashlib.sha256(token.encode()).hexdigest(): identity for token, identity in
+                           [('reviewer-token', 'reviewer'), ('reader-token', 'reader')]}}))
+            env['IG_ACCESS_POLICY'] = str(policy)
+            headers['Authorization'] = 'Bearer reviewer-token'
+        with socket.socket() as sock:
+&gt;           sock.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+tests/test_frontend_xss.py:71: PermissionError</error></testcase><testcase classname="tests.test_frontend_xss" name="test_decision_review_stale_submission_refreshes_without_overwriting[server0]" time="0.171"><error message="failed on setup with &quot;PermissionError: [Errno 1] Operation not permitted&quot;">tmp_path = PosixPath('/private/var/folders/sj/799zmzcs10n9pm_vhxx4typc0000gn/T/pytest-of-niklas/pytest-820/test_decision_review_stale_sub0')
+request = &lt;SubRequest 'server' for &lt;Function test_decision_review_stale_submission_refreshes_without_overwriting[server0]&gt;&gt;
+
+    @pytest.fixture
+    def server(tmp_path, request):
+        """Each workflow gets a fresh brain and a real HTTP/WebSocket server."""
+        options = getattr(request, 'param', {})
+        brain = Brain(str(tmp_path / "brain"), mode=options.get('mode', 'local'))
+        if options.get('mode') == 'git':
+            brain.init()
+        else:
+            brain.ensure_ready()
+        brain.write_node(Node(id="hostile", text=NODE_TEXT))
+        brain.write_node(Node(id="safe", text="A second idea about memory"))
+        brain.write_edges([Edge(id="suggestion", source="hostile", target="safe",
+                               kind="fact", predicate=HOSTILE, pending=True,
+                               evidence=[{"node_id": "hostile", "text": HOSTILE}])])
+        env = {k: v for k, v in os.environ.items()
+               if not k.startswith(("IG_", "IDEAGRAPH_"))}
+        env.update(IG_BRAIN_MODE=brain.mode, IG_BRAIN_PATH=str(brain.path),
+                   IDEAGRAPH_EMBEDDER="hash", PYTHONPATH=str(REPO))
+        headers = {}
+        if options.get('secure'):
+            policy = tmp_path / 'browser-policy.json'
+            policy.write_text(json.dumps({'graphs': {'default': {
+                'roles': {'reviewer': 'editor', 'reader': 'viewer'},
+                'nodes': {'source': {'read': ['reviewer'], 'write': ['reviewer']}}}},
+                'tokens': {hashlib.sha256(token.encode()).hexdigest(): identity for token, identity in
+                           [('reviewer-token', 'reviewer'), ('reader-token', 'reader')]}}))
+            env['IG_ACCESS_POLICY'] = str(policy)
+            headers['Authorization'] = 'Bearer reviewer-token'
+        with socket.socket() as sock:
+&gt;           sock.bind(("127.0.0.1", 0))
+E           PermissionError: [Errno 1] Operation not permitted
+
+tests/test_frontend_xss.py:71: PermissionError</error></testcase><testcase classname="tests.test_mcp" name="test_write_mode_registers_exactly_the_write_tools" time="0.877" /></testsuite></testsuites>
