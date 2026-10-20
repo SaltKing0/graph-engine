@@ -85,5 +85,18 @@
     "elapsed_seconds": 2.133,
     "exit_code": 0,
     "log": "verifier-final.log"
+  },
+  {
+    "label": "verifier-ci-scope",
+    "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+    "argv": [
+      ".venv/bin/python",
+      "docs/decision-evaluation-results/false-alert-development-v1/y1-adoption-review-v1/verify.py"
+    ],
+    "started_at": "2026-10-20T13:39:16.139602+00:00",
+    "ended_at": "2026-10-20T13:39:18.822792+00:00",
+    "elapsed_seconds": 2.683,
+    "exit_code": 0,
+    "log": "verifier-ci-scope.log"
   }
 ]

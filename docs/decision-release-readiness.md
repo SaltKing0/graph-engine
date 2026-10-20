@@ -549,7 +549,10 @@ Fresh source/identity reconstruction preserves the exact 18 versions / 19 events
 and three unresolved findings. Five existing lifecycle regressions pass and 11
 malformed in-memory plan variants are rejected; no new cases or independent
 scores are created. The original artifact verifier passes at its original head.
-No engine/tool/test/CI/dependency change or threshold adjustment was required.
+No engine/tool/test/dependency change or threshold adjustment was required.
+The initial browser/matrix CI setup failed because `ubuntu-latest` selected
+Ubuntu 26.04, unsupported by Playwright 1.58.0; only those two jobs are pinned
+to compatible Ubuntu 24.04, retaining all checks and skip-failure guards.
 The historical false-alert gate still fails 5/95 (5.26%) >5%; proposed profile
 misses 3/3 positives and independent coverage remains 0/0/0. No acceptance checkbox
 is added. Independent annotation/final evaluation, actual provenance, final

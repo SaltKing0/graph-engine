@@ -1,4 +1,5 @@
 """Reproduce the preparation review without changing its historical evidence."""
+import gzip
 import json
 from pathlib import Path
 import subprocess
@@ -37,11 +38,31 @@ def main() -> None:
     commands = json.loads((HERE / 'commands.json').read_bytes())
     assert len(commands) >= 3 and all(row['exit_code'] == 0 for row in commands)
     assert '5 passed' in (HERE / 'lifecycle-regressions.log').read_text()
-    allowed = {'docs/decision-source-observations.md', 'docs/decision-release-readiness.md'}
+    guides = {'docs/decision-source-observations.md', 'docs/decision-release-readiness.md'}
+    workflow = '.github/workflows/ci.yml'
+    original_workflow = subprocess.check_output(['git', 'show', BASE + ':' + workflow], cwd=ROOT, text=True)
+    expected_workflow = original_workflow
+    for job, name in [('test-browser', 'test (3.12, Chromium)'),
+                      ('decision-integrity', 'test (3.12, Decision Memory integrity matrix)')]:
+        old = f'  {job}:\n    name: {name}\n    runs-on: ubuntu-latest'
+        assert expected_workflow.count(old) == 1
+        expected_workflow = expected_workflow.replace(old, old.replace('ubuntu-latest', 'ubuntu-24.04'))
+    assert (ROOT / workflow).read_text() == expected_workflow
+    failure = json.loads((HERE / 'ci-setup/failure.json').read_bytes())
+    first_run = json.loads((HERE / 'ci-setup/first-run.json').read_bytes())
+    assert first_run['headSha'] == failure['failed_head'] == '0c7e0a8db5ca412f7c29c60e4db651d99b0544f6'
+    assert first_run['status'] == 'completed' and first_run['conclusion'] == 'failure'
+    jobs = {row['databaseId']: row for row in first_run['jobs']}
+    for row, filename in zip(failure['jobs'], ('ci-chromium.log.gz', 'ci-matrix.log.gz')):
+        job = jobs[row['job_id']]
+        assert job['conclusion'] == 'failure'
+        assert any(step['name'] == row['failed_step'] and step['conclusion'] == 'failure' for step in job['steps'])
+        assert failure['error'] in gzip.decompress((HERE / 'ci-setup' / filename).read_bytes()).decode()
+    allowed = guides | {workflow}
     prefix = 'docs/decision-evaluation-results/false-alert-development-v1/y1-adoption-review-v1/'
     changes = subprocess.check_output(['git', 'diff', '--name-only', BASE], cwd=ROOT, text=True).splitlines()
     assert all(name in allowed or name.startswith(prefix) for name in changes), changes
-    for name in allowed:
+    for name in guides:
         original = subprocess.check_output(['git', 'show', BASE + ':' + name], cwd=ROOT)
         assert (ROOT / name).read_bytes().startswith(original), name
     print('Revised unsigned plan and source review reproduced: fictional-event time, exact metric/unit/condition bindings, required review outcomes.')

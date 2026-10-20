@@ -111,13 +111,22 @@ preceded the final frozen validator; it supplies no separate semantic measuremen
 The [verifier](verify.py) reproduces the revised JSON/review and checks the full
 inventory, transitive code/source identities, unchanged original files and
 append-only guides. **35 local file/heading references pass** across this report
-and the two guides. Production engine, tools, tests, CI and dependencies are
-unchanged. Full local suite/matrix are **not rerun** for this documentation-only
+and the two guides. Production engine, tools, tests and dependencies are
+unchanged. Full local suite/matrix are **not rerun** for this documentation
 delivery; historical results remain **2,186 passes /10 optional model skips** and
 **55 matrix tests /41 applicable cells**, 13 technical N/A. The prior final head
 passed all 15 checks: [CI](https://github.com/SaltKing0/graph-engine/actions/runs/39156918240),
 [advisories](https://github.com/SaltKing0/graph-engine/actions/runs/39156918385).
 CI for the new head is reported separately in Draft PR #96.
+
+The first new CI run failed **before tests** in Chromium and the integrity matrix:
+`ubuntu-latest` selected Ubuntu 26.04, unsupported by pinned Playwright 1.58.0.
+The two jobs are now explicitly pinned to **Ubuntu 24.04**, which is present in
+the same installed Playwright release's platform registry. All other workflow
+bytes, Playwright versions, test commands, `--fail-on-skip` and matrix limits stay
+unchanged. The verifier permits exactly these two runner replacements, not an
+arbitrary CI exception. Raw failed-job logs and the scoped change are retained
+in `ci-setup/`; only a successful new execution can supply browser/matrix proof.
 
 ## Open acceptance
 
