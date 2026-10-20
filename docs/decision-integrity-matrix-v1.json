@@ -613,7 +613,7 @@
       "surface": "service",
       "operation": "Inject failure after authoritative publication at index rebuild and commit boundaries; interrupt a two-event review batch before/after authoritative publication and replay its exact request",
       "preconditions": "A structured proposal has a stable idempotency key; index/commit raises after local publication. Review requests contain two exact proposed claim refs and one captured generation/idempotency key.",
-      "invariant": "Return an explicit published-locally receipt; identical retry returns the durable receipt without duplicate records; sync may remain required. Review publication is all-or-nothing; replay retains exactly one receipt, both original subject refs and no duplicated events.",
+      "invariant": "Before sidecar publication, fail without any accepted event or receipt; after publication, report a published-locally receipt. Identical replay retains exactly one receipt and both original review subject refs without duplicate records/events; sync may remain required.",
       "scope": "Actual storage publication, index and commit failure boundaries",
       "applicable": true,
       "tests": [
@@ -635,7 +635,7 @@
       "surface": "cli",
       "operation": "Inject failure after authoritative publication at index rebuild and commit boundaries; interrupt a two-event review batch before/after authoritative publication and replay its exact request",
       "preconditions": "A structured proposal has a stable idempotency key; index/commit raises after local publication. Review requests contain two exact proposed claim refs and one captured generation/idempotency key.",
-      "invariant": "Return an explicit published-locally receipt; identical retry returns the durable receipt without duplicate records; sync may remain required. Review publication is all-or-nothing; replay retains exactly one receipt, both original subject refs and no duplicated events.",
+      "invariant": "Before sidecar publication, fail without any accepted event or receipt; after publication, report a published-locally receipt. Identical replay retains exactly one receipt and both original review subject refs without duplicate records/events; sync may remain required.",
       "scope": "Actual CLI parser/output with injected local index/commit failures (in process)",
       "applicable": true,
       "tests": [
@@ -653,7 +653,7 @@
       "surface": "http",
       "operation": "Inject failure after authoritative publication at index rebuild and commit boundaries; interrupt a two-event review batch before/after authoritative publication and replay its exact request",
       "preconditions": "A structured proposal has a stable idempotency key; index/commit raises after local publication. Review requests contain two exact proposed claim refs and one captured generation/idempotency key.",
-      "invariant": "Return an explicit published-locally receipt; identical retry returns the durable receipt without duplicate records; sync may remain required. Review publication is all-or-nothing; replay retains exactly one receipt, both original subject refs and no duplicated events.",
+      "invariant": "Before sidecar publication, fail without any accepted event or receipt; after publication, report a published-locally receipt. Identical replay retains exactly one receipt and both original review subject refs without duplicate records/events; sync may remain required.",
       "scope": "Actual ASGI HTTP 502/receipt/retry responses at index/commit boundaries",
       "applicable": true,
       "tests": [
@@ -675,7 +675,7 @@
       "scope": "Declared operation capability boundary; not an executed pass",
       "applicable": false,
       "tests": [],
-      "not_applicable_reason": "No raw structured-version proposal operation exists on mcp. This scenario concerns that proposal publication boundary; browser finding-review failure paths require separate future scenarios."
+      "not_applicable_reason": "No raw structured-version proposal or typed review mutation exists on mcp. This cell concerns those publication boundaries; browser finding publication is tested in RECOVERY-UI-01."
     },
     {
       "scenario_id": "RECOVERY-UI-01",
@@ -701,7 +701,7 @@
       "scope": "Declared operation capability boundary; not an executed pass",
       "applicable": false,
       "tests": [],
-      "not_applicable_reason": "No raw structured-version proposal operation exists on exports. This scenario concerns that proposal publication boundary; browser finding-review failure paths require separate future scenarios."
+      "not_applicable_reason": "No raw structured-version proposal or typed review mutation exists on exports. This cell concerns those publication boundaries; browser finding publication is tested in RECOVERY-UI-01."
     },
     {
       "scenario_id": "WRITERS-01",
@@ -710,7 +710,7 @@
       "operation": "Start concurrent same-generation structured proposals, then retry the losing request; race two exact-target review requests, refresh only the losing request preconditions and retry",
       "preconditions": "Two CLI processes or HTTP workers share one brain and captured generation, using distinct idempotency keys. Both reviews capture the same generation and distinct existing proposed claim refs.",
       "invariant": "Exactly one initial transaction wins; loser gets a conflict, then a fresh-preview retry retains both records without forks or duplicates. Only one initial event publishes; the refreshed loser adds one event without retargeting or duplicating either review.",
-      "scope": "Two actual CLI processes from a common start barrier; inspect persisted generations, receipts and Git state",
+      "scope": "Actual CLI processes and ASGI HTTP workers exercise the same storage guard; inspect persisted generations, exact review targets, receipts and histories.",
       "applicable": true,
       "tests": [
         "tests/test_decision_integrity.py::test_simultaneous_cli_proposals_have_one_winner_and_lossless_retry",
