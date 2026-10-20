@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/integrity-closeout-v1/verify.py", line 118, in <module>
+    main()
+  File "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo/docs/decision-evaluation-results/integrity-closeout-v1/verify.py", line 84, in main
+    assert {(c['category'], c['surface']) for c in review['cells']} == {
+             ~^^^^^^^^^^^^
+KeyError: 'category'

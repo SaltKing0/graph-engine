@@ -558,3 +558,27 @@ misses 3/3 positives and independent coverage remains 0/0/0. No acceptance check
 is added. Independent annotation/final evaluation, actual provenance, final
 sign-off and users/product benefit remain absent. Activation, resolution, merge
 and release remain unperformed; PR #96 stays Draft and the feature experimental.
+
+## Integrity engineering closeout (20 October 2026)
+
+[#96](https://github.com/SaltKing0/graph-engine/pull/96) was merged after all
+15 checks passed. The [engineering closeout](decision-evaluation-results/integrity-closeout-v1/README.md)
+for #92 reviews all 54 matrix cells and 13 technical exclusions, and closes a
+specific evidence gap for review-batch publication/retry and concurrent reviews
+on CLI/HTTP. The reviewed inventory executes **73 tests / 41 applicable cells**,
+all passed locally and in matching CI; all 15 code CI checks are green.
+
+This is a reviewed bounded engineering inventory by Codex, the implementing
+agent. It is not a human review, an independent sign-off, or #91's future final
+candidate. The matrix runner deliberately retains `final_candidate=null`,
+`independent_sign_off=null`, the complete final integrity gate unmeasured and
+`release_ready=false`. Relevant later candidate changes require revalidation
+and actual final sign-off. An engineering-only closure of #92 requires an
+explicit scope disposition while carrying that final obligation in #91/#73;
+this report does not silently waive or satisfy the original criteria.
+
+#90, #91, #93 and epic #73 remain open. Independent coverage remains 0/0/0,
+false alerts remain 5/95 (5.26%, above 5%), the empty proposed profile still
+misses 3/3 positives, and actual user benefit remains unmeasured. No reserved
+final cases, changed thresholds, Y1 activation, release or package publication
+are part of this closeout. Historical results and review decisions are retained.

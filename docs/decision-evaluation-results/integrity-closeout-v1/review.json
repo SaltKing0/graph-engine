@@ -1,0 +1,1895 @@
+{
+  "schema": "dm.integrity.engineering-review/1",
+  "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+  "code_sha256": "6c4ffbf17997c1e006e0866fadf194003ebe9a7254c6bae6fd4c7e9cbeabcb9b",
+  "matrix_sha256": "ddbe4afaff7260cca018e795c833434a306da33136aa05b87586e0f1e7b2be74",
+  "reviewer": {
+    "id": "codex-implementing-agent",
+    "kind": "implementing_agent",
+    "independent": false,
+    "human": false
+  },
+  "final_candidate": null,
+  "independent_sign_off": null,
+  "release_ready": false,
+  "scope": "Engineering review of the explicit bounded software inventory. No final-candidate or independent acceptance.",
+  "cells": [
+    {
+      "cell": {
+        "scenario_id": "ACL-01",
+        "category": "acl_revocation",
+        "surface": "service",
+        "operation": "Revoke one direct or second derivation source before current/historical reads",
+        "preconditions": "A versioned decision/evidence graph exists; one source permission is removed while graph read remains allowed.",
+        "invariant": "No unauthorized source bytes or IDs, including multi-source derivatives, paths and historical/context exports.",
+        "scope": "Shared typed service over exact Git revisions",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-service]",
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-service]",
+          "tests/test_decision_memory.py::test_sidecar_reference_acl_checks_basis_anchor_as_well_as_source",
+          "tests/test_decision_memory.py::test_missing_and_cyclic_node_lineage_fail_closed"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-service]",
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-service]",
+          "tests/test_decision_memory.py::test_sidecar_reference_acl_checks_basis_anchor_as_well_as_source",
+          "tests/test_decision_memory.py::test_missing_and_cyclic_node_lineage_fail_closed[lineage0]",
+          "tests/test_decision_memory.py::test_missing_and_cyclic_node_lineage_fail_closed[lineage1]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-service]",
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-service]",
+          "tests/test_decision_memory.py::test_sidecar_reference_acl_checks_basis_anchor_as_well_as_source",
+          "tests/test_decision_memory.py::test_missing_and_cyclic_node_lineage_fail_closed[lineage0]",
+          "tests/test_decision_memory.py::test_missing_and_cyclic_node_lineage_fail_closed[lineage1]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Direct and second-source revocation are checked under current policy on live and historical projections. Accessible queue/context operations must still succeed; empty error responses cannot count as privacy evidence. Source text, IDs and derivatives must be absent; read-side files and Git HEAD are compared.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/decision_memory.py",
+        "graph_engine/decision_service.py",
+        "graph_engine/snapshots.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "ACL-01",
+        "category": "acl_revocation",
+        "surface": "cli",
+        "operation": "Revoke one direct or second derivation source before current/historical reads",
+        "preconditions": "A versioned decision/evidence graph exists; one source permission is removed while graph read remains allowed.",
+        "invariant": "No unauthorized source bytes or IDs, including multi-source derivatives, paths and historical/context exports.",
+        "scope": "Actual CLI subprocess / JSON stdin and stdout",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-cli]",
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-cli]"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-cli]",
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-cli]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-cli]",
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-cli]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Direct and second-source revocation are checked under current policy on live and historical projections. Accessible queue/context operations must still succeed; empty error responses cannot count as privacy evidence. Source text, IDs and derivatives must be absent; read-side files and Git HEAD are compared.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/__main__.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "ACL-01",
+        "category": "acl_revocation",
+        "surface": "http",
+        "operation": "Revoke one direct or second derivation source before current/historical reads",
+        "preconditions": "A versioned decision/evidence graph exists; one source permission is removed while graph read remains allowed.",
+        "invariant": "No unauthorized source bytes or IDs, including multi-source derivatives, paths and historical/context exports.",
+        "scope": "ASGI HTTP request/response and authorization middleware; real TCP UI cases are separate",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-http]",
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-http]"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-http]",
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-http]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-http]",
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-http]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Direct and second-source revocation are checked under current policy on live and historical projections. Accessible queue/context operations must still succeed; empty error responses cannot count as privacy evidence. Source text, IDs and derivatives must be absent; read-side files and Git HEAD are compared.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "ACL-01",
+        "category": "acl_revocation",
+        "surface": "mcp",
+        "operation": "Revoke one direct or second derivation source before current/historical reads",
+        "preconditions": "A versioned decision/evidence graph exists; one source permission is removed while graph read remains allowed.",
+        "invariant": "No unauthorized source bytes or IDs, including multi-source derivatives, paths and historical/context exports.",
+        "scope": "Actual CLI stdio JSON-RPC session",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-mcp]",
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-mcp]",
+          "tests/test_mcp.py::test_write_mode_registers_exactly_the_write_tools"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-mcp]",
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-mcp]",
+          "tests/test_mcp.py::test_write_mode_registers_exactly_the_write_tools"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-mcp]",
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-mcp]",
+          "tests/test_mcp.py::test_write_mode_registers_exactly_the_write_tools"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Direct and second-source revocation are checked under current policy on live and historical projections. Accessible queue/context operations must still succeed; empty error responses cannot count as privacy evidence. Source text, IDs and derivatives must be absent; read-side files and Git HEAD are compared.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/mcp/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "ACL-01",
+        "category": "acl_revocation",
+        "surface": "browser",
+        "operation": "Revoke one direct or second derivation source before current/historical reads",
+        "preconditions": "A versioned decision/evidence graph exists; one source permission is removed while graph read remains allowed.",
+        "invariant": "No unauthorized source bytes or IDs, including multi-source derivatives, paths and historical/context exports.",
+        "scope": "Real Chromium DOM interaction against a real authenticated/local HTTP server",
+        "applicable": true,
+        "tests": [
+          "tests/test_frontend_xss.py::test_decision_review_restricted_evidence_is_hidden_by_real_authenticated_api",
+          "tests/test_frontend_xss.py::test_decision_integrity_second_source_revocation_clears_derived_ui"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_frontend_xss.py::test_decision_review_restricted_evidence_is_hidden_by_real_authenticated_api[server0]",
+          "tests/test_frontend_xss.py::test_decision_integrity_second_source_revocation_clears_derived_ui[git-secure]"
+        ],
+        "expected_nodes": [
+          "tests/test_frontend_xss.py::test_decision_review_restricted_evidence_is_hidden_by_real_authenticated_api[server0]",
+          "tests/test_frontend_xss.py::test_decision_integrity_second_source_revocation_clears_derived_ui[git-secure]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Direct and second-source revocation are checked under current policy on live and historical projections. Accessible queue/context operations must still succeed; empty error responses cannot count as privacy evidence. Source text, IDs and derivatives must be absent; read-side files and Git HEAD are compared.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/web/decision-review.js",
+        "graph_engine/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "ACL-01",
+        "category": "acl_revocation",
+        "surface": "exports",
+        "operation": "Revoke one direct or second derivation source before current/historical reads",
+        "preconditions": "A versioned decision/evidence graph exists; one source permission is removed while graph read remains allowed.",
+        "invariant": "No unauthorized source bytes or IDs, including multi-source derivatives, paths and historical/context exports.",
+        "scope": "Actual bounded context JSON and rendered Markdown brief",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-exports]",
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-exports]"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-exports]",
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-exports]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[acl-exports]",
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[multisource-acl-exports]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Direct and second-source revocation are checked under current policy on live and historical projections. Accessible queue/context operations must still succeed; empty error responses cannot count as privacy evidence. Source text, IDs and derivatives must be absent; read-side files and Git HEAD are compared.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/decision_service.py",
+        "graph_engine/decision_brief.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "FORGET-01",
+        "category": "tombstones",
+        "surface": "service",
+        "operation": "Forget a captured source, then query the historical decision and live review/context views",
+        "preconditions": "A stored source and decision have a historical revision and an explained update.",
+        "invariant": "No live/context/brief resurrection of forgotten source bytes or IDs; explicit forensic snapshot semantics remain separate.",
+        "scope": "Shared typed service over exact Git revisions",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-service]"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-service]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-service]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Forgotten sources disappear from live typed projections, contexts and browser history refresh. Explicit authorized forensic snapshots remain distinct from live resurrection; current ACL still applies to that historical access.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/decision_memory.py",
+        "graph_engine/decision_service.py",
+        "graph_engine/snapshots.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "FORGET-01",
+        "category": "tombstones",
+        "surface": "cli",
+        "operation": "Forget a captured source, then query the historical decision and live review/context views",
+        "preconditions": "A stored source and decision have a historical revision and an explained update.",
+        "invariant": "No live/context/brief resurrection of forgotten source bytes or IDs; explicit forensic snapshot semantics remain separate.",
+        "scope": "Actual CLI subprocess / JSON stdin and stdout",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-cli]"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-cli]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-cli]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Forgotten sources disappear from live typed projections, contexts and browser history refresh. Explicit authorized forensic snapshots remain distinct from live resurrection; current ACL still applies to that historical access.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/__main__.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "FORGET-01",
+        "category": "tombstones",
+        "surface": "http",
+        "operation": "Forget a captured source, then query the historical decision and live review/context views",
+        "preconditions": "A stored source and decision have a historical revision and an explained update.",
+        "invariant": "No live/context/brief resurrection of forgotten source bytes or IDs; explicit forensic snapshot semantics remain separate.",
+        "scope": "ASGI HTTP request/response and authorization middleware; real TCP UI cases are separate",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-http]"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-http]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-http]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Forgotten sources disappear from live typed projections, contexts and browser history refresh. Explicit authorized forensic snapshots remain distinct from live resurrection; current ACL still applies to that historical access.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "FORGET-01",
+        "category": "tombstones",
+        "surface": "mcp",
+        "operation": "Forget a captured source, then query the historical decision and live review/context views",
+        "preconditions": "A stored source and decision have a historical revision and an explained update.",
+        "invariant": "No live/context/brief resurrection of forgotten source bytes or IDs; explicit forensic snapshot semantics remain separate.",
+        "scope": "Actual CLI stdio JSON-RPC session",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-mcp]"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-mcp]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-mcp]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Forgotten sources disappear from live typed projections, contexts and browser history refresh. Explicit authorized forensic snapshots remain distinct from live resurrection; current ACL still applies to that historical access.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/mcp/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "FORGET-01",
+        "category": "tombstones",
+        "surface": "browser",
+        "operation": "Forget a captured source, then query the historical decision and live review/context views",
+        "preconditions": "A stored source and decision have a historical revision and an explained update.",
+        "invariant": "No live/context/brief resurrection of forgotten source bytes or IDs; explicit forensic snapshot semantics remain separate.",
+        "scope": "Real Chromium DOM interaction against a real authenticated/local HTTP server",
+        "applicable": true,
+        "tests": [
+          "tests/test_frontend_xss.py::test_decision_integrity_tombstone_clears_historical_ui"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_frontend_xss.py::test_decision_integrity_tombstone_clears_historical_ui[git]"
+        ],
+        "expected_nodes": [
+          "tests/test_frontend_xss.py::test_decision_integrity_tombstone_clears_historical_ui[git]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Forgotten sources disappear from live typed projections, contexts and browser history refresh. Explicit authorized forensic snapshots remain distinct from live resurrection; current ACL still applies to that historical access.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/web/decision-review.js",
+        "graph_engine/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "FORGET-01",
+        "category": "tombstones",
+        "surface": "exports",
+        "operation": "Forget a captured source, then query the historical decision and live review/context views",
+        "preconditions": "A stored source and decision have a historical revision and an explained update.",
+        "invariant": "No live/context/brief resurrection of forgotten source bytes or IDs; explicit forensic snapshot semantics remain separate.",
+        "scope": "Actual bounded context JSON and rendered Markdown brief",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-exports]"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-exports]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[tombstone-exports]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Forgotten sources disappear from live typed projections, contexts and browser history refresh. Explicit authorized forensic snapshots remain distinct from live resurrection; current ACL still applies to that historical access.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/decision_service.py",
+        "graph_engine/decision_brief.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "EDIT-01",
+        "category": "source_edit",
+        "surface": "service",
+        "operation": "Capture a successor source; read old versions and explained review candidates",
+        "preconditions": "Old source, evidence, dependencies and decision are pinned before a later edit.",
+        "invariant": "Exact old versions remain resolvable; successor review/assessment is not silently inherited; reads do not write brain state.",
+        "scope": "Shared typed service over exact Git revisions",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-service]",
+          "tests/test_decision_memory.py::test_claim_wording_and_context_edit_never_transfer_review",
+          "tests/test_decision_memory.py::test_source_edit_versions_exact_bytes_and_marks_basis_changed",
+          "tests/test_decision_memory.py::test_source_write_interruption_is_stale_then_reconciled",
+          "tests/test_decision_memory.py::test_manual_source_edit_is_detected_without_read_repair"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-service]",
+          "tests/test_decision_memory.py::test_claim_wording_and_context_edit_never_transfer_review",
+          "tests/test_decision_memory.py::test_source_edit_versions_exact_bytes_and_marks_basis_changed",
+          "tests/test_decision_memory.py::test_source_write_interruption_is_stale_then_reconciled",
+          "tests/test_decision_memory.py::test_manual_source_edit_is_detected_without_read_repair"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-service]",
+          "tests/test_decision_memory.py::test_claim_wording_and_context_edit_never_transfer_review",
+          "tests/test_decision_memory.py::test_source_edit_versions_exact_bytes_and_marks_basis_changed",
+          "tests/test_decision_memory.py::test_source_write_interruption_is_stale_then_reconciled",
+          "tests/test_decision_memory.py::test_manual_source_edit_is_detected_without_read_repair"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Historical text and source versions remain exact. Source and claim successors do not inherit reviews. Out-of-band or interrupted source edits invalidate effective freshness without read repair.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/decision_memory.py",
+        "graph_engine/decision_service.py",
+        "graph_engine/snapshots.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "EDIT-01",
+        "category": "source_edit",
+        "surface": "cli",
+        "operation": "Capture a successor source; read old versions and explained review candidates",
+        "preconditions": "Old source, evidence, dependencies and decision are pinned before a later edit.",
+        "invariant": "Exact old versions remain resolvable; successor review/assessment is not silently inherited; reads do not write brain state.",
+        "scope": "Actual CLI subprocess / JSON stdin and stdout",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-cli]"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-cli]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-cli]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Historical text and source versions remain exact. Source and claim successors do not inherit reviews. Out-of-band or interrupted source edits invalidate effective freshness without read repair.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/__main__.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "EDIT-01",
+        "category": "source_edit",
+        "surface": "http",
+        "operation": "Capture a successor source; read old versions and explained review candidates",
+        "preconditions": "Old source, evidence, dependencies and decision are pinned before a later edit.",
+        "invariant": "Exact old versions remain resolvable; successor review/assessment is not silently inherited; reads do not write brain state.",
+        "scope": "ASGI HTTP request/response and authorization middleware; real TCP UI cases are separate",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-http]"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-http]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-http]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Historical text and source versions remain exact. Source and claim successors do not inherit reviews. Out-of-band or interrupted source edits invalidate effective freshness without read repair.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "EDIT-01",
+        "category": "source_edit",
+        "surface": "mcp",
+        "operation": "Capture a successor source; read old versions and explained review candidates",
+        "preconditions": "Old source, evidence, dependencies and decision are pinned before a later edit.",
+        "invariant": "Exact old versions remain resolvable; successor review/assessment is not silently inherited; reads do not write brain state.",
+        "scope": "Actual CLI stdio JSON-RPC session",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-mcp]"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-mcp]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-mcp]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Historical text and source versions remain exact. Source and claim successors do not inherit reviews. Out-of-band or interrupted source edits invalidate effective freshness without read repair.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/mcp/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "EDIT-01",
+        "category": "source_edit",
+        "surface": "browser",
+        "operation": "Capture a successor source; read old versions and explained review candidates",
+        "preconditions": "Old source, evidence, dependencies and decision are pinned before a later edit.",
+        "invariant": "Exact old versions remain resolvable; successor review/assessment is not silently inherited; reads do not write brain state.",
+        "scope": "Real Chromium DOM interaction against a real authenticated/local HTTP server",
+        "applicable": true,
+        "tests": [
+          "tests/test_frontend_xss.py::test_decision_impact_full_browser_flow_and_pinned_brief"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_frontend_xss.py::test_decision_impact_full_browser_flow_and_pinned_brief[server0]"
+        ],
+        "expected_nodes": [
+          "tests/test_frontend_xss.py::test_decision_impact_full_browser_flow_and_pinned_brief[server0]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Historical text and source versions remain exact. Source and claim successors do not inherit reviews. Out-of-band or interrupted source edits invalidate effective freshness without read repair.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/web/decision-review.js",
+        "graph_engine/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "EDIT-01",
+        "category": "source_edit",
+        "surface": "exports",
+        "operation": "Capture a successor source; read old versions and explained review candidates",
+        "preconditions": "Old source, evidence, dependencies and decision are pinned before a later edit.",
+        "invariant": "Exact old versions remain resolvable; successor review/assessment is not silently inherited; reads do not write brain state.",
+        "scope": "Actual bounded context JSON and rendered Markdown brief",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-exports]"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-exports]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-exports]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Historical text and source versions remain exact. Source and claim successors do not inherit reviews. Out-of-band or interrupted source edits invalidate effective freshness without read repair.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/decision_service.py",
+        "graph_engine/decision_brief.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "MERGE-01",
+        "category": "merge",
+        "surface": "service",
+        "operation": "Attempt an explicit generic merge involving a version-pinned source",
+        "preconditions": "Decision Memory provenance pins a source node; an unrelated node is the other operand.",
+        "invariant": "Reject before any node/edge/history mutation; do not retarget reviews or source identity.",
+        "scope": "Actual generic merge_nodes service boundary",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_memory.py::test_pinned_merge_refuses_before_any_changes"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_memory.py::test_pinned_merge_refuses_before_any_changes"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_memory.py::test_pinned_merge_refuses_before_any_changes"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Generic merge refuses version-pinned sources before file mutation. Ordinary unpinned merges still work. No version-aware source merge is claimed. Surfaces without a merge operation are excluded only from this mutation row.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/decision_memory.py",
+        "graph_engine/decision_service.py",
+        "graph_engine/snapshots.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "MERGE-01",
+        "category": "merge",
+        "surface": "cli",
+        "operation": "Attempt an explicit generic merge involving a version-pinned source",
+        "preconditions": "Decision Memory provenance pins a source node; an unrelated node is the other operand.",
+        "invariant": "Reject before any node/edge/history mutation; do not retarget reviews or source identity.",
+        "scope": "Actual generic ig merge subprocess",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_cli_cannot_merge_version_pinned_source_or_reassign_reviews"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_cli_cannot_merge_version_pinned_source_or_reassign_reviews"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_cli_cannot_merge_version_pinned_source_or_reassign_reviews"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Generic merge refuses version-pinned sources before file mutation. Ordinary unpinned merges still work. No version-aware source merge is claimed. Surfaces without a merge operation are excluded only from this mutation row.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/__main__.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "MERGE-01",
+        "category": "merge",
+        "surface": "http",
+        "operation": "Attempt an explicit generic merge involving a version-pinned source",
+        "preconditions": "Decision Memory provenance pins a source node; an unrelated node is the other operand.",
+        "invariant": "Reject before any node/edge/history mutation; do not retarget reviews or source identity.",
+        "scope": "Declared operation capability boundary; not an executed pass",
+        "applicable": false,
+        "tests": [],
+        "not_applicable_reason": "This scenario is explicit generic node merge. No merge operation exists on this typed http surface; read projections are separately covered in ACL/EDIT/HISTORY rows.",
+        "observed_nodes": [],
+        "expected_nodes": [],
+        "missing_nodes": [],
+        "result": "not_applicable_declared"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "operation_not_exposed",
+      "rationale": "Generic merge refuses version-pinned sources before file mutation. Ordinary unpinned merges still work. No version-aware source merge is claimed. Surfaces without a merge operation are excluded only from this mutation row.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "MERGE-01",
+        "category": "merge",
+        "surface": "mcp",
+        "operation": "Attempt an explicit generic merge involving a version-pinned source",
+        "preconditions": "Decision Memory provenance pins a source node; an unrelated node is the other operand.",
+        "invariant": "Reject before any node/edge/history mutation; do not retarget reviews or source identity.",
+        "scope": "Declared operation capability boundary; not an executed pass",
+        "applicable": false,
+        "tests": [],
+        "not_applicable_reason": "This scenario is explicit generic node merge. No merge operation exists on this typed mcp surface; read projections are separately covered in ACL/EDIT/HISTORY rows.",
+        "observed_nodes": [],
+        "expected_nodes": [],
+        "missing_nodes": [],
+        "result": "not_applicable_declared"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "operation_not_exposed",
+      "rationale": "Generic merge refuses version-pinned sources before file mutation. Ordinary unpinned merges still work. No version-aware source merge is claimed. Surfaces without a merge operation are excluded only from this mutation row.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/mcp/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "MERGE-01",
+        "category": "merge",
+        "surface": "browser",
+        "operation": "Attempt an explicit generic merge involving a version-pinned source",
+        "preconditions": "Decision Memory provenance pins a source node; an unrelated node is the other operand.",
+        "invariant": "Reject before any node/edge/history mutation; do not retarget reviews or source identity.",
+        "scope": "Declared operation capability boundary; not an executed pass",
+        "applicable": false,
+        "tests": [],
+        "not_applicable_reason": "This scenario is explicit generic node merge. No merge operation exists on this typed browser surface; read projections are separately covered in ACL/EDIT/HISTORY rows.",
+        "observed_nodes": [],
+        "expected_nodes": [],
+        "missing_nodes": [],
+        "result": "not_applicable_declared"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "operation_not_exposed",
+      "rationale": "Generic merge refuses version-pinned sources before file mutation. Ordinary unpinned merges still work. No version-aware source merge is claimed. Surfaces without a merge operation are excluded only from this mutation row.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/web/decision-review.js",
+        "graph_engine/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "MERGE-01",
+        "category": "merge",
+        "surface": "exports",
+        "operation": "Attempt an explicit generic merge involving a version-pinned source",
+        "preconditions": "Decision Memory provenance pins a source node; an unrelated node is the other operand.",
+        "invariant": "Reject before any node/edge/history mutation; do not retarget reviews or source identity.",
+        "scope": "Declared operation capability boundary; not an executed pass",
+        "applicable": false,
+        "tests": [],
+        "not_applicable_reason": "This scenario is explicit generic node merge. No merge operation exists on this typed exports surface; read projections are separately covered in ACL/EDIT/HISTORY rows.",
+        "observed_nodes": [],
+        "expected_nodes": [],
+        "missing_nodes": [],
+        "result": "not_applicable_declared"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "operation_not_exposed",
+      "rationale": "Generic merge refuses version-pinned sources before file mutation. Ordinary unpinned merges still work. No version-aware source merge is claimed. Surfaces without a merge operation are excluded only from this mutation row.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/decision_service.py",
+        "graph_engine/decision_brief.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "HISTORY-01",
+        "category": "snapshot",
+        "surface": "service",
+        "operation": "Resolve explicit historical inspect/brief revisions after a later source change",
+        "preconditions": "A selected historical revision differs from current HEAD; source remains authorized and live.",
+        "invariant": "Historical payloads use their selected version and review state; current ACLs still apply; UI comparison brief uses comparison.after.",
+        "scope": "Shared typed service over exact Git revisions",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-service]",
+          "tests/test_decision_memory.py::test_historical_versions_reviews_and_old_absent_schema_are_read_only",
+          "tests/test_decision_memory.py::test_historical_revocation_and_authorized_tombstone_history",
+          "tests/test_decision_memory.py::test_future_historical_sidecar_schema_fails",
+          "tests/test_decision_memory.py::test_snapshot_sidecar_checks_legacy_historical_capture_lineage",
+          "tests/test_decision_memory.py::test_reads_never_touch_brain_or_vectors"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-service]",
+          "tests/test_decision_memory.py::test_historical_versions_reviews_and_old_absent_schema_are_read_only",
+          "tests/test_decision_memory.py::test_historical_revocation_and_authorized_tombstone_history",
+          "tests/test_decision_memory.py::test_future_historical_sidecar_schema_fails",
+          "tests/test_decision_memory.py::test_snapshot_sidecar_checks_legacy_historical_capture_lineage",
+          "tests/test_decision_memory.py::test_reads_never_touch_brain_or_vectors"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-service]",
+          "tests/test_decision_memory.py::test_historical_versions_reviews_and_old_absent_schema_are_read_only",
+          "tests/test_decision_memory.py::test_historical_revocation_and_authorized_tombstone_history",
+          "tests/test_decision_memory.py::test_future_historical_sidecar_schema_fails",
+          "tests/test_decision_memory.py::test_snapshot_sidecar_checks_legacy_historical_capture_lineage",
+          "tests/test_decision_memory.py::test_reads_never_touch_brain_or_vectors"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Selected revisions retain historical content and event targets; no silent HEAD fallback. Absent old sidecars are empty; future schemas fail explicitly. Current and historical lineage restrictions remain effective. Incomplete exports omit whole qualified units with visible limits.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/decision_memory.py",
+        "graph_engine/decision_service.py",
+        "graph_engine/snapshots.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "HISTORY-01",
+        "category": "snapshot",
+        "surface": "cli",
+        "operation": "Resolve explicit historical inspect/brief revisions after a later source change",
+        "preconditions": "A selected historical revision differs from current HEAD; source remains authorized and live.",
+        "invariant": "Historical payloads use their selected version and review state; current ACLs still apply; UI comparison brief uses comparison.after.",
+        "scope": "Actual CLI subprocess / JSON stdin and stdout",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-cli]"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-cli]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-cli]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Selected revisions retain historical content and event targets; no silent HEAD fallback. Absent old sidecars are empty; future schemas fail explicitly. Current and historical lineage restrictions remain effective. Incomplete exports omit whole qualified units with visible limits.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/__main__.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "HISTORY-01",
+        "category": "snapshot",
+        "surface": "http",
+        "operation": "Resolve explicit historical inspect/brief revisions after a later source change",
+        "preconditions": "A selected historical revision differs from current HEAD; source remains authorized and live.",
+        "invariant": "Historical payloads use their selected version and review state; current ACLs still apply; UI comparison brief uses comparison.after.",
+        "scope": "ASGI HTTP request/response and authorization middleware; real TCP UI cases are separate",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-http]"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-http]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-http]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Selected revisions retain historical content and event targets; no silent HEAD fallback. Absent old sidecars are empty; future schemas fail explicitly. Current and historical lineage restrictions remain effective. Incomplete exports omit whole qualified units with visible limits.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "HISTORY-01",
+        "category": "snapshot",
+        "surface": "mcp",
+        "operation": "Resolve explicit historical inspect/brief revisions after a later source change",
+        "preconditions": "A selected historical revision differs from current HEAD; source remains authorized and live.",
+        "invariant": "Historical payloads use their selected version and review state; current ACLs still apply; UI comparison brief uses comparison.after.",
+        "scope": "Actual CLI stdio JSON-RPC session",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-mcp]"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-mcp]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-mcp]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Selected revisions retain historical content and event targets; no silent HEAD fallback. Absent old sidecars are empty; future schemas fail explicitly. Current and historical lineage restrictions remain effective. Incomplete exports omit whole qualified units with visible limits.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/mcp/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "HISTORY-01",
+        "category": "snapshot",
+        "surface": "browser",
+        "operation": "Resolve explicit historical inspect/brief revisions after a later source change",
+        "preconditions": "A selected historical revision differs from current HEAD; source remains authorized and live.",
+        "invariant": "Historical payloads use their selected version and review state; current ACLs still apply; UI comparison brief uses comparison.after.",
+        "scope": "Real Chromium DOM interaction against a real authenticated/local HTTP server",
+        "applicable": true,
+        "tests": [
+          "tests/test_frontend_xss.py::test_decision_integrity_brief_keeps_selected_revision_after_later_edit"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_frontend_xss.py::test_decision_integrity_brief_keeps_selected_revision_after_later_edit[git]"
+        ],
+        "expected_nodes": [
+          "tests/test_frontend_xss.py::test_decision_integrity_brief_keeps_selected_revision_after_later_edit[git]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Selected revisions retain historical content and event targets; no silent HEAD fallback. Absent old sidecars are empty; future schemas fail explicitly. Current and historical lineage restrictions remain effective. Incomplete exports omit whole qualified units with visible limits.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/web/decision-review.js",
+        "graph_engine/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "HISTORY-01",
+        "category": "snapshot",
+        "surface": "exports",
+        "operation": "Resolve explicit historical inspect/brief revisions after a later source change",
+        "preconditions": "A selected historical revision differs from current HEAD; source remains authorized and live.",
+        "invariant": "Historical payloads use their selected version and review state; current ACLs still apply; UI comparison brief uses comparison.after.",
+        "scope": "Actual bounded context JSON and rendered Markdown brief",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-exports]",
+          "tests/test_decision_brief.py::test_budget_atomicity_and_exact_included_id_accounting",
+          "tests/test_decision_brief.py::test_long_scope_is_omitted_with_conclusion",
+          "tests/test_decision_brief.py::test_limits_warn_and_context_omits_incomplete_units"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-exports]",
+          "tests/test_decision_brief.py::test_budget_atomicity_and_exact_included_id_accounting",
+          "tests/test_decision_brief.py::test_long_scope_is_omitted_with_conclusion",
+          "tests/test_decision_brief.py::test_limits_warn_and_context_omits_incomplete_units"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-exports]",
+          "tests/test_decision_brief.py::test_budget_atomicity_and_exact_included_id_accounting",
+          "tests/test_decision_brief.py::test_long_scope_is_omitted_with_conclusion",
+          "tests/test_decision_brief.py::test_limits_warn_and_context_omits_incomplete_units"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Selected revisions retain historical content and event targets; no silent HEAD fallback. Absent old sidecars are empty; future schemas fail explicitly. Current and historical lineage restrictions remain effective. Incomplete exports omit whole qualified units with visible limits.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/decision_service.py",
+        "graph_engine/decision_brief.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "STALE-01",
+        "category": "stale_review",
+        "surface": "service",
+        "operation": "Submit a review after its captured generation or source basis changes",
+        "preconditions": "A review envelope was prepared before intervening source/content/review activity.",
+        "invariant": "Reject stale submission without overwriting newer content/reviews; UI refreshes evidence and retains explicit version targets.",
+        "scope": "Source and generation preconditions in typed review/store service",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_service.py::test_import_propose_review_changed_source_and_stale_review",
+          "tests/test_decision_memory.py::test_stale_generation_and_source_hash_previews_conflict"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_service.py::test_import_propose_review_changed_source_and_stale_review",
+          "tests/test_decision_memory.py::test_stale_generation_and_source_hash_previews_conflict"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_service.py::test_import_propose_review_changed_source_and_stale_review",
+          "tests/test_decision_memory.py::test_stale_generation_and_source_hash_previews_conflict"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Captured generation and source/permission preconditions reject stale submissions without overwriting the accepted history. The browser refreshes conflict state; no typed review write exists on read-only MCP/exports.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/decision_memory.py",
+        "graph_engine/decision_service.py",
+        "graph_engine/snapshots.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "STALE-01",
+        "category": "stale_review",
+        "surface": "cli",
+        "operation": "Submit a review after its captured generation or source basis changes",
+        "preconditions": "A review envelope was prepared before intervening source/content/review activity.",
+        "invariant": "Reject stale submission without overwriting newer content/reviews; UI refreshes evidence and retains explicit version targets.",
+        "scope": "Actual CLI subprocess",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[stale-cli]"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[stale-cli]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[stale-cli]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Captured generation and source/permission preconditions reject stale submissions without overwriting the accepted history. The browser refreshes conflict state; no typed review write exists on read-only MCP/exports.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/__main__.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "STALE-01",
+        "category": "stale_review",
+        "surface": "http",
+        "operation": "Submit a review after its captured generation or source basis changes",
+        "preconditions": "A review envelope was prepared before intervening source/content/review activity.",
+        "invariant": "Reject stale submission without overwriting newer content/reviews; UI refreshes evidence and retains explicit version targets.",
+        "scope": "Actual ASGI HTTP review endpoint",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[stale-http]"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[stale-http]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[stale-http]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Captured generation and source/permission preconditions reject stale submissions without overwriting the accepted history. The browser refreshes conflict state; no typed review write exists on read-only MCP/exports.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "STALE-01",
+        "category": "stale_review",
+        "surface": "mcp",
+        "operation": "Submit a review after its captured generation or source basis changes",
+        "preconditions": "A review envelope was prepared before intervening source/content/review activity.",
+        "invariant": "Reject stale submission without overwriting newer content/reviews; UI refreshes evidence and retains explicit version targets.",
+        "scope": "Declared operation capability boundary; not an executed pass",
+        "applicable": false,
+        "tests": [],
+        "not_applicable_reason": "Typed Decision Memory review writes are not exposed by mcp. This is a mutation scenario; historical read behavior is covered separately.",
+        "observed_nodes": [],
+        "expected_nodes": [],
+        "missing_nodes": [],
+        "result": "not_applicable_declared"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "operation_not_exposed",
+      "rationale": "Captured generation and source/permission preconditions reject stale submissions without overwriting the accepted history. The browser refreshes conflict state; no typed review write exists on read-only MCP/exports.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/mcp/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "STALE-01",
+        "category": "stale_review",
+        "surface": "browser",
+        "operation": "Submit a review after its captured generation or source basis changes",
+        "preconditions": "A review envelope was prepared before intervening source/content/review activity.",
+        "invariant": "Reject stale submission without overwriting newer content/reviews; UI refreshes evidence and retains explicit version targets.",
+        "scope": "Actual Chromium stale submission and evidence refresh",
+        "applicable": true,
+        "tests": [
+          "tests/test_frontend_xss.py::test_decision_review_stale_submission_refreshes_without_overwriting"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_frontend_xss.py::test_decision_review_stale_submission_refreshes_without_overwriting[server0]"
+        ],
+        "expected_nodes": [
+          "tests/test_frontend_xss.py::test_decision_review_stale_submission_refreshes_without_overwriting[server0]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Captured generation and source/permission preconditions reject stale submissions without overwriting the accepted history. The browser refreshes conflict state; no typed review write exists on read-only MCP/exports.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/web/decision-review.js",
+        "graph_engine/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "STALE-01",
+        "category": "stale_review",
+        "surface": "exports",
+        "operation": "Submit a review after its captured generation or source basis changes",
+        "preconditions": "A review envelope was prepared before intervening source/content/review activity.",
+        "invariant": "Reject stale submission without overwriting newer content/reviews; UI refreshes evidence and retains explicit version targets.",
+        "scope": "Declared operation capability boundary; not an executed pass",
+        "applicable": false,
+        "tests": [],
+        "not_applicable_reason": "Typed Decision Memory review writes are not exposed by exports. This is a mutation scenario; historical read behavior is covered separately.",
+        "observed_nodes": [],
+        "expected_nodes": [],
+        "missing_nodes": [],
+        "result": "not_applicable_declared"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "operation_not_exposed",
+      "rationale": "Captured generation and source/permission preconditions reject stale submissions without overwriting the accepted history. The browser refreshes conflict state; no typed review write exists on read-only MCP/exports.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/decision_service.py",
+        "graph_engine/decision_brief.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "UNDO-01",
+        "category": "undo",
+        "surface": "service",
+        "operation": "Correct an unconsumed review and reject correction after a decision consumed it",
+        "preconditions": "An accepted review exists; optionally a subsequent decision cites that exact review event.",
+        "invariant": "Fresh correction retains original history; dependent correction is refused without silent review reassignment.",
+        "scope": "Exact review correction and downstream event-basis guard",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_service.py::test_explicit_revise_and_guarded_undo",
+          "tests/test_decision_service.py::test_undo_fails_after_dependent_review"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_service.py::test_explicit_revise_and_guarded_undo",
+          "tests/test_decision_service.py::test_undo_fails_after_dependent_review"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_service.py::test_explicit_revise_and_guarded_undo",
+          "tests/test_decision_service.py::test_undo_fails_after_dependent_review"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Fresh correction is explicit and version/event pinned. Dependent or duplicate undo is rejected without erasing history. Browser ordinary edge undo is a separate operation; no typed assessment correction UI is claimed.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/decision_memory.py",
+        "graph_engine/decision_service.py",
+        "graph_engine/snapshots.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "UNDO-01",
+        "category": "undo",
+        "surface": "cli",
+        "operation": "Correct an unconsumed review and reject correction after a decision consumed it",
+        "preconditions": "An accepted review exists; optionally a subsequent decision cites that exact review event.",
+        "invariant": "Fresh correction retains original history; dependent correction is refused without silent review reassignment.",
+        "scope": "Actual CLI subprocess correction envelope",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[fresh-undo-cli]",
+          "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[dependent-undo-cli]"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[fresh-undo-cli]",
+          "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[dependent-undo-cli]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[fresh-undo-cli]",
+          "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[dependent-undo-cli]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Fresh correction is explicit and version/event pinned. Dependent or duplicate undo is rejected without erasing history. Browser ordinary edge undo is a separate operation; no typed assessment correction UI is claimed.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/__main__.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "UNDO-01",
+        "category": "undo",
+        "surface": "http",
+        "operation": "Correct an unconsumed review and reject correction after a decision consumed it",
+        "preconditions": "An accepted review exists; optionally a subsequent decision cites that exact review event.",
+        "invariant": "Fresh correction retains original history; dependent correction is refused without silent review reassignment.",
+        "scope": "Actual ASGI HTTP correction envelope",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[fresh-undo-http]",
+          "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[dependent-undo-http]"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[fresh-undo-http]",
+          "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[dependent-undo-http]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[fresh-undo-http]",
+          "tests/test_decision_integrity.py::test_review_preconditions_through_write_adapters[dependent-undo-http]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Fresh correction is explicit and version/event pinned. Dependent or duplicate undo is rejected without erasing history. Browser ordinary edge undo is a separate operation; no typed assessment correction UI is claimed.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "UNDO-01",
+        "category": "undo",
+        "surface": "mcp",
+        "operation": "Correct an unconsumed review and reject correction after a decision consumed it",
+        "preconditions": "An accepted review exists; optionally a subsequent decision cites that exact review event.",
+        "invariant": "Fresh correction retains original history; dependent correction is refused without silent review reassignment.",
+        "scope": "Declared operation capability boundary; not an executed pass",
+        "applicable": false,
+        "tests": [],
+        "not_applicable_reason": "No correction/undo of typed assessment events is exposed on mcp. Ordinary-memory edge undo is a different operation and is not counted as evidence.",
+        "observed_nodes": [],
+        "expected_nodes": [],
+        "missing_nodes": [],
+        "result": "not_applicable_declared"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "operation_not_exposed",
+      "rationale": "Fresh correction is explicit and version/event pinned. Dependent or duplicate undo is rejected without erasing history. Browser ordinary edge undo is a separate operation; no typed assessment correction UI is claimed.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/mcp/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "UNDO-01",
+        "category": "undo",
+        "surface": "browser",
+        "operation": "Correct an unconsumed review and reject correction after a decision consumed it",
+        "preconditions": "An accepted review exists; optionally a subsequent decision cites that exact review event.",
+        "invariant": "Fresh correction retains original history; dependent correction is refused without silent review reassignment.",
+        "scope": "Declared operation capability boundary; not an executed pass",
+        "applicable": false,
+        "tests": [],
+        "not_applicable_reason": "No correction/undo of typed assessment events is exposed on browser. Ordinary-memory edge undo is a different operation and is not counted as evidence.",
+        "observed_nodes": [],
+        "expected_nodes": [],
+        "missing_nodes": [],
+        "result": "not_applicable_declared"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "operation_not_exposed",
+      "rationale": "Fresh correction is explicit and version/event pinned. Dependent or duplicate undo is rejected without erasing history. Browser ordinary edge undo is a separate operation; no typed assessment correction UI is claimed.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/web/decision-review.js",
+        "graph_engine/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "UNDO-01",
+        "category": "undo",
+        "surface": "exports",
+        "operation": "Correct an unconsumed review and reject correction after a decision consumed it",
+        "preconditions": "An accepted review exists; optionally a subsequent decision cites that exact review event.",
+        "invariant": "Fresh correction retains original history; dependent correction is refused without silent review reassignment.",
+        "scope": "Declared operation capability boundary; not an executed pass",
+        "applicable": false,
+        "tests": [],
+        "not_applicable_reason": "No correction/undo of typed assessment events is exposed on exports. Ordinary-memory edge undo is a different operation and is not counted as evidence.",
+        "observed_nodes": [],
+        "expected_nodes": [],
+        "missing_nodes": [],
+        "result": "not_applicable_declared"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "operation_not_exposed",
+      "rationale": "Fresh correction is explicit and version/event pinned. Dependent or duplicate undo is rejected without erasing history. Browser ordinary edge undo is a separate operation; no typed assessment correction UI is claimed.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/decision_service.py",
+        "graph_engine/decision_brief.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "RECOVERY-01",
+        "category": "crash_retry",
+        "surface": "service",
+        "operation": "Inject failure after authoritative publication at index rebuild and commit boundaries; interrupt a two-event review batch before/after authoritative publication and replay its exact request",
+        "preconditions": "A structured proposal has a stable idempotency key; index/commit raises after local publication. Review requests contain two exact proposed claim refs and one captured generation/idempotency key.",
+        "invariant": "Before sidecar publication, fail without any accepted event or receipt; after publication, report a published-locally receipt. Identical replay retains exactly one receipt and both original review subject refs without duplicate records/events; sync may remain required.",
+        "scope": "Actual storage publication, index and commit failure boundaries",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_memory.py::test_interrupted_sidecar_publication_leaves_only_reusable_anchors",
+          "tests/test_decision_memory.py::test_commit_failure_preserves_authoritative_receipt",
+          "tests/test_decision_service.py::test_post_publication_failure_returns_durable_retry",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[sidecar-cli]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[index-cli]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[commit-cli]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[sidecar-http]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[index-http]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[commit-http]"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_memory.py::test_interrupted_sidecar_publication_leaves_only_reusable_anchors",
+          "tests/test_decision_memory.py::test_commit_failure_preserves_authoritative_receipt",
+          "tests/test_decision_service.py::test_post_publication_failure_returns_durable_retry",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[sidecar-cli]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[index-cli]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[commit-cli]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[sidecar-http]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[index-http]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[commit-http]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_memory.py::test_interrupted_sidecar_publication_leaves_only_reusable_anchors",
+          "tests/test_decision_memory.py::test_commit_failure_preserves_authoritative_receipt",
+          "tests/test_decision_service.py::test_post_publication_failure_returns_durable_retry",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[sidecar-cli]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[index-cli]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[commit-cli]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[sidecar-http]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[index-http]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[commit-http]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Proposal and two-event review boundaries are tested before sidecar replacement and after index/commit failure. Both review targets publish together with one durable receipt; replay is idempotent. Browser finding publication has its own real-server fault case. No instruction-level power-loss proof or implicit successful sync is claimed.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/decision_memory.py",
+        "graph_engine/decision_service.py",
+        "graph_engine/snapshots.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "RECOVERY-01",
+        "category": "crash_retry",
+        "surface": "cli",
+        "operation": "Inject failure after authoritative publication at index rebuild and commit boundaries; interrupt a two-event review batch before/after authoritative publication and replay its exact request",
+        "preconditions": "A structured proposal has a stable idempotency key; index/commit raises after local publication. Review requests contain two exact proposed claim refs and one captured generation/idempotency key.",
+        "invariant": "Before sidecar publication, fail without any accepted event or receipt; after publication, report a published-locally receipt. Identical replay retains exactly one receipt and both original review subject refs without duplicate records/events; sync may remain required.",
+        "scope": "Actual CLI parser/output with injected local index/commit failures (in process)",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[index-cli]",
+          "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[commit-cli]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[sidecar-cli]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[index-cli]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[commit-cli]"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[index-cli]",
+          "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[commit-cli]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[sidecar-cli]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[index-cli]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[commit-cli]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[index-cli]",
+          "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[commit-cli]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[sidecar-cli]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[index-cli]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[commit-cli]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Proposal and two-event review boundaries are tested before sidecar replacement and after index/commit failure. Both review targets publish together with one durable receipt; replay is idempotent. Browser finding publication has its own real-server fault case. No instruction-level power-loss proof or implicit successful sync is claimed.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/__main__.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "RECOVERY-01",
+        "category": "crash_retry",
+        "surface": "http",
+        "operation": "Inject failure after authoritative publication at index rebuild and commit boundaries; interrupt a two-event review batch before/after authoritative publication and replay its exact request",
+        "preconditions": "A structured proposal has a stable idempotency key; index/commit raises after local publication. Review requests contain two exact proposed claim refs and one captured generation/idempotency key.",
+        "invariant": "Before sidecar publication, fail without any accepted event or receipt; after publication, report a published-locally receipt. Identical replay retains exactly one receipt and both original review subject refs without duplicate records/events; sync may remain required.",
+        "scope": "Actual ASGI HTTP 502/receipt/retry responses at index/commit boundaries",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[index-http]",
+          "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[commit-http]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[sidecar-http]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[index-http]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[commit-http]"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[index-http]",
+          "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[commit-http]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[sidecar-http]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[index-http]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[commit-http]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[index-http]",
+          "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[commit-http]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[sidecar-http]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[index-http]",
+          "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[commit-http]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Proposal and two-event review boundaries are tested before sidecar replacement and after index/commit failure. Both review targets publish together with one durable receipt; replay is idempotent. Browser finding publication has its own real-server fault case. No instruction-level power-loss proof or implicit successful sync is claimed.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "RECOVERY-01",
+        "category": "crash_retry",
+        "surface": "mcp",
+        "operation": "Inject failure after authoritative publication at index rebuild and commit boundaries",
+        "preconditions": "A structured proposal has a stable idempotency key; index/commit raises after local publication.",
+        "invariant": "Return an explicit published-locally receipt; identical retry returns the durable receipt without duplicate records; sync may remain required.",
+        "scope": "Declared operation capability boundary; not an executed pass",
+        "applicable": false,
+        "tests": [],
+        "not_applicable_reason": "No raw structured-version proposal or typed review mutation exists on mcp. This cell concerns those publication boundaries; browser finding publication is tested in RECOVERY-UI-01.",
+        "observed_nodes": [],
+        "expected_nodes": [],
+        "missing_nodes": [],
+        "result": "not_applicable_declared"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "operation_not_exposed",
+      "rationale": "Proposal and two-event review boundaries are tested before sidecar replacement and after index/commit failure. Both review targets publish together with one durable receipt; replay is idempotent. Browser finding publication has its own real-server fault case. No instruction-level power-loss proof or implicit successful sync is claimed.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/mcp/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "RECOVERY-UI-01",
+        "category": "crash_retry",
+        "surface": "browser",
+        "operation": "Publish a finding review while the real server fails its first post-publication index rebuild",
+        "preconditions": "A browser displays a source-change candidate; a test-only server hook fails once after finding publication.",
+        "invariant": "UI explicitly reports published-locally/incomplete sync, refreshes the stored finding, and does not duplicate the review or receipt.",
+        "scope": "Real Chromium click, real HTTP 502 response, actual durable sidecar and history after refresh",
+        "applicable": true,
+        "tests": [
+          "tests/test_frontend_xss.py::test_decision_integrity_published_finding_failure_preserves_receipt_and_history"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_frontend_xss.py::test_decision_integrity_published_finding_failure_preserves_receipt_and_history[git-fault]"
+        ],
+        "expected_nodes": [
+          "tests/test_frontend_xss.py::test_decision_integrity_published_finding_failure_preserves_receipt_and_history[git-fault]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Proposal and two-event review boundaries are tested before sidecar replacement and after index/commit failure. Both review targets publish together with one durable receipt; replay is idempotent. Browser finding publication has its own real-server fault case. No instruction-level power-loss proof or implicit successful sync is claimed.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/web/decision-review.js",
+        "graph_engine/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "RECOVERY-01",
+        "category": "crash_retry",
+        "surface": "exports",
+        "operation": "Inject failure after authoritative publication at index rebuild and commit boundaries",
+        "preconditions": "A structured proposal has a stable idempotency key; index/commit raises after local publication.",
+        "invariant": "Return an explicit published-locally receipt; identical retry returns the durable receipt without duplicate records; sync may remain required.",
+        "scope": "Declared operation capability boundary; not an executed pass",
+        "applicable": false,
+        "tests": [],
+        "not_applicable_reason": "No raw structured-version proposal or typed review mutation exists on exports. This cell concerns those publication boundaries; browser finding publication is tested in RECOVERY-UI-01.",
+        "observed_nodes": [],
+        "expected_nodes": [],
+        "missing_nodes": [],
+        "result": "not_applicable_declared"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "operation_not_exposed",
+      "rationale": "Proposal and two-event review boundaries are tested before sidecar replacement and after index/commit failure. Both review targets publish together with one durable receipt; replay is idempotent. Browser finding publication has its own real-server fault case. No instruction-level power-loss proof or implicit successful sync is claimed.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/decision_service.py",
+        "graph_engine/decision_brief.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "WRITERS-01",
+        "category": "two_writers",
+        "surface": "service",
+        "operation": "Start concurrent same-generation structured proposals, then retry the losing request; race two exact-target review requests, refresh only the losing request preconditions and retry",
+        "preconditions": "Two CLI processes or HTTP workers share one brain and captured generation, using distinct idempotency keys. Both reviews capture the same generation and distinct existing proposed claim refs.",
+        "invariant": "Exactly one initial transaction wins; loser gets a conflict, then a fresh-preview retry retains both records without forks or duplicates. Only one initial event publishes; the refreshed loser adds one event without retargeting or duplicating either review.",
+        "scope": "Actual CLI processes and ASGI HTTP workers exercise the same storage guard; inspect persisted generations, exact review targets, receipts and histories.",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_simultaneous_cli_proposals_have_one_winner_and_lossless_retry",
+          "tests/test_decision_integrity.py::test_concurrent_reviews_keep_exact_targets_and_lossless_retry[cli]",
+          "tests/test_decision_integrity.py::test_concurrent_reviews_keep_exact_targets_and_lossless_retry[http]"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_simultaneous_cli_proposals_have_one_winner_and_lossless_retry",
+          "tests/test_decision_integrity.py::test_concurrent_reviews_keep_exact_targets_and_lossless_retry[cli]",
+          "tests/test_decision_integrity.py::test_concurrent_reviews_keep_exact_targets_and_lossless_retry[http]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_simultaneous_cli_proposals_have_one_winner_and_lossless_retry",
+          "tests/test_decision_integrity.py::test_concurrent_reviews_keep_exact_targets_and_lossless_retry[cli]",
+          "tests/test_decision_integrity.py::test_concurrent_reviews_keep_exact_targets_and_lossless_retry[http]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Shared storage guards are exercised with actual CLI processes, concurrent ASGI workers and two browser tabs. Same-generation writes have one winner and an explicit conflict. Refreshed review retry preserves both exact subjects and immutable content, without duplicate effects.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/decision_memory.py",
+        "graph_engine/decision_service.py",
+        "graph_engine/snapshots.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "WRITERS-01",
+        "category": "two_writers",
+        "surface": "cli",
+        "operation": "Start concurrent same-generation structured proposals, then retry the losing request; race two exact-target review requests, refresh only the losing request preconditions and retry",
+        "preconditions": "Two CLI processes or HTTP workers share one brain and captured generation, using distinct idempotency keys. Both reviews capture the same generation and distinct existing proposed claim refs.",
+        "invariant": "Exactly one initial transaction wins; loser gets a conflict, then a fresh-preview retry retains both records without forks or duplicates. Only one initial event publishes; the refreshed loser adds one event without retargeting or duplicating either review.",
+        "scope": "Two actual CLI processes from a common start barrier; inspect persisted generations, receipts and Git state",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_simultaneous_cli_proposals_have_one_winner_and_lossless_retry",
+          "tests/test_decision_integrity.py::test_concurrent_reviews_keep_exact_targets_and_lossless_retry[cli]"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_simultaneous_cli_proposals_have_one_winner_and_lossless_retry",
+          "tests/test_decision_integrity.py::test_concurrent_reviews_keep_exact_targets_and_lossless_retry[cli]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_simultaneous_cli_proposals_have_one_winner_and_lossless_retry",
+          "tests/test_decision_integrity.py::test_concurrent_reviews_keep_exact_targets_and_lossless_retry[cli]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Shared storage guards are exercised with actual CLI processes, concurrent ASGI workers and two browser tabs. Same-generation writes have one winner and an explicit conflict. Refreshed review retry preserves both exact subjects and immutable content, without duplicate effects.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/__main__.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "WRITERS-01",
+        "category": "two_writers",
+        "surface": "http",
+        "operation": "Start concurrent same-generation structured proposals, then retry the losing request; race two exact-target review requests, refresh only the losing request preconditions and retry",
+        "preconditions": "Two CLI processes or HTTP workers share one brain and captured generation, using distinct idempotency keys. Both reviews capture the same generation and distinct existing proposed claim refs.",
+        "invariant": "Exactly one initial transaction wins; loser gets a conflict, then a fresh-preview retry retains both records without forks or duplicates. Only one initial event publishes; the refreshed loser adds one event without retargeting or duplicating either review.",
+        "scope": "Two synchronized actual ASGI HTTP workers, conflict and fresh-preview retry",
+        "applicable": true,
+        "tests": [
+          "tests/test_decision_integrity.py::test_simultaneous_http_proposals_share_generation_and_preserve_both_on_retry",
+          "tests/test_decision_integrity.py::test_concurrent_reviews_keep_exact_targets_and_lossless_retry[http]"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_decision_integrity.py::test_simultaneous_http_proposals_share_generation_and_preserve_both_on_retry",
+          "tests/test_decision_integrity.py::test_concurrent_reviews_keep_exact_targets_and_lossless_retry[http]"
+        ],
+        "expected_nodes": [
+          "tests/test_decision_integrity.py::test_simultaneous_http_proposals_share_generation_and_preserve_both_on_retry",
+          "tests/test_decision_integrity.py::test_concurrent_reviews_keep_exact_targets_and_lossless_retry[http]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Shared storage guards are exercised with actual CLI processes, concurrent ASGI workers and two browser tabs. Same-generation writes have one winner and an explicit conflict. Refreshed review retry preserves both exact subjects and immutable content, without duplicate effects.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "WRITERS-01",
+        "category": "two_writers",
+        "surface": "mcp",
+        "operation": "Start concurrent same-generation structured proposals, then retry the losing request",
+        "preconditions": "Two CLI processes or HTTP workers share one brain and captured generation, using distinct idempotency keys.",
+        "invariant": "Exactly one initial transaction wins; loser gets a conflict, then a fresh-preview retry retains both records without forks or duplicates.",
+        "scope": "Declared operation capability boundary; not an executed pass",
+        "applicable": false,
+        "tests": [],
+        "not_applicable_reason": "Concurrent raw structured-version proposals are not exposed on mcp. This cell does not assert coverage of every other possible write concurrency pattern.",
+        "observed_nodes": [],
+        "expected_nodes": [],
+        "missing_nodes": [],
+        "result": "not_applicable_declared"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "operation_not_exposed",
+      "rationale": "Shared storage guards are exercised with actual CLI processes, concurrent ASGI workers and two browser tabs. Same-generation writes have one winner and an explicit conflict. Refreshed review retry preserves both exact subjects and immutable content, without duplicate effects.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/mcp/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "WRITERS-UI-01",
+        "category": "two_writers",
+        "surface": "browser",
+        "operation": "Release two actual browser finding-review requests from the same captured generation",
+        "preconditions": "Two tabs display the same candidate and each prepares a distinct review request; request routing supplies a common start barrier only.",
+        "invariant": "One review wins, the other displays a stale-review conflict; only one finding transaction/receipt is stored and both tabs refresh.",
+        "scope": "Two real Chromium tabs and actual server responses; request bodies and responses are not mocked",
+        "applicable": true,
+        "tests": [
+          "tests/test_frontend_xss.py::test_decision_integrity_two_browser_reviews_have_one_winner_without_duplicate_effects"
+        ],
+        "not_applicable_reason": null,
+        "observed_nodes": [
+          "tests/test_frontend_xss.py::test_decision_integrity_two_browser_reviews_have_one_winner_without_duplicate_effects[git]"
+        ],
+        "expected_nodes": [
+          "tests/test_frontend_xss.py::test_decision_integrity_two_browser_reviews_have_one_winner_without_duplicate_effects[git]"
+        ],
+        "missing_nodes": [],
+        "result": "passed"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "evidence_matches_declared_invariant",
+      "rationale": "Shared storage guards are exercised with actual CLI processes, concurrent ASGI workers and two browser tabs. Same-generation writes have one winner and an explicit conflict. Refreshed review retry preserves both exact subjects and immutable content, without duplicate effects.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/web/decision-review.js",
+        "graph_engine/server.py"
+      ]
+    },
+    {
+      "cell": {
+        "scenario_id": "WRITERS-01",
+        "category": "two_writers",
+        "surface": "exports",
+        "operation": "Start concurrent same-generation structured proposals, then retry the losing request",
+        "preconditions": "Two CLI processes or HTTP workers share one brain and captured generation, using distinct idempotency keys.",
+        "invariant": "Exactly one initial transaction wins; loser gets a conflict, then a fresh-preview retry retains both records without forks or duplicates.",
+        "scope": "Declared operation capability boundary; not an executed pass",
+        "applicable": false,
+        "tests": [],
+        "not_applicable_reason": "Concurrent raw structured-version proposals are not exposed on exports. This cell does not assert coverage of every other possible write concurrency pattern.",
+        "observed_nodes": [],
+        "expected_nodes": [],
+        "missing_nodes": [],
+        "result": "not_applicable_declared"
+      },
+      "engineering_candidate": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "runtime_record": "validation/matrix/report.json.gz",
+      "reviewer_id": "codex-implementing-agent",
+      "review_disposition": "operation_not_exposed",
+      "rationale": "Shared storage guards are exercised with actual CLI processes, concurrent ASGI workers and two browser tabs. Same-generation writes have one winner and an explicit conflict. Refreshed review retry preserves both exact subjects and immutable content, without duplicate effects.",
+      "contract_reference": "docs/decision-memory-v1.md#evaluation-gates-frozen-before-tuning",
+      "interface_references": [
+        "graph_engine/decision_service.py",
+        "graph_engine/decision_brief.py"
+      ]
+    }
+  ]
+}
