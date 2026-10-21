@@ -1,0 +1,269 @@
+{
+  "schema": "dm.integrity.closeout-commands/1",
+  "runs": [
+    {
+      "id": "baseline-matrix",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "tools.decision_integrity",
+        "--output",
+        "/tmp/issue92-closeout/baseline-matrix"
+      ],
+      "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+      "environment_overrides": {
+        "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+        "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+      },
+      "source_commit_at_start": "57761ec81dace7c5fced47c3a8f1f095653d7022",
+      "expected_exit_code": 0,
+      "actual_exit_code": 0,
+      "log": "validation/baseline/pytest.log.gz",
+      "note": "Clean merged Main baseline, original inventory: 55/55 tests and 41/41 applicable cells."
+    },
+    {
+      "id": "new-review-tests-initial",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_decision_integrity.py",
+        "-k",
+        "review_batch_recovery or concurrent_reviews",
+        "--fail-on-skip",
+        "-q"
+      ],
+      "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+      "environment_overrides": {},
+      "source_commit_at_start": "57761ec81dace7c5fced47c3a8f1f095653d7022",
+      "expected_exit_code": 0,
+      "actual_exit_code": 1,
+      "log": "validation/new-review-tests-initial.log",
+      "note": "Uncommitted test additions. One test-authoring error expected an exception instead of the existing CLI plain-text error/exit 1; seven passed. Not a production defect."
+    },
+    {
+      "id": "new-review-tests-corrected",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_decision_integrity.py",
+        "-k",
+        "review_batch_recovery or concurrent_reviews",
+        "--fail-on-skip",
+        "-q"
+      ],
+      "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+      "environment_overrides": {},
+      "source_commit_at_start": "57761ec81dace7c5fced47c3a8f1f095653d7022",
+      "expected_exit_code": 0,
+      "actual_exit_code": 0,
+      "log": "validation/new-review-tests-corrected.log",
+      "note": "Uncommitted assertion correction only. Eight instances pass; 33 unrelated instances deselected explicitly."
+    },
+    {
+      "id": "focused",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_decision_integrity.py",
+        "tests/test_decision_integrity_matrix.py",
+        "--fail-on-skip",
+        "-q"
+      ],
+      "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+      "environment_overrides": {},
+      "source_commit_at_start": "57761ec81dace7c5fced47c3a8f1f095653d7022",
+      "expected_exit_code": 0,
+      "actual_exit_code": 0,
+      "log": "validation/focused.log",
+      "note": "Uncommitted expanded tests and inventory before 726de7d; 51 passed."
+    },
+    {
+      "id": "expanded-matrix",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "tools.decision_integrity",
+        "--output",
+        "/tmp/issue92-closeout/final-matrix"
+      ],
+      "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+      "environment_overrides": {
+        "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+        "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+      },
+      "source_commit_at_start": "726de7d56eda3d947209b86f9c3b68b8831d5a2c",
+      "expected_exit_code": 0,
+      "actual_exit_code": 0,
+      "log": "validation/expanded/pytest.log.gz",
+      "note": "Clean 726de7d snapshot captured before a13685a clarified wording; 73 tests, 41/41 cells."
+    },
+    {
+      "id": "reviewed-matrix",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "tools.decision_integrity",
+        "--output",
+        "/tmp/issue92-closeout/reviewed-matrix"
+      ],
+      "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+      "environment_overrides": {
+        "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+        "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+      },
+      "source_commit_at_start": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "expected_exit_code": 0,
+      "actual_exit_code": 0,
+      "log": "validation/matrix/pytest.log.gz",
+      "note": "Clean reviewed inventory, matches CI code/matrix hashes; 73 tests, 41/41 cells, no skips."
+    },
+    {
+      "id": "full-suite",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/",
+        "-q"
+      ],
+      "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+      "environment_overrides": {
+        "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+        "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+      },
+      "source_commit_at_start": "726de7d56eda3d947209b86f9c3b68b8831d5a2c",
+      "expected_exit_code": 0,
+      "actual_exit_code": 0,
+      "log": "validation/full-suite.log",
+      "note": "Started clean on 726de7d. During execution a13685a changed matrix descriptions only, with identical executable/test source and selectors. Optional local real-model stack absent; matching reviewed-code CI supplies model/trust coverage."
+    },
+    {
+      "id": "strict-mcp-access",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_mcp.py",
+        "tests/test_access_namespaces.py",
+        "tests/test_entities.py",
+        "tests/test_fact_validity.py",
+        "tests/test_graph_retrieval.py",
+        "tests/test_decision_brief.py",
+        "tests/test_decision_review.py",
+        "--fail-on-skip",
+        "-q"
+      ],
+      "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+      "environment_overrides": {},
+      "source_commit_at_start": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "expected_exit_code": 0,
+      "actual_exit_code": 0,
+      "log": "validation/strict-mcp-access.log",
+      "note": ""
+    },
+    {
+      "id": "strict-pdf",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_document_import.py",
+        "--fail-on-skip",
+        "-q"
+      ],
+      "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+      "environment_overrides": {},
+      "source_commit_at_start": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "expected_exit_code": 0,
+      "actual_exit_code": 0,
+      "log": "validation/strict-pdf.log",
+      "note": ""
+    },
+    {
+      "id": "strict-browser",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "pytest",
+        "tests/test_frontend_xss.py",
+        "--fail-on-skip",
+        "-q"
+      ],
+      "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+      "environment_overrides": {
+        "GRAPH_ENGINE_TEST_D3": "/tmp/decision-solo-d3.v7.min.js",
+        "PLAYWRIGHT_BROWSERS_PATH": "/tmp/decision-solo-playwright"
+      },
+      "source_commit_at_start": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "expected_exit_code": 0,
+      "actual_exit_code": 0,
+      "log": "validation/strict-browser.log",
+      "note": ""
+    },
+    {
+      "id": "memory-smoke",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "tools.memory_benchmark",
+        "--smoke",
+        "--check",
+        "--output",
+        "/tmp/issue92-closeout/memory-smoke.json"
+      ],
+      "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+      "environment_overrides": {},
+      "source_commit_at_start": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "expected_exit_code": 0,
+      "actual_exit_code": 0,
+      "log": "validation/memory-smoke.log",
+      "note": ""
+    },
+    {
+      "id": "decision-controls",
+      "argv": [
+        ".venv/bin/python",
+        "-m",
+        "tools.decision_benchmark",
+        "--split",
+        "all",
+        "--check",
+        "--output",
+        "/tmp/issue92-closeout/decision-controls.json"
+      ],
+      "cwd": "/Users/niklas/Documents/ChatGPT/graph-engine/decision-solo",
+      "environment_overrides": {},
+      "source_commit_at_start": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+      "expected_exit_code": 0,
+      "actual_exit_code": 0,
+      "log": "validation/decision-controls.log",
+      "note": "Previously exposed synthetic controls; no --real-corpus, final successor data or provider calls."
+    }
+  ],
+  "ci": {
+    "code_commit": "a13685af0d55fac5fd9aa485f0f1196d13054eb1",
+    "workflow_run": 39437297009,
+    "advisory_run": 39437297017,
+    "checks": "validation/ci/checks.json",
+    "log": "validation/ci/workflow.log.gz"
+  },
+  "not_run_locally": [
+    "Real-model/trust: optional st/torch stack absent; supplied by matching 15/15 code CI including strict model-trust gate.",
+    "No provider calls, reserved final corpus evaluation, independent annotation/sign-off, user sessions or release.",
+    "Standalone decision_workflow / production control replay: no production interfaces changed; the required full suite includes the existing no-network whole-workflow and evaluation-boundary regressions. Historical semantic scores are retained rather than replaced.",
+    "Large optional performance benchmarks: no performance claim or relevant runtime change."
+  ],
+  "timing_note": "Raw pytest logs retain measured durations; no human-review time or product-benefit inference.",
+  "report_verification_authoring_failure": {
+    "command": [
+      ".venv/bin/python",
+      "docs/decision-evaluation-results/integrity-closeout-v1/verify.py"
+    ],
+    "actual_exit_code": 1,
+    "log": "validation/verify-initial.log",
+    "correction": "Read category/surface from each review record\u2019s nested cell. No software result or review disposition changed."
+  }
+}

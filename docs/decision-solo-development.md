@@ -154,8 +154,11 @@ invoked from another directory. The [PR review record](decision-evaluation-resul
 preserves the reproduced defects, corrections and full/filtered reruns.
 
 This is a **bounded engineering inventory**, not an independently approved
-exhaustive definition of every failure scenario. Scenario sufficiency and the
-N/A declarations still need review. `software_matrix_complete=true` means all
+exhaustive definition of every failure scenario. An implementing-agent review of scenario mappings and all N/A declarations is
+recorded in the [integrity engineering closeout](decision-evaluation-results/integrity-closeout-v1/README.md).
+It adds review-batch recovery and concurrent-review evidence, plus explicit
+historical-schema and incomplete-export mappings. Independent final acceptance
+is not supplied by that engineering review. `software_matrix_complete=true` means all
 declared applicable cells have executed successfully. Final integrity sign-off
 remains null because #91's independently evaluated final candidate is absent.
 Relevant later changes require revalidation on that candidate. No OS-level

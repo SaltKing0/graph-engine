@@ -1,6 +1,6 @@
 {
   "schema": "dm.integrity.matrix/1",
-  "version": "engineering-matrix-v1.0.0",
+  "version": "engineering-matrix-v1.1.0",
   "scope": "Nine concrete engineering scenarios x six public surfaces; bounded inventory, not exhaustive final contract sign-off.",
   "final_sign_off": null,
   "final_candidate": null,
@@ -9,7 +9,7 @@
     "MCP typed Decision Memory tools are read-only; generic remember/forget are different operations.",
     "Explicit forensic snapshots may retain authorized forgotten history; live/context resurrection remains forbidden.",
     "Software observations are implementing-agent evidence, not independent reviewer judgments.",
-    "Recovery includes raw proposal index/commit boundaries and browser finding index failure; no claim covers every possible OS crash instruction boundary."
+    "Recovery covers proposal and review-batch sidecar/index/commit boundaries and browser finding publication; no claim covers every possible OS crash instruction boundary."
   ],
   "cells": [
     {
@@ -201,7 +201,9 @@
       "tests": [
         "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-service]",
         "tests/test_decision_memory.py::test_claim_wording_and_context_edit_never_transfer_review",
-        "tests/test_decision_memory.py::test_source_edit_versions_exact_bytes_and_marks_basis_changed"
+        "tests/test_decision_memory.py::test_source_edit_versions_exact_bytes_and_marks_basis_changed",
+        "tests/test_decision_memory.py::test_source_write_interruption_is_stale_then_reconciled",
+        "tests/test_decision_memory.py::test_manual_source_edit_is_detected_without_read_repair"
       ],
       "not_applicable_reason": null
     },
@@ -361,7 +363,12 @@
       "scope": "Shared typed service over exact Git revisions",
       "applicable": true,
       "tests": [
-        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-service]"
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-service]",
+        "tests/test_decision_memory.py::test_historical_versions_reviews_and_old_absent_schema_are_read_only",
+        "tests/test_decision_memory.py::test_historical_revocation_and_authorized_tombstone_history",
+        "tests/test_decision_memory.py::test_future_historical_sidecar_schema_fails",
+        "tests/test_decision_memory.py::test_snapshot_sidecar_checks_legacy_historical_capture_lineage",
+        "tests/test_decision_memory.py::test_reads_never_touch_brain_or_vectors"
       ],
       "not_applicable_reason": null
     },
@@ -431,7 +438,10 @@
       "scope": "Actual bounded context JSON and rendered Markdown brief",
       "applicable": true,
       "tests": [
-        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-exports]"
+        "tests/test_decision_integrity.py::test_historical_privacy_and_read_only_adapters[source-edit-exports]",
+        "tests/test_decision_brief.py::test_budget_atomicity_and_exact_included_id_accounting",
+        "tests/test_decision_brief.py::test_long_scope_is_omitted_with_conclusion",
+        "tests/test_decision_brief.py::test_limits_warn_and_context_omits_incomplete_units"
       ],
       "not_applicable_reason": null
     },
@@ -601,15 +611,21 @@
       "scenario_id": "RECOVERY-01",
       "category": "crash_retry",
       "surface": "service",
-      "operation": "Inject failure after authoritative publication at index rebuild and commit boundaries",
-      "preconditions": "A structured proposal has a stable idempotency key; index/commit raises after local publication.",
-      "invariant": "Return an explicit published-locally receipt; identical retry returns the durable receipt without duplicate records; sync may remain required.",
+      "operation": "Inject failure after authoritative publication at index rebuild and commit boundaries; interrupt a two-event review batch before/after authoritative publication and replay its exact request",
+      "preconditions": "A structured proposal has a stable idempotency key; index/commit raises after local publication. Review requests contain two exact proposed claim refs and one captured generation/idempotency key.",
+      "invariant": "Before sidecar publication, fail without any accepted event or receipt; after publication, report a published-locally receipt. Identical replay retains exactly one receipt and both original review subject refs without duplicate records/events; sync may remain required.",
       "scope": "Actual storage publication, index and commit failure boundaries",
       "applicable": true,
       "tests": [
         "tests/test_decision_memory.py::test_interrupted_sidecar_publication_leaves_only_reusable_anchors",
         "tests/test_decision_memory.py::test_commit_failure_preserves_authoritative_receipt",
-        "tests/test_decision_service.py::test_post_publication_failure_returns_durable_retry"
+        "tests/test_decision_service.py::test_post_publication_failure_returns_durable_retry",
+        "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[sidecar-cli]",
+        "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[index-cli]",
+        "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[commit-cli]",
+        "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[sidecar-http]",
+        "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[index-http]",
+        "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[commit-http]"
       ],
       "not_applicable_reason": null
     },
@@ -617,14 +633,17 @@
       "scenario_id": "RECOVERY-01",
       "category": "crash_retry",
       "surface": "cli",
-      "operation": "Inject failure after authoritative publication at index rebuild and commit boundaries",
-      "preconditions": "A structured proposal has a stable idempotency key; index/commit raises after local publication.",
-      "invariant": "Return an explicit published-locally receipt; identical retry returns the durable receipt without duplicate records; sync may remain required.",
+      "operation": "Inject failure after authoritative publication at index rebuild and commit boundaries; interrupt a two-event review batch before/after authoritative publication and replay its exact request",
+      "preconditions": "A structured proposal has a stable idempotency key; index/commit raises after local publication. Review requests contain two exact proposed claim refs and one captured generation/idempotency key.",
+      "invariant": "Before sidecar publication, fail without any accepted event or receipt; after publication, report a published-locally receipt. Identical replay retains exactly one receipt and both original review subject refs without duplicate records/events; sync may remain required.",
       "scope": "Actual CLI parser/output with injected local index/commit failures (in process)",
       "applicable": true,
       "tests": [
         "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[index-cli]",
-        "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[commit-cli]"
+        "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[commit-cli]",
+        "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[sidecar-cli]",
+        "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[index-cli]",
+        "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[commit-cli]"
       ],
       "not_applicable_reason": null
     },
@@ -632,14 +651,17 @@
       "scenario_id": "RECOVERY-01",
       "category": "crash_retry",
       "surface": "http",
-      "operation": "Inject failure after authoritative publication at index rebuild and commit boundaries",
-      "preconditions": "A structured proposal has a stable idempotency key; index/commit raises after local publication.",
-      "invariant": "Return an explicit published-locally receipt; identical retry returns the durable receipt without duplicate records; sync may remain required.",
+      "operation": "Inject failure after authoritative publication at index rebuild and commit boundaries; interrupt a two-event review batch before/after authoritative publication and replay its exact request",
+      "preconditions": "A structured proposal has a stable idempotency key; index/commit raises after local publication. Review requests contain two exact proposed claim refs and one captured generation/idempotency key.",
+      "invariant": "Before sidecar publication, fail without any accepted event or receipt; after publication, report a published-locally receipt. Identical replay retains exactly one receipt and both original review subject refs without duplicate records/events; sync may remain required.",
       "scope": "Actual ASGI HTTP 502/receipt/retry responses at index/commit boundaries",
       "applicable": true,
       "tests": [
         "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[index-http]",
-        "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[commit-http]"
+        "tests/test_decision_integrity.py::test_post_publication_retry_through_adapters[commit-http]",
+        "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[sidecar-http]",
+        "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[index-http]",
+        "tests/test_decision_integrity.py::test_review_batch_recovery_keeps_exact_targets_and_one_receipt[commit-http]"
       ],
       "not_applicable_reason": null
     },
@@ -653,7 +675,7 @@
       "scope": "Declared operation capability boundary; not an executed pass",
       "applicable": false,
       "tests": [],
-      "not_applicable_reason": "No raw structured-version proposal operation exists on mcp. This scenario concerns that proposal publication boundary; browser finding-review failure paths require separate future scenarios."
+      "not_applicable_reason": "No raw structured-version proposal or typed review mutation exists on mcp. This cell concerns those publication boundaries; browser finding publication is tested in RECOVERY-UI-01."
     },
     {
       "scenario_id": "RECOVERY-UI-01",
@@ -679,19 +701,21 @@
       "scope": "Declared operation capability boundary; not an executed pass",
       "applicable": false,
       "tests": [],
-      "not_applicable_reason": "No raw structured-version proposal operation exists on exports. This scenario concerns that proposal publication boundary; browser finding-review failure paths require separate future scenarios."
+      "not_applicable_reason": "No raw structured-version proposal or typed review mutation exists on exports. This cell concerns those publication boundaries; browser finding publication is tested in RECOVERY-UI-01."
     },
     {
       "scenario_id": "WRITERS-01",
       "category": "two_writers",
       "surface": "service",
-      "operation": "Start concurrent same-generation structured proposals, then retry the losing request",
-      "preconditions": "Two CLI processes or HTTP workers share one brain and captured generation, using distinct idempotency keys.",
-      "invariant": "Exactly one initial transaction wins; loser gets a conflict, then a fresh-preview retry retains both records without forks or duplicates.",
-      "scope": "Two actual CLI processes from a common start barrier; inspect persisted generations, receipts and Git state",
+      "operation": "Start concurrent same-generation structured proposals, then retry the losing request; race two exact-target review requests, refresh only the losing request preconditions and retry",
+      "preconditions": "Two CLI processes or HTTP workers share one brain and captured generation, using distinct idempotency keys. Both reviews capture the same generation and distinct existing proposed claim refs.",
+      "invariant": "Exactly one initial transaction wins; loser gets a conflict, then a fresh-preview retry retains both records without forks or duplicates. Only one initial event publishes; the refreshed loser adds one event without retargeting or duplicating either review.",
+      "scope": "Actual CLI processes and ASGI HTTP workers exercise the same storage guard; inspect persisted generations, exact review targets, receipts and histories.",
       "applicable": true,
       "tests": [
-        "tests/test_decision_integrity.py::test_simultaneous_cli_proposals_have_one_winner_and_lossless_retry"
+        "tests/test_decision_integrity.py::test_simultaneous_cli_proposals_have_one_winner_and_lossless_retry",
+        "tests/test_decision_integrity.py::test_concurrent_reviews_keep_exact_targets_and_lossless_retry[cli]",
+        "tests/test_decision_integrity.py::test_concurrent_reviews_keep_exact_targets_and_lossless_retry[http]"
       ],
       "not_applicable_reason": null
     },
@@ -699,13 +723,14 @@
       "scenario_id": "WRITERS-01",
       "category": "two_writers",
       "surface": "cli",
-      "operation": "Start concurrent same-generation structured proposals, then retry the losing request",
-      "preconditions": "Two CLI processes or HTTP workers share one brain and captured generation, using distinct idempotency keys.",
-      "invariant": "Exactly one initial transaction wins; loser gets a conflict, then a fresh-preview retry retains both records without forks or duplicates.",
+      "operation": "Start concurrent same-generation structured proposals, then retry the losing request; race two exact-target review requests, refresh only the losing request preconditions and retry",
+      "preconditions": "Two CLI processes or HTTP workers share one brain and captured generation, using distinct idempotency keys. Both reviews capture the same generation and distinct existing proposed claim refs.",
+      "invariant": "Exactly one initial transaction wins; loser gets a conflict, then a fresh-preview retry retains both records without forks or duplicates. Only one initial event publishes; the refreshed loser adds one event without retargeting or duplicating either review.",
       "scope": "Two actual CLI processes from a common start barrier; inspect persisted generations, receipts and Git state",
       "applicable": true,
       "tests": [
-        "tests/test_decision_integrity.py::test_simultaneous_cli_proposals_have_one_winner_and_lossless_retry"
+        "tests/test_decision_integrity.py::test_simultaneous_cli_proposals_have_one_winner_and_lossless_retry",
+        "tests/test_decision_integrity.py::test_concurrent_reviews_keep_exact_targets_and_lossless_retry[cli]"
       ],
       "not_applicable_reason": null
     },
@@ -713,13 +738,14 @@
       "scenario_id": "WRITERS-01",
       "category": "two_writers",
       "surface": "http",
-      "operation": "Start concurrent same-generation structured proposals, then retry the losing request",
-      "preconditions": "Two CLI processes or HTTP workers share one brain and captured generation, using distinct idempotency keys.",
-      "invariant": "Exactly one initial transaction wins; loser gets a conflict, then a fresh-preview retry retains both records without forks or duplicates.",
+      "operation": "Start concurrent same-generation structured proposals, then retry the losing request; race two exact-target review requests, refresh only the losing request preconditions and retry",
+      "preconditions": "Two CLI processes or HTTP workers share one brain and captured generation, using distinct idempotency keys. Both reviews capture the same generation and distinct existing proposed claim refs.",
+      "invariant": "Exactly one initial transaction wins; loser gets a conflict, then a fresh-preview retry retains both records without forks or duplicates. Only one initial event publishes; the refreshed loser adds one event without retargeting or duplicating either review.",
       "scope": "Two synchronized actual ASGI HTTP workers, conflict and fresh-preview retry",
       "applicable": true,
       "tests": [
-        "tests/test_decision_integrity.py::test_simultaneous_http_proposals_share_generation_and_preserve_both_on_retry"
+        "tests/test_decision_integrity.py::test_simultaneous_http_proposals_share_generation_and_preserve_both_on_retry",
+        "tests/test_decision_integrity.py::test_concurrent_reviews_keep_exact_targets_and_lossless_retry[http]"
       ],
       "not_applicable_reason": null
     },

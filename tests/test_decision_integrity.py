@@ -303,3 +303,157 @@ def test_cli_cannot_merge_version_pinned_source_or_reassign_reviews(service):
     assert 'decision' in (proc.stdout + proc.stderr).lower()
     assert service.inspect(refs['support'])['record']['payload']['source'] == refs['evidence']
     assert files(service.brain) == original
+
+
+@pytest.mark.parametrize('surface', ['cli', 'http'])
+@pytest.mark.parametrize('failure_point', ['sidecar', 'index', 'commit'])
+def test_review_batch_recovery_keeps_exact_targets_and_one_receipt(service, tmp_path, monkeypatch,
+                                                                  capsys, surface, failure_point):
+    """Inject at publication boundaries; a review batch is never half accepted."""
+    import graph_engine.decision_memory as dm
+    from graph_engine.__main__ import cmd_decision
+
+    refs = [save(service, claim(f'Review target {i}'))[0] for i in range(2)]
+    request = envelope(service, events=[event(ref, axis='workflow', before='proposed', after='accepted')
+                                        for ref in refs])
+    commit(service)
+    original = read_file(service.brain)
+    original_files = files(service.brain)
+    monkeypatch.setattr(runtime, 'make_brain', lambda: service.brain)
+    path = tmp_path / 'review.json'
+    path.write_text(json.dumps(request))
+
+    def submit():
+        if surface == 'http':
+            with TestClient(app) as client:
+                response = client.post('/api/decision-memory/reviews', json=request)
+            return response.status_code, response.json()
+        code = 0
+        try:
+            cmd_decision(['review', str(path)])
+        except SystemExit as exc:
+            code = exc.code
+        output = capsys.readouterr()
+        if code and failure_point == 'sidecar':
+            return code, {'error': output.err}
+        return code, json.loads(output.err if code else output.out)
+
+    def fail(*args, **kwargs):
+        raise OSError('Scripted review publication interruption')
+
+    with monkeypatch.context() as fault:
+        if failure_point == 'sidecar':
+            fault.setattr(dm, '_atomic_write', fail)
+            if surface == 'http':
+                with pytest.raises(OSError, match='Scripted review'):
+                    submit()
+            else:
+                code, error = submit()
+                assert code == 1 and 'Scripted review publication interruption' in error['error']
+            assert read_file(service.brain) == original
+            assert files(service.brain) == original_files
+        else:
+            method = 'rebuild_index' if failure_point == 'index' else 'commit_and_push'
+            fault.setattr(service.brain, method, fail)
+            code, interrupted = submit()
+            assert code == (502 if surface == 'http' else 1)
+            assert interrupted['published_locally']
+            published = read_file(service.brain)
+            assert published['generation'] == original['generation'] + 1
+            assert len(published['events']) == len(original['events']) + 2
+            assert len(published['receipts']) == len(original['receipts']) + 1
+            code, replay = submit()
+            assert code == (200 if surface == 'http' else 0)
+            assert replay['replay'] and replay['receipt'] == interrupted['receipt']
+            assert read_file(service.brain) == published
+
+    code, result = submit()
+    assert code == (200 if surface == 'http' else 0)
+    settled = read_file(service.brain)
+    assert settled['versions'] == original['versions']
+    assert settled['generation'] == original['generation'] + 1
+    assert len(settled['events']) == len(original['events']) + 2
+    assert len(settled['receipts']) == len(original['receipts']) + 1
+    assert [e['subject'] for e in settled['events']] == refs
+    assert all(service.inspect(ref)['state']['workflow'] == 'accepted' for ref in refs)
+    # Retry via a newly constructed service/CLI, not only an in-memory instance.
+    if surface == 'cli':
+        child = subprocess.run([sys.executable, '-m', 'graph_engine', 'decision', 'review', str(path)],
+                               text=True, capture_output=True, cwd=ROOT, env=child_env(), timeout=30)
+        assert child.returncode == 0, child.stderr
+        replay = json.loads(child.stdout)
+    else:
+        _, replay = submit()
+    assert replay['replay'] and replay['receipt'] == result['receipt']
+    assert read_file(service.brain) == settled
+
+
+@pytest.mark.parametrize('surface', ['cli', 'http'])
+def test_concurrent_reviews_keep_exact_targets_and_lossless_retry(service, tmp_path, monkeypatch, surface):
+    refs = [save(service, claim(f'Concurrent review target {i}'))[0] for i in range(2)]
+    requests = [envelope(service, events=[event(ref, axis='workflow', before='proposed', after='accepted')])
+                for ref in refs]
+    commit(service)
+    original = read_file(service.brain)
+    monkeypatch.setattr(runtime, 'make_brain', lambda: service.brain)
+    if surface == 'cli':
+        paths = [tmp_path / f'review-{i}.json' for i in range(2)]
+        for path, request in zip(paths, requests):
+            path.write_text(json.dumps(request))
+        gate = tmp_path / 'start-reviews'
+        code = ('import os,sys,time; from pathlib import Path; '
+                'Path(sys.argv[1]).write_text("ready"); gate=Path(sys.argv[2]);\n'
+                'while not gate.exists(): time.sleep(0.01)\n'
+                'os.execv(sys.executable,[sys.executable,"-m","graph_engine","decision","review",sys.argv[3]])')
+        children = []
+        try:
+            for i, path in enumerate(paths):
+                children.append(subprocess.Popen([sys.executable, '-c', code,
+                    str(tmp_path / f'review-ready-{i}'), str(gate), str(path)],
+                    stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, cwd=ROOT, env=child_env()))
+            deadline = time.monotonic() + 15
+            while not all((tmp_path / f'review-ready-{i}').exists() for i in range(2)):
+                assert time.monotonic() < deadline, 'Review writers did not reach the start barrier'
+                time.sleep(0.01)
+            gate.touch()
+            outputs = [child.communicate(timeout=30) for child in children]
+            assert sorted(child.returncode for child in children) == [0, 1], outputs
+            loser = next(i for i, child in enumerate(children) if child.returncode)
+            assert 'refresh' in outputs[loser][1].lower()
+        finally:
+            for child in children:
+                if child.poll() is None:
+                    child.kill()
+                child.wait(timeout=5)
+    else:
+        barrier = Barrier(2)
+        with TestClient(app) as client, ThreadPoolExecutor(max_workers=2) as pool:
+            def post(request):
+                barrier.wait(timeout=10)
+                return client.post('/api/decision-memory/reviews', json=request)
+            responses = list(pool.map(post, requests))
+        assert sorted(response.status_code for response in responses) == [200, 409]
+        loser = next(i for i, response in enumerate(responses) if response.status_code == 409)
+    won = read_file(service.brain)
+    assert won['versions'] == original['versions']
+    assert won['generation'] == original['generation'] + 1
+    assert len(won['events']) == len(original['events']) + 1
+    assert len(won['receipts']) == len(original['receipts']) + 1
+    assert won['events'][-1]['subject'] == refs[1 - loser]
+    preview = service.preview()
+    requests[loser].update(expected_generation=preview['generation'], expected_heads=preview['heads'])
+    if surface == 'cli':
+        paths[loser].write_text(json.dumps(requests[loser]))
+        response = subprocess.run([sys.executable, '-m', 'graph_engine', 'decision', 'review', str(paths[loser])],
+            text=True, capture_output=True, cwd=ROOT, env=child_env(), timeout=30)
+        assert response.returncode == 0, response.stderr
+    else:
+        with TestClient(app) as client:
+            assert client.post('/api/decision-memory/reviews', json=requests[loser]).status_code == 200
+    settled = read_file(service.brain)
+    assert settled['versions'] == original['versions']
+    assert settled['generation'] == original['generation'] + 2
+    assert len(settled['events']) == len(original['events']) + 2
+    assert len(settled['receipts']) == len(original['receipts']) + 2
+    assert [e['subject'] for e in settled['events']] == [refs[1 - loser], refs[loser]]
+    assert all(service.inspect(ref)['state']['workflow'] == 'accepted' for ref in refs)
