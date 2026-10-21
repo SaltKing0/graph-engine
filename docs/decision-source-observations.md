@@ -2,6 +2,10 @@
 
 This is an engineering tool for [#91](https://github.com/SaltKing0/graph-engine/issues/91), not independent semantic acceptance. It captures and checks selected source-derived conditions, measurements and measurement-root identifiers from the already exposed development cases. The [saved report](decision-evaluation-results/false-alert-development-v1/structured-v1/README.md) preserves commands, raw proposals, errors and limits.
 
+The [21 October project closeout](decision-release-readiness.md#project-closeout-21-october-2026)
+concludes prototype delivery and defers independent acceptance. These development
+tools remain available; saved reports retain their original measurements and statuses.
+
 ## Run and inspect
 
 From the repository checkout with CONTRIBUTING.md dependencies, select a new output directory:
@@ -32,7 +36,7 @@ Production capture proposes source records, a typed profile and evidence records
 
 The real graph-report artifact is a pre-existing repository document about known small synthetic retrieval fixtures. Its twelve selected means and actual n=2/n=10 counts are not new measurements or independent real-world evidence. Units, environment and measurement-root gaps remain explicit; unavailable `answer_correct_exact` is not zero.
 
-The historical 5/95 false-alert result remains failed and the empty proposed dependency profile still misses 3/3 positives. Passing capture/schema tests is not passing independent semantic gates or demonstrating product benefit. Independent final coverage stays 0/0/0. #90–#93 and #73 remain open; Decision Memory stays experimental. Review source roles, complete conditions, units and root identity before developing authoritative integration, then retain independent final evaluation and user study as separate requirements.
+The historical 5/95 false-alert result remains failed and the empty proposed dependency profile still misses 3/3 positives. Passing capture/schema tests is not passing independent semantic gates or demonstrating product benefit. Independent final coverage stays 0/0/0. #90, #91 and #93 are deferred; #92 is closed for engineering delivery and #73 for the experimental prototype scope. Decision Memory stays experimental. If acceptance resumes, review source roles, complete conditions, units and root identity before developing authoritative integration, then retain independent final evaluation and user study as separate requirements.
 
 ## Explicit developer field review and source preparation
 

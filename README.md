@@ -23,6 +23,8 @@ need no migration. **v1 remains experimental:** independently reviewed held-out
 quality and controlled human review-time savings are unmeasured. See the
 [complete no-provider walkthrough](docs/decision-workflow.md) and
 [release-readiness report](docs/decision-release-readiness.md).
+The [prototype delivery is complete](docs/decision-release-readiness.md#project-closeout-21-october-2026);
+independent validation is deferred, and independent acceptance remains incomplete.
 
 ## Quickstart
 

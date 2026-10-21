@@ -5,10 +5,13 @@ Status: evaluation infrastructure and **provisional source corpus** for
 [v1 contract](decision-memory-v1.md#evaluation-gates-frozen-before-tuning).
 This adds no runtime decision types, propagation or UI. Project sources are
 real; annotations are source-only **Codex drafts**, not independent gold.
-Independent review and adequate held-out coverage remain delivery requirements.
+Independent review and adequate held-out coverage remain acceptance requirements.
 The delivered #75/#81 work packages are closed; their closure does not complete
-independent acceptance. Remaining corpus work is tracked in
-[#90](https://github.com/SaltKing0/graph-engine/issues/90), followed by #91–#93.
+independent acceptance. Under the [21 October project closeout](decision-release-readiness.md#project-closeout-21-october-2026),
+the remaining corpus work in [#90](https://github.com/SaltKing0/graph-engine/issues/90),
+semantic/final-integrity acceptance in #91 and human study in #93 are deferred.
+#92 is closed for engineering delivery; its final integrity obligations are
+retained in #91. Epic #73 is complete only for the experimental prototype scope.
 See the [successor annotation handbook](decision-annotation-handbook.md) for
 development-only tools, reviewer forms and the controlled final-data handoff.
 Do not claim release readiness from these baseline runs.
@@ -211,9 +214,9 @@ run establishes no production latency guarantee or controlled usability result.
 
 `--check` establishes successful offline execution and budget integrity only;
 it does not require the deliberately simple baseline to pass product gates.
-Release readiness remains false pending #90–#93's independent coverage, statement,
-integrity and usability evaluations. Existing engine, memory, optional model/
-MCP/PDF/browser and advisory gates remain in place.
+Release readiness remains false: independent coverage, statement, final integrity
+and usability evaluations are deferred, not passed. Existing engine, memory,
+optional model/MCP/PDF/browser and advisory gates remain in place.
 
 ## Saved runs and remaining delivery
 
@@ -228,8 +231,8 @@ The real bundle contains eight action reconstructions and sixteen events but
 dependency review and disagreements remain missing. No real positive/negative/
 inconclusive release stratum is established; extraction, answer and user-time
 outcomes are unmeasured. Synthetic controls establish harness coverage only.
-Freeze an independently reviewed successor in #90 before #91's final evaluation;
-subsequent tuning requires fresh final evidence.
+If acceptance resumes, freeze an independently reviewed successor in #90 before
+#91's final evaluation; subsequent tuning requires fresh final evidence.
 
 
 ## Production workflow audit (#81)

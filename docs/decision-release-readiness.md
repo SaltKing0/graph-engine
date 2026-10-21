@@ -17,6 +17,46 @@ synthetic controls cannot establish real decision quality or review-time savings
 The [walkthrough](decision-workflow.md) explains intended users, explicit
 activation, CLI/HTTP/MCP/UI flows, limitations and recovery.
 
+## Project closeout (21 October 2026)
+
+The project owner chose to conclude the current work as an **experimental
+prototype** and defer independent validation. This closes the implementation
+delivery scope; original overall acceptance remains incomplete.
+
+| Issue | Current disposition | Acceptance still missing |
+| --- | --- | --- |
+| [#90](https://github.com/SaltKing0/graph-engine/issues/90) | Closed as `not_planned`; successor-corpus validation deferred | Calibration, separate qualified judgments/adjudication, fresh protected final families, reviewed runtime inputs and freeze/coverage sign-off |
+| [#91](https://github.com/SaltKing0/graph-engine/issues/91) | Closed as `not_planned`; semantic and final integrity acceptance deferred | Fixed-candidate matched comparisons, independent scoring and exact-candidate integrity revalidation/sign-off |
+| [#92](https://github.com/SaltKing0/graph-engine/issues/92) | Closed as delivered engineering work | Original criteria **3, 6, 8 and 10** remain unmet/partial, retained in #91/#73 and now deferred |
+| [#93](https://github.com/SaltKing0/graph-engine/issues/93) | Closed as `not_planned`; controlled human study deferred | Actual participant sessions, independent outcome review and the frozen benefit criterion |
+| [#73](https://github.com/SaltKing0/graph-engine/issues/73) | Closed as `completed` for the revised prototype-delivery scope | Original independent overall acceptance is not achieved |
+
+PRs #94–#97 are merged. The last engineering merge, [#97](https://github.com/SaltKing0/graph-engine/pull/97),
+is `93bcbde3047bea3879cb5975d914261219842425`. Its reviewed head
+`0487660678374140c121e6f16ba09069d9911a44` passed 15/15 CI checks. The
+[saved engineering report](decision-evaluation-results/integrity-closeout-v1/README.md)
+records **73/73 matrix tests, 41/41 applicable cells, 13 technical N/A** and
+**2,194 local passes / 10 optional model skips**, with matching CI model
+coverage. These are historical engineering measurements, not new runs or
+independent final-candidate sign-off.
+
+Independent final coverage remains **0 positive pairs / 0 negative pairs /
+0 inconclusive cases**, below the unchanged **20/20/10** minimum. The historical
+synthetic source-change diagnostic retains **5/95 false alerts (5.26% >5%)**;
+its empty proposed profile misses **3/3** positives. Real semantic quality,
+final integrity acceptance and human review-time benefit remain unmeasured.
+Issue closure does not change `release_ready=false` or turn missing evidence
+into a passed gate. No Y1 activation, version bump, release or publication is
+part of this disposition.
+
+If acceptance resumes, reopen or explicitly replace the deferred work in this
+order: **#90 → #91 (semantic plus retained final integrity acceptance) → #93 →
+overall acceptance**. Preserve original thresholds, sources, labels, freezes,
+results and exposure disclosures. Use fresh independently reviewed final cases,
+a frozen candidate/protocol, actual final sign-off and real participant sessions
+before claiming validated benefit. The original requirements below remain the
+conditions for promotion; they are not scheduled work in the closed prototype scope.
+
 ## Evidence boundary and unresolved delivery
 
 The frozen `project-v1` corpus has eight reconstructed actions and sixteen local
@@ -82,15 +122,21 @@ assessment marks missing observations unmeasured and inadequate independent
 coverage failed. A partial integrity walkthrough cannot satisfy the complete
 integrity gate.
 
-The #81 implementation/diagnostic work package is closed. Remaining acceptance
-is tracked in [#90](https://github.com/SaltKing0/graph-engine/issues/90) (independent
-successor corpus), #91 (semantic/baseline assessment), #92 (integrity matrix)
-and #93 (actual controlled user exercise), under open epic #73. Keep Decision
-Memory experimental until these evidence gates pass. The
+The #81 implementation/diagnostic and #92 engineering work packages are closed.
+The unmet acceptance requirements are retained in the deferred #90, #91 and #93
+issues and the reduced-scope #73 closeout above. Final integrity acceptance,
+including original #92 criteria 3, 6, 8 and 10, belongs with #91 if work resumes.
+Keep Decision Memory experimental until these evidence gates pass. The
 [annotation handbook](decision-annotation-handbook.md) prepares source-only
 development packets and reviewer forms; no human calibration or final corpus
 is established by that preparation. Paid calls and real corpus execution remain
 opt-in. Release publishing is a separate action.
+
+The dated progress entries below retain their historical status statements and
+measurements. References there to open issues, draft PRs or a pending scope
+decision describe the state at the time; the
+[21 October closeout](#project-closeout-21-october-2026) supersedes those delivery
+statuses. Versioned result directories and frozen evaluation inputs are unchanged.
 
 ## Solo engineering follow-up (18 October 2026)
 

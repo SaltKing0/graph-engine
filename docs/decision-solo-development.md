@@ -1,7 +1,9 @@
 # Solo Decision Memory development and integrity inventory
 
-Status: **engineering development only; keep experimental**. This is the solo
-work authorized on 18 October 2026 alongside [#90](https://github.com/SaltKing0/graph-engine/issues/90),
+Status: **engineering delivery complete; independent acceptance deferred** under
+the [21 October project closeout](decision-release-readiness.md#project-closeout-21-october-2026).
+Decision Memory remains experimental. This guide records the solo work
+authorized on 18 October 2026 alongside [#90](https://github.com/SaltKing0/graph-engine/issues/90),
 [#91](https://github.com/SaltKing0/graph-engine/issues/91) and
 [#92](https://github.com/SaltKing0/graph-engine/issues/92), under epic #73.
 It does not replace the [frozen acceptance gates](decision-memory-v1.md#evaluation-gates-frozen-before-tuning).
@@ -167,8 +169,12 @@ failure at every machine instruction is claimed.
 ## Handoff and remaining acceptance
 
 See the [saved development results](decision-evaluation-results/solo-development-v1/README.md)
-for exact runs and limitations. #90 remains open: no second reviewer,
-adjudication or fresh final family is invented. #91 final matched semantic
-comparisons and #92 final-candidate sign-off remain open. #93's controlled
-human exercise and product benefit remain unmeasured. Decision Memory stays
-experimental. Merge, version/tag changes and releases remain separate actions.
+for exact runs and limitations. #90, #91 and #93 are closed as `not_planned`,
+and #73 is complete only for the experimental prototype delivery. No second
+reviewer, adjudication or fresh final family is supplied by this disposition.
+#91's matched semantic comparisons and final integrity obligations retained
+from #92 remain unmet/partial and deferred. #93's controlled human exercise and
+product benefit remain unmeasured. Engineering PRs #94–#97 are merged; releases
+remain separate actions. Decision Memory stays experimental. If acceptance resumes,
+follow the original gates and evidence requirements in the
+[readiness assessment](decision-release-readiness.md#frozen-gates-and-promotion).
