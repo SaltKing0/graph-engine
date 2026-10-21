@@ -6,6 +6,13 @@ follows [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+- Close the Decision Memory project as an experimental prototype: #90, #91
+  and #93 are deferred (`not_planned`), while #73 is complete only for the
+  reduced delivery scope. Document the retained final integrity obligations
+  from #92 and the conditions for resuming acceptance. Original thresholds,
+  failed/unmeasured gates and historical evidence remain unchanged.
+
 ### Added
 - Complete no-provider Decision Memory workflow audit, conservative production
   source-change diagnostic, saved-baseline comparisons and explicit release-gate

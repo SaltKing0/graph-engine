@@ -8,6 +8,10 @@ system outputs or successor cases are inspected. It preserves the
 [original contract and scoring gates](decision-memory-v1.md#evaluation-gates-frozen-before-tuning).
 It is not a report of completed annotation.
 
+Under the [21 October project closeout](decision-release-readiness.md#project-closeout-21-october-2026),
+#90 is closed as `not_planned`. This handbook and its forms remain available
+for future work; the original acceptance requirements below are unchanged.
+
 ## Units and labels
 
 A case is one chronological source-update event with its available source
@@ -250,6 +254,8 @@ from form fields. It is not an annotation verifier for a successor corpus.
 Required external deliverables: actual calibration/disagreement records; fresh
 licensed source packets; two separate initial human judgments per final pair;
 adjudication and reviewed proposals/conditions; access/freeze/coverage sign-off.
-Only then can #90 unblock the final semantic comparison in #91. Full integrity
-sign-off belongs to #92 and actual participant sessions to #93. No benefit or
-release claim follows from this preparation.
+If acceptance resumes, only these deliverables can unblock the final semantic
+comparison in #91. Final integrity sign-off also belongs to #91, retaining the
+original #92 criteria 3, 6, 8 and 10; #92 is closed for engineering delivery only.
+Actual participant sessions belong to deferred #93. No benefit or release claim
+follows from this preparation.
